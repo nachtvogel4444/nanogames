@@ -1,0 +1,3 @@
+﻿The authors of NanoGames, in alphabetical order:
+
+Florian Häglsperger <florian@haeglsperger.com>
