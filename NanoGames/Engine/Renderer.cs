@@ -12,7 +12,7 @@ namespace NanoGames.Engine
     /// </summary>
     internal sealed class Renderer : IRenderer, IDisposable
     {
-        private const double _lineRadius = 0.75;
+        private const double _lineRadius = 1.5;
 
         private static readonly VertexSpecification _vertexSpecification = new VertexSpecification()
         {
