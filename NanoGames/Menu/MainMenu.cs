@@ -10,6 +10,7 @@ namespace NanoGames.Menu
     /// </summary>
     internal sealed class MainMenu : IView, IDisposable
     {
+        private IView _fpsView = new FpsView();
         private IView _background = new Backgrounds.Starfield();
 
         /// <inheritdoc/>
@@ -20,6 +21,8 @@ namespace NanoGames.Menu
         /// <inheritdoc/>
         public void Refresh(Terminal terminal)
         {
+            _fpsView.Refresh(terminal);
+
             terminal.Line(new Color(0.5, 0, 0), new Vector(10, 10), new Vector(200, 10));
             terminal.Line(new Color(0.5, 0, 0.5), new Vector(10, 10), new Vector(630, 350));
 

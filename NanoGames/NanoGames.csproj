@@ -71,8 +71,11 @@
     <Compile Include="Engine\OpenGLWrappers\VertexSpecification.cs" />
     <Compile Include="Engine\Window.cs" />
     <Compile Include="Engine\Renderer.cs" />
+    <Compile Include="Font.cs" />
+    <Compile Include="Glyph.cs" />
     <Compile Include="IRenderer.cs" />
     <Compile Include="IView.cs" />
+    <Compile Include="Menu\FpsView.cs" />
     <Compile Include="Menu\MainMenu.cs" />
     <Compile Include="Startup\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

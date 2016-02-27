@@ -34,5 +34,51 @@ namespace NanoGames
         {
             _renderer?.Line(color, vectorA, vectorB);
         }
+
+        /// <summary>
+        /// Draws a glyph.
+        /// </summary>
+        /// <param name="color">The color of the glyph.</param>
+        /// <param name="glyph">The glyph to draw.</param>
+        /// <param name="lowerLeft">The lower-left corner of the glyph.</param>
+        /// <param name="x">The x vector of the glyph to draw.</param>
+        /// <param name="y">The y vector of the glyph to draw.</param>
+        public void Glyph(Color color, Glyph glyph, Vector lowerLeft, Vector x, Vector y)
+        {
+            if (glyph == null)
+            {
+                return;
+            }
+
+            foreach (var stroke in glyph)
+            {
+                Line(color, lowerLeft + stroke.A.X * x + stroke.A.Y * y, lowerLeft + stroke.B.X * x + stroke.B.Y * y);
+            }
+        }
+
+        /// <summary>
+        /// Writes text.
+        /// </summary>
+        /// <param name="color">The text color.</param>
+        /// <param name="size">The font size. Glyphs are square shaped, so this is both the width and height of each character.</param>
+        /// <param name="position">The position of the lower-left corner of the text.</param>
+        /// <param name="text">The text to write.</param>
+        public void Text(Color color, double size, Vector position, string text)
+        {
+            if (text == null)
+            {
+                return;
+            }
+
+            var x = new Vector(size, 0);
+            var y = new Vector(0, size);
+
+            foreach (var c in text)
+            {
+                var glyph = Font.GetGlyph(c);
+                Glyph(color, Font.GetGlyph(c), position, x, y);
+                position.X += size;
+            }
+        }
     }
 }
