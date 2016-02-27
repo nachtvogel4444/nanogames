@@ -15,6 +15,8 @@ namespace NanoGames.Engine
         private readonly GameWindow _gameWindow;
         private readonly IView _mainView;
 
+        private bool _closing;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Window"/> class.
         /// </summary>
@@ -46,6 +48,10 @@ namespace NanoGames.Engine
                     while (true)
                     {
                         _gameWindow.ProcessEvents();
+                        if (_closing)
+                        {
+                            break;
+                        }
 
                         var width = _gameWindow.Width;
                         var height = _gameWindow.Height;
@@ -71,14 +77,14 @@ namespace NanoGames.Engine
 
         private void OnClose(object sender, EventArgs e)
         {
-            throw new QuitException();
+            _closing = true;
         }
 
         private void OnKeyDown(object sender, KeyboardKeyEventArgs e)
         {
             if (e.Key == Key.F10)
             {
-                throw new QuitException();
+                _closing = true;
             }
         }
     }
