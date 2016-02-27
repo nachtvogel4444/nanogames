@@ -12,12 +12,14 @@ namespace NanoGames.Engine
     /// </summary>
     internal sealed class Renderer : IRenderer, IDisposable
     {
-        private const double _lineWidth = 1;
+        private const double _lineRadius = 0.75;
 
         private static readonly VertexSpecification _vertexSpecification = new VertexSpecification()
         {
-            { 0, 2, VertexAttribPointerType.Short, true },
-            { 1, 3, VertexAttribPointerType.UnsignedByte, true },
+            { 0, 2, VertexAttribPointerType.Float, false },
+            { 1, 2, VertexAttribPointerType.Float, false },
+            { 2, 1, VertexAttribPointerType.Float, false },
+            { 3, 3, VertexAttribPointerType.UnsignedByte, true },
         };
 
         private readonly Shader _shader = new Shader("NanoGames.Shaders.Line");
@@ -67,17 +69,17 @@ namespace NanoGames.Engine
 
             if (terminalAspect > screenAspect)
             {
-                _xScale = 2 * short.MaxValue / Terminal.Width;
-                _xOffset = -short.MaxValue;
-                _yScale = 2 * short.MaxValue / Terminal.Height * (screenAspect / terminalAspect);
-                _yOffset = -short.MinValue;
+                _xScale = 2.0 / Terminal.Width;
+                _xOffset = -1;
+                _yScale = 2.0 / Terminal.Height * (screenAspect / terminalAspect);
+                _yOffset = -1;
             }
             else
             {
-                _xScale = 2 * short.MaxValue / Terminal.Width * (terminalAspect / screenAspect);
-                _xOffset = -short.MaxValue;
-                _yScale = 2 * short.MaxValue / Terminal.Height;
-                _yOffset = -short.MinValue;
+                _xScale = 2.0 / Terminal.Width * (terminalAspect / screenAspect);
+                _xOffset = -1;
+                _yScale = 2.0 / Terminal.Height;
+                _yOffset = -1;
             }
         }
 
@@ -97,33 +99,40 @@ namespace NanoGames.Engine
         /// <inheritdoc/>
         public void Line(Color color, Vector vectorA, Vector vectorB)
         {
-            if (vectorA.X < _lineWidth || vectorB.X < _lineWidth || vectorA.Y < _lineWidth || vectorB.Y < _lineWidth || vectorA.X > Terminal.Width - _lineWidth || vectorB.X > Terminal.Width - _lineWidth || vectorA.Y > Terminal.Height - _lineWidth || vectorB.Y > Terminal.Height - _lineWidth)
-            {
-                return;
-            }
-
             var r = GetColorValue(color.R);
             var g = GetColorValue(color.G);
             var b = GetColorValue(color.B);
 
-            var lineOffset = (vectorB - vectorA).Normalized.RotatedLeft * (0.5 * _lineWidth);
+            var v = vectorB - vectorA;
+            var vectorLength = v.Length;
+            v *= _lineRadius / vectorLength;
+            var w = v.RotatedLeft;
+            float lineLength = (float)(vectorLength / _lineRadius);
 
             _buffer.Triangle(0, 1, 3);
             _buffer.Triangle(1, 2, 3);
 
-            WriteVector(vectorA + lineOffset);
+            WriteVector(vectorA - v + w);
+            _buffer.VertexFloat(-1, 1);
+            _buffer.VertexFloat(lineLength);
             _buffer.VertexByte(r, g, b);
             _buffer.EndVertex();
 
-            WriteVector(vectorA - lineOffset);
+            WriteVector(vectorA - v - w);
+            _buffer.VertexFloat(-1, -1);
+            _buffer.VertexFloat(lineLength);
             _buffer.VertexByte(r, g, b);
             _buffer.EndVertex();
 
-            WriteVector(vectorB - lineOffset);
+            WriteVector(vectorB + v - w);
+            _buffer.VertexFloat(lineLength + 1, -1);
+            _buffer.VertexFloat(lineLength);
             _buffer.VertexByte(r, g, b);
             _buffer.EndVertex();
 
-            WriteVector(vectorB + lineOffset);
+            WriteVector(vectorB + v + w);
+            _buffer.VertexFloat(lineLength + 1, 1);
+            _buffer.VertexFloat(lineLength);
             _buffer.VertexByte(r, g, b);
             _buffer.EndVertex();
         }
@@ -135,7 +144,7 @@ namespace NanoGames.Engine
 
         private void WriteVector(Vector v)
         {
-            _buffer.VertexInt16((short)(v.X * _xScale + _xOffset), (short)(v.Y * _yScale + _yOffset));
+            _buffer.VertexFloat((float)(v.X * _xScale + _xOffset), (float)(v.Y * _yScale + _yOffset));
         }
     }
 }

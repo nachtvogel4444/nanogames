@@ -23,7 +23,7 @@ namespace NanoGames.Menu
                 var fpsString = ((int)(fps + 0.5)).ToString("D2");
 
                 double size = 8;
-                terminal.Text(new Color(0.8, 0.8, 0), size, new Vector(640 - fpsString.Length * size, 360 - size), fpsString);
+                terminal.Text(new Color(0.8, 0.6, 0.2), size, new Vector(640 - fpsString.Length * size, 360 - size), fpsString);
             }
 
             if (_times.Count > 128)
