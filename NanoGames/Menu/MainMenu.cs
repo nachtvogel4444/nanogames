@@ -10,6 +10,8 @@ namespace NanoGames.Menu
     /// </summary>
     internal sealed class MainMenu : IView, IDisposable
     {
+        private IView _background = new Backgrounds.Starfield();
+
         /// <inheritdoc/>
         public void Dispose()
         {
@@ -20,6 +22,8 @@ namespace NanoGames.Menu
         {
             terminal.Line(new Color(0.5, 0, 0), new Vector(10, 10), new Vector(200, 10));
             terminal.Line(new Color(0.5, 0, 0.5), new Vector(10, 10), new Vector(630, 350));
+
+            _background.Refresh(terminal);
         }
     }
 }

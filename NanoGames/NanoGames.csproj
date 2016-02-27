@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Backgrounds\Starfield.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="Engine\OpenGLWrappers\ByteBuffer.cs" />
     <Compile Include="Engine\QuitException.cs" />

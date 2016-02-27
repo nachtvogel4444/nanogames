@@ -97,6 +97,11 @@ namespace NanoGames.Engine
         /// <inheritdoc/>
         public void Line(Color color, Vector vectorA, Vector vectorB)
         {
+            if (vectorA.X < _lineWidth || vectorB.X < _lineWidth || vectorA.Y < _lineWidth || vectorB.Y < _lineWidth || vectorA.X > Terminal.Width - _lineWidth || vectorB.X > Terminal.Width - _lineWidth || vectorA.Y > Terminal.Height - _lineWidth || vectorB.Y > Terminal.Height - _lineWidth)
+            {
+                return;
+            }
+
             var r = GetColorValue(color.R);
             var g = GetColorValue(color.G);
             var b = GetColorValue(color.B);
