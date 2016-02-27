@@ -26,6 +26,7 @@
     <DocumentationFile>bin\Debug\NanoGames.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>..\NanoGames.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -39,6 +40,7 @@
     <CodeAnalysisRuleSet>..\NanoGames.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Release\NanoGames.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -59,15 +61,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Color.cs" />
+    <Compile Include="Engine\OpenGLWrappers\ByteBuffer.cs" />
     <Compile Include="Engine\QuitException.cs" />
-    <Compile Include="Engine\GameLoop.cs" />
+    <Compile Include="Engine\OpenGLWrappers\Shader.cs" />
+    <Compile Include="Engine\OpenGLWrappers\TriangleBuffer.cs" />
+    <Compile Include="Engine\OpenGLWrappers\VertexArray.cs" />
+    <Compile Include="Engine\OpenGLWrappers\VertexSpecification.cs" />
+    <Compile Include="Engine\Window.cs" />
+    <Compile Include="Engine\Renderer.cs" />
+    <Compile Include="IRenderer.cs" />
+    <Compile Include="IView.cs" />
+    <Compile Include="Menu\MainMenu.cs" />
     <Compile Include="Startup\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Terminal.cs" />
+    <Compile Include="Vector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="Shaders\Line.fs.glsl" />
+    <EmbeddedResource Include="Shaders\Line.vs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
