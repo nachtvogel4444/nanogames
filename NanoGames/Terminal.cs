@@ -11,12 +11,12 @@ namespace NanoGames
         /// <summary>
         /// The virtual screen width.
         /// </summary>
-        public const double Width = 640;
+        public const double Width = 320;
 
         /// <summary>
         /// The virtual screen height.
         /// </summary>
-        public const double Height = 360;
+        public const double Height = 180;
 
         private readonly IRenderer _renderer;
 

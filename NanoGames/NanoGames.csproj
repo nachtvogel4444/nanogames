@@ -64,6 +64,7 @@
     <Compile Include="Backgrounds\Starfield.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="Engine\OpenGLWrappers\ByteBuffer.cs" />
+    <Compile Include="Engine\PostProcessor.cs" />
     <Compile Include="Engine\QuitException.cs" />
     <Compile Include="Engine\OpenGLWrappers\Shader.cs" />
     <Compile Include="Engine\OpenGLWrappers\TriangleBuffer.cs" />
@@ -88,6 +89,8 @@
     <None Include="packages.config" />
     <EmbeddedResource Include="Shaders\Line.fs.glsl" />
     <EmbeddedResource Include="Shaders\Line.vs.glsl" />
+    <EmbeddedResource Include="Shaders\Tube.vs.glsl" />
+    <EmbeddedResource Include="Shaders\Tube.fs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />

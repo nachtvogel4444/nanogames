@@ -29,7 +29,9 @@ namespace NanoGames.Engine
 
             _gameWindow.Title = "NanoGames";
             _gameWindow.VSync = VSyncMode.On;
-            _gameWindow.WindowState = WindowState.Maximized;
+            _gameWindow.WindowState = WindowState.Fullscreen;
+            _gameWindow.WindowBorder = WindowBorder.Hidden;
+            _gameWindow.CursorVisible = false;
             _gameWindow.Closed += OnClose;
             _gameWindow.KeyDown += OnKeyDown;
         }

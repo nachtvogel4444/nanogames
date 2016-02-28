@@ -12,7 +12,7 @@ namespace NanoGames.Engine
     /// </summary>
     internal sealed class Renderer : IRenderer, IDisposable
     {
-        private const double _lineRadius = 1.5;
+        private const double _lineRadius = 0.5;
 
         private static readonly VertexSpecification _vertexSpecification = new VertexSpecification()
         {
@@ -25,6 +25,11 @@ namespace NanoGames.Engine
         private readonly Shader _shader = new Shader("NanoGames.Shaders.Line");
         private readonly TriangleBuffer _buffer = new TriangleBuffer(_vertexSpecification);
         private readonly VertexArray _vertexArray = new VertexArray(_vertexSpecification);
+
+        private readonly PostProcessor _postProcessor = new PostProcessor();
+
+        private readonly int _framebufferId;
+        private readonly int _frameTextureId;
 
         private int _width;
         private int _height;
@@ -39,11 +44,27 @@ namespace NanoGames.Engine
         /// </summary>
         public Renderer()
         {
+            _framebufferId = GL.GenFramebuffer();
+            _frameTextureId = GL.GenTexture();
+
+            GL.BindTexture(TextureTarget.Texture2D, _frameTextureId);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToBorder);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToBorder);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBorderColor, new float[] { 0, 0, 0, 0 });
+
+            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, _framebufferId);
+            GL.FramebufferTexture(FramebufferTarget.DrawFramebuffer, FramebufferAttachment.ColorAttachment0, _frameTextureId, 0);
+
+            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
         }
 
         /// <inheritdoc/>
         public void Dispose()
         {
+            GL.DeleteFramebuffer(_framebufferId);
+            _postProcessor.Dispose();
             _vertexArray.Dispose();
             _buffer.Dispose();
             _shader.Dispose();
@@ -56,12 +77,25 @@ namespace NanoGames.Engine
         /// <param name="height">The height in pixels.</param>
         public void BeginFrame(int width, int height)
         {
-            GL.Viewport(0, 0, width, height);
-            GL.ClearColor(0, 0, 0, 1);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            _postProcessor.BeginFrame(width, height);
 
-            _width = width;
-            _height = height;
+            if ((double)width / (double)height > Terminal.Width / Terminal.Height)
+            {
+                width = (int)Math.Ceiling(height / Terminal.Height * Terminal.Width);
+            }
+            else
+            {
+                height = (int)Math.Ceiling(width / Terminal.Width * Terminal.Height);
+            }
+
+            if (_width != width || _height != height)
+            {
+                _width = width;
+                _height = height;
+                GL.BindTexture(TextureTarget.Texture2D, _frameTextureId);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, width, height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, IntPtr.Zero);
+            }
+
             _buffer.Clear();
 
             double screenAspect = (double)_width / (double)_height;
@@ -88,12 +122,23 @@ namespace NanoGames.Engine
         /// </summary>
         public void EndFrame()
         {
+            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, _framebufferId);
+
+            GL.Viewport(0, 0, _width, _height);
+            GL.ClearColor(0.0625f, 0.0625f, 0.0625f, 1);
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+
             _shader.Bind();
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
             _vertexArray.SetData(_buffer, BufferUsageHint.StreamDraw);
             _vertexArray.Draw();
             GL.Disable(EnableCap.Blend);
+
+            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+
+            GL.BindTexture(TextureTarget.Texture2D, _frameTextureId);
+            _postProcessor.EndFrame();
         }
 
         /// <inheritdoc/>

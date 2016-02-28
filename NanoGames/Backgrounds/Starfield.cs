@@ -78,7 +78,7 @@ namespace NanoGames.Backgrounds
 
         private Vector GetScreenVector(double x, double y, double z)
         {
-            return new Vector((x / z) * 320 + 320, (y / z) * 320 + 180);
+            return new Vector((x / z) * 0.5 * Terminal.Width + 0.5 * Terminal.Width, (y / z) * 0.5 * Terminal.Width + 0.5 * Terminal.Height);
         }
 
         private sealed class Star
