@@ -18,7 +18,7 @@ namespace NanoGames.Backgrounds
         private readonly List<int> _freeIndexes = new List<int>();
 
         /// <inheritdoc/>
-        public void Refresh(Terminal terminal)
+        public void Update(Terminal terminal)
         {
             for (int i = 0; i < _stars.Count; ++i)
             {

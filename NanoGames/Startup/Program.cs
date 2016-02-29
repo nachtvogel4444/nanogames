@@ -3,6 +3,7 @@
 
 using NanoGames.Engine;
 using NanoGames.Menu;
+using System;
 
 namespace NanoGames.Startup
 {
@@ -11,11 +12,12 @@ namespace NanoGames.Startup
     /// </summary>
     internal static class Program
     {
+        [STAThread]
         private static void Main(string[] args)
         {
-            using (var mainMenu = new MainMenu())
+            using (var mainView = new MainView())
             {
-                using (var window = new Window(mainMenu))
+                using (var window = new Window(mainView))
                 {
                     window.Run();
                 }

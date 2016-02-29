@@ -14,7 +14,7 @@ namespace NanoGames.Menu
         private readonly Queue<long> _times = new Queue<long>();
 
         /// <inheritdoc/>
-        public void Refresh(Terminal terminal)
+        public void Update(Terminal terminal)
         {
             var time = Stopwatch.GetTimestamp();
             if (_times.Count > 0)

@@ -9,9 +9,9 @@ namespace NanoGames
     internal interface IView
     {
         /// <summary>
-        /// Refreshes and renders the view.
+        /// Updates and renders the view.
         /// </summary>
         /// <param name="terminal">The terminal this view should render to.</param>
-        void Refresh(Terminal terminal);
+        void Update(Terminal terminal);
     }
 }

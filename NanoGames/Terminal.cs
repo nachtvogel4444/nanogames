@@ -29,6 +29,11 @@ namespace NanoGames
             _renderer = renderer;
         }
 
+        /// <summary>
+        /// Gets or sets the player's input.
+        /// </summary>
+        public Input Input { get; set; } = new Input();
+
         /// <inheritdoc/>
         public void Line(Color color, Vector vectorA, Vector vectorB)
         {
@@ -79,6 +84,23 @@ namespace NanoGames
                 Glyph(color, Font.GetGlyph(c), position, x, y);
                 position.X += size;
             }
+        }
+
+        /// <summary>
+        /// Writes text centered at the given position.
+        /// </summary>
+        /// <param name="color">The text color.</param>
+        /// <param name="size">The font size. Glyphs are square shaped, so this is both the width and height of each character.</param>
+        /// <param name="position">The position of the lower-left corner of the text.</param>
+        /// <param name="text">The text to write.</param>
+        public void TextCenter(Color color, double size, Vector position, string text)
+        {
+            if (text == null)
+            {
+                return;
+            }
+
+            Text(color, size, position - new Vector(text.Length * size * 0.5, 0), text);
         }
     }
 }

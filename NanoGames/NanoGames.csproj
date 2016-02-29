@@ -74,10 +74,16 @@
     <Compile Include="Engine\Renderer.cs" />
     <Compile Include="Font.cs" />
     <Compile Include="Glyph.cs" />
+    <Compile Include="Input.cs" />
     <Compile Include="IRenderer.cs" />
     <Compile Include="IView.cs" />
+    <Compile Include="Menu\Choice.cs" />
+    <Compile Include="Menu\ChoiceMenuItem.cs" />
     <Compile Include="Menu\FpsView.cs" />
-    <Compile Include="Menu\MainMenu.cs" />
+    <Compile Include="Menu\MainView.cs" />
+    <Compile Include="Menu\CommandMenuItem.cs" />
+    <Compile Include="Menu\Menu.cs" />
+    <Compile Include="Menu\MenuItem.cs" />
     <Compile Include="Startup\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Terminal.cs" />
