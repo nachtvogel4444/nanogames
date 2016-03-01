@@ -117,6 +117,22 @@ namespace NanoGames.Ui
                     _framesSinceKeyPress = 0;
                 }
             }
+            else if (input.Backspace)
+            {
+                if (_framesSinceKeyPress >= _keyRepeatFrames)
+                {
+                    Items?[SelectedIndex]?.HandleBackspace();
+                    _framesSinceKeyPress = 0;
+                }
+            }
+            else if (input.Delete)
+            {
+                if (_framesSinceKeyPress >= _keyRepeatFrames)
+                {
+                    Items?[SelectedIndex]?.HandleDelete();
+                    _framesSinceKeyPress = 0;
+                }
+            }
             else
             {
                 _framesSinceKeyPress = _keyRepeatFrames;

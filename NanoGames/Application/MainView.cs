@@ -44,6 +44,12 @@ namespace NanoGames.Application
                 SelectedIndex = 1,
                 Items =
                 {
+                    new TextMenuItem("NAME")
+                    {
+                        Text = Settings.Instance.PlayerName,
+                        MaxLength = 12,
+                        OnChange = value => Settings.Instance.PlayerName = value,
+                    },
                     new ChoiceMenuItem<bool>("FULLSCREEN")
                     {
                         Choices =

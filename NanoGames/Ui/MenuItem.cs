@@ -54,5 +54,19 @@ namespace NanoGames.Ui
         public virtual void HandleText(string text)
         {
         }
+
+        /// <summary>
+        /// Called when the user presses backspace.
+        /// </summary>
+        public virtual void HandleBackspace()
+        {
+        }
+
+        /// <summary>
+        /// Called when the user presses delete.
+        /// </summary>
+        public virtual void HandleDelete()
+        {
+        }
     }
 }

@@ -18,6 +18,7 @@ namespace NanoGames.Application
         private bool _enableSaving = false;
 
         private bool _isFullscreen = false;
+        private string _playerName = "ANON";
 
         private Settings()
         {
@@ -41,6 +42,23 @@ namespace NanoGames.Application
             set
             {
                 _isFullscreen = value;
+                Save();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the player name.
+        /// </summary>
+        public string PlayerName
+        {
+            get
+            {
+                return _playerName;
+            }
+
+            set
+            {
+                _playerName = value;
                 Save();
             }
         }

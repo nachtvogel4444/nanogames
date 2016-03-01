@@ -47,5 +47,15 @@ namespace NanoGames
         /// Gets or sets the text entered by the user since the last frame.
         /// </summary>
         public string Text { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the backspace key is pressed.
+        /// </summary>
+        public bool Backspace { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the delete key is pressed.
+        /// </summary>
+        public bool Delete { get; set; }
     }
 }

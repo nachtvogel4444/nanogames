@@ -204,13 +204,15 @@ namespace NanoGames.Engine
             _textInput = null;
 
             var keyboardState = Keyboard.GetState();
-            input.Back = keyboardState[OpenTK.Input.Key.Escape];
-            input.Up = keyboardState[OpenTK.Input.Key.Up];
-            input.Down = keyboardState[OpenTK.Input.Key.Down];
-            input.Left = keyboardState[OpenTK.Input.Key.Left];
-            input.Right = keyboardState[OpenTK.Input.Key.Right];
-            input.Fire = keyboardState[OpenTK.Input.Key.Space] || keyboardState[OpenTK.Input.Key.Enter] || keyboardState[OpenTK.Input.Key.KeypadEnter];
-            input.AltFire = keyboardState[OpenTK.Input.Key.ControlLeft] || keyboardState[OpenTK.Input.Key.ControlRight];
+            input.Back = keyboardState[Key.Escape];
+            input.Up = keyboardState[Key.Up];
+            input.Down = keyboardState[Key.Down];
+            input.Left = keyboardState[Key.Left];
+            input.Right = keyboardState[Key.Right];
+            input.Fire = keyboardState[Key.Space] || keyboardState[Key.Enter] || keyboardState[Key.KeypadEnter];
+            input.AltFire = keyboardState[Key.ControlLeft] || keyboardState[Key.ControlRight];
+            input.Backspace = keyboardState[Key.BackSpace];
+            input.Delete = keyboardState[Key.Delete];
         }
 
         private void OnClose(object sender, EventArgs e)
@@ -220,7 +222,7 @@ namespace NanoGames.Engine
 
         private void OnKeyDown(object sender, KeyboardKeyEventArgs e)
         {
-            if (e.Key == OpenTK.Input.Key.F10)
+            if (e.Key == Key.F10)
             {
                 _closing = true;
             }
