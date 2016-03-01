@@ -22,10 +22,11 @@ namespace NanoGames.Application
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainView"/> class.
-        ///
         /// </summary>
         public MainView()
         {
+            Window.Current.IsFullscreen = Settings.Instance.IsFullscreen;
+
             _mainMenu = new Menu
             {
                 OnBack = OnQuit,
@@ -48,9 +49,14 @@ namespace NanoGames.Application
                         Choices =
                         {
                             new Choice<bool>(false, "NO"),
-                            new Choice<bool>(true, "YES"),
+                            new Choice<bool>(true, DebugMode.IsEnabled ? "DEBUG" : "YES"),
                         },
-                        OnSelect = v => Window.Current.IsFullscreen = v,
+                        SelectedValue = Settings.Instance.IsFullscreen,
+                        OnSelect = v =>
+                        {
+                            Window.Current.IsFullscreen = v;
+                            Settings.Instance.IsFullscreen = v;
+                        },
                     },
                     new CommandMenuItem("BACK", () => _currentView = _mainMenu),
                 },
@@ -67,6 +73,11 @@ namespace NanoGames.Application
         /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
+            if (DebugMode.IsEnabled)
+            {
+                terminal.Text(new Color(0.5, 0.5, 0.5), 4, new Vector(0, 176), "DEBUG");
+            }
+
             _fpsView.Update(terminal);
             _currentView?.Update(terminal);
             _background.Update(terminal);

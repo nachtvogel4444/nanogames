@@ -14,12 +14,9 @@ namespace NanoGames.Application
         [STAThread]
         private static void Main(string[] args)
         {
-            using (var mainView = new MainView())
+            using (var window = new Window())
             {
-                using (var window = new Window(mainView))
-                {
-                    window.Run();
-                }
+                window.Run(() => new MainView());
             }
         }
     }

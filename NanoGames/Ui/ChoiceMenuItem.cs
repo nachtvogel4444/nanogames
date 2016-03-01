@@ -60,7 +60,7 @@ namespace NanoGames.Ui
         }
 
         /// <summary>
-        /// Gets the selected value.
+        /// Gets or sets the selected value.
         /// </summary>
         public T SelectedValue
         {
@@ -68,6 +68,24 @@ namespace NanoGames.Ui
             {
                 var choice = SelectedChoice;
                 return choice == null ? default(T) : choice.Value;
+            }
+
+            set
+            {
+                int index = 0;
+                if (Choices != null)
+                {
+                    for (int i = 0; i < Choices.Count; ++i)
+                    {
+                        if (Choices[i] != null && EqualityComparer<T>.Default.Equals(Choices[i].Value, value))
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+                }
+
+                SelectedIndex = index;
             }
         }
 

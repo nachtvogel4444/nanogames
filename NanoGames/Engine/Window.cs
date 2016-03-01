@@ -20,7 +20,6 @@ namespace NanoGames.Engine
         private static readonly long _maxOffset = _frameDuration;
 
         private readonly GameWindow _gameWindow;
-        private readonly IView _mainView;
 
         private bool _closing;
 
@@ -31,11 +30,8 @@ namespace NanoGames.Engine
         /// <summary>
         /// Initializes a new instance of the <see cref="Window"/> class.
         /// </summary>
-        /// <param name="mainView">The main view.</param>
-        public Window(IView mainView)
+        public Window()
         {
-            _mainView = mainView;
-
             _gameWindow = new GameWindow(1280, 720);
 
             _gameWindow.Title = "NanoGames";
@@ -67,6 +63,12 @@ namespace NanoGames.Engine
 
             set
             {
+                if (DebugMode.IsEnabled)
+                {
+                    /* Don't allow fullscreen in debug mode to prevent freezes. */
+                    value = false;
+                }
+
                 if (value != _isFullscreen)
                 {
                     _isFullscreen = value;
@@ -89,7 +91,10 @@ namespace NanoGames.Engine
         /// <summary>
         /// Runs the game loop until the game is quit.
         /// </summary>
-        public void Run()
+        /// <typeparam name="TView">The main view type.</typeparam>
+        /// <param name="createMainView">The main view factory.</param>
+        public void Run<TView>(Func<TView> createMainView)
+            where TView : IView, IDisposable
         {
             var previousWindow = _currentWindow.Value;
             _currentWindow.Value = this;
@@ -102,71 +107,74 @@ namespace NanoGames.Engine
                     var terminal = new Terminal(renderer);
                     var nullTerminal = new Terminal(null);
 
-                    /* Render an empty frame to synchronize the timer. */
-                    var width = _gameWindow.Width;
-                    var height = _gameWindow.Height;
-                    renderer.BeginFrame(width, height);
-                    renderer.EndFrame();
-                    _gameWindow.SwapBuffers();
-
-                    long frameZeroTime = Stopwatch.GetTimestamp();
-                    long frameIndex = 0;
-
-                    while (true)
+                    using (var mainView = createMainView())
                     {
-                        _gameWindow.ProcessEvents();
+                        /* Render an empty frame to synchronize the timer. */
+                        var width = _gameWindow.Width;
+                        var height = _gameWindow.Height;
+                        renderer.BeginFrame(width, height);
+                        renderer.EndFrame();
+                        _gameWindow.SwapBuffers();
 
-                        if (_closing)
-                        {
-                            return;
-                        }
+                        long frameZeroTime = Stopwatch.GetTimestamp();
+                        long frameIndex = 0;
 
                         while (true)
                         {
-                            long frameOffset = GetFrameOffset(frameZeroTime, frameIndex);
+                            _gameWindow.ProcessEvents();
 
-                            if (frameOffset > _maxOffset)
+                            if (_closing)
                             {
-                                /* We are behind, skip rendering frames. */
-                                do
-                                {
-                                    ++frameIndex;
-                                    UpdateInput(input);
-                                    nullTerminal.Input = input;
-
-                                    _mainView.Update(nullTerminal);
-                                }
-                                while (GetFrameOffset(frameZeroTime, frameIndex) > 0);
-
-                                continue;
-                            }
-                            else if (frameOffset < -_maxOffset)
-                            {
-                                /* We are ahead, pause until we no longer are. */
-                                do
-                                {
-                                    Thread.Sleep(1);
-                                }
-                                while (GetFrameOffset(frameZeroTime, frameIndex) < 0);
-
-                                continue;
+                                return;
                             }
 
-                            /* We are at the correct time, render the frame normally. */
-                            break;
+                            while (true)
+                            {
+                                long frameOffset = GetFrameOffset(frameZeroTime, frameIndex);
+
+                                if (frameOffset > _maxOffset)
+                                {
+                                    /* We are behind, skip rendering frames. */
+                                    do
+                                    {
+                                        ++frameIndex;
+                                        UpdateInput(input);
+                                        nullTerminal.Input = input;
+
+                                        mainView.Update(nullTerminal);
+                                    }
+                                    while (GetFrameOffset(frameZeroTime, frameIndex) > 0);
+
+                                    continue;
+                                }
+                                else if (frameOffset < -_maxOffset)
+                                {
+                                    /* We are ahead, pause until we no longer are. */
+                                    do
+                                    {
+                                        Thread.Sleep(1);
+                                    }
+                                    while (GetFrameOffset(frameZeroTime, frameIndex) < 0);
+
+                                    continue;
+                                }
+
+                                /* We are at the correct time, render the frame normally. */
+                                break;
+                            }
+
+                            ++frameIndex;
+                            UpdateInput(input);
+                            terminal.Input = input;
+
+                            width = _gameWindow.Width;
+                            height = _gameWindow.Height;
+                            renderer.BeginFrame(width, height);
+                            mainView.Update(terminal);
+                            renderer.EndFrame();
+
+                            _gameWindow.SwapBuffers();
                         }
-
-                        ++frameIndex;
-                        UpdateInput(input);
-                        terminal.Input = input;
-
-                        width = _gameWindow.Width;
-                        height = _gameWindow.Height;
-                        renderer.BeginFrame(width, height);
-                        _mainView.Update(terminal);
-                        renderer.EndFrame();
-
-                        _gameWindow.SwapBuffers();
                     }
                 }
             }
