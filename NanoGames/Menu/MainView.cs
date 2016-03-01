@@ -14,7 +14,7 @@ namespace NanoGames.Menu
         private IView _fpsView = new FpsView();
         private IView _background = new Backgrounds.Starfield();
 
-        private Menu _menu;
+        private IView _currentView;
 
         private Menu _mainMenu;
         private Menu _settingsMenu;
@@ -30,14 +30,15 @@ namespace NanoGames.Menu
                 OnBack = OnQuit,
                 Items =
                 {
-                    new CommandMenuItem("SETTINGS", () => _menu = _settingsMenu),
+                    new CommandMenuItem("PRACTICE", () => _currentView = new PracticeView(() => _currentView = _mainMenu)),
+                    new CommandMenuItem("SETTINGS", () => _currentView = _settingsMenu),
                     new CommandMenuItem("QUIT", OnQuit),
                 },
             };
 
             _settingsMenu = new Menu
             {
-                OnBack = () => _menu = _mainMenu,
+                OnBack = () => _currentView = _mainMenu,
                 SelectedIndex = 1,
                 Items =
                 {
@@ -50,11 +51,11 @@ namespace NanoGames.Menu
                         },
                         OnSelect = v => Window.Current.IsFullscreen = v,
                     },
-                    new CommandMenuItem("BACK", () => _menu = _mainMenu),
+                    new CommandMenuItem("BACK", () => _currentView = _mainMenu),
                 },
             };
 
-            _menu = _mainMenu;
+            _currentView = _mainMenu;
         }
 
         /// <inheritdoc/>
@@ -66,7 +67,7 @@ namespace NanoGames.Menu
         public void Update(Terminal terminal)
         {
             _fpsView.Update(terminal);
-            _menu?.Update(terminal);
+            _currentView?.Update(terminal);
             _background.Update(terminal);
         }
 
