@@ -2,9 +2,10 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using NanoGames.Engine;
+using NanoGames.Ui;
 using System;
 
-namespace NanoGames.Menu
+namespace NanoGames.Application
 {
     /// <summary>
     /// The game's main menu.

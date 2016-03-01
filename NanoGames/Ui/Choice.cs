@@ -1,7 +1,7 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
-namespace NanoGames.Menu
+namespace NanoGames.Ui
 {
     /// <summary>
     /// A choice in a <see cref="ChoiceMenuItem{T}"/>.

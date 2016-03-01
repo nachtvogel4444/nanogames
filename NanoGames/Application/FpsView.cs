@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace NanoGames.Menu
+namespace NanoGames.Application
 {
     /// <summary>
     /// A view that measures and draws the current frames per second.

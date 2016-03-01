@@ -2,10 +2,11 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using NanoGames.Games;
+using NanoGames.Ui;
 using System;
 using System.Linq;
 
-namespace NanoGames.Menu
+namespace NanoGames.Application
 {
     /// <summary>
     /// A view that allows players to play singleplayer practice games.
