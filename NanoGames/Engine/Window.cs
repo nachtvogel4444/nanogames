@@ -4,6 +4,7 @@
 using OpenTK;
 using OpenTK.Input;
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace NanoGames.Engine
@@ -13,7 +14,10 @@ namespace NanoGames.Engine
     /// </summary>
     internal sealed class Window : IDisposable
     {
+        private const int _frameRate = 60;
         private static readonly ThreadLocal<Window> _currentWindow = new ThreadLocal<Window>();
+        private static readonly long _frameDuration = Stopwatch.Frequency / _frameRate;
+        private static readonly long _maxOffset = _frameDuration;
 
         private readonly GameWindow _gameWindow;
         private readonly IView _mainView;
@@ -96,6 +100,17 @@ namespace NanoGames.Engine
                 {
                     var input = new Input();
                     var terminal = new Terminal(renderer);
+                    var nullTerminal = new Terminal(null);
+
+                    /* Render an empty frame to synchronize the timer. */
+                    var width = _gameWindow.Width;
+                    var height = _gameWindow.Height;
+                    renderer.BeginFrame(width, height);
+                    renderer.EndFrame();
+                    _gameWindow.SwapBuffers();
+
+                    long frameZeroTime = Stopwatch.GetTimestamp();
+                    long frameIndex = 0;
 
                     while (true)
                     {
@@ -103,15 +118,50 @@ namespace NanoGames.Engine
 
                         if (_closing)
                         {
+                            return;
+                        }
+
+                        while (true)
+                        {
+                            long frameOffset = GetFrameOffset(frameZeroTime, frameIndex);
+
+                            if (frameOffset > _maxOffset)
+                            {
+                                /* We are behind, skip rendering frames. */
+                                do
+                                {
+                                    ++frameIndex;
+                                    UpdateInput(input);
+                                    nullTerminal.Input = input;
+
+                                    _mainView.Update(nullTerminal);
+                                }
+                                while (GetFrameOffset(frameZeroTime, frameIndex) > 0);
+
+                                continue;
+                            }
+                            else if (frameOffset < -_maxOffset)
+                            {
+                                /* We are ahead, pause until we no longer are. */
+                                do
+                                {
+                                    Thread.Sleep(1);
+                                }
+                                while (GetFrameOffset(frameZeroTime, frameIndex) < 0);
+
+                                continue;
+                            }
+
+                            /* We are at the correct time, render the frame normally. */
                             break;
                         }
 
+                        ++frameIndex;
                         UpdateInput(input);
                         terminal.Input = input;
 
-                        var width = _gameWindow.Width;
-                        var height = _gameWindow.Height;
-
+                        width = _gameWindow.Width;
+                        height = _gameWindow.Height;
                         renderer.BeginFrame(width, height);
                         _mainView.Update(terminal);
                         renderer.EndFrame();
@@ -133,6 +183,11 @@ namespace NanoGames.Engine
         public void Dispose()
         {
             _gameWindow.Dispose();
+        }
+
+        private static long GetFrameOffset(long frameZeroTime, long frameIndex)
+        {
+            return (Stopwatch.GetTimestamp() - frameZeroTime) - (frameIndex * _frameDuration);
         }
 
         private void UpdateInput(Input input)
