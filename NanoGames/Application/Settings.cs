@@ -17,6 +17,7 @@ namespace NanoGames.Application
 
         private bool _enableSaving = false;
 
+        private bool _showFps = false;
         private bool _isFullscreen = false;
         private string _playerName = "ANON";
 
@@ -28,6 +29,23 @@ namespace NanoGames.Application
         /// Gets the current settings.
         /// </summary>
         public static Settings Instance { get; } = Load();
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to show the FPS.
+        /// </summary>
+        public bool ShowFps
+        {
+            get
+            {
+                return _showFps;
+            }
+
+            set
+            {
+                _showFps = value;
+                Save();
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the window should be fullscreen.

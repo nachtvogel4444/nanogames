@@ -89,6 +89,11 @@ namespace NanoGames.Engine
         }
 
         /// <summary>
+        /// Gets a value indicating whether the currently rendered frame is a skipped frame.
+        /// </summary>
+        public bool IsSkippedFrame { get; private set; }
+
+        /// <summary>
         /// Runs the game loop until the game is quit.
         /// </summary>
         /// <typeparam name="TView">The main view type.</typeparam>
@@ -141,7 +146,9 @@ namespace NanoGames.Engine
                                         UpdateInput(input);
                                         nullTerminal.Input = input;
 
+                                        IsSkippedFrame = true;
                                         mainView.Update(nullTerminal);
+                                        IsSkippedFrame = false;
                                     }
                                     while (GetFrameOffset(frameZeroTime, frameIndex) > 0);
 

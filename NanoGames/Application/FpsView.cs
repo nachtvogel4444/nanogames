@@ -1,6 +1,7 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using NanoGames.Engine;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -16,14 +17,28 @@ namespace NanoGames.Application
         /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
+            if (Window.Current.IsSkippedFrame)
+            {
+                /* Skipped frames don't count for the FPS measurement, otherwise calculating the FPS would be pointless as we always update 60 times per second. */
+                return;
+            }
+
+            var fontSize = 6;
+            var color = new Color(0.8, 0.6, 0.2);
+
+            if (DebugMode.IsEnabled)
+            {
+                terminal.Text(color, fontSize, new Vector(0, Terminal.Height - fontSize), "DEBUG");
+            }
+
             var time = Stopwatch.GetTimestamp();
-            if (_times.Count > 0)
+
+            if (Settings.Instance.ShowFps && _times.Count > 0)
             {
                 var fps = (double)Stopwatch.Frequency * _times.Count / (time - _times.Peek());
                 var fpsString = ((int)(fps + 0.5)).ToString("D2");
 
-                double size = 8;
-                terminal.Text(new Color(0.8, 0.6, 0.2), size, new Vector(Terminal.Width - fpsString.Length * size, Terminal.Height - size), fpsString);
+                terminal.Text(color, fontSize, new Vector(Terminal.Width - fpsString.Length * fontSize, Terminal.Height - fontSize), fpsString);
             }
 
             if (_times.Count > 128)

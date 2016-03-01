@@ -64,6 +64,16 @@ namespace NanoGames.Application
                             Settings.Instance.IsFullscreen = v;
                         },
                     },
+                    new ChoiceMenuItem<bool>("SHOW FPS")
+                    {
+                        Choices =
+                        {
+                            new Choice<bool>(false, "NO"),
+                            new Choice<bool>(true, "YES"),
+                        },
+                        SelectedValue = Settings.Instance.ShowFps,
+                        OnSelect = value => Settings.Instance.ShowFps = value,
+                    },
                     new CommandMenuItem("BACK", () => _currentView = _mainMenu),
                 },
             };
@@ -79,11 +89,6 @@ namespace NanoGames.Application
         /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
-            if (DebugMode.IsEnabled)
-            {
-                terminal.Text(new Color(0.5, 0.5, 0.5), 4, new Vector(0, 176), "DEBUG");
-            }
-
             _fpsView.Update(terminal);
             _currentView?.Update(terminal);
             _background.Update(terminal);
