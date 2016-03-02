@@ -85,5 +85,33 @@ namespace NanoGames
         {
             return (1 / f) * v;
         }
+
+        public static bool operator ==(Vector a, Vector b)
+        {
+            return a.X == b.X && a.Y == b.Y;
+        }
+
+        public static bool operator !=(Vector a, Vector b)
+        {
+            return !(a == b);
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            return obj is Vector && this == (Vector)obj;
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() * unchecked((int)0xf8f5a063) + Y.GetHashCode();
+        }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return FormattableString.Invariant($"({X}, {Y})");
+        }
     }
 }
