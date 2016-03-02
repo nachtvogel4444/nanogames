@@ -78,6 +78,13 @@ namespace NanoGames
                 }
             },
             {
+                ':', new Glyph(6, 6)
+                {
+                    { 3, 1 },
+                    { 3, 4 },
+                }
+            },
+            {
                 '<', new Glyph(6, 6)
                 {
                     { 5, 5, 1, 3, 5, 1 },

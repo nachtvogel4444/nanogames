@@ -40,6 +40,12 @@ namespace NanoGames
             _renderer?.Line(color, vectorA, vectorB);
         }
 
+        /// <inheritdoc/>
+        public void Point(Color color, Vector vector)
+        {
+            _renderer?.Point(color, vector);
+        }
+
         /// <summary>
         /// Draws a glyph.
         /// </summary>
@@ -55,9 +61,14 @@ namespace NanoGames
                 return;
             }
 
-            foreach (var stroke in glyph)
+            foreach (var stroke in glyph.Strokes)
             {
                 Line(color, lowerLeft + stroke.A.X * x + stroke.A.Y * y, lowerLeft + stroke.B.X * x + stroke.B.Y * y);
+            }
+
+            foreach (var point in glyph.Points)
+            {
+                Point(color, lowerLeft + point.X * x + point.Y * y);
             }
         }
 

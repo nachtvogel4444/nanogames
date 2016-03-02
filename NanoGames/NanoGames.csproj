@@ -115,6 +115,8 @@
     <EmbeddedResource Include="Shaders\Line.vs.glsl" />
     <EmbeddedResource Include="Shaders\Tube.vs.glsl" />
     <EmbeddedResource Include="Shaders\Tube.fs.glsl" />
+    <EmbeddedResource Include="Shaders\Point.vs.glsl" />
+    <EmbeddedResource Include="Shaders\Point.fs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />

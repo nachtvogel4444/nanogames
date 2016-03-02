@@ -1,6 +1,7 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,12 +10,10 @@ namespace NanoGames
     /// <summary>
     /// Represents a reusable single-colored shape.
     /// </summary>
-    internal sealed class Glyph : IEnumerable<Glyph.Stroke>
+    internal sealed class Glyph : IEnumerable
     {
         private readonly double _width;
         private readonly double _height;
-
-        private readonly List<Stroke> _strokes = new List<Stroke>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Glyph"/> class.
@@ -28,27 +27,38 @@ namespace NanoGames
         }
 
         /// <summary>
+        /// Gets the list of points in this glyph.
+        /// </summary>
+        public List<Vector> Points { get; } = new List<Vector>();
+
+        /// <summary>
+        /// Gets the list of strokes in this glyph.
+        /// </summary>
+        public List<Stroke> Strokes { get; } = new List<Stroke>();
+
+        /// <summary>
         /// Adds a new stroke to the glyph.
         /// </summary>
         /// <param name="points">The points to draw.</param>
         public void Add(params double[] points)
         {
-            for (int i = 0; i + 3 < points.Length; i += 2)
+            if (points.Length == 2)
             {
-                _strokes.Add(new Stroke(new Vector(points[i] / _width, points[i + 1] / _height), new Vector(points[i + 2] / _width, points[i + 3] / _height)));
+                Points.Add(new Vector(points[0] / _width, points[1] / _width));
             }
-        }
-
-        /// <inheritdoc/>
-        public IEnumerator<Stroke> GetEnumerator()
-        {
-            return _strokes.GetEnumerator();
+            else
+            {
+                for (int i = 0; i + 3 < points.Length; i += 2)
+                {
+                    Strokes.Add(new Stroke(new Vector(points[i] / _width, points[i + 1] / _height), new Vector(points[i + 2] / _width, points[i + 3] / _height)));
+                }
+            }
         }
 
         /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _strokes.GetEnumerator();
+            throw new NotImplementedException();
         }
 
         /// <summary>

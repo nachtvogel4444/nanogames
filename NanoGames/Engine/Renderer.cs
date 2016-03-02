@@ -14,7 +14,7 @@ namespace NanoGames.Engine
     {
         private const double _lineRadius = 0.5;
 
-        private static readonly VertexSpecification _vertexSpecification = new VertexSpecification()
+        private static readonly VertexSpecification _lineVertexSpecification = new VertexSpecification()
         {
             { 0, 2, VertexAttribPointerType.Float, false },
             { 1, 2, VertexAttribPointerType.Float, false },
@@ -22,9 +22,20 @@ namespace NanoGames.Engine
             { 3, 3, VertexAttribPointerType.UnsignedByte, true },
         };
 
-        private readonly Shader _shader = new Shader("NanoGames.Shaders.Line");
-        private readonly TriangleBuffer _buffer = new TriangleBuffer(_vertexSpecification);
-        private readonly VertexArray _vertexArray = new VertexArray(_vertexSpecification);
+        private static readonly VertexSpecification _pointVertexSpecification = new VertexSpecification()
+        {
+            { 0, 2, VertexAttribPointerType.Float, false },
+            { 1, 2, VertexAttribPointerType.Float, false },
+            { 2, 3, VertexAttribPointerType.UnsignedByte, true },
+        };
+
+        private readonly Shader _lineShader = new Shader("NanoGames.Shaders.Line");
+        private readonly TriangleBuffer _lineBuffer = new TriangleBuffer(_lineVertexSpecification);
+        private readonly VertexArray _lineVertexArray = new VertexArray(_lineVertexSpecification);
+
+        private readonly Shader _pointShader = new Shader("NanoGames.Shaders.Point");
+        private readonly TriangleBuffer _pointBuffer = new TriangleBuffer(_pointVertexSpecification);
+        private readonly VertexArray _pointVertexArray = new VertexArray(_pointVertexSpecification);
 
         private readonly PostProcessor _postProcessor = new PostProcessor();
 
@@ -65,9 +76,12 @@ namespace NanoGames.Engine
         {
             GL.DeleteFramebuffer(_framebufferId);
             _postProcessor.Dispose();
-            _vertexArray.Dispose();
-            _buffer.Dispose();
-            _shader.Dispose();
+            _pointVertexArray.Dispose();
+            _pointBuffer.Dispose();
+            _pointShader.Dispose();
+            _lineVertexArray.Dispose();
+            _lineBuffer.Dispose();
+            _lineShader.Dispose();
         }
 
         /// <summary>
@@ -96,7 +110,8 @@ namespace NanoGames.Engine
                 GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, width, height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, IntPtr.Zero);
             }
 
-            _buffer.Clear();
+            _lineBuffer.Clear();
+            _pointBuffer.Clear();
 
             double screenAspect = (double)_width / (double)_height;
             double terminalAspect = (double)Terminal.Width / (double)Terminal.Height;
@@ -128,11 +143,19 @@ namespace NanoGames.Engine
             GL.ClearColor(0.0625f, 0.0625f, 0.0625f, 1);
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            _shader.Bind();
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
-            _vertexArray.SetData(_buffer, BufferUsageHint.StreamDraw);
-            _vertexArray.Draw();
+
+            _lineShader.Bind();
+            _lineVertexArray.SetData(_lineBuffer, BufferUsageHint.StreamDraw);
+            _lineVertexArray.Draw();
+            _lineVertexArray.Dispose();
+
+            _pointShader.Bind();
+            _pointVertexArray.SetData(_pointBuffer, BufferUsageHint.StreamDraw);
+            _pointVertexArray.Draw();
+            _pointVertexArray.Dispose();
+
             GL.Disable(EnableCap.Blend);
 
             GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
@@ -154,32 +177,70 @@ namespace NanoGames.Engine
             var w = v.RotatedLeft;
             float lineLength = (float)(vectorLength / _lineRadius);
 
-            _buffer.Triangle(0, 1, 3);
-            _buffer.Triangle(1, 2, 3);
+            _lineBuffer.Triangle(0, 1, 3);
+            _lineBuffer.Triangle(1, 2, 3);
 
-            WriteVector(vectorA - v + w);
-            _buffer.VertexFloat(-1, 1);
-            _buffer.VertexFloat(lineLength);
-            _buffer.VertexByte(r, g, b);
-            _buffer.EndVertex();
+            WriteVector(_lineBuffer, vectorA - v + w);
+            _lineBuffer.VertexFloat(-1, 1);
+            _lineBuffer.VertexFloat(lineLength);
+            _lineBuffer.VertexByte(r, g, b);
+            _lineBuffer.EndVertex();
 
-            WriteVector(vectorA - v - w);
-            _buffer.VertexFloat(-1, -1);
-            _buffer.VertexFloat(lineLength);
-            _buffer.VertexByte(r, g, b);
-            _buffer.EndVertex();
+            WriteVector(_lineBuffer, vectorA - v - w);
+            _lineBuffer.VertexFloat(-1, -1);
+            _lineBuffer.VertexFloat(lineLength);
+            _lineBuffer.VertexByte(r, g, b);
+            _lineBuffer.EndVertex();
 
-            WriteVector(vectorB + v - w);
-            _buffer.VertexFloat(lineLength + 1, -1);
-            _buffer.VertexFloat(lineLength);
-            _buffer.VertexByte(r, g, b);
-            _buffer.EndVertex();
+            WriteVector(_lineBuffer, vectorB + v - w);
+            _lineBuffer.VertexFloat(lineLength + 1, -1);
+            _lineBuffer.VertexFloat(lineLength);
+            _lineBuffer.VertexByte(r, g, b);
+            _lineBuffer.EndVertex();
 
-            WriteVector(vectorB + v + w);
-            _buffer.VertexFloat(lineLength + 1, 1);
-            _buffer.VertexFloat(lineLength);
-            _buffer.VertexByte(r, g, b);
-            _buffer.EndVertex();
+            WriteVector(_lineBuffer, vectorB + v + w);
+            _lineBuffer.VertexFloat(lineLength + 1, 1);
+            _lineBuffer.VertexFloat(lineLength);
+            _lineBuffer.VertexByte(r, g, b);
+            _lineBuffer.EndVertex();
+        }
+
+        /// <inheritdoc/>
+        public void Point(Color color, Vector vector)
+        {
+            ////double fo = 1;
+            ////Line(color, vector + new Vector(-fo, -fo), vector + new Vector(fo, -fo));
+            ////Line(color, vector + new Vector(fo, -fo), vector + new Vector(fo, fo));
+            ////Line(color, vector + new Vector(fo, fo), vector + new Vector(-fo, fo));
+            ////Line(color, vector + new Vector(-fo, fo), vector + new Vector(-fo, -fo));
+            ////return;
+
+            var r = GetColorValue(color.R);
+            var g = GetColorValue(color.G);
+            var b = GetColorValue(color.B);
+
+            _pointBuffer.Triangle(0, 1, 2);
+            _pointBuffer.Triangle(0, 2, 3);
+
+            WriteVector(_pointBuffer, vector - new Vector(-_lineRadius, -_lineRadius));
+            _pointBuffer.VertexFloat(-1, -1);
+            _pointBuffer.VertexByte(r, g, b);
+            _pointBuffer.EndVertex();
+
+            WriteVector(_pointBuffer, vector - new Vector(_lineRadius, -_lineRadius));
+            _pointBuffer.VertexFloat(1, -1);
+            _pointBuffer.VertexByte(r, g, b);
+            _pointBuffer.EndVertex();
+
+            WriteVector(_pointBuffer, vector - new Vector(_lineRadius, _lineRadius));
+            _pointBuffer.VertexFloat(1, 1);
+            _pointBuffer.VertexByte(r, g, b);
+            _pointBuffer.EndVertex();
+
+            WriteVector(_pointBuffer, vector - new Vector(-_lineRadius, _lineRadius));
+            _pointBuffer.VertexFloat(-1, 1);
+            _pointBuffer.VertexByte(r, g, b);
+            _pointBuffer.EndVertex();
         }
 
         private static byte GetColorValue(double value)
@@ -187,9 +248,9 @@ namespace NanoGames.Engine
             return (byte)Math.Max(0, Math.Min(255, value * 255));
         }
 
-        private void WriteVector(Vector v)
+        private void WriteVector(TriangleBuffer buffer, Vector v)
         {
-            _buffer.VertexFloat((float)(v.X * _xScale + _xOffset), (float)(v.Y * _yScale + _yOffset));
+            buffer.VertexFloat((float)(v.X * _xScale + _xOffset), (float)(v.Y * _yScale + _yOffset));
         }
     }
 }
