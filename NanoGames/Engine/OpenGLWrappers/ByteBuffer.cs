@@ -101,6 +101,17 @@ namespace NanoGames.Engine.OpenGLWrappers
             return data;
         }
 
+        /// <summary>
+        /// Enlarges this byte buffer until it is aligned to the specified value.
+        /// </summary>
+        /// <param name="alignment">The alignment.</param>
+        public void Align(int alignment)
+        {
+            var alignedByteCount = ((_byteCount + (alignment - 1)) / alignment) * alignment;
+            EnsureCapacity(alignedByteCount);
+            _byteCount = alignedByteCount;
+        }
+
         private void EnsureCapacity(int requiredCapacity)
         {
             if (_capacity >= requiredCapacity)

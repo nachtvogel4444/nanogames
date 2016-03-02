@@ -69,6 +69,8 @@ namespace NanoGames.Engine.OpenGLWrappers
         /// <param name="usageHint">A hint how OpenGL should use the data.</param>
         public void UploadData(BufferUsageHint usageHint)
         {
+            _vertices.Align(Specification[0].Alignment);
+
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)_indices.ByteCount, _indices.Ptr, usageHint);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)_vertices.ByteCount, _vertices.Ptr, usageHint);
         }

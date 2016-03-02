@@ -61,6 +61,7 @@ namespace NanoGames.Engine.OpenGLWrappers
             }
             else
             {
+                GL.BindVertexArray(_vertexArray);
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementArrayBuffer);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _arrayBuffer);
             }
