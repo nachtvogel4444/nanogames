@@ -37,11 +37,11 @@ namespace NanoGames.Games
             {
                 var player = new TPlayer();
                 player.Match = match;
-                player.CopyFrom(playerDescription);
+                CopyPlayerValues(playerDescription, player);
                 players.Add(player);
             }
 
-            match.Players = players;
+            match.SetPlayers(description.LocalPlayerIndex, players);
 
             match.Initialize();
             foreach (var player in players)
@@ -50,6 +50,12 @@ namespace NanoGames.Games
             }
 
             return match;
+        }
+
+        private void CopyPlayerValues(Player from, Player to)
+        {
+            to.Index = from.Index;
+            to.Color = from.Color;
         }
     }
 }

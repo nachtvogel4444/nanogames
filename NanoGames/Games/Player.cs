@@ -23,7 +23,7 @@ namespace NanoGames.Games
         /// <summary>
         /// Gets or sets the player's terminal.
         /// </summary>
-        public Terminal Terminal { get; set; }
+        public Terminal Terminal { get; set; } = Terminal.Null;
 
         /// <summary>
         /// Gets a random number generator.
@@ -31,18 +31,7 @@ namespace NanoGames.Games
         public Random Random { get; } = new Random();
 
         /// <summary>
-        /// Copies all values from another player object.
-        /// </summary>
-        /// <param name="player">The player object to copy.</param>
-        public virtual void CopyFrom(Player player)
-        {
-            Index = player.Index;
-            Color = player.Color;
-            Terminal = player.Terminal;
-        }
-
-        /// <summary>
-        /// Updates and optionally renders the player's state. This is runs after calling <see cref="Match{TPlayer}.UpdateMatch"/>.
+        /// Updates and optionally renders the player's state. This is runs after calling <see cref="Match{TPlayer}.Update()"/>.
         /// </summary>
         public virtual void Update()
         {

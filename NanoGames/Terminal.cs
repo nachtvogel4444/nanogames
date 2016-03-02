@@ -18,6 +18,11 @@ namespace NanoGames
         /// </summary>
         public const double Height = 180;
 
+        /// <summary>
+        /// A terminal with a null renderer.
+        /// </summary>
+        public static readonly Terminal Null = new Terminal(null);
+
         private readonly IRenderer _renderer;
 
         /// <summary>

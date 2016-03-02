@@ -49,7 +49,7 @@ namespace NanoGames.Application
                 }
                 else
                 {
-                    _match.Update();
+                    _match.Update(terminal);
                 }
             }
 
@@ -69,13 +69,13 @@ namespace NanoGames.Application
         {
             var description = new MatchDescription
             {
+                LocalPlayerIndex = 0,
                 Players =
                 {
                     new Player
                     {
                         Index = 0,
                         Color = _playerColor,
-                        Terminal = _currentTerminal,
                     },
                 },
             };

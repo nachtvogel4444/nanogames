@@ -14,7 +14,7 @@ namespace NanoGames.Games.FallingBlocks
         }
 
         /// <inheritdoc/>
-        protected override void UpdateMatch()
+        protected override void Update()
         {
         }
     }
