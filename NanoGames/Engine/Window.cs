@@ -210,16 +210,18 @@ namespace NanoGames.Engine
             input.Text = _textInput;
             _textInput = null;
 
+            var hasFocus = _gameWindow.Focused;
+
             var keyboardState = Keyboard.GetState();
-            input.Back = keyboardState[Key.Escape];
-            input.Up = keyboardState[Key.Up];
-            input.Down = keyboardState[Key.Down];
-            input.Left = keyboardState[Key.Left];
-            input.Right = keyboardState[Key.Right];
-            input.Fire = keyboardState[Key.Space] || keyboardState[Key.Enter] || keyboardState[Key.KeypadEnter];
-            input.AltFire = keyboardState[Key.ControlLeft] || keyboardState[Key.ControlRight];
-            input.Backspace = keyboardState[Key.BackSpace];
-            input.Delete = keyboardState[Key.Delete];
+            input.Back = hasFocus && keyboardState[Key.Escape];
+            input.Up = hasFocus && keyboardState[Key.Up];
+            input.Down = hasFocus && keyboardState[Key.Down];
+            input.Left = hasFocus && keyboardState[Key.Left];
+            input.Right = hasFocus && keyboardState[Key.Right];
+            input.Fire = hasFocus && (keyboardState[Key.Space] || keyboardState[Key.Enter] || keyboardState[Key.KeypadEnter]);
+            input.AltFire = hasFocus && (keyboardState[Key.ControlLeft] || keyboardState[Key.ControlRight]);
+            input.Backspace = hasFocus && keyboardState[Key.BackSpace];
+            input.Delete = hasFocus && keyboardState[Key.Delete];
         }
 
         private void OnClose(object sender, EventArgs e)
