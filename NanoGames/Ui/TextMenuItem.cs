@@ -8,7 +8,7 @@ namespace NanoGames.Ui
     /// <summary>
     /// A menu item that allows entering text.
     /// </summary>
-    internal class TextMenuItem : MenuItem
+    internal sealed class TextMenuItem : MenuItem
     {
         private const double _cursorBlinkFrames = 60;
         private int _cursorBlinkFrame = 0;
@@ -56,6 +56,17 @@ namespace NanoGames.Ui
         /// Gets or sets the action invoked when the text changes.
         /// </summary>
         public Action<string> OnChange { get; set; }
+
+        /// <summary>
+        /// Gets or sets the action invoked when the menu item is activated.
+        /// </summary>
+        public Action OnActivate { get; set; }
+
+        /// <inheritdoc/>
+        public override void HandleActivate()
+        {
+            OnActivate?.Invoke();
+        }
 
         /// <inheritdoc/>
         public override void Update(Terminal terminal, Vector position, bool isSelected)

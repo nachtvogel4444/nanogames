@@ -13,6 +13,19 @@ namespace NanoGames
         private static readonly Dictionary<int, Glyph> _glyphs = new Dictionary<int, Glyph>()
         {
             {
+                '!', new Glyph(6, 6)
+                {
+                    { 3, 5, 3, 2 },
+                    { 3, 1 },
+                }
+            },
+            {
+                '.', new Glyph(6, 6)
+                {
+                    { 3, 1 },
+                }
+            },
+            {
                 '0', new Glyph(6, 6)
                 {
                     { 1, 1, 5, 1, 5, 5, 1, 5, 1, 1 },

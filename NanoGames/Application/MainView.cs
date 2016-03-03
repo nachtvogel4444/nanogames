@@ -2,8 +2,10 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using NanoGames.Engine;
+using NanoGames.Network;
 using NanoGames.Ui;
 using System;
+using System.Threading.Tasks;
 
 namespace NanoGames.Application
 {
@@ -18,7 +20,10 @@ namespace NanoGames.Application
         private IView _currentView;
 
         private Menu _mainMenu;
+        private Menu _multiplayerMenu;
         private Menu _settingsMenu;
+
+        private string _server;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainView"/> class.
@@ -32,9 +37,40 @@ namespace NanoGames.Application
                 OnBack = OnQuit,
                 Items =
                 {
+                    new CommandMenuItem("MULTIPLAYER", () => _currentView = _multiplayerMenu),
                     new CommandMenuItem("PRACTICE", () => _currentView = new PracticeView(() => _currentView = _mainMenu)),
                     new CommandMenuItem("SETTINGS", () => _currentView = _settingsMenu),
                     new CommandMenuItem("QUIT", OnQuit),
+                },
+            };
+
+            _server = Settings.Instance.LastServer;
+            _multiplayerMenu = new Menu()
+            {
+                OnBack = () => _currentView = _mainMenu,
+                Items =
+                {
+                    new CommandMenuItem(
+                        "HOST GAME",
+                        () =>
+                        {
+                            _currentView = new Lobby(
+                                () => _currentView = _multiplayerMenu,
+                                Task.Run(() => new Server().GetLocalEndpoint<Packet>()));
+                        }),
+                    new TextMenuItem("CONNECT TO")
+                    {
+                        Text = _server,
+                        OnChange = v => _server = v,
+                        OnActivate = () =>
+                        {
+                            Settings.Instance.LastServer = _server;
+                            _currentView = new Lobby(
+                                () => _currentView = _multiplayerMenu,
+                                Client<Packet>.ConnectAsync(_server));
+                        },
+                    },
+                    new CommandMenuItem("BACK", () => _currentView = _mainMenu),
                 },
             };
 

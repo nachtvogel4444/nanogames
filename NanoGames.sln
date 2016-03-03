@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoGames", "NanoGames\Nano
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoGames.Tests", "NanoGames.Tests\NanoGames.Tests.csproj", "{AE52D852-A1E1-48B3-B4E0-4BB64B0AD657}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NanoGames.Network", "NanoGames.Network\NanoGames.Network.csproj", "{858C767F-35F8-434C-AE91-D1C453820D23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{AE52D852-A1E1-48B3-B4E0-4BB64B0AD657}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE52D852-A1E1-48B3-B4E0-4BB64B0AD657}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE52D852-A1E1-48B3-B4E0-4BB64B0AD657}.Release|Any CPU.Build.0 = Release|Any CPU
+		{858C767F-35F8-434C-AE91-D1C453820D23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{858C767F-35F8-434C-AE91-D1C453820D23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{858C767F-35F8-434C-AE91-D1C453820D23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{858C767F-35F8-434C-AE91-D1C453820D23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

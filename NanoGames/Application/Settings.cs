@@ -20,6 +20,7 @@ namespace NanoGames.Application
         private bool _showFps = false;
         private bool _isFullscreen = false;
         private string _playerName = "ANON";
+        private string _lastServer = string.Empty;
 
         private Settings()
         {
@@ -77,6 +78,23 @@ namespace NanoGames.Application
             set
             {
                 _playerName = value;
+                Save();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the last server.
+        /// </summary>
+        public string LastServer
+        {
+            get
+            {
+                return _lastServer;
+            }
+
+            set
+            {
+                _lastServer = value;
                 Save();
             }
         }

@@ -128,7 +128,7 @@ namespace NanoGames.Engine.OpenGLWrappers
         /// <summary>
         /// Represents a single entry of the vertex.
         /// </summary>
-        public class Entry
+        public sealed class Entry
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="Entry"/> class.
