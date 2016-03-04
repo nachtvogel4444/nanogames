@@ -83,7 +83,7 @@ namespace NanoGames.Application
                     new TextMenuItem("NAME")
                     {
                         Text = Settings.Instance.PlayerName,
-                        MaxLength = 12,
+                        MaxLength = Settings.MaxPlayerNameLength,
                         OnChange = value => Settings.Instance.PlayerName = value,
                     },
                     new ChoiceMenuItem<bool>("FULLSCREEN")

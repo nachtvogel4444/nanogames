@@ -13,6 +13,11 @@ namespace NanoGames.Application
     /// </summary>
     internal sealed class Settings
     {
+        /// <summary>
+        /// The maximum length of a player name.
+        /// </summary>
+        public const int MaxPlayerNameLength = 12;
+
         private static readonly string _settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NanoGames", "Settings.json");
 
         private bool _enableSaving = false;

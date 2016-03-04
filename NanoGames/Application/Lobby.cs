@@ -4,6 +4,8 @@
 using NanoGames.Network;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace NanoGames.Application
@@ -26,6 +28,8 @@ namespace NanoGames.Application
 
         private PlayerInfo _myPlayerInfo;
         private Dictionary<PlayerId, PlayerInfo> _players = new Dictionary<PlayerId, PlayerInfo>();
+
+        private bool _fireWasPressed = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Lobby"/> class.
@@ -102,6 +106,19 @@ namespace NanoGames.Application
                 HandlePacket(packet);
             }
 
+            if (terminal.Input.Fire)
+            {
+                if (!_fireWasPressed)
+                {
+                    _fireWasPressed = true;
+                    _myPlayerInfo.IsReady = !_myPlayerInfo.IsReady;
+                }
+            }
+            else
+            {
+                _fireWasPressed = false;
+            }
+
             UpdateLobby(terminal);
         }
 
@@ -122,12 +139,33 @@ namespace NanoGames.Application
         private void UpdateLobby(Terminal terminal)
         {
             double fontSize = 8;
-            double x = 320 - 12 * fontSize;
-            double y = 160;
-            foreach (var playerInfo in _players.Values)
+            double x = 160 - 0.5 * ((Settings.MaxPlayerNameLength + 6) * fontSize);
+            double y = 90 + 0.5 * _players.Count * fontSize - fontSize;
+
+            foreach (var playerInfo in _players.Values.OrderBy(p => p.Score).ThenBy(p => p.Name, StringComparer.InvariantCultureIgnoreCase))
             {
-                terminal.Text(_AnnouncementColor, fontSize, new Vector(x, y), playerInfo.Name);
+                terminal.Text(Colors.Control, fontSize, new Vector(x + fontSize, y), playerInfo.Name);
+                terminal.Text(
+                    new Color(0.7, 0.7, 0.7),
+                    fontSize,
+                    new Vector(x + (Settings.MaxPlayerNameLength + 2) * fontSize, y),
+                    playerInfo.Score.ToString("0000", CultureInfo.InvariantCulture));
+
+                if (playerInfo.IsReady)
+                {
+                    terminal.Text(Colors.Title, fontSize, new Vector(x, y), "✓");
+                }
+
                 y -= fontSize;
+            }
+
+            if (_myPlayerInfo.IsReady)
+            {
+                terminal.TextCenter(Colors.Title, 8, new Vector(160, 150), "WAITING");
+            }
+            else
+            {
+                terminal.TextCenter(Colors.Error, 8, new Vector(160, 150), "SPACE TO START");
             }
         }
 
@@ -136,6 +174,10 @@ namespace NanoGames.Application
             public PlayerId Id;
 
             public string Name;
+
+            public bool IsReady;
+
+            public int Score = 0;
         }
     }
 }
