@@ -23,15 +23,6 @@ namespace NanoGames.Network
             _tcpClient = new TcpClient();
         }
 
-        /// <inheritdoc/>
-        public override bool IsConnected
-        {
-            get
-            {
-                return _tcpClient.Connected;
-            }
-        }
-
         /// <summary>
         /// Connects to a server.
         /// </summary>
@@ -42,6 +33,12 @@ namespace NanoGames.Network
             var client = await Task.Run(() => new Client<TPacket>());
             await client.ConnectInternalAsync(server);
             return client;
+        }
+
+        /// <inheritdoc/>
+        protected override bool GetIsConnected()
+        {
+            return _tcpClient.Connected;
         }
 
         /// <inheritdoc/>
@@ -68,13 +65,18 @@ namespace NanoGames.Network
         {
             await _tcpClient.ConnectAsync(server, Server.Port);
             _stream = _tcpClient.GetStream();
-            _reader = new StreamReader(_stream, OnPacket, null);
+            _reader = new StreamReader(_stream, OnPacket, OnDisconnect);
             _writer = new StreamWriter(_stream);
         }
 
         private void OnPacket(byte[] packet)
         {
             ReceiveBytes(packet);
+        }
+
+        private void OnDisconnect()
+        {
+            Dispose();
         }
     }
 }

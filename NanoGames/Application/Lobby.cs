@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using NanoGames.Network;
+using NanoGames.Ui;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,8 +23,11 @@ namespace NanoGames.Application
         private static readonly Vector _Center = new Vector(160, 86);
 
         private readonly Action _goBack;
+        private readonly Menu _menu;
+
         private readonly Task<Endpoint<Packet>> _endpointTask;
 
+        private IView _currentView;
         private Endpoint<Packet> _endpoint;
 
         private PlayerInfo _myPlayerInfo;
@@ -58,12 +62,36 @@ namespace NanoGames.Application
                 goBack();
             };
 
+            _menu = new Menu("NANOGAMES")
+            {
+                OnBack = () => _currentView = null,
+                Items =
+                {
+                    new CommandMenuItem("BACK", () => _currentView = null),
+                    new CommandMenuItem("SETTINGS", () => _currentView = new SettingsView(() => _currentView = _menu)),
+                    new CommandMenuItem("DISCONNECT", _goBack),
+                },
+            };
+
             _endpointTask = endpointTask;
         }
 
         /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
+            if (_currentView == null && terminal.Input.Back)
+            {
+                _currentView = _menu;
+            }
+
+            if (_currentView != null)
+            {
+                _currentView.Update(terminal);
+
+                /* Run the rest of the update method, but hide the output. */
+                terminal = Terminal.Null;
+            }
+
             if (!_endpointTask.IsCompleted)
             {
                 if (terminal.Input.Back || terminal.Input.AltFire)

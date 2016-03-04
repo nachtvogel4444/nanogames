@@ -21,7 +21,6 @@ namespace NanoGames.Application
 
         private Menu _mainMenu;
         private Menu _multiplayerMenu;
-        private Menu _settingsMenu;
 
         private string _server;
 
@@ -39,7 +38,7 @@ namespace NanoGames.Application
                 {
                     new CommandMenuItem("MULTIPLAYER", () => _currentView = _multiplayerMenu),
                     new CommandMenuItem("PRACTICE", () => _currentView = new PracticeView(() => _currentView = _mainMenu)),
-                    new CommandMenuItem("SETTINGS", () => _currentView = _settingsMenu),
+                    new CommandMenuItem("SETTINGS", () => _currentView = new SettingsView(() => _currentView = _mainMenu)),
                     new CommandMenuItem("QUIT", OnQuit),
                 },
             };
@@ -69,46 +68,6 @@ namespace NanoGames.Application
                                 () => _currentView = _multiplayerMenu,
                                 Client<Packet>.ConnectAsync(_server));
                         },
-                    },
-                    new CommandMenuItem("BACK", () => _currentView = _mainMenu),
-                },
-            };
-
-            _settingsMenu = new Menu("SETTINGS")
-            {
-                OnBack = () => _currentView = _mainMenu,
-                SelectedIndex = 1,
-                Items =
-                {
-                    new TextMenuItem("NAME")
-                    {
-                        Text = Settings.Instance.PlayerName,
-                        MaxLength = Settings.MaxPlayerNameLength,
-                        OnChange = value => Settings.Instance.PlayerName = value,
-                    },
-                    new ChoiceMenuItem<bool>("FULLSCREEN")
-                    {
-                        Choices =
-                        {
-                            new Choice<bool>(false, "NO"),
-                            new Choice<bool>(true, DebugMode.IsEnabled ? "DEBUG" : "YES"),
-                        },
-                        SelectedValue = Settings.Instance.IsFullscreen,
-                        OnSelect = v =>
-                        {
-                            Window.Current.IsFullscreen = v;
-                            Settings.Instance.IsFullscreen = v;
-                        },
-                    },
-                    new ChoiceMenuItem<bool>("SHOW FPS")
-                    {
-                        Choices =
-                        {
-                            new Choice<bool>(false, "NO"),
-                            new Choice<bool>(true, "YES"),
-                        },
-                        SelectedValue = Settings.Instance.ShowFps,
-                        OnSelect = value => Settings.Instance.ShowFps = value,
                     },
                     new CommandMenuItem("BACK", () => _currentView = _mainMenu),
                 },

@@ -24,6 +24,8 @@ namespace NanoGames.Network
         private readonly WorkerThread _listenerThread;
         private readonly HashSet<IConnection> _connections = new HashSet<IConnection>();
 
+        private bool _isDisposed = false;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Server"/> class.
         /// The server is running until disposed.
@@ -50,16 +52,29 @@ namespace NanoGames.Network
         /// <inheritdoc/>
         public void Dispose()
         {
-            try
-            {
-                _listener.Stop();
-            }
-            catch
-            {
-            }
-
             lock (_mutex)
             {
+                if (_isDisposed)
+                {
+                    return;
+                }
+
+                _isDisposed = true;
+
+                try
+                {
+                    _listener.Stop();
+                }
+                catch
+                {
+                }
+
+                foreach (var connection in _connections)
+                {
+                    connection.Dispose();
+                }
+
+                _connections.Clear();
             }
 
             _listenerThread.Dispose();
@@ -124,12 +139,12 @@ namespace NanoGames.Network
                 _server = server;
             }
 
-            public override bool IsConnected => true;
-
             public void Receive(byte[] packet)
             {
                 ReceiveBytes(packet);
             }
+
+            protected override bool GetIsConnected() => true;
 
             protected override void Dispose(bool isDisposing)
             {

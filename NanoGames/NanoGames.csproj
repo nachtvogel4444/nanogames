@@ -73,6 +73,7 @@
     <Compile Include="Application\Packet.cs" />
     <Compile Include="Application\PlayerId.cs" />
     <Compile Include="Application\Settings.cs" />
+    <Compile Include="Application\SettingsView.cs" />
     <Compile Include="Backgrounds\Starfield.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="Colors.cs" />

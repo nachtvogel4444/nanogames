@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace NanoGames.Network
 {
@@ -14,6 +15,8 @@ namespace NanoGames.Network
     {
         private readonly BlockingCollection<byte[]> _inbox = new BlockingCollection<byte[]>();
 
+        private int _isDisposed = 0;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Endpoint{TPacket}"/> class.
         /// </summary>
@@ -24,7 +27,7 @@ namespace NanoGames.Network
         /// <summary>
         /// Gets a value indicating whether the endpoint is still connected.
         /// </summary>
-        public abstract bool IsConnected { get; }
+        public bool IsConnected => Volatile.Read(ref _isDisposed) == 0 && GetIsConnected();
 
         /// <inheritdoc/>
         public void Dispose()
@@ -39,6 +42,11 @@ namespace NanoGames.Network
         /// <param name="packet">The packet to send.</param>
         public void Send(TPacket packet)
         {
+            if (Volatile.Read(ref _isDisposed) != 0)
+            {
+                return;
+            }
+
             SendBytes(SerializationHelper.Serialize(packet));
         }
 
@@ -49,6 +57,12 @@ namespace NanoGames.Network
         /// <returns>A value indicating whether we successfully received a packet.</returns>
         public bool TryReceive(out TPacket packet)
         {
+            if (Volatile.Read(ref _isDisposed) != 0)
+            {
+                packet = default(TPacket);
+                return false;
+            }
+
             byte[] bytes;
             if (_inbox.TryTake(out bytes))
             {
@@ -68,8 +82,19 @@ namespace NanoGames.Network
         /// <param name="bytes">The bytes to queue.</param>
         internal void ReceiveBytes(byte[] bytes)
         {
+            if (Volatile.Read(ref _isDisposed) != 0)
+            {
+                return;
+            }
+
             _inbox.Add(bytes);
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the endpoint is still connected.
+        /// </summary>
+        /// <returns>True if the endpoint is connected, false otherwise.</returns>
+        protected abstract bool GetIsConnected();
 
         /// <summary>
         /// Disposes this object.
@@ -77,6 +102,11 @@ namespace NanoGames.Network
         /// <param name="isDisposing">True if this is a dispose call, false if this is a finalizer call.</param>
         protected virtual void Dispose(bool isDisposing)
         {
+            if (Interlocked.Exchange(ref _isDisposed, 1) != 0)
+            {
+                return;
+            }
+
             if (isDisposing)
             {
                 _inbox.Dispose();
