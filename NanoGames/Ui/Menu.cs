@@ -64,9 +64,9 @@ namespace NanoGames.Ui
 
             double stride = FontSize + 8;
 
-            double top = 90 + 0.5 * (stride * (items - 1) - 4 * FontSize);
+            double top = 90 + 0.5 * (stride * (items - 1) + FontSize) - FontSize;
 
-            terminal.TextCenter(Colors.Title, FontSize, new Vector(160, top + 3 * FontSize), Title);
+            terminal.TextCenter(Colors.Title, FontSize, new Vector(160, 150), Title);
 
             for (int i = 0; i < items; ++i)
             {

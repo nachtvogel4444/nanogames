@@ -72,8 +72,8 @@ namespace NanoGames.Application
                     return;
                 }
 
-                terminal.TextCenter(Colors.Title, 8, _Center + new Vector(0, 8), "CONNECTING");
-                terminal.TextCenter(Colors.FocusedControl, 8, _Center - new Vector(0, 16), "CANCEL");
+                terminal.TextCenter(Colors.Title, 8, new Vector(160, 150), "CONNECTING");
+                terminal.TextCenter(Colors.FocusedControl, 8, new Vector(160, 86), "CANCEL");
                 return;
             }
 
@@ -85,8 +85,8 @@ namespace NanoGames.Application
                     return;
                 }
 
-                terminal.TextCenter(Colors.Error, 8, _Center + new Vector(0, 8), _endpoint == null ? "CONNECTION FAILED" : "CONNECTION LOST");
-                terminal.TextCenter(Colors.FocusedControl, 8, _Center - new Vector(0, 16), "BACK");
+                terminal.TextCenter(Colors.Error, 8, new Vector(160, 150), _endpoint == null ? "CONNECTION FAILED" : "CONNECTION LOST");
+                terminal.TextCenter(Colors.FocusedControl, 8, new Vector(160, 86), "BACK");
                 return;
             }
 
