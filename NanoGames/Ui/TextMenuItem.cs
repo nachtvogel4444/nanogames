@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using System;
+using System.Diagnostics;
 
 namespace NanoGames.Ui
 {
@@ -10,8 +11,7 @@ namespace NanoGames.Ui
     /// </summary>
     internal sealed class TextMenuItem : MenuItem
     {
-        private const double _cursorBlinkFrames = 60;
-        private int _cursorBlinkFrame = 0;
+        private double _cursorBlinkTime = 0;
         private int _cursorPosition = 0;
 
         private string _text = string.Empty;
@@ -77,8 +77,7 @@ namespace NanoGames.Ui
             {
                 terminal.TextCenter(Colors.FocusedControl, Menu.FontSize, position, text);
 
-                ++_cursorBlinkFrame;
-                var cursorBrightness = 0.5 + 0.5 * Math.Cos(_cursorBlinkFrame / _cursorBlinkFrames * 2 * Math.PI);
+                var cursorBrightness = 0.5 + 0.5 * Math.Cos((Stopwatch.GetTimestamp() - _cursorBlinkTime) / (double)Stopwatch.Frequency * 2 * Math.PI);
                 var cursorColor = new Color(cursorBrightness, cursorBrightness, cursorBrightness);
 
                 var x = position.X + text.Length * Menu.FontSize * 0.5 - Menu.FontSize * (_text.Length - _cursorPosition);
@@ -89,7 +88,7 @@ namespace NanoGames.Ui
             {
                 terminal.TextCenter(Colors.Control, Menu.FontSize, position, text);
                 _cursorPosition = _text.Length;
-                _cursorBlinkFrame = 0;
+                ResetCursorBlink();
             }
         }
 
@@ -101,7 +100,7 @@ namespace NanoGames.Ui
                 return;
             }
 
-            _cursorBlinkFrame = 0;
+            ResetCursorBlink();
 
             bool wasModified = false;
             foreach (var c in text.ToUpperInvariant())
@@ -128,7 +127,7 @@ namespace NanoGames.Ui
         /// <inheritdoc/>
         public override void HandleLeft()
         {
-            _cursorBlinkFrame = 0;
+            ResetCursorBlink();
             if (_cursorPosition > 0)
             {
                 --_cursorPosition;
@@ -138,7 +137,7 @@ namespace NanoGames.Ui
         /// <inheritdoc/>
         public override void HandleRight()
         {
-            _cursorBlinkFrame = 0;
+            ResetCursorBlink();
             if (_cursorPosition < _text.Length)
             {
                 ++_cursorPosition;
@@ -148,7 +147,7 @@ namespace NanoGames.Ui
         /// <inheritdoc/>
         public override void HandleBackspace()
         {
-            _cursorBlinkFrame = 0;
+            ResetCursorBlink();
             if (_text.Length > 0 && _cursorPosition > 0)
             {
                 _text = _text.Substring(0, _cursorPosition - 1) + _text.Substring(_cursorPosition, _text.Length - _cursorPosition);
@@ -160,12 +159,17 @@ namespace NanoGames.Ui
         /// <inheritdoc/>
         public override void HandleDelete()
         {
-            _cursorBlinkFrame = 0;
+            ResetCursorBlink();
             if (_text.Length > 0 && _cursorPosition < _text.Length)
             {
                 _text = _text.Substring(0, _cursorPosition) + _text.Substring(_cursorPosition + 1, _text.Length - _cursorPosition - 1);
                 OnChange?.Invoke(_text);
             }
+        }
+
+        private void ResetCursorBlink()
+        {
+            _cursorBlinkTime = Stopwatch.GetTimestamp();
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
-using NanoGames.Engine;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -17,12 +16,6 @@ namespace NanoGames.Application
         /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
-            if (Window.Current.IsSkippedFrame)
-            {
-                /* Skipped frames don't count for the FPS measurement, otherwise calculating the FPS would be pointless as we always update 60 times per second. */
-                return;
-            }
-
             var fontSize = 6;
             var color = new Color(0.8, 0.6, 0.2);
 

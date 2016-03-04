@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace NanoGames.Backgrounds
 {
@@ -11,15 +12,27 @@ namespace NanoGames.Backgrounds
     /// </summary>
     internal sealed class Starfield : IView
     {
-        private const double _velocity = 0.00375;
+        private const double _velocity = 0.225;
 
         private readonly Random _random = new Random();
         private readonly List<Star> _stars = new List<Star>();
         private readonly List<int> _freeIndexes = new List<int>();
 
+        private long _lastTimestamp = 0;
+
         /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
+            var currentTimestamp = Stopwatch.GetTimestamp();
+            var deltaTimestamp = currentTimestamp - _lastTimestamp;
+            _lastTimestamp = currentTimestamp;
+            if (currentTimestamp == deltaTimestamp)
+            {
+                return;
+            }
+
+            var deltaTime = deltaTimestamp / (double)Stopwatch.Frequency;
+
             for (int i = 0; i < _stars.Count; ++i)
             {
                 var star = _stars[i];
@@ -30,7 +43,7 @@ namespace NanoGames.Backgrounds
                 }
 
                 var oldZ = star.Z;
-                var z = oldZ - _velocity;
+                var z = oldZ - _velocity * deltaTime;
 
                 if (z < 0)
                 {
@@ -47,7 +60,7 @@ namespace NanoGames.Backgrounds
 
                 terminal.Line(
                     new Color(c, c, c),
-                    GetScreenVector(x, y, oldZ + _velocity),
+                    GetScreenVector(x, y, oldZ + _velocity / 60),
                     GetScreenVector(x, y, z));
             }
 
