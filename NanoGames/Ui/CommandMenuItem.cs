@@ -31,7 +31,7 @@ namespace NanoGames.Ui
         /// <inheritdoc/>
         public override void Update(Terminal terminal, Vector position, bool isSelected)
         {
-            var color = isSelected ? SelectedItemColor : ItemColor;
+            var color = isSelected ? Colors.FocusedControl : Colors.Control;
             terminal.TextCenter(color, Menu.FontSize, position, Text);
         }
 

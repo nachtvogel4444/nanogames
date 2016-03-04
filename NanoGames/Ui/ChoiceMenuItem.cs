@@ -122,11 +122,11 @@ namespace NanoGames.Ui
 
             if (isSelected)
             {
-                terminal.TextCenter(SelectedItemColor, Menu.FontSize, position, "< " + text + " >");
+                terminal.TextCenter(Colors.FocusedControl, Menu.FontSize, position, "< " + text + " >");
             }
             else
             {
-                terminal.TextCenter(ItemColor, Menu.FontSize, position, text);
+                terminal.TextCenter(Colors.Control, Menu.FontSize, position, text);
             }
         }
 

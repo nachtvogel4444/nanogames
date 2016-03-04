@@ -29,7 +29,7 @@ namespace NanoGames.Application
         {
             _goBack = goBack;
 
-            _selectDisciplineMenu = new Menu
+            _selectDisciplineMenu = new Menu("SELECT GAME")
             {
                 OnBack = GoBack,
                 Items = DisciplineDirectory.Disciplines.Select(d => new CommandMenuItem(d.Name, () => StartMatch(d))).ToList<MenuItem>(),

@@ -9,16 +9,6 @@ namespace NanoGames.Ui
     internal abstract class MenuItem
     {
         /// <summary>
-        /// The default color of menu items.
-        /// </summary>
-        public static readonly Color ItemColor = new Color(0.1, 0.4, 0.8);
-
-        /// <summary>
-        /// The default color of selected items.
-        /// </summary>
-        public static readonly Color SelectedItemColor = new Color(0.8, 0.8, 0.8);
-
-        /// <summary>
         /// Updates and renders the current menu item.
         /// </summary>
         /// <param name="terminal">The terminal to render to.</param>

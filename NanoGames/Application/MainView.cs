@@ -32,7 +32,7 @@ namespace NanoGames.Application
         {
             Window.Current.IsFullscreen = Settings.Instance.IsFullscreen;
 
-            _mainMenu = new Menu
+            _mainMenu = new Menu("NANOGAMES")
             {
                 OnBack = OnQuit,
                 Items =
@@ -45,7 +45,7 @@ namespace NanoGames.Application
             };
 
             _server = Settings.Instance.LastServer;
-            _multiplayerMenu = new Menu()
+            _multiplayerMenu = new Menu("MULTIPLAYER")
             {
                 OnBack = () => _currentView = _mainMenu,
                 Items =
@@ -74,7 +74,7 @@ namespace NanoGames.Application
                 },
             };
 
-            _settingsMenu = new Menu
+            _settingsMenu = new Menu("SETTINGS")
             {
                 OnBack = () => _currentView = _mainMenu,
                 SelectedIndex = 1,

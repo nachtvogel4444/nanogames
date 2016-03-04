@@ -21,6 +21,20 @@ namespace NanoGames.Ui
         private int _framesSinceKeyPress;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Menu"/> class.
+        /// </summary>
+        /// <param name="title">The menu title.</param>
+        public Menu(string title)
+        {
+            Title = title;
+        }
+
+        /// <summary>
+        /// Gets or sets the menu title.
+        /// </summary>
+        public string Title { get; set; }
+
+        /// <summary>
         /// Gets or sets the action invoked when the user navigates back.
         /// </summary>
         public Action OnBack { get; set; }
@@ -50,7 +64,10 @@ namespace NanoGames.Ui
 
             double stride = FontSize + 8;
 
-            double top = 90 + 0.5 * (stride * (items - 1) - FontSize);
+            double top = 90 + 0.5 * (stride * (items - 1) - 4 * FontSize);
+
+            terminal.TextCenter(Colors.Title, FontSize, new Vector(160, top + 3 * FontSize), Title);
+
             for (int i = 0; i < items; ++i)
             {
                 Items[i]?.Update(terminal, new Vector(160, top - i * stride), SelectedIndex == i);

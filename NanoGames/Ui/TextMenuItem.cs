@@ -75,7 +75,7 @@ namespace NanoGames.Ui
 
             if (isSelected)
             {
-                terminal.TextCenter(SelectedItemColor, Menu.FontSize, position, text);
+                terminal.TextCenter(Colors.FocusedControl, Menu.FontSize, position, text);
 
                 ++_cursorBlinkFrame;
                 var cursorBrightness = 0.5 + 0.5 * Math.Cos(_cursorBlinkFrame / _cursorBlinkFrames * 2 * Math.PI);
@@ -87,7 +87,7 @@ namespace NanoGames.Ui
             }
             else
             {
-                terminal.TextCenter(ItemColor, Menu.FontSize, position, text);
+                terminal.TextCenter(Colors.Control, Menu.FontSize, position, text);
                 _cursorPosition = _text.Length;
                 _cursorBlinkFrame = 0;
             }

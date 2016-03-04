@@ -34,22 +34,25 @@ namespace NanoGames.Application
         /// <param name="endpointTask">The task that will return the endpoint.</param>
         public Lobby(Action goBack, Task<Endpoint<Packet>> endpointTask)
         {
-            _goBack = () => Task.Run(
-                async () =>
+            _goBack = () =>
+            {
+                if (!_endpointTask.IsCanceled && !_endpointTask.IsFaulted)
                 {
-                    try
+                    Task.Run(
+                    async () =>
                     {
-                        if (!_endpointTask.IsCanceled && !_endpointTask.IsFaulted)
+                        try
                         {
                             (await _endpointTask).Dispose();
                         }
-                    }
-                    catch
-                    {
-                    }
+                        catch
+                        {
+                        }
+                    });
+                }
 
-                    goBack();
-                });
+                goBack();
+            };
 
             _endpointTask = endpointTask;
         }
@@ -59,13 +62,14 @@ namespace NanoGames.Application
         {
             if (!_endpointTask.IsCompleted)
             {
-                if (terminal.Input.Back)
+                if (terminal.Input.Back || terminal.Input.AltFire)
                 {
                     _goBack();
                     return;
                 }
 
-                terminal.TextCenter(_AnnouncementColor, 8, _Center, "CONNECTING...");
+                terminal.TextCenter(Colors.Title, 8, _Center + new Vector(0, 8), "CONNECTING");
+                terminal.TextCenter(Colors.FocusedControl, 8, _Center - new Vector(0, 16), "CANCEL");
                 return;
             }
 
@@ -77,7 +81,8 @@ namespace NanoGames.Application
                     return;
                 }
 
-                terminal.TextCenter(_AnnouncementColor, 8, _Center, _endpoint == null ? "CONNECTION FAILED!" : "CONNECTION LOST!");
+                terminal.TextCenter(Colors.Error, 8, _Center + new Vector(0, 8), _endpoint == null ? "CONNECTION FAILED" : "CONNECTION LOST");
+                terminal.TextCenter(Colors.FocusedControl, 8, _Center - new Vector(0, 16), "BACK");
                 return;
             }
 

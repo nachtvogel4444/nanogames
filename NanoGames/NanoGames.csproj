@@ -75,6 +75,7 @@
     <Compile Include="Application\Settings.cs" />
     <Compile Include="Backgrounds\Starfield.cs" />
     <Compile Include="Color.cs" />
+    <Compile Include="Colors.cs" />
     <Compile Include="DebugMode.cs" />
     <Compile Include="Games\Discipline{TMatch,TPlayer}.cs" />
     <Compile Include="Games\FallingBlocks\Constants.cs" />
