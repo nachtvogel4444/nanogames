@@ -1,0 +1,19 @@
+﻿using System;
+
+namespace NanoGames.Server
+{
+    /// <summary>
+    /// The program class.
+    /// </summary>
+    internal class Program
+    {
+        private static void Main(string[] args)
+        {
+            using (var server = new Network.Server())
+            {
+                Console.WriteLine("NanoGames Server running.");
+                Console.ReadKey(false);
+            }
+        }
+    }
+}
