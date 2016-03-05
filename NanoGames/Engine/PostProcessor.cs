@@ -18,7 +18,7 @@ namespace NanoGames.Engine
             { 1, 2, VertexAttribPointerType.Float, false },
         };
 
-        private readonly Shader _shader = new Shader("NanoGames.Shaders.Tube");
+        private readonly Shader _shader = new Shader("NanoGames.Engine.Shaders.Tube");
         private readonly TriangleBuffer _buffer = new TriangleBuffer(_tubeVertexSpecification);
         private readonly VertexArray _vertexArray = new VertexArray(_tubeVertexSpecification);
         private int _width;

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace NanoGames.Ui
+namespace NanoGames.Application.Ui
 {
     /// <summary>
     /// Represents a menu that the player can navigate.

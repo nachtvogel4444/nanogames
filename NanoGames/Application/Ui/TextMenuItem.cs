@@ -4,7 +4,7 @@
 using System;
 using System.Diagnostics;
 
-namespace NanoGames.Ui
+namespace NanoGames.Application.Ui
 {
     /// <summary>
     /// A menu item that allows entering text.

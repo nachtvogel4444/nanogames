@@ -29,11 +29,11 @@ namespace NanoGames.Engine
             { 2, 3, VertexAttribPointerType.UnsignedByte, true },
         };
 
-        private readonly Shader _lineShader = new Shader("NanoGames.Shaders.Line");
+        private readonly Shader _lineShader = new Shader("NanoGames.Engine.Shaders.Line");
         private readonly TriangleBuffer _lineBuffer = new TriangleBuffer(_lineVertexSpecification);
         private readonly VertexArray _lineVertexArray = new VertexArray(_lineVertexSpecification);
 
-        private readonly Shader _pointShader = new Shader("NanoGames.Shaders.Point");
+        private readonly Shader _pointShader = new Shader("NanoGames.Engine.Shaders.Point");
         private readonly TriangleBuffer _pointBuffer = new TriangleBuffer(_pointVertexSpecification);
         private readonly VertexArray _pointVertexArray = new VertexArray(_pointVertexSpecification);
 

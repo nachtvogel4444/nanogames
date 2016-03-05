@@ -1,9 +1,9 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using NanoGames.Application.Ui;
 using NanoGames.Engine;
 using NanoGames.Network;
-using NanoGames.Ui;
 using System;
 using System.Threading.Tasks;
 

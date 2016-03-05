@@ -3,7 +3,7 @@
 
 using System;
 
-namespace NanoGames.Ui
+namespace NanoGames.Application.Ui
 {
     /// <summary>
     /// A menu item that executes a command when selected.

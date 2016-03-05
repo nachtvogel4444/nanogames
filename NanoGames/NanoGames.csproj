@@ -103,29 +103,29 @@
     <Compile Include="Input.cs" />
     <Compile Include="IRenderer.cs" />
     <Compile Include="IView.cs" />
-    <Compile Include="Ui\Choice.cs" />
-    <Compile Include="Ui\ChoiceMenuItem.cs" />
+    <Compile Include="Application\Ui\Choice.cs" />
+    <Compile Include="Application\Ui\ChoiceMenuItem.cs" />
     <Compile Include="Application\FpsView.cs" />
     <Compile Include="Application\MainView.cs" />
-    <Compile Include="Ui\CommandMenuItem.cs" />
-    <Compile Include="Ui\Menu.cs" />
-    <Compile Include="Ui\MenuItem.cs" />
+    <Compile Include="Application\Ui\CommandMenuItem.cs" />
+    <Compile Include="Application\Ui\Menu.cs" />
+    <Compile Include="Application\Ui\MenuItem.cs" />
     <Compile Include="Application\PracticeView.cs" />
     <Compile Include="Application\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Terminal.cs" />
-    <Compile Include="Ui\TextMenuItem.cs" />
+    <Compile Include="Application\Ui\TextMenuItem.cs" />
     <Compile Include="Vector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <EmbeddedResource Include="Shaders\Line.fs.glsl" />
-    <EmbeddedResource Include="Shaders\Line.vs.glsl" />
-    <EmbeddedResource Include="Shaders\Tube.vs.glsl" />
-    <EmbeddedResource Include="Shaders\Tube.fs.glsl" />
-    <EmbeddedResource Include="Shaders\Point.vs.glsl" />
-    <EmbeddedResource Include="Shaders\Point.fs.glsl" />
+    <EmbeddedResource Include="Engine\Shaders\Line.fs.glsl" />
+    <EmbeddedResource Include="Engine\Shaders\Line.vs.glsl" />
+    <EmbeddedResource Include="Engine\Shaders\Tube.vs.glsl" />
+    <EmbeddedResource Include="Engine\Shaders\Tube.fs.glsl" />
+    <EmbeddedResource Include="Engine\Shaders\Point.vs.glsl" />
+    <EmbeddedResource Include="Engine\Shaders\Point.fs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\Newtonsoft.Json.dll" />

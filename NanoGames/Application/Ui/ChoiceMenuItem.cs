@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace NanoGames.Ui
+namespace NanoGames.Application.Ui
 {
     /// <summary>
     /// A menu item giving the user a choice between several alternatives.
