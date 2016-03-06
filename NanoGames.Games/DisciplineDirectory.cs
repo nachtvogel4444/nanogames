@@ -8,7 +8,7 @@ namespace NanoGames.Games
     /// <summary>
     /// A directory of game disciplines.
     /// </summary>
-    internal static class DisciplineDirectory
+    public static class DisciplineDirectory
     {
         private static readonly List<Discipline> _disciplines = new List<Discipline>();
 

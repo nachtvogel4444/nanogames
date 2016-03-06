@@ -6,7 +6,4 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("NanoGames Server")]
 [assembly: AssemblyDescription("NanoGames Dedicated Server")]
-[assembly: AssemblyProduct("NanoGames")]
-[assembly: AssemblyCopyright("Copyright (c) the authors of NanoGames")]
-[assembly: AssemblyVersion("0.0.*")]
 [assembly: ComVisible(false)]

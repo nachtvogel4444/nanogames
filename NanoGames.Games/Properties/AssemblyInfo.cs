@@ -4,6 +4,6 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("NanoGames.Network")]
-[assembly: AssemblyDescription("NanoGames Network library")]
+[assembly: AssemblyTitle("NanoGames.Games")]
+[assembly: AssemblyDescription("NanoGames Games library")]
 [assembly: ComVisible(false)]

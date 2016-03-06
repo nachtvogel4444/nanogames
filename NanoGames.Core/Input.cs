@@ -6,7 +6,7 @@ namespace NanoGames
     /// <summary>
     /// Represents the input state of a player.
     /// </summary>
-    internal sealed class Input
+    public sealed class Input
     {
         /// <summary>
         /// Gets or sets a value indicating whether the back button is pressed.

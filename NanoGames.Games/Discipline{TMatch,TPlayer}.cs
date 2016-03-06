@@ -33,17 +33,16 @@ namespace NanoGames.Games
             var match = new TMatch();
 
             var players = new List<TPlayer>();
-            foreach (var playerDescription in description.Players)
+            for (int i = 0; i < description.Players.Count; ++i)
             {
                 var player = new TPlayer();
                 player.Match = match;
-                CopyPlayerValues(playerDescription, player);
+                SetPlayerValues(player, i, description.Players[i]);
                 players.Add(player);
             }
 
-            match.SetPlayers(description.LocalPlayerIndex, players);
+            match.Initialize(players);
 
-            match.Initialize();
             foreach (var player in players)
             {
                 player.Initialize();
@@ -52,10 +51,11 @@ namespace NanoGames.Games
             return match;
         }
 
-        private void CopyPlayerValues(Player from, Player to)
+        private void SetPlayerValues(Player player, int index, PlayerDescription description)
         {
-            to.Index = from.Index;
-            to.Color = from.Color;
+            player.Index = index;
+            player.Color = description.Color;
+            player.Terminal = description.Terminal;
         }
     }
 }

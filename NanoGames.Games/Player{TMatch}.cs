@@ -14,13 +14,5 @@ namespace NanoGames.Games
         /// Gets or sets the match this player belongs to.
         /// </summary>
         public TMatch Match { get; set; }
-
-        /// <summary>
-        /// Initializes the player. This is called after <see cref="Match.Initialize"/>.
-        /// </summary>
-        public abstract void Initialize();
-
-        /// <inheritdoc/>
-        public abstract override void Update();
     }
 }

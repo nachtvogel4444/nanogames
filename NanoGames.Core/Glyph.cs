@@ -10,7 +10,7 @@ namespace NanoGames
     /// <summary>
     /// Represents a reusable single-colored shape.
     /// </summary>
-    internal sealed class Glyph : IEnumerable
+    public sealed class Glyph : IEnumerable
     {
         private readonly double _width;
         private readonly double _height;

@@ -6,7 +6,7 @@ namespace NanoGames.Games
     /// <summary>
     /// Represents a game discipline.
     /// </summary>
-    internal abstract class Discipline
+    public abstract class Discipline
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Discipline"/> class.

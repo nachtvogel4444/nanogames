@@ -13,8 +13,6 @@ namespace NanoGames.Games
     internal abstract class Match<TPlayer> : Match
         where TPlayer : Player
     {
-        private int _localPlayerIndex;
-
         /// <summary>
         /// Gets the list of players.
         /// </summary>
@@ -25,30 +23,22 @@ namespace NanoGames.Games
         /// </summary>
         /// <param name="localPlayerIndex">The index of the local player, or -1 if there is no local player.</param>
         /// <param name="players">The list of players.</param>
-        public void SetPlayers(int localPlayerIndex, List<TPlayer> players)
+        public void Initialize(List<TPlayer> players)
         {
             if (Players != null)
             {
                 throw new InvalidOperationException("The players can only be set once.");
             }
 
-            _localPlayerIndex = localPlayerIndex;
             Players = players.AsReadOnly();
         }
 
         /// <inheritdoc/>
-        public override sealed void Update(Terminal terminal)
+        public override sealed void Update(List<PlayerDescription> playerDescriptions)
         {
             for (int i = 0; i < Players.Count; ++i)
             {
-                if (i == _localPlayerIndex)
-                {
-                    Players[i].Terminal = terminal;
-                }
-                else
-                {
-                    Players[i].Terminal = Terminal.Null;
-                }
+                Players[i].Terminal = playerDescriptions[i].Terminal;
             }
 
             /* Update the match. */
@@ -60,6 +50,11 @@ namespace NanoGames.Games
                 player.Update();
             }
         }
+
+        /// <summary>
+        /// Initializes the match. This is called before <see cref="Player.Initialize"/>.
+        /// </summary>
+        protected abstract void Initialize();
 
         /// <summary>
         /// Updates and renders the match for all players. This is called before <see cref="Player.Update"/>.

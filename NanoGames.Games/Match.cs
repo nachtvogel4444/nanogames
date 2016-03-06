@@ -2,13 +2,14 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using System;
+using System.Collections.Generic;
 
 namespace NanoGames.Games
 {
     /// <summary>
     /// Represents a single match of a discipline.
     /// </summary>
-    internal abstract class Match : IView
+    public abstract class Match
     {
         /// <summary>
         /// Gets a random number generator.
@@ -16,11 +17,9 @@ namespace NanoGames.Games
         public Random Random { get; } = new Random();
 
         /// <summary>
-        /// Initializes the match.
+        /// Updates and renders the match.
         /// </summary>
-        public abstract void Initialize();
-
-        /// <inheritdoc/>
-        public abstract void Update(Terminal terminal);
+        /// <param name="terminal"></param>
+        public abstract void Update(List<PlayerDescription> players);
     }
 }

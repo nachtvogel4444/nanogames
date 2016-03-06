@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using NanoGames.Application.Ui;
+using NanoGames.Engine;
 using NanoGames.Network;
 using System;
 using System.Collections.Generic;

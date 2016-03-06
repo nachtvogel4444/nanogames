@@ -6,7 +6,7 @@ namespace NanoGames
     /// <summary>
     /// Contains standard colors.
     /// </summary>
-    internal static class Colors
+    public static class Colors
     {
         /// <summary>
         /// Full white.

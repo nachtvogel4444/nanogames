@@ -1,16 +1,17 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using NanoGames.Engine;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace NanoGames.Backgrounds
+namespace NanoGames.Application
 {
     /// <summary>
     /// A view showing a moving starfield.
     /// </summary>
-    internal sealed class Starfield : IView
+    internal sealed class StarfieldView : IView
     {
         private const double _velocity = 0.225;
 

@@ -8,7 +8,7 @@ namespace NanoGames
     /// <summary>
     /// Contains glyphs for all supported characters.
     /// </summary>
-    internal static class Font
+    public static class Font
     {
         private static readonly Dictionary<int, Glyph> _glyphs = new Dictionary<int, Glyph>()
         {

@@ -59,6 +59,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\NanoGames.Core\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="VectorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -66,6 +69,18 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NanoGames.Core\NanoGames.Core.csproj">
+      <Project>{be63934a-7c7f-45b4-ba4e-65ce906e5efe}</Project>
+      <Name>NanoGames.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NanoGames.Games\NanoGames.Games.csproj">
+      <Project>{aa5142cb-e7d5-4600-a1cd-4855fe3ee3e9}</Project>
+      <Name>NanoGames.Games</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NanoGames.Network\NanoGames.Network.csproj">
+      <Project>{858c767f-35f8-434c-ae91-d1c453820d23}</Project>
+      <Name>NanoGames.Network</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NanoGames\NanoGames.csproj">
       <Project>{d671e4a3-de68-46ee-a28d-1cf57adedc03}</Project>
       <Name>NanoGames</Name>

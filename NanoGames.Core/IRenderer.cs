@@ -6,7 +6,7 @@ namespace NanoGames
     /// <summary>
     /// The 2D rendering interface.
     /// </summary>
-    internal interface IRenderer
+    public interface IRenderer
     {
         /// <summary>
         /// Draws a line.

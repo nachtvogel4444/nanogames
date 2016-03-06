@@ -2,8 +2,10 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using NanoGames.Application.Ui;
+using NanoGames.Engine;
 using NanoGames.Games;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NanoGames.Application
@@ -49,7 +51,14 @@ namespace NanoGames.Application
                 }
                 else
                 {
-                    _match.Update(terminal);
+                    _match.Update(
+                        new List<PlayerDescription>
+                        {
+                            new PlayerDescription
+                            {
+                                Terminal = terminal,
+                            },
+                        });
                 }
             }
 
@@ -69,12 +78,10 @@ namespace NanoGames.Application
         {
             var description = new MatchDescription
             {
-                LocalPlayerIndex = 0,
                 Players =
                 {
-                    new Player
+                    new PlayerDescription
                     {
-                        Index = 0,
                         Color = _playerColor,
                     },
                 },

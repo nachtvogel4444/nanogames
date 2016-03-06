@@ -6,7 +6,7 @@ namespace NanoGames
     /// <summary>
     /// A color.
     /// </summary>
-    internal struct Color
+    public struct Color
     {
         /// <summary>
         /// The red value ranging linearly from 0 to 1.

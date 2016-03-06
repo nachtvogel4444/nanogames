@@ -15,7 +15,7 @@ namespace NanoGames.Application
     internal sealed class MainView : IView, IDisposable
     {
         private IView _fpsView = new FpsView();
-        private IView _background = new Backgrounds.Starfield();
+        private IView _background = new StarfieldView();
 
         private IView _currentView;
 

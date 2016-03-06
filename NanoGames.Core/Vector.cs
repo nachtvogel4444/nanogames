@@ -8,7 +8,7 @@ namespace NanoGames
     /// <summary>
     /// A 2D vector.
     /// </summary>
-    internal struct Vector
+    public struct Vector
     {
         /// <summary>
         /// The X coordinate.

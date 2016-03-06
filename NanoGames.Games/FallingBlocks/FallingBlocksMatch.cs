@@ -9,7 +9,7 @@ namespace NanoGames.Games.FallingBlocks
     internal sealed class FallingBlocksMatch : Match<FallingBlocksPlayer>
     {
         /// <inheritdoc/>
-        public override void Initialize()
+        protected override void Initialize()
         {
         }
 

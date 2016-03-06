@@ -6,7 +6,7 @@ namespace NanoGames
     /// <summary>
     /// Represents an input/output connection to a player.
     /// </summary>
-    internal sealed class Terminal : IRenderer
+    public sealed class Terminal : IRenderer
     {
         /// <summary>
         /// The virtual screen width.
