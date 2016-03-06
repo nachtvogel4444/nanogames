@@ -53,7 +53,7 @@ namespace NanoGames.Application
                         "HOST GAME",
                         () =>
                         {
-                            _currentView = new Lobby(
+                            _currentView = new LobbyView(
                                 () => _currentView = _multiplayerMenu,
                                 Task.Run(() => new Server().GetLocalEndpoint<Packet>()));
                         }),
@@ -64,7 +64,7 @@ namespace NanoGames.Application
                         OnActivate = () =>
                         {
                             Settings.Instance.LastServer = _server;
-                            _currentView = new Lobby(
+                            _currentView = new LobbyView(
                                 () => _currentView = _multiplayerMenu,
                                 Client<Packet>.ConnectAsync(_server));
                         },

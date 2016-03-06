@@ -99,8 +99,9 @@ namespace NanoGames.Engine
             {
                 using (var renderer = new Renderer())
                 {
-                    var input = new Input();
-                    var terminal = new Terminal(renderer);
+                    var input = new ExtendedInput();
+                    var graphics = new Graphics(renderer);
+                    var terminal = new Terminal(input, graphics);
 
                     using (var mainView = createMainView())
                     {
@@ -118,7 +119,6 @@ namespace NanoGames.Engine
 
                             renderer.BeginFrame(width, height);
                             UpdateInput(input);
-                            terminal.Input = input;
                             mainView.Update(terminal);
                             renderer.EndFrame();
 
@@ -142,7 +142,7 @@ namespace NanoGames.Engine
             _gameWindow.Dispose();
         }
 
-        private void UpdateInput(Input input)
+        private void UpdateInput(ExtendedInput input)
         {
             input.Text = _textInput;
             _textInput = null;
@@ -150,7 +150,7 @@ namespace NanoGames.Engine
             var hasFocus = _gameWindow.Focused;
 
             var keyboardState = Keyboard.GetState();
-            input.Back = hasFocus && keyboardState[Key.Escape];
+            input.Escape = hasFocus && keyboardState[Key.Escape];
             input.Up = hasFocus && keyboardState[Key.Up];
             input.Down = hasFocus && keyboardState[Key.Down];
             input.Left = hasFocus && keyboardState[Key.Left];

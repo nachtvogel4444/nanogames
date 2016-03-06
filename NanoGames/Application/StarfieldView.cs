@@ -59,7 +59,7 @@ namespace NanoGames.Application
 
                 var c = 0.33 * (1 - oldZ);
 
-                terminal.Line(
+                terminal.Graphics.Line(
                     new Color(c, c, c),
                     GetScreenVector(x, y, oldZ + _velocity / 60),
                     GetScreenVector(x, y, z));
@@ -92,7 +92,7 @@ namespace NanoGames.Application
 
         private Vector GetScreenVector(double x, double y, double z)
         {
-            return new Vector((x / z) * 0.5 * Terminal.Width + 0.5 * Terminal.Width, (y / z) * 0.5 * Terminal.Width + 0.5 * Terminal.Height);
+            return new Vector((x / z) * 0.5 * Graphics.Width + 0.5 * Graphics.Width, (y / z) * 0.5 * Graphics.Width + 0.5 * Graphics.Height);
         }
 
         private sealed class Star

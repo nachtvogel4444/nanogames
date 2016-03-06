@@ -1,6 +1,7 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using NanoGames.Engine;
 using System;
 using System.Diagnostics;
 
@@ -75,18 +76,18 @@ namespace NanoGames.Application.Ui
 
             if (isSelected)
             {
-                terminal.TextCenter(Colors.FocusedControl, Menu.FontSize, position, text);
+                terminal.Graphics.PrintCenter(Colors.FocusedControl, Menu.FontSize, position, text);
 
                 var cursorBrightness = 0.5 + 0.5 * Math.Cos((Stopwatch.GetTimestamp() - _cursorBlinkTime) / (double)Stopwatch.Frequency * 2 * Math.PI);
                 var cursorColor = new Color(cursorBrightness, cursorBrightness, cursorBrightness);
 
                 var x = position.X + text.Length * Menu.FontSize * 0.5 - Menu.FontSize * (_text.Length - _cursorPosition);
                 var dy = Menu.FontSize / 6;
-                terminal.Line(cursorColor, new Vector(x, position.Y - dy), new Vector(x, position.Y + Menu.FontSize + dy));
+                terminal.Graphics.Line(cursorColor, new Vector(x, position.Y - dy), new Vector(x, position.Y + Menu.FontSize + dy));
             }
             else
             {
-                terminal.TextCenter(Colors.Control, Menu.FontSize, position, text);
+                terminal.Graphics.PrintCenter(Colors.Control, Menu.FontSize, position, text);
                 _cursorPosition = _text.Length;
                 ResetCursorBlink();
             }

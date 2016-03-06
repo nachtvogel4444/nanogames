@@ -1,6 +1,7 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using NanoGames.Engine;
 using System;
 using System.Collections.Generic;
 
@@ -122,11 +123,11 @@ namespace NanoGames.Application.Ui
 
             if (isSelected)
             {
-                terminal.TextCenter(Colors.FocusedControl, Menu.FontSize, position, "< " + text + " >");
+                terminal.Graphics.PrintCenter(Colors.FocusedControl, Menu.FontSize, position, "< " + text + " >");
             }
             else
             {
-                terminal.TextCenter(Colors.Control, Menu.FontSize, position, text);
+                terminal.Graphics.PrintCenter(Colors.Control, Menu.FontSize, position, text);
             }
         }
 

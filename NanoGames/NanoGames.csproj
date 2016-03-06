@@ -72,13 +72,13 @@
     <Compile Include="..\NanoGames.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Application\Lobby.cs" />
+    <Compile Include="Application\LobbyView.cs" />
     <Compile Include="Application\Packet.cs" />
     <Compile Include="Application\PlayerId.cs" />
     <Compile Include="Application\Settings.cs" />
     <Compile Include="Application\SettingsView.cs" />
     <Compile Include="Application\StarfieldView.cs" />
-    <Compile Include="DebugMode.cs" />
+    <Compile Include="Engine\ExtendedInput.cs" />
     <Compile Include="Engine\OpenGLWrappers\ByteBuffer.cs" />
     <Compile Include="Engine\PostProcessor.cs" />
     <Compile Include="Engine\QuitException.cs" />
@@ -86,6 +86,7 @@
     <Compile Include="Engine\OpenGLWrappers\TriangleBuffer.cs" />
     <Compile Include="Engine\OpenGLWrappers\VertexArray.cs" />
     <Compile Include="Engine\OpenGLWrappers\VertexSpecification.cs" />
+    <Compile Include="Engine\Terminal.cs" />
     <Compile Include="Engine\Window.cs" />
     <Compile Include="Engine\Renderer.cs" />
     <Compile Include="Engine\IView.cs" />

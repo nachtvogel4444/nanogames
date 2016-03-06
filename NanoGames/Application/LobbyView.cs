@@ -15,7 +15,7 @@ namespace NanoGames.Application
     /// <summary>
     /// Represents the game lobby.
     /// </summary>
-    internal sealed class Lobby : IView
+    internal sealed class LobbyView : IView
     {
         private static readonly Color _AnnouncementColor = new Color(1, 1, 1);
 
@@ -37,11 +37,11 @@ namespace NanoGames.Application
         private bool _fireWasPressed = true;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Lobby"/> class.
+        /// Initializes a new instance of the <see cref="LobbyView"/> class.
         /// </summary>
         /// <param name="goBack">The action invoked to navigate back in the menu.</param>
         /// <param name="endpointTask">The task that will return the endpoint.</param>
-        public Lobby(Action goBack, Task<Endpoint<Packet>> endpointTask)
+        public LobbyView(Action goBack, Task<Endpoint<Packet>> endpointTask)
         {
             _goBack = () =>
             {
@@ -80,7 +80,7 @@ namespace NanoGames.Application
         /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
-            if (_currentView == null && terminal.Input.Back)
+            if (_currentView == null && terminal.Input.Escape)
             {
                 _currentView = _menu;
             }
@@ -90,32 +90,32 @@ namespace NanoGames.Application
                 _currentView.Update(terminal);
 
                 /* Run the rest of the update method, but hide the output. */
-                terminal = Terminal.Null;
+                terminal = new Terminal(new ExtendedInput(), Graphics.Null);
             }
 
             if (!_endpointTask.IsCompleted)
             {
-                if (terminal.Input.Back || terminal.Input.AltFire)
+                if (terminal.Input.Escape || terminal.Input.AltFire)
                 {
                     _goBack();
                     return;
                 }
 
-                terminal.TextCenter(Colors.Title, 8, new Vector(160, 150), "CONNECTING");
-                terminal.TextCenter(Colors.FocusedControl, 8, new Vector(160, 86), "CANCEL");
+                terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, 150), "CONNECTING");
+                terminal.Graphics.PrintCenter(Colors.FocusedControl, 8, new Vector(160, 86), "CANCEL");
                 return;
             }
 
             if (_endpointTask.IsFaulted || _endpointTask.IsCanceled || !_endpointTask.Result.IsConnected)
             {
-                if (terminal.Input.Back || terminal.Input.Fire || terminal.Input.AltFire)
+                if (terminal.Input.Escape || terminal.Input.Fire || terminal.Input.AltFire)
                 {
                     _goBack();
                     return;
                 }
 
-                terminal.TextCenter(Colors.Error, 8, new Vector(160, 150), _endpoint == null ? "CONNECTION FAILED" : "CONNECTION LOST");
-                terminal.TextCenter(Colors.FocusedControl, 8, new Vector(160, 86), "BACK");
+                terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, 150), _endpoint == null ? "CONNECTION FAILED" : "CONNECTION LOST");
+                terminal.Graphics.PrintCenter(Colors.FocusedControl, 8, new Vector(160, 86), "BACK");
                 return;
             }
 
@@ -173,8 +173,8 @@ namespace NanoGames.Application
 
             foreach (var playerInfo in _players.Values.OrderBy(p => p.Score).ThenBy(p => p.Name, StringComparer.InvariantCultureIgnoreCase))
             {
-                terminal.Text(Colors.Control, fontSize, new Vector(x + fontSize, y), playerInfo.Name);
-                terminal.Text(
+                terminal.Graphics.Print(Colors.Control, fontSize, new Vector(x + fontSize, y), playerInfo.Name);
+                terminal.Graphics.Print(
                     new Color(0.7, 0.7, 0.7),
                     fontSize,
                     new Vector(x + (Settings.MaxPlayerNameLength + 2) * fontSize, y),
@@ -182,7 +182,7 @@ namespace NanoGames.Application
 
                 if (playerInfo.IsReady)
                 {
-                    terminal.Text(Colors.Title, fontSize, new Vector(x, y), "✓");
+                    terminal.Graphics.Print(Colors.Title, fontSize, new Vector(x, y), "✓");
                 }
 
                 y -= fontSize;
@@ -190,11 +190,11 @@ namespace NanoGames.Application
 
             if (_myPlayerInfo.IsReady)
             {
-                terminal.TextCenter(Colors.Title, 8, new Vector(160, 150), "WAITING");
+                terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, 150), "WAITING");
             }
             else
             {
-                terminal.TextCenter(Colors.Error, 8, new Vector(160, 150), "SPACE TO START");
+                terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, 150), "SPACE TO START");
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using NanoGames.Engine;
 using System;
 
 namespace NanoGames.Application.Ui
@@ -32,7 +33,7 @@ namespace NanoGames.Application.Ui
         public override void Update(Terminal terminal, Vector position, bool isSelected)
         {
             var color = isSelected ? Colors.FocusedControl : Colors.Control;
-            terminal.TextCenter(color, Menu.FontSize, position, Text);
+            terminal.Graphics.PrintCenter(color, Menu.FontSize, position, Text);
         }
 
         /// <inheritdoc/>

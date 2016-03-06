@@ -1,6 +1,8 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using NanoGames.Engine;
+
 namespace NanoGames.Application.Ui
 {
     /// <summary>

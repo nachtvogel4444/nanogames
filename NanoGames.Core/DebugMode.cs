@@ -10,7 +10,7 @@ namespace NanoGames
     /// <summary>
     /// Determines if the game is being debugged, which modifies some behaviors.
     /// </summary>
-    internal static class DebugMode
+    public static class DebugMode
     {
         private static bool _isEnabled;
 

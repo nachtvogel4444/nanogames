@@ -45,7 +45,7 @@ namespace NanoGames.Application
         {
             if (_match != null)
             {
-                if (terminal.Input.Back)
+                if (terminal.Input.Escape)
                 {
                     _match = null;
                 }
@@ -56,7 +56,8 @@ namespace NanoGames.Application
                         {
                             new PlayerDescription
                             {
-                                Terminal = terminal,
+                                Graphics = terminal.Graphics,
+                                Input = terminal.Input,
                             },
                         });
                 }

@@ -67,7 +67,7 @@ namespace NanoGames.Application.Ui
 
             double top = 90 + 0.5 * (stride * (items - 1) + FontSize) - FontSize;
 
-            terminal.TextCenter(Colors.Title, FontSize, new Vector(160, 150), Title);
+            terminal.Graphics.PrintCenter(Colors.Title, FontSize, new Vector(160, 150), Title);
 
             for (int i = 0; i < items; ++i)
             {
@@ -75,7 +75,7 @@ namespace NanoGames.Application.Ui
             }
         }
 
-        private void ProcessInput(Input input)
+        private void ProcessInput(ExtendedInput input)
         {
             if (_framesSinceKeyPress < _keyRepeatFrames)
             {
@@ -87,7 +87,7 @@ namespace NanoGames.Application.Ui
                 Items?[SelectedIndex]?.HandleText(input.Text);
             }
 
-            if (input.Back || input.AltFire)
+            if (input.Escape || input.AltFire)
             {
                 if (_framesSinceKeyPress >= _keyRepeatFrames)
                 {

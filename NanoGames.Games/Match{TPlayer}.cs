@@ -38,7 +38,8 @@ namespace NanoGames.Games
         {
             for (int i = 0; i < Players.Count; ++i)
             {
-                Players[i].Terminal = playerDescriptions[i].Terminal;
+                Players[i].Graphics = playerDescriptions[i].Graphics;
+                Players[i].Input = playerDescriptions[i].Input;
             }
 
             /* Update the match. */

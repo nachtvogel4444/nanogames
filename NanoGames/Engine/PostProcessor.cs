@@ -45,7 +45,7 @@ namespace NanoGames.Engine
                 _height = height;
 
                 float w, h;
-                float a = (float)(width / Terminal.Width * Terminal.Height / height);
+                float a = (float)(width / Graphics.Width * Graphics.Height / height);
                 if (a > 1)
                 {
                     h = 1;

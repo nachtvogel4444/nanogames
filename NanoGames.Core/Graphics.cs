@@ -4,9 +4,9 @@
 namespace NanoGames
 {
     /// <summary>
-    /// Represents an input/output connection to a player.
+    /// Represents a player's graphics interface.
     /// </summary>
-    public sealed class Terminal : IRenderer
+    public sealed class Graphics
     {
         /// <summary>
         /// The virtual screen width.
@@ -21,31 +21,35 @@ namespace NanoGames
         /// <summary>
         /// A terminal with a null renderer.
         /// </summary>
-        public static readonly Terminal Null = new Terminal(null);
+        public static readonly Graphics Null = new Graphics(null);
 
         private readonly IRenderer _renderer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Terminal"/> class.
+        /// Initializes a new instance of the <see cref="Graphics"/> class.
         /// </summary>
         /// <param name="renderer">The renderer to draw onto.</param>
-        public Terminal(IRenderer renderer)
+        public Graphics(IRenderer renderer)
         {
             _renderer = renderer;
         }
 
         /// <summary>
-        /// Gets or sets the player's input.
+        /// Draws a line.
         /// </summary>
-        public Input Input { get; set; } = new Input();
-
-        /// <inheritdoc/>
+        /// <param name="color">The line color.</param>
+        /// <param name="vectorA">The line's starting point.</param>
+        /// <param name="vectorB">The line's end point.</param>
         public void Line(Color color, Vector vectorA, Vector vectorB)
         {
             _renderer?.Line(color, vectorA, vectorB);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Draws a point.
+        /// </summary>
+        /// <param name="color">The point color.</param>
+        /// <param name="vector">The point coordinates.</param>
         public void Point(Color color, Vector vector)
         {
             _renderer?.Point(color, vector);
@@ -84,7 +88,7 @@ namespace NanoGames
         /// <param name="size">The font size. Glyphs are square shaped, so this is both the width and height of each character.</param>
         /// <param name="position">The position of the lower-left corner of the text.</param>
         /// <param name="text">The text to write.</param>
-        public void Text(Color color, double size, Vector position, string text)
+        public void Print(Color color, double size, Vector position, string text)
         {
             if (text == null)
             {
@@ -109,14 +113,14 @@ namespace NanoGames
         /// <param name="size">The font size. Glyphs are square shaped, so this is both the width and height of each character.</param>
         /// <param name="position">The position of the lower-left corner of the text.</param>
         /// <param name="text">The text to write.</param>
-        public void TextCenter(Color color, double size, Vector position, string text)
+        public void PrintCenter(Color color, double size, Vector position, string text)
         {
             if (text == null)
             {
                 return;
             }
 
-            Text(color, size, position - new Vector(text.Length * size * 0.5, 0), text);
+            Print(color, size, position - new Vector(text.Length * size * 0.5, 0), text);
         }
     }
 }

@@ -23,7 +23,12 @@ namespace NanoGames.Games
         /// <summary>
         /// Gets or sets the player's terminal.
         /// </summary>
-        public Terminal Terminal { get; set; } = Terminal.Null;
+        public Graphics Graphics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the player's input.
+        /// </summary>
+        public Input Input { get; set; }
 
         /// <summary>
         /// Gets a random number generator.

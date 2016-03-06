@@ -22,7 +22,7 @@ namespace NanoGames.Application
 
             if (DebugMode.IsEnabled)
             {
-                terminal.Text(color, fontSize, new Vector(0, Terminal.Height - fontSize), "DEBUG");
+                terminal.Graphics.Print(color, fontSize, new Vector(0, Graphics.Height - fontSize), "DEBUG");
             }
 
             var time = Stopwatch.GetTimestamp();
@@ -32,7 +32,7 @@ namespace NanoGames.Application
                 var fps = (double)Stopwatch.Frequency * _times.Count / (time - _times.Peek());
                 var fpsString = ((int)(fps + 0.5)).ToString("D2");
 
-                terminal.Text(color, fontSize, new Vector(Terminal.Width - fpsString.Length * fontSize, Terminal.Height - fontSize), fpsString);
+                terminal.Graphics.Print(color, fontSize, new Vector(Graphics.Width - fpsString.Length * fontSize, Graphics.Height - fontSize), fpsString);
             }
 
             if (_times.Count > 128)

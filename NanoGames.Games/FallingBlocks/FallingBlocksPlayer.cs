@@ -32,9 +32,9 @@ namespace NanoGames.Games.FallingBlocks
         {
             var bottomLeft = Constants.BottomLeft;
 
-            Terminal.Line(Constants.ContainerColor, bottomLeft + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), bottomLeft + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
-            Terminal.Line(Constants.ContainerColor, bottomLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder), bottomLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
-            Terminal.Line(Constants.ContainerColor, bottomLeft + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), bottomLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder));
+            Graphics.Line(Constants.ContainerColor, bottomLeft + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), bottomLeft + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
+            Graphics.Line(Constants.ContainerColor, bottomLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder), bottomLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
+            Graphics.Line(Constants.ContainerColor, bottomLeft + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), bottomLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder));
 
             for (int x = 0; x < Constants.Width; ++x)
             {
@@ -50,10 +50,10 @@ namespace NanoGames.Games.FallingBlocks
                         var c = blockBottomLeft + new Vector(Constants.BlockSize - Constants.BlockBorder, Constants.BlockSize - Constants.BlockBorder);
                         var d = blockBottomLeft + new Vector(Constants.BlockBorder, Constants.BlockSize - Constants.BlockBorder);
 
-                        Terminal.Line(color, a, b);
-                        Terminal.Line(color, b, c);
-                        Terminal.Line(color, c, d);
-                        Terminal.Line(color, d, a);
+                        Graphics.Line(color, a, b);
+                        Graphics.Line(color, b, c);
+                        Graphics.Line(color, c, d);
+                        Graphics.Line(color, d, a);
                     }
                 }
             }

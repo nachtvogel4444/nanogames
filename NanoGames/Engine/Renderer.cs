@@ -93,13 +93,13 @@ namespace NanoGames.Engine
         {
             _postProcessor.BeginFrame(width, height);
 
-            if ((double)width / (double)height > Terminal.Width / Terminal.Height)
+            if ((double)width / (double)height > Graphics.Width / Graphics.Height)
             {
-                width = (int)Math.Ceiling(height / Terminal.Height * Terminal.Width);
+                width = (int)Math.Ceiling(height / Graphics.Height * Graphics.Width);
             }
             else
             {
-                height = (int)Math.Ceiling(width / Terminal.Width * Terminal.Height);
+                height = (int)Math.Ceiling(width / Graphics.Width * Graphics.Height);
             }
 
             if (_width != width || _height != height)
@@ -114,20 +114,20 @@ namespace NanoGames.Engine
             _pointBuffer.Clear();
 
             double screenAspect = (double)_width / (double)_height;
-            double terminalAspect = (double)Terminal.Width / (double)Terminal.Height;
+            double terminalAspect = (double)Graphics.Width / (double)Graphics.Height;
 
             if (terminalAspect > screenAspect)
             {
-                _xScale = 2.0 / Terminal.Width;
+                _xScale = 2.0 / Graphics.Width;
                 _xOffset = -1;
-                _yScale = 2.0 / Terminal.Height * (screenAspect / terminalAspect);
+                _yScale = 2.0 / Graphics.Height * (screenAspect / terminalAspect);
                 _yOffset = -1;
             }
             else
             {
-                _xScale = 2.0 / Terminal.Width * (terminalAspect / screenAspect);
+                _xScale = 2.0 / Graphics.Width * (terminalAspect / screenAspect);
                 _xOffset = -1;
-                _yScale = 2.0 / Terminal.Height;
+                _yScale = 2.0 / Graphics.Height;
                 _yOffset = -1;
             }
         }

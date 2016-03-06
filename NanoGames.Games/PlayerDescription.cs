@@ -14,8 +14,13 @@ namespace NanoGames.Games
         public Color Color { get; set; }
 
         /// <summary>
-        /// Gets or sets the player's terminal.
+        /// Gets or sets the player's graphics.
         /// </summary>
-        public Terminal Terminal { get; set; } = Terminal.Null;
+        public Graphics Graphics { get; set; }
+
+        /// <summary>
+        /// Gets or sets the player's input.
+        /// </summary>
+        public Input Input { get; set; }
     }
 }
