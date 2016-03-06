@@ -1,6 +1,8 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using System;
+
 namespace NanoGames
 {
     /// <summary>
@@ -17,6 +19,11 @@ namespace NanoGames
         /// The virtual screen height.
         /// </summary>
         public const double Height = 180;
+
+        /// <summary>
+        /// The virtual screen center point.
+        /// </summary>
+        public static readonly Vector Center = new Vector(Width * 0.5, Height * 0.5);
 
         /// <summary>
         /// A terminal with a null renderer.
@@ -121,6 +128,49 @@ namespace NanoGames
             }
 
             Print(color, size, position - new Vector(text.Length * size * 0.5, 0), text);
+        }
+
+        /// <summary>
+        /// Draws a circle.
+        /// </summary>
+        /// <param name="color">The color.</param>
+        /// <param name="center">The center point.</param>
+        /// <param name="radius">The radius.</param>
+        public void Circle(Color color, Vector center, double radius)
+        {
+            if (radius == 0)
+            {
+                return;
+            }
+
+            int steps = Math.Max(8, (int)Math.Ceiling(Math.Abs(radius) * 2 * Math.PI));
+            for (int i = 0; i < steps; ++i)
+            {
+                var angleA = i * 2 * Math.PI / steps;
+                var angleB = (i + 1) * 2 * Math.PI / steps;
+
+                var vectorA = center + new Vector(radius * Math.Cos(angleA), radius * Math.Sin(angleA));
+                var vectorB = center + new Vector(radius * Math.Cos(angleB), radius * Math.Sin(angleB));
+
+                Line(color, vectorA, vectorB);
+            }
+        }
+
+        /// <summary>
+        /// Draws a rectangle.
+        /// </summary>
+        /// <param name="color">The color.</param>
+        /// <param name="lowerLeft">The lower left point.</param>
+        /// <param name="upperRight">The upper right point.</param>
+        public void Rectangle(Color color, Vector lowerLeft, Vector upperRight)
+        {
+            var lowerRight = new Vector(upperRight.X, lowerLeft.Y);
+            var upperLeft = new Vector(lowerLeft.X, upperRight.Y);
+
+            Line(color, lowerLeft, lowerRight);
+            Line(color, lowerRight, upperRight);
+            Line(color, upperRight, upperLeft);
+            Line(color, upperLeft, lowerLeft);
         }
     }
 }
