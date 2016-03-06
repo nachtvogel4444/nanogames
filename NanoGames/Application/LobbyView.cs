@@ -17,12 +17,6 @@ namespace NanoGames.Application
     /// </summary>
     internal sealed class LobbyView : IView
     {
-        private static readonly Color _AnnouncementColor = new Color(1, 1, 1);
-
-        private static readonly Color _ScoreColor = new Color(0.5, 0.5, 0.5);
-
-        private static readonly Vector _Center = new Vector(160, 86);
-
         private readonly Action _goBack;
         private readonly Menu _menu;
 
@@ -101,8 +95,8 @@ namespace NanoGames.Application
                     return;
                 }
 
-                terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, 150), "CONNECTING");
-                terminal.Graphics.PrintCenter(Colors.FocusedControl, 8, new Vector(160, 86), "CANCEL");
+                terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), "CONNECTING");
+                terminal.Graphics.PrintCenter(Colors.FocusedControl, 8, new Vector(160, 96), "CANCEL");
                 return;
             }
 
@@ -114,8 +108,8 @@ namespace NanoGames.Application
                     return;
                 }
 
-                terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, 150), _endpoint == null ? "CONNECTION FAILED" : "CONNECTION LOST");
-                terminal.Graphics.PrintCenter(Colors.FocusedControl, 8, new Vector(160, 86), "BACK");
+                terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, Menu.TitleY), _endpoint == null ? "CONNECTION FAILED" : "CONNECTION LOST");
+                terminal.Graphics.PrintCenter(Colors.FocusedControl, 8, new Vector(160, 96), "BACK");
                 return;
             }
 
@@ -169,7 +163,7 @@ namespace NanoGames.Application
         {
             double fontSize = 8;
             double x = 160 - 0.5 * ((Settings.MaxPlayerNameLength + 6) * fontSize);
-            double y = 90 + 0.5 * _players.Count * fontSize - fontSize;
+            double y = 100 - 0.5 * _players.Count * fontSize;
 
             foreach (var playerInfo in _players.Values.OrderBy(p => p.Score).ThenBy(p => p.Name, StringComparer.InvariantCultureIgnoreCase))
             {
@@ -185,16 +179,16 @@ namespace NanoGames.Application
                     terminal.Graphics.Print(Colors.Title, fontSize, new Vector(x, y), "✓");
                 }
 
-                y -= fontSize;
+                y += fontSize;
             }
 
             if (_myPlayerInfo.IsReady)
             {
-                terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, 150), "WAITING");
+                terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), "WAITING");
             }
             else
             {
-                terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, 150), "SPACE TO START");
+                terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, Menu.TitleY), "SPACE TO START");
             }
         }
 

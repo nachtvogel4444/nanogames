@@ -17,6 +17,11 @@ namespace NanoGames.Application.Ui
         /// </summary>
         public const double FontSize = 8;
 
+        /// <summary>
+        /// The y coordinate of the title line.
+        /// </summary>
+        public const double TitleY = 32;
+
         private const int _keyRepeatFrames = 12;
 
         private int _framesSinceKeyPress;
@@ -65,13 +70,13 @@ namespace NanoGames.Application.Ui
 
             double stride = FontSize + 8;
 
-            double top = 90 + 0.5 * (stride * (items - 1) + FontSize) - FontSize;
+            double top = 100 - 0.5 * (stride * (items - 1) + FontSize);
 
-            terminal.Graphics.PrintCenter(Colors.Title, FontSize, new Vector(160, 150), Title);
+            terminal.Graphics.PrintCenter(Colors.Title, FontSize, new Vector(160, TitleY), Title);
 
             for (int i = 0; i < items; ++i)
             {
-                Items[i]?.Update(terminal, new Vector(160, top - i * stride), SelectedIndex == i);
+                Items[i]?.Update(terminal, new Vector(160, top + i * stride), SelectedIndex == i);
             }
         }
 

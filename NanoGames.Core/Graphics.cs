@@ -7,6 +7,8 @@ namespace NanoGames
 {
     /// <summary>
     /// Represents a player's graphics interface.
+    /// The screen always has a virtual width of 320 and a height of 200 pixels.
+    /// (0, 0) is at the top-left corner.
     /// </summary>
     public sealed class Graphics
     {
@@ -18,7 +20,7 @@ namespace NanoGames
         /// <summary>
         /// The virtual screen height.
         /// </summary>
-        public const double Height = 180;
+        public const double Height = 200;
 
         /// <summary>
         /// The virtual screen center point.
@@ -49,7 +51,7 @@ namespace NanoGames
         /// <param name="vectorB">The line's end point.</param>
         public void Line(Color color, Vector vectorA, Vector vectorB)
         {
-            _renderer?.Line(color, vectorA, vectorB);
+            _renderer?.Line(color, (float)vectorA.X, (float)Height - (float)vectorA.Y, (float)vectorB.X, (float)Height - (float)vectorB.Y);
         }
 
         /// <summary>
@@ -59,7 +61,7 @@ namespace NanoGames
         /// <param name="vector">The point coordinates.</param>
         public void Point(Color color, Vector vector)
         {
-            _renderer?.Point(color, vector);
+            _renderer?.Point(color, (float)vector.X, (float)Height - (float)vector.Y);
         }
 
         /// <summary>
@@ -67,10 +69,10 @@ namespace NanoGames
         /// </summary>
         /// <param name="color">The color of the glyph.</param>
         /// <param name="glyph">The glyph to draw.</param>
-        /// <param name="lowerLeft">The lower-left corner of the glyph.</param>
+        /// <param name="topLeft">The top-left corner of the glyph.</param>
         /// <param name="x">The x vector of the glyph to draw.</param>
         /// <param name="y">The y vector of the glyph to draw.</param>
-        public void Glyph(Color color, Glyph glyph, Vector lowerLeft, Vector x, Vector y)
+        public void Glyph(Color color, Glyph glyph, Vector topLeft, Vector x, Vector y)
         {
             if (glyph == null)
             {
@@ -79,12 +81,12 @@ namespace NanoGames
 
             foreach (var stroke in glyph.Strokes)
             {
-                Line(color, lowerLeft + stroke.A.X * x + stroke.A.Y * y, lowerLeft + stroke.B.X * x + stroke.B.Y * y);
+                Line(color, topLeft + stroke.A.X * x + stroke.A.Y * y, topLeft + stroke.B.X * x + stroke.B.Y * y);
             }
 
             foreach (var point in glyph.Points)
             {
-                Point(color, lowerLeft + point.X * x + point.Y * y);
+                Point(color, topLeft + point.X * x + point.Y * y);
             }
         }
 
@@ -93,9 +95,9 @@ namespace NanoGames
         /// </summary>
         /// <param name="color">The text color.</param>
         /// <param name="size">The font size. Glyphs are square shaped, so this is both the width and height of each character.</param>
-        /// <param name="position">The position of the lower-left corner of the text.</param>
+        /// <param name="topLeft">The position of the top-left corner of the text.</param>
         /// <param name="text">The text to write.</param>
-        public void Print(Color color, double size, Vector position, string text)
+        public void Print(Color color, double size, Vector topLeft, string text)
         {
             if (text == null)
             {
@@ -108,8 +110,8 @@ namespace NanoGames
             foreach (var c in text)
             {
                 var glyph = Font.GetGlyph(c);
-                Glyph(color, Font.GetGlyph(c), position, x, y);
-                position.X += size;
+                Glyph(color, Font.GetGlyph(c), topLeft, x, y);
+                topLeft.X += size;
             }
         }
 
@@ -118,16 +120,16 @@ namespace NanoGames
         /// </summary>
         /// <param name="color">The text color.</param>
         /// <param name="size">The font size. Glyphs are square shaped, so this is both the width and height of each character.</param>
-        /// <param name="position">The position of the lower-left corner of the text.</param>
+        /// <param name="topCenter">The position of the top-center of the text.</param>
         /// <param name="text">The text to write.</param>
-        public void PrintCenter(Color color, double size, Vector position, string text)
+        public void PrintCenter(Color color, double size, Vector topCenter, string text)
         {
             if (text == null)
             {
                 return;
             }
 
-            Print(color, size, position - new Vector(text.Length * size * 0.5, 0), text);
+            Print(color, size, topCenter - new Vector(text.Length * size * 0.5, 0), text);
         }
 
         /// <summary>
@@ -160,17 +162,17 @@ namespace NanoGames
         /// Draws a rectangle.
         /// </summary>
         /// <param name="color">The color.</param>
-        /// <param name="lowerLeft">The lower left point.</param>
-        /// <param name="upperRight">The upper right point.</param>
-        public void Rectangle(Color color, Vector lowerLeft, Vector upperRight)
+        /// <param name="topLeft">The top-left point.</param>
+        /// <param name="bottomRight">The bottom-right point.</param>
+        public void Rectangle(Color color, Vector topLeft, Vector bottomRight)
         {
-            var lowerRight = new Vector(upperRight.X, lowerLeft.Y);
-            var upperLeft = new Vector(lowerLeft.X, upperRight.Y);
+            var topRight = new Vector(bottomRight.X, topLeft.Y);
+            var bottomLeft = new Vector(topLeft.X, bottomRight.Y);
 
-            Line(color, lowerLeft, lowerRight);
-            Line(color, lowerRight, upperRight);
-            Line(color, upperRight, upperLeft);
-            Line(color, upperLeft, lowerLeft);
+            Line(color, topLeft, topRight);
+            Line(color, topRight, bottomRight);
+            Line(color, bottomRight, bottomLeft);
+            Line(color, bottomLeft, topLeft);
         }
     }
 }

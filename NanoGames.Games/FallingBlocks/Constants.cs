@@ -59,8 +59,8 @@ namespace NanoGames.Games.FallingBlocks
         public static readonly Color FallingBlockColor = new Color(1, 1, 1);
 
         /// <summary>
-        /// The bottom left corner of the playing field on the screen.
+        /// The top-left corner of the playing field on the screen.
         /// </summary>
-        public static readonly Vector BottomLeft = new Vector(0.5 * (Graphics.Width - BlockSize * Width), 0.5 * (Graphics.Height - BlockSize * (Height + ExtraHeight)));
+        public static readonly Vector TopLeft = new Vector(0.5 * (Graphics.Width - BlockSize * Width), 0.5 * (Graphics.Height - BlockSize * (Height - ExtraHeight)));
     }
 }

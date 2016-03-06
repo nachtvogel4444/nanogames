@@ -49,12 +49,12 @@ namespace NanoGames
         /// <summary>
         /// Gets the vector rotated 90 degrees left.
         /// </summary>
-        public Vector RotatedLeft => new Vector(-Y, X);
+        public Vector RotatedLeft => new Vector(Y, -X);
 
         /// <summary>
         /// Gets the vector rotated 90 degrees right.
         /// </summary>
-        public Vector RotatedRight => new Vector(Y, -X);
+        public Vector RotatedRight => new Vector(-Y, X);
 
         public static Vector operator +(Vector a, Vector b)
         {

@@ -21,7 +21,7 @@ namespace NanoGames.Games.Example
             for (int i = 0; i < Players.Count; ++i)
             {
                 double angle = start + i * 2 * Math.PI / Players.Count;
-                Players[i].Position = new Vector(160 + 90 * Math.Cos(angle), 90 + 60 * Math.Sin(angle));
+                Players[i].Position = new Vector(160 + 100 * Math.Cos(angle), 90 + 100 * Math.Sin(angle));
             }
 
             /* After this, ExamplePlayer.Initialize is called by the framework for every individual player. */
@@ -57,12 +57,12 @@ namespace NanoGames.Games.Example
 
             if (player.Input.Up)
             {
-                player.Velocity.Y += _acceleration;
+                player.Velocity.Y -= _acceleration;
             }
 
             if (player.Input.Down)
             {
-                player.Velocity.Y -= _acceleration;
+                player.Velocity.Y += _acceleration;
             }
 
             if (player.Input.Left)
@@ -98,12 +98,12 @@ namespace NanoGames.Games.Example
 
             if (player.Position.Y < 0)
             {
-                player.Position.Y += 180;
+                player.Position.Y += 200;
             }
 
-            if (player.Position.Y > 180)
+            if (player.Position.Y > 200)
             {
-                player.Position.Y -= 180;
+                player.Position.Y -= 200;
             }
 
             /* Check for the victory condition. */

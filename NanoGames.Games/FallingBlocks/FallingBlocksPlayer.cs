@@ -14,7 +14,7 @@ namespace NanoGames.Games.FallingBlocks
         /// <inheritdoc/>
         public override void Initialize()
         {
-            for (int y = 0; y < Constants.Height && y < Constants.InitialGarbageLines; ++y)
+            for (int y = Constants.Height - Constants.InitialGarbageLines; y < Constants.Height; ++y)
             {
                 for (int x = 0; x < Constants.Width; ++x)
                 {
@@ -30,11 +30,9 @@ namespace NanoGames.Games.FallingBlocks
         /// <inheritdoc/>
         public override void Update()
         {
-            var bottomLeft = Constants.BottomLeft;
-
-            Graphics.Line(Constants.ContainerColor, bottomLeft + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), bottomLeft + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
-            Graphics.Line(Constants.ContainerColor, bottomLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder), bottomLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
-            Graphics.Line(Constants.ContainerColor, bottomLeft + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), bottomLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder));
+            Graphics.Line(Constants.ContainerColor, Constants.TopLeft + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
+            Graphics.Line(Constants.ContainerColor, Constants.TopLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
+            Graphics.Line(Constants.ContainerColor, Constants.TopLeft + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder), Constants.TopLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
 
             for (int x = 0; x < Constants.Width; ++x)
             {
@@ -42,18 +40,10 @@ namespace NanoGames.Games.FallingBlocks
                 {
                     if (_isBlocked[x, y])
                     {
-                        var color = _color[x, y];
-                        var blockBottomLeft = Constants.BottomLeft + new Vector(x * Constants.BlockSize, y * Constants.BlockSize);
-
-                        var a = blockBottomLeft + new Vector(Constants.BlockBorder, Constants.BlockBorder);
-                        var b = blockBottomLeft + new Vector(Constants.BlockSize - Constants.BlockBorder, Constants.BlockBorder);
-                        var c = blockBottomLeft + new Vector(Constants.BlockSize - Constants.BlockBorder, Constants.BlockSize - Constants.BlockBorder);
-                        var d = blockBottomLeft + new Vector(Constants.BlockBorder, Constants.BlockSize - Constants.BlockBorder);
-
-                        Graphics.Line(color, a, b);
-                        Graphics.Line(color, b, c);
-                        Graphics.Line(color, c, d);
-                        Graphics.Line(color, d, a);
+                        Graphics.Rectangle(
+                            _color[x, y],
+                            Constants.TopLeft + new Vector(x * Constants.BlockSize + Constants.BlockBorder, y * Constants.BlockSize + Constants.BlockBorder),
+                            Constants.TopLeft + new Vector((x + 1) * Constants.BlockSize - Constants.BlockBorder, (y + 1) * Constants.BlockSize - Constants.BlockBorder));
                     }
                 }
             }

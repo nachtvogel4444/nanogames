@@ -15,7 +15,7 @@ void main()
 
 	/* Project the view ray onto the spherical tube and compute the screen coordinates that we hit. */
 	float d = (r + 1) / r;
-	float xs = 0.87157553712 * d * sqrt(FragmentTextureCoordinate.x * FragmentTextureCoordinate.x + 0.31640625 * FragmentTextureCoordinate.y * FragmentTextureCoordinate.y);
+	float xs = 0.847998304 * d * sqrt(FragmentTextureCoordinate.x * FragmentTextureCoordinate.x + 0.390625 * FragmentTextureCoordinate.y * FragmentTextureCoordinate.y);
 	float a = d / xs;
 	float xt = (a * d - sqrt(a * a - d * d + 1)) / (a * a + 1);
 	float f = xt / xs * d * r;
