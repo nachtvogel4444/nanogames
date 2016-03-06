@@ -36,6 +36,14 @@ namespace NanoGames.Games
         public Random Random { get; } = new Random();
 
         /// <summary>
+        /// Gets or sets the player's score.
+        /// This used to determine the player's ranking.
+        /// It's never shown on the screen and can be a completely artificial number.
+        /// Higher scores are better.
+        /// </summary>
+        public double Score { get; set; }
+
+        /// <summary>
         /// Initializes the player. This is called after <see cref="Match{TPlayer}.Initialize()"/>.
         /// </summary>
         public abstract void Initialize();

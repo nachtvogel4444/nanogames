@@ -60,6 +60,11 @@ namespace NanoGames.Application
                                 Input = terminal.Input,
                             },
                         });
+
+                    if (_match.IsCompleted)
+                    {
+                        _match = null;
+                    }
                 }
             }
 

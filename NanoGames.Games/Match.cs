@@ -17,6 +17,11 @@ namespace NanoGames.Games
         public Random Random { get; } = new Random();
 
         /// <summary>
+        /// Gets or sets a value indicating whether the match is completed.
+        /// </summary>
+        public bool IsCompleted { get; set; }
+
+        /// <summary>
         /// Updates and renders the match.
         /// </summary>
         /// <param name="terminal"></param>

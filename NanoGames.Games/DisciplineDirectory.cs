@@ -15,6 +15,7 @@ namespace NanoGames.Games
         static DisciplineDirectory()
         {
             /* Note: names must be in ALL-CAPS to render correctly. */
+            Add<Example.ExampleMatch, Example.ExamplePlayer>("EXAMPLE");
             Add<FallingBlocks.FallingBlocksMatch, FallingBlocks.FallingBlocksPlayer>("FALLING BLOCKS");
         }
 

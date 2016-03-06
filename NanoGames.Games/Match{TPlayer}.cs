@@ -31,6 +31,8 @@ namespace NanoGames.Games
             }
 
             Players = players.AsReadOnly();
+
+            Initialize();
         }
 
         /// <inheritdoc/>

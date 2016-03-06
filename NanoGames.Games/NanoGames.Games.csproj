@@ -50,6 +50,8 @@
     <Compile Include="Discipline.cs" />
     <Compile Include="DisciplineDirectory.cs" />
     <Compile Include="Discipline{TMatch,TPlayer}.cs" />
+    <Compile Include="Example\ExampleMatch.cs" />
+    <Compile Include="Example\ExamplePlayer.cs" />
     <Compile Include="FallingBlocks\Constants.cs" />
     <Compile Include="FallingBlocks\FallingBlocksMatch.cs" />
     <Compile Include="FallingBlocks\FallingBlocksPlayer.cs" />
