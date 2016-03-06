@@ -93,7 +93,7 @@ namespace NanoGames.Application
                 },
             };
 
-            _match = DisciplineDirectory.Disciplines[0].CreateMatch(description);
+            _match = discipline.CreateMatch(description);
         }
     }
 }
