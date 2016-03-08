@@ -48,6 +48,20 @@ namespace NanoGames.Application
                             Settings.Instance.IsFullscreen = v;
                         },
                     },
+                    new ChoiceMenuItem<bool>("VSYNC")
+                    {
+                        Choices =
+                        {
+                            new Choice<bool>(false, "NO"),
+                            new Choice<bool>(true, "YES"),
+                        },
+                        SelectedValue = Settings.Instance.IsVSynced,
+                        OnSelect = v =>
+                        {
+                            Window.Current.IsVSynced = v;
+                            Settings.Instance.IsVSynced = v;
+                        },
+                    },
                     new ChoiceMenuItem<bool>("SHOW FPS")
                     {
                         Choices =

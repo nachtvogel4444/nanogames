@@ -24,6 +24,7 @@ namespace NanoGames.Application
 
         private bool _showFps = false;
         private bool _isFullscreen = false;
+        private bool _isVSynced = true;
         private string _playerName = "ANON";
         private string _lastServer = string.Empty;
 
@@ -66,6 +67,23 @@ namespace NanoGames.Application
             set
             {
                 _isFullscreen = value;
+                Save();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the rendering is vsynced.
+        /// </summary>
+        public bool IsVSynced
+        {
+            get
+            {
+                return _isVSynced;
+            }
+
+            set
+            {
+                _isVSynced = value;
                 Save();
             }
         }

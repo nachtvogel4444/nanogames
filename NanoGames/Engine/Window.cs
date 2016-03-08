@@ -85,6 +85,15 @@ namespace NanoGames.Engine
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the rendering is vsynced.
+        /// </summary>
+        public bool IsVSynced
+        {
+            get { return _gameWindow.VSync == VSyncMode.On; }
+            set { _gameWindow.VSync = value ? VSyncMode.On : VSyncMode.Off; }
+        }
+
+        /// <summary>
         /// Runs the game loop until the game is quit.
         /// </summary>
         /// <typeparam name="TView">The main view type.</typeparam>

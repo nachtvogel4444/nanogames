@@ -30,6 +30,7 @@ namespace NanoGames.Application
         public MainView()
         {
             Window.Current.IsFullscreen = Settings.Instance.IsFullscreen;
+            Window.Current.IsVSynced = Settings.Instance.IsVSynced;
 
             _mainMenu = new Menu("NANOGAMES")
             {
