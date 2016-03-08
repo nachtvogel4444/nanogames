@@ -98,7 +98,7 @@ namespace NanoGames.Application
                 _currentView.Update(terminal);
 
                 /* Run the rest of the update method, but hide the output. */
-                terminal = new Terminal(Graphics.Null);
+                terminal = new Terminal(null);
             }
 
             if (!_endpointTask.IsCompleted)

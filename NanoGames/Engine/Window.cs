@@ -110,8 +110,7 @@ namespace NanoGames.Engine
             {
                 using (var renderer = new Renderer())
                 {
-                    var graphics = new Graphics(renderer);
-                    var terminal = new Terminal(graphics);
+                    var terminal = new Terminal(renderer);
 
                     using (var mainView = createMainView())
                     {

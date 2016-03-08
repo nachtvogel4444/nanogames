@@ -4,8 +4,10 @@
 using NanoGames.Application.Ui;
 using NanoGames.Engine;
 using NanoGames.Games;
+using NanoGames.Synchronization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace NanoGames.Application
@@ -23,6 +25,11 @@ namespace NanoGames.Application
         private Terminal _currentTerminal;
         private Match _match;
 
+        private BufferedRenderer _bufferedRenderer;
+        private Graphics _bufferedGraphics;
+        private long _matchStartTimestamp;
+        private long _matchFrameCount = 0;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PracticeView"/> class.
         /// </summary>
@@ -30,6 +37,9 @@ namespace NanoGames.Application
         public PracticeView(Action goBack)
         {
             _goBack = goBack;
+
+            _bufferedRenderer = new BufferedRenderer();
+            _bufferedGraphics = new Graphics(_bufferedRenderer);
 
             _selectDisciplineMenu = new Menu("SELECT GAME")
             {
@@ -51,21 +61,7 @@ namespace NanoGames.Application
                 }
                 else
                 {
-                    _match = Synchronization.Cloning.Clone(_match);
-                    _match.Update(
-                        new List<PlayerDescription>
-                        {
-                            new PlayerDescription
-                            {
-                                Graphics = terminal.Graphics,
-                                Input = terminal.Input,
-                            },
-                        });
-
-                    if (_match.IsCompleted)
-                    {
-                        _match = null;
-                    }
+                    UpdateMatch(terminal);
                 }
             }
 
@@ -74,6 +70,41 @@ namespace NanoGames.Application
                 _currentTerminal = terminal;
                 _selectDisciplineMenu.Update(terminal);
             }
+        }
+
+        private void UpdateMatch(Terminal terminal)
+        {
+            var currentTimestamp = Stopwatch.GetTimestamp();
+
+            if (_matchStartTimestamp == 0)
+            {
+                _matchStartTimestamp = currentTimestamp;
+            }
+
+            /* Check if the buffered frame is still valid and compute new frames as needed. */
+            while (Stopwatch.GetTimestamp() - _matchStartTimestamp - _matchFrameCount * GameSpeed.FrameInterval > GameSpeed.FrameInterval)
+            {
+                ++_matchFrameCount;
+                _bufferedRenderer.Clear();
+                _match.Update(
+                    new List<PlayerDescription>
+                    {
+                                new PlayerDescription
+                                {
+                                    Graphics = _bufferedGraphics,
+                                    Input = terminal.Input,
+                                },
+                    });
+
+                if (_match.IsCompleted)
+                {
+                    _match = null;
+                    return;
+                }
+            }
+
+            /* Render the buffered frame. */
+            _bufferedRenderer.RenderTo(terminal.Renderer);
         }
 
         private void GoBack()
