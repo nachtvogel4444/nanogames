@@ -12,7 +12,7 @@ namespace NanoGames.Network
     /// <typeparam name="TPacket">The packet type.</typeparam>
     public sealed class Client<TPacket> : Endpoint<TPacket>
     {
-        private readonly TcpClient _tcpClient;
+        private TcpClient _tcpClient;
 
         private NetworkStream _stream;
         private StreamReader _reader;
@@ -20,7 +20,8 @@ namespace NanoGames.Network
 
         private Client()
         {
-            _tcpClient = new TcpClient();
+            _tcpClient = new TcpClient(AddressFamily.InterNetworkV6);
+            _tcpClient.Client.DualMode = true;
         }
 
         /// <summary>
