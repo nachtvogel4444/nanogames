@@ -20,6 +20,8 @@ namespace NanoGames.Application
         private readonly List<int> _freeIndexes = new List<int>();
 
         private long _lastTimestamp = 0;
+        private long _nextStarTimestamp = 0;
+        private long _starInterval = Stopwatch.Frequency / 60 / 16;
 
         /// <inheritdoc/>
         public void Update(Terminal terminal)
@@ -29,6 +31,7 @@ namespace NanoGames.Application
             _lastTimestamp = currentTimestamp;
             if (currentTimestamp == deltaTimestamp)
             {
+                _nextStarTimestamp = currentTimestamp;
                 return;
             }
 
@@ -65,8 +68,10 @@ namespace NanoGames.Application
                     GetScreenVector(x, y, z));
             }
 
-            while (_random.NextDouble() > 1.0 / 16.0)
+            while (currentTimestamp > _nextStarTimestamp)
             {
+                _nextStarTimestamp += _starInterval;
+
                 int f = _freeIndexes.Count - 1;
                 if (f >= 0)
                 {
