@@ -91,6 +91,7 @@ namespace NanoGames.Application
             if (_currentView == null && escape)
             {
                 _currentView = _menu;
+                terminal.KeyEvents.Clear();
             }
 
             if (_currentView != null)
