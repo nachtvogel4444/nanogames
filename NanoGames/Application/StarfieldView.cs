@@ -13,7 +13,8 @@ namespace NanoGames.Application
     /// </summary>
     internal sealed class StarfieldView : IView
     {
-        private const double _velocity = 0.225;
+        private const double _velocity = 0.25;
+        private const int _starsPerSecond = 1024;
 
         private readonly Random _random = new Random();
         private readonly List<Star> _stars = new List<Star>();
@@ -21,11 +22,23 @@ namespace NanoGames.Application
 
         private long _lastTimestamp = 0;
         private long _nextStarTimestamp = 0;
-        private long _starInterval = Stopwatch.Frequency / 60 / 16;
+        private long _starInterval = Stopwatch.Frequency / _starsPerSecond;
 
         /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
+            if (_stars.Count == 0)
+            {
+                double starDistanceInterval = _velocity / _starsPerSecond;
+                for (double z = 1; z > 0; z -= starDistanceInterval)
+                {
+                    var star = new Star();
+                    CreateStar(star);
+                    star.Z = z;
+                    _stars.Add(star);
+                }
+            }
+
             var currentTimestamp = Stopwatch.GetTimestamp();
             var deltaTimestamp = currentTimestamp - _lastTimestamp;
             _lastTimestamp = currentTimestamp;
@@ -64,7 +77,7 @@ namespace NanoGames.Application
 
                 terminal.Graphics.Line(
                     new Color(c, c, c),
-                    GetScreenVector(x, y, oldZ + _velocity / 60),
+                    GetScreenVector(x, y, z + _velocity / 32),
                     GetScreenVector(x, y, z));
             }
 
