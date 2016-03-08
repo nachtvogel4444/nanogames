@@ -10,6 +10,7 @@ namespace NanoGames.Engine
     /// <summary>
     /// The 2D renderer implementation.
     /// </summary>
+    [Synchronization.NonClonable]
     internal sealed class Renderer : IRenderer, IDisposable
     {
         private const float _lineRadius = 0.5f;

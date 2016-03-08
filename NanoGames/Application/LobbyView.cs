@@ -28,8 +28,6 @@ namespace NanoGames.Application
         private PlayerInfo _myPlayerInfo;
         private Dictionary<PlayerId, PlayerInfo> _players = new Dictionary<PlayerId, PlayerInfo>();
 
-        private bool _fireWasPressed = true;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="LobbyView"/> class.
         /// </summary>
@@ -74,7 +72,23 @@ namespace NanoGames.Application
         /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
-            if (_currentView == null && terminal.Input.Escape)
+            bool escape = false;
+            bool enter = false;
+            foreach (var keyEvent in terminal.KeyEvents)
+            {
+                switch (keyEvent.Code)
+                {
+                    case KeyCode.Escape:
+                        escape = true;
+                        break;
+
+                    case KeyCode.Enter:
+                        enter = true;
+                        break;
+                }
+            }
+
+            if (_currentView == null && escape)
             {
                 _currentView = _menu;
             }
@@ -84,12 +98,12 @@ namespace NanoGames.Application
                 _currentView.Update(terminal);
 
                 /* Run the rest of the update method, but hide the output. */
-                terminal = new Terminal(new ExtendedInput(), Graphics.Null);
+                terminal = new Terminal(Graphics.Null);
             }
 
             if (!_endpointTask.IsCompleted)
             {
-                if (terminal.Input.Escape || terminal.Input.AltFire)
+                if (escape || enter)
                 {
                     _goBack();
                     return;
@@ -102,7 +116,7 @@ namespace NanoGames.Application
 
             if (_endpointTask.IsFaulted || _endpointTask.IsCanceled || !_endpointTask.Result.IsConnected)
             {
-                if (terminal.Input.Escape || terminal.Input.Fire || terminal.Input.AltFire)
+                if (escape || enter)
                 {
                     _goBack();
                     return;
@@ -129,17 +143,9 @@ namespace NanoGames.Application
                 HandlePacket(packet);
             }
 
-            if (terminal.Input.Fire)
+            if (enter)
             {
-                if (!_fireWasPressed)
-                {
-                    _fireWasPressed = true;
-                    _myPlayerInfo.IsReady = !_myPlayerInfo.IsReady;
-                }
-            }
-            else
-            {
-                _fireWasPressed = false;
+                _myPlayerInfo.IsReady = !_myPlayerInfo.IsReady;
             }
 
             UpdateLobby(terminal);
@@ -188,7 +194,7 @@ namespace NanoGames.Application
             }
             else
             {
-                terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, Menu.TitleY), "SPACE TO START");
+                terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, Menu.TitleY), "ENTER TO START");
             }
         }
 

@@ -22,10 +22,6 @@ namespace NanoGames.Application.Ui
         /// </summary>
         public const double TitleY = 32;
 
-        private const int _keyRepeatFrames = 12;
-
-        private int _framesSinceKeyPress;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Menu"/> class.
         /// </summary>
@@ -64,7 +60,7 @@ namespace NanoGames.Application.Ui
                 return;
             }
 
-            ProcessInput(terminal.Input);
+            ProcessInput(terminal.KeyEvents);
 
             SelectedIndex = (SelectedIndex + items) % items;
 
@@ -80,85 +76,28 @@ namespace NanoGames.Application.Ui
             }
         }
 
-        private void ProcessInput(ExtendedInput input)
+        private void ProcessInput(List<KeyEvent> keyEvents)
         {
-            if (_framesSinceKeyPress < _keyRepeatFrames)
+            foreach (var keyEvent in keyEvents)
             {
-                ++_framesSinceKeyPress;
-            }
+                switch (keyEvent.Code)
+                {
+                    case KeyCode.Up:
+                        --SelectedIndex;
+                        break;
 
-            if (input.Text != null)
-            {
-                Items?[SelectedIndex]?.HandleText(input.Text);
-            }
+                    case KeyCode.Down:
+                        ++SelectedIndex;
+                        break;
 
-            if (input.Escape || input.AltFire)
-            {
-                if (_framesSinceKeyPress >= _keyRepeatFrames)
-                {
-                    OnBack?.Invoke();
-                    _framesSinceKeyPress = 0;
+                    case KeyCode.Escape:
+                        OnBack?.Invoke();
+                        break;
+
+                    default:
+                        Items?[SelectedIndex]?.HandleKeyEvent(keyEvent);
+                        break;
                 }
-            }
-            else if (input.Down)
-            {
-                if (_framesSinceKeyPress >= _keyRepeatFrames)
-                {
-                    ++SelectedIndex;
-                    _framesSinceKeyPress = 0;
-                }
-            }
-            else if (input.Up)
-            {
-                if (_framesSinceKeyPress >= _keyRepeatFrames)
-                {
-                    --SelectedIndex;
-                    _framesSinceKeyPress = 0;
-                }
-            }
-            else if (input.Fire)
-            {
-                if (_framesSinceKeyPress >= _keyRepeatFrames)
-                {
-                    Items?[SelectedIndex]?.HandleActivate();
-                    _framesSinceKeyPress = 0;
-                }
-            }
-            else if (input.Left)
-            {
-                if (_framesSinceKeyPress >= _keyRepeatFrames)
-                {
-                    Items?[SelectedIndex]?.HandleLeft();
-                    _framesSinceKeyPress = 0;
-                }
-            }
-            else if (input.Right)
-            {
-                if (_framesSinceKeyPress >= _keyRepeatFrames)
-                {
-                    Items?[SelectedIndex]?.HandleRight();
-                    _framesSinceKeyPress = 0;
-                }
-            }
-            else if (input.Backspace)
-            {
-                if (_framesSinceKeyPress >= _keyRepeatFrames)
-                {
-                    Items?[SelectedIndex]?.HandleBackspace();
-                    _framesSinceKeyPress = 0;
-                }
-            }
-            else if (input.Delete)
-            {
-                if (_framesSinceKeyPress >= _keyRepeatFrames)
-                {
-                    Items?[SelectedIndex]?.HandleDelete();
-                    _framesSinceKeyPress = 0;
-                }
-            }
-            else
-            {
-                _framesSinceKeyPress = _keyRepeatFrames;
             }
         }
     }

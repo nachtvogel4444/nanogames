@@ -6,7 +6,7 @@ namespace NanoGames
     /// <summary>
     /// Represents the input state of a player.
     /// </summary>
-    public class Input
+    public sealed class Input
     {
         /// <summary>
         /// Gets or sets a value indicating whether the up button is pressed.
@@ -37,5 +37,19 @@ namespace NanoGames
         /// Gets or sets a value indicating whether the alt fire button is pressed.
         /// </summary>
         public bool AltFire { get; set; }
+
+        /// <summary>
+        /// Copies all values from another instance.
+        /// </summary>
+        /// <param name="input">The instance to copy from.</param>
+        public void CopyFrom(Input input)
+        {
+            Up = input.Up;
+            Down = input.Down;
+            Left = input.Left;
+            Right = input.Right;
+            Fire = input.Fire;
+            AltFire = input.AltFire;
+        }
     }
 }

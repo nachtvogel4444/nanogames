@@ -37,9 +37,12 @@ namespace NanoGames.Application.Ui
         }
 
         /// <inheritdoc/>
-        public override void HandleActivate()
+        public override void HandleKeyEvent(KeyEvent keyEvent)
         {
-            _onActivate?.Invoke();
+            if (keyEvent.Code == KeyCode.Enter)
+            {
+                _onActivate?.Invoke();
+            }
         }
     }
 }

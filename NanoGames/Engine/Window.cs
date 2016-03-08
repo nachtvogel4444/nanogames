@@ -4,6 +4,7 @@
 using OpenTK;
 using OpenTK.Input;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace NanoGames.Engine
@@ -21,7 +22,7 @@ namespace NanoGames.Engine
 
         private bool _isFullscreen;
 
-        private string _textInput = null;
+        private List<KeyEvent> _keyEvents = new List<KeyEvent>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Window"/> class.
@@ -35,6 +36,7 @@ namespace NanoGames.Engine
             _gameWindow.Closed += OnClose;
             _gameWindow.KeyDown += OnKeyDown;
             _gameWindow.KeyPress += OnKeyPress;
+            _gameWindow.Keyboard.KeyRepeat = true;
 
             _isFullscreen = true;
             IsFullscreen = false;
@@ -108,9 +110,8 @@ namespace NanoGames.Engine
             {
                 using (var renderer = new Renderer())
                 {
-                    var input = new ExtendedInput();
                     var graphics = new Graphics(renderer);
-                    var terminal = new Terminal(input, graphics);
+                    var terminal = new Terminal(graphics);
 
                     using (var mainView = createMainView())
                     {
@@ -127,7 +128,7 @@ namespace NanoGames.Engine
                             var height = _gameWindow.Height;
 
                             renderer.BeginFrame(width, height);
-                            UpdateInput(input);
+                            UpdateInput(terminal.Input, terminal.KeyEvents);
                             mainView.Update(terminal);
                             renderer.EndFrame();
 
@@ -151,23 +152,62 @@ namespace NanoGames.Engine
             _gameWindow.Dispose();
         }
 
-        private void UpdateInput(ExtendedInput input)
+        private static KeyCode GetKeyCode(Key key)
         {
-            input.Text = _textInput;
-            _textInput = null;
+            switch (key)
+            {
+                case Key.Up:
+                    return KeyCode.Up;
+
+                case Key.Down:
+                    return KeyCode.Down;
+
+                case Key.Left:
+                    return KeyCode.Left;
+
+                case Key.Right:
+                    return KeyCode.Right;
+
+                case Key.Space:
+                    return KeyCode.Fire;
+
+                case Key.ControlLeft:
+                case Key.ControlRight:
+                case Key.AltLeft:
+                case Key.AltRight:
+                    return KeyCode.AltFire;
+
+                case Key.Escape:
+                    return KeyCode.Escape;
+
+                case Key.Enter:
+                    return KeyCode.Enter;
+
+                case Key.BackSpace:
+                    return KeyCode.Backspace;
+
+                case Key.Delete:
+                    return KeyCode.Delete;
+
+                default:
+                    return KeyCode.None;
+            }
+        }
+
+        private void UpdateInput(Input input, List<KeyEvent> keyEvents)
+        {
+            keyEvents.Clear();
+            keyEvents.AddRange(_keyEvents);
+            _keyEvents.Clear();
 
             var hasFocus = _gameWindow.Focused;
-
-            var keyboardState = Keyboard.GetState();
-            input.Escape = hasFocus && keyboardState[Key.Escape];
+            var keyboardState = hasFocus ? Keyboard.GetState() : default(KeyboardState);
             input.Up = hasFocus && keyboardState[Key.Up];
             input.Down = hasFocus && keyboardState[Key.Down];
             input.Left = hasFocus && keyboardState[Key.Left];
             input.Right = hasFocus && keyboardState[Key.Right];
-            input.Fire = hasFocus && (keyboardState[Key.Space] || keyboardState[Key.Enter] || keyboardState[Key.KeypadEnter]);
-            input.AltFire = hasFocus && (keyboardState[Key.ControlLeft] || keyboardState[Key.ControlRight]);
-            input.Backspace = hasFocus && keyboardState[Key.BackSpace];
-            input.Delete = hasFocus && keyboardState[Key.Delete];
+            input.Fire = hasFocus && keyboardState[Key.Space];
+            input.AltFire = hasFocus && (keyboardState[Key.ControlLeft] || keyboardState[Key.ControlRight] || keyboardState[Key.AltLeft] || keyboardState[Key.AltRight]);
         }
 
         private void OnClose(object sender, EventArgs e)
@@ -181,11 +221,17 @@ namespace NanoGames.Engine
             {
                 _closing = true;
             }
+
+            var code = GetKeyCode(e.Key);
+            if (code != KeyCode.None)
+            {
+                _keyEvents.Add(new KeyEvent(code));
+            }
         }
 
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
-            _textInput = (_textInput ?? string.Empty) + e.KeyChar;
+            _keyEvents.Add(new KeyEvent(e.KeyChar));
         }
     }
 }

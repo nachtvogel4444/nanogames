@@ -64,12 +64,6 @@ namespace NanoGames.Application.Ui
         public Action OnActivate { get; set; }
 
         /// <inheritdoc/>
-        public override void HandleActivate()
-        {
-            OnActivate?.Invoke();
-        }
-
-        /// <inheritdoc/>
         public override void Update(Terminal terminal, Vector position, bool isSelected)
         {
             string text = Label + ": " + _text;
@@ -94,39 +88,61 @@ namespace NanoGames.Application.Ui
         }
 
         /// <inheritdoc/>
-        public override void HandleText(string text)
+        public override void HandleKeyEvent(KeyEvent keyEvent)
         {
-            if (text == null)
+            if (keyEvent.Char != 0)
+            {
+                HandleChar(keyEvent.Char);
+            }
+            else
+            {
+                switch (keyEvent.Code)
+                {
+                    case KeyCode.Enter:
+                        OnActivate?.Invoke();
+                        break;
+
+                    case KeyCode.Left:
+                        HandleLeft();
+                        break;
+
+                    case KeyCode.Right:
+                        HandleRight();
+                        break;
+
+                    case KeyCode.Backspace:
+                        HandleBackspace();
+                        break;
+
+                    case KeyCode.Delete:
+                        HandleDelete();
+                        break;
+                }
+            }
+        }
+
+        private void HandleChar(char c)
+        {
+            ResetCursorBlink();
+
+            if (MaxLength > 0 && _text.Length >= MaxLength)
             {
                 return;
             }
 
-            ResetCursorBlink();
+            c = char.ToUpperInvariant(c);
 
-            bool wasModified = false;
-            foreach (var c in text.ToUpperInvariant())
+            if (Font.GetGlyph(c) == null)
             {
-                if (MaxLength > 0 && _text.Length >= MaxLength)
-                {
-                    break;
-                }
-
-                if (Font.GetGlyph(c) != null)
-                {
-                    _text = _text.Substring(0, _cursorPosition) + c + _text.Substring(_cursorPosition, _text.Length - _cursorPosition);
-                    ++_cursorPosition;
-                    wasModified = true;
-                }
+                return;
             }
 
-            if (wasModified)
-            {
-                OnChange?.Invoke(_text);
-            }
+            _text = _text.Substring(0, _cursorPosition) + c + _text.Substring(_cursorPosition, _text.Length - _cursorPosition);
+            ++_cursorPosition;
+            OnChange?.Invoke(_text);
         }
 
-        /// <inheritdoc/>
-        public override void HandleLeft()
+        private void HandleLeft()
         {
             ResetCursorBlink();
             if (_cursorPosition > 0)
@@ -135,8 +151,7 @@ namespace NanoGames.Application.Ui
             }
         }
 
-        /// <inheritdoc/>
-        public override void HandleRight()
+        private void HandleRight()
         {
             ResetCursorBlink();
             if (_cursorPosition < _text.Length)
@@ -145,8 +160,7 @@ namespace NanoGames.Application.Ui
             }
         }
 
-        /// <inheritdoc/>
-        public override void HandleBackspace()
+        private void HandleBackspace()
         {
             ResetCursorBlink();
             if (_text.Length > 0 && _cursorPosition > 0)
@@ -157,8 +171,7 @@ namespace NanoGames.Application.Ui
             }
         }
 
-        /// <inheritdoc/>
-        public override void HandleDelete()
+        private void HandleDelete()
         {
             ResetCursorBlink();
             if (_text.Length > 0 && _cursorPosition < _text.Length)

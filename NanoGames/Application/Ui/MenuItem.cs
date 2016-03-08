@@ -19,45 +19,10 @@ namespace NanoGames.Application.Ui
         public abstract void Update(Terminal terminal, Vector position, bool isSelected);
 
         /// <summary>
-        /// Called when the menu item is activated.
+        /// Handles a key event.
         /// </summary>
-        public virtual void HandleActivate()
-        {
-        }
-
-        /// <summary>
-        /// Called when the user navigates left.
-        /// </summary>
-        public virtual void HandleLeft()
-        {
-        }
-
-        /// <summary>
-        /// Called when the user navigates right.
-        /// </summary>
-        public virtual void HandleRight()
-        {
-        }
-
-        /// <summary>
-        /// Called when the user enters text.
-        /// </summary>
-        /// <param name="text">The text entered by the user.</param>
-        public virtual void HandleText(string text)
-        {
-        }
-
-        /// <summary>
-        /// Called when the user presses backspace.
-        /// </summary>
-        public virtual void HandleBackspace()
-        {
-        }
-
-        /// <summary>
-        /// Called when the user presses delete.
-        /// </summary>
-        public virtual void HandleDelete()
+        /// <param name="keyEvent">The key event to handle.</param>
+        public virtual void HandleKeyEvent(KeyEvent keyEvent)
         {
         }
     }

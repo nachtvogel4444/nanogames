@@ -45,12 +45,13 @@ namespace NanoGames.Application
         {
             if (_match != null)
             {
-                if (terminal.Input.Escape)
+                if (terminal.KeyEvents.Any(k => k.Code == KeyCode.Escape))
                 {
                     _match = null;
                 }
                 else
                 {
+                    _match = Synchronization.Cloning.Clone(_match);
                     _match.Update(
                         new List<PlayerDescription>
                         {

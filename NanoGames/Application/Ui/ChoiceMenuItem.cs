@@ -91,28 +91,23 @@ namespace NanoGames.Application.Ui
         }
 
         /// <inheritdoc/>
-        public override void HandleActivate()
-        {
-            HandleRight();
-        }
-
-        /// <inheritdoc/>
-        public override void HandleLeft()
+        public override void HandleKeyEvent(KeyEvent keyEvent)
         {
             if (Choices != null && Choices.Count > 0)
             {
-                SelectedIndex = (SelectedIndex + Choices.Count - 1) % Choices.Count;
-                InvokeOnSelect();
-            }
-        }
+                switch (keyEvent.Code)
+                {
+                    case KeyCode.Left:
+                        SelectedIndex = (SelectedIndex + Choices.Count - 1) % Choices.Count;
+                        InvokeOnSelect();
+                        break;
 
-        /// <inheritdoc/>
-        public override void HandleRight()
-        {
-            if (Choices != null && Choices.Count > 0)
-            {
-                SelectedIndex = (SelectedIndex + 1) % Choices.Count;
-                InvokeOnSelect();
+                    case KeyCode.Right:
+                    case KeyCode.Enter:
+                        SelectedIndex = (SelectedIndex + 1) % Choices.Count;
+                        InvokeOnSelect();
+                        break;
+                }
             }
         }
 
