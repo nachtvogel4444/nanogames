@@ -72,9 +72,9 @@
     <Compile Include="..\NanoGames.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Application\LobbyView.cs" />
-    <Compile Include="Application\Packet.cs" />
-    <Compile Include="Application\PlayerId.cs" />
+    <Compile Include="Application\TournamentView.cs" />
+    <Compile Include="Synchronization\Packet.cs" />
+    <Compile Include="Synchronization\PlayerId.cs" />
     <Compile Include="Application\Settings.cs" />
     <Compile Include="Application\SettingsView.cs" />
     <Compile Include="Application\StarfieldView.cs" />
@@ -106,6 +106,8 @@
     <Compile Include="Application\Ui\TextMenuItem.cs" />
     <Compile Include="Synchronization\GameSpeed.cs" />
     <Compile Include="Synchronization\NonClonableAttribute.cs" />
+    <Compile Include="Synchronization\PlayerState.cs" />
+    <Compile Include="Synchronization\Tournament.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

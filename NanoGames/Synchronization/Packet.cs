@@ -3,7 +3,7 @@
 
 using ProtoBuf;
 
-namespace NanoGames.Application
+namespace NanoGames.Synchronization
 {
     /// <summary>
     /// Represents a packet sent over the network.
@@ -22,5 +22,17 @@ namespace NanoGames.Application
         /// </summary>
         [ProtoMember(2)]
         public string PlayerName;
+
+        /// <summary>
+        /// The player's current tournament score.
+        /// </summary>
+        [ProtoMember(3)]
+        public int TournamentScore;
+
+        /// <summary>
+        /// A value indicating whether the player is ready for the next game.
+        /// </summary>
+        [ProtoMember(4)]
+        public bool IsReady;
     }
 }

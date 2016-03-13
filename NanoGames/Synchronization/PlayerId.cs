@@ -2,15 +2,16 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using ProtoBuf;
+using System;
 using System.Diagnostics;
 
-namespace NanoGames.Application
+namespace NanoGames.Synchronization
 {
     /// <summary>
     /// Represents a player id.
     /// </summary>
     [ProtoContract]
-    public struct PlayerId
+    public struct PlayerId : IEquatable<PlayerId>, IComparable<PlayerId>
     {
         [ProtoMember(1)]
         private long _id;
@@ -49,6 +50,18 @@ namespace NanoGames.Application
         public override int GetHashCode()
         {
             return _id.GetHashCode();
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(PlayerId other)
+        {
+            return other == this;
+        }
+
+        /// <inheritdoc/>
+        public int CompareTo(PlayerId other)
+        {
+            return _id.CompareTo(other._id);
         }
     }
 }

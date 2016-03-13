@@ -3,9 +3,8 @@
 
 using NanoGames.Application.Ui;
 using NanoGames.Engine;
-using NanoGames.Network;
+using NanoGames.Synchronization;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,43 +14,27 @@ namespace NanoGames.Application
     /// <summary>
     /// Represents the game lobby.
     /// </summary>
-    internal sealed class LobbyView : IView
+    internal sealed class TournamentView : IView
     {
         private readonly Action _goBack;
         private readonly Menu _menu;
 
-        private readonly Task<Endpoint<Packet>> _endpointTask;
+        private readonly Tournament _tournament;
 
         private IView _currentView;
-        private Endpoint<Packet> _endpoint;
-
-        private PlayerInfo _myPlayerInfo;
-        private Dictionary<PlayerId, PlayerInfo> _players = new Dictionary<PlayerId, PlayerInfo>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LobbyView"/> class.
+        /// Initializes a new instance of the <see cref="TournamentView"/> class.
         /// </summary>
         /// <param name="goBack">The action invoked to navigate back in the menu.</param>
-        /// <param name="endpointTask">The task that will return the endpoint.</param>
-        public LobbyView(Action goBack, Task<Endpoint<Packet>> endpointTask)
+        /// <param name="tournament">The tournament.</param>
+        public TournamentView(Action goBack, Tournament tournament)
         {
+            _tournament = tournament;
+
             _goBack = () =>
             {
-                if (!_endpointTask.IsCanceled && !_endpointTask.IsFaulted)
-                {
-                    Task.Run(
-                    async () =>
-                    {
-                        try
-                        {
-                            (await _endpointTask).Dispose();
-                        }
-                        catch
-                        {
-                        }
-                    });
-                }
-
+                Task.Run(() => _tournament.DisposeAsync());
                 goBack();
             };
 
@@ -65,8 +48,6 @@ namespace NanoGames.Application
                     new CommandMenuItem("DISCONNECT", _goBack),
                 },
             };
-
-            _endpointTask = endpointTask;
         }
 
         /// <inheritdoc/>
@@ -100,9 +81,20 @@ namespace NanoGames.Application
 
                 /* Run the rest of the update method, but hide the output. */
                 terminal = new Terminal(null);
+                escape = false;
+                enter = false;
             }
 
-            if (!_endpointTask.IsCompleted)
+            _tournament.LocalPlayer.Name = Settings.Instance.PlayerName;
+
+            if (enter)
+            {
+                _tournament.LocalPlayer.IsReady = !_tournament.LocalPlayer.IsReady;
+            }
+
+            _tournament.Update(null);
+
+            if (_tournament.IsConnecting)
             {
                 if (escape || enter)
                 {
@@ -115,7 +107,7 @@ namespace NanoGames.Application
                 return;
             }
 
-            if (_endpointTask.IsFaulted || _endpointTask.IsCanceled || !_endpointTask.Result.IsConnected)
+            if (!_tournament.IsConnected)
             {
                 if (escape || enter)
                 {
@@ -123,63 +115,29 @@ namespace NanoGames.Application
                     return;
                 }
 
-                terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, Menu.TitleY), _endpoint == null ? "CONNECTION FAILED" : "CONNECTION LOST");
+                var message = _tournament.WasConnected ? "CONNECTION LOST" : "CONNECTION FAILED";
+                terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, Menu.TitleY), message);
                 terminal.Graphics.PrintCenter(Colors.FocusedControl, 8, new Vector(160, 96), "BACK");
                 return;
             }
 
-            if (_endpoint == null)
-            {
-                _endpoint = _endpointTask.Result;
-
-                _myPlayerInfo = new PlayerInfo { Id = PlayerId.Create(), Name = Settings.Instance.PlayerName };
-                _players[_myPlayerInfo.Id] = _myPlayerInfo;
-
-                SendAnnouncement();
-            }
-
-            Packet packet;
-            while (_endpoint.TryReceive(out packet))
-            {
-                HandlePacket(packet);
-            }
-
-            if (enter)
-            {
-                _myPlayerInfo.IsReady = !_myPlayerInfo.IsReady;
-            }
-
-            UpdateLobby(terminal);
+            DrawLobby(terminal);
         }
 
-        private void SendAnnouncement()
-        {
-            _endpoint.Send(new Packet { PlayerId = _myPlayerInfo.Id, PlayerName = _myPlayerInfo.Name });
-        }
-
-        private void HandlePacket(Packet packet)
-        {
-            if (packet.PlayerId != default(PlayerId) && !_players.ContainsKey(packet.PlayerId))
-            {
-                _players[packet.PlayerId] = new PlayerInfo { Name = packet.PlayerName };
-                SendAnnouncement();
-            }
-        }
-
-        private void UpdateLobby(Terminal terminal)
+        private void DrawLobby(Terminal terminal)
         {
             double fontSize = 8;
             double x = 160 - 0.5 * ((Settings.MaxPlayerNameLength + 6) * fontSize);
-            double y = 100 - 0.5 * _players.Count * fontSize;
+            double y = 100 - 0.5 * _tournament.Players.Count * fontSize;
 
-            foreach (var playerInfo in _players.Values.OrderBy(p => p.Score).ThenBy(p => p.Name, StringComparer.InvariantCultureIgnoreCase))
+            foreach (var playerInfo in _tournament.Players.OrderBy(p => p.TournamentScore).ThenBy(p => p.Name, StringComparer.InvariantCultureIgnoreCase).ThenBy(p => p.Id))
             {
                 terminal.Graphics.Print(Colors.Control, fontSize, new Vector(x + fontSize, y), playerInfo.Name);
                 terminal.Graphics.Print(
                     new Color(0.7, 0.7, 0.7),
                     fontSize,
                     new Vector(x + (Settings.MaxPlayerNameLength + 2) * fontSize, y),
-                    playerInfo.Score.ToString("0000", CultureInfo.InvariantCulture));
+                    playerInfo.TournamentScore.ToString("0000", CultureInfo.InvariantCulture));
 
                 if (playerInfo.IsReady)
                 {
@@ -189,7 +147,7 @@ namespace NanoGames.Application
                 y += fontSize;
             }
 
-            if (_myPlayerInfo.IsReady)
+            if (_tournament.LocalPlayer.IsReady)
             {
                 terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), "WAITING");
             }
@@ -197,17 +155,6 @@ namespace NanoGames.Application
             {
                 terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, Menu.TitleY), "ENTER TO START");
             }
-        }
-
-        private class PlayerInfo
-        {
-            public PlayerId Id;
-
-            public string Name;
-
-            public bool IsReady;
-
-            public int Score = 0;
         }
     }
 }

@@ -4,6 +4,7 @@
 using NanoGames.Application.Ui;
 using NanoGames.Engine;
 using NanoGames.Network;
+using NanoGames.Synchronization;
 using System;
 using System.Threading.Tasks;
 
@@ -54,9 +55,9 @@ namespace NanoGames.Application
                         "HOST GAME",
                         () =>
                         {
-                            _currentView = new LobbyView(
+                            _currentView = new TournamentView(
                                 () => _currentView = _multiplayerMenu,
-                                Task.Run(() => new Server().GetLocalEndpoint<Packet>()));
+                                new Tournament(Task.Run(() => new Server().GetLocalEndpoint<Packet>())));
                         }),
                     new TextMenuItem("CONNECT TO")
                     {
@@ -65,9 +66,9 @@ namespace NanoGames.Application
                         OnActivate = () =>
                         {
                             Settings.Instance.LastServer = _server;
-                            _currentView = new LobbyView(
+                            _currentView = new TournamentView(
                                 () => _currentView = _multiplayerMenu,
-                                Client<Packet>.ConnectAsync(_server));
+                                new Tournament(Client<Packet>.ConnectAsync(_server)));
                         },
                     },
                     new CommandMenuItem("BACK", () => _currentView = _mainMenu),
