@@ -58,6 +58,7 @@ namespace NanoGames.Application
                 if (terminal.KeyEvents.Any(k => k.Code == KeyCode.Escape))
                 {
                     _match = null;
+                    terminal.KeyEvents.Clear();
                 }
                 else
                 {
