@@ -11,9 +11,9 @@ namespace NanoGames.Synchronization
     internal static class Durations
     {
         /// <summary>
-        /// The round countdown duration in Stopwatch ticks.
+        /// The pre-vote countdown duration in Stopwatch ticks.
         /// </summary>
-        public static readonly long Countdown = 5 * Stopwatch.Frequency;
+        public static readonly long VoteCountdown = 5 * Stopwatch.Frequency;
 
         /// <summary>
         /// The vote duration in Stopwatch ticks.
@@ -21,8 +21,13 @@ namespace NanoGames.Synchronization
         public static readonly long Vote = 15 * Stopwatch.Frequency;
 
         /// <summary>
-        /// The pre-match preparation duration in Stopwatch ticks.
+        /// The pre-match transition duration in Stopwatch ticks.
         /// </summary>
-        public static readonly long Preparation = 5 * Stopwatch.Frequency;
+        public static readonly long MatchTransition = 5 * Stopwatch.Frequency;
+
+        /// <summary>
+        /// The pre-match countdown duration in Stopwatch ticks.
+        /// </summary>
+        public static readonly long MatchCountdown = 5 * Stopwatch.Frequency;
     }
 }

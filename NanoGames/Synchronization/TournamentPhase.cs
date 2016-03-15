@@ -21,7 +21,7 @@ namespace NanoGames.Synchronization
         /// <summary>
         /// Show the pre-vote countdown.
         /// </summary>
-        Countdown = 2,
+        VoteCountdown = 2,
 
         /// <summary>
         /// Show the vote.
@@ -29,13 +29,18 @@ namespace NanoGames.Synchronization
         Vote = 3,
 
         /// <summary>
-        /// Show the pre-match preparation.
+        /// Show the pre-match transition.
         /// </summary>
-        Preparation = 4,
+        MatchTransition = 4,
+
+        /// <summary>
+        /// Show the pre-match countdown.
+        /// </summary>
+        MatchCountdown = 5,
 
         /// <summary>
         /// Show the match.
         /// </summary>
-        Match = 5,
+        Match = 6,
     }
 }

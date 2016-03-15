@@ -166,12 +166,12 @@ namespace NanoGames.Synchronization
 
             if (roundDuration < Timestamps.VoteStart)
             {
-                TournamentPhase = TournamentPhase.Countdown;
+                TournamentPhase = TournamentPhase.VoteCountdown;
                 NextPhaseTimestamp = _roundStartTimestamp + Timestamps.VoteStart;
             }
             else
             {
-                if (roundDuration < Timestamps.PreparationStart)
+                if (roundDuration < Timestamps.MatchTransitionStart)
                 {
                     if (_voteOptions.Count == 0)
                     {
@@ -181,7 +181,7 @@ namespace NanoGames.Synchronization
                     }
 
                     TournamentPhase = TournamentPhase.Vote;
-                    NextPhaseTimestamp = _roundStartTimestamp + Timestamps.PreparationStart;
+                    NextPhaseTimestamp = _roundStartTimestamp + Timestamps.MatchTransitionStart;
                 }
                 else
                 {
@@ -190,15 +190,23 @@ namespace NanoGames.Synchronization
                         _voteOptions.Clear();
                     }
 
-                    if (roundDuration < Timestamps.MatchStart)
+                    if (roundDuration < Timestamps.MatchCountdownStart)
                     {
-                        TournamentPhase = TournamentPhase.Preparation;
-                        NextPhaseTimestamp = _roundStartTimestamp + Timestamps.MatchStart;
+                        TournamentPhase = TournamentPhase.MatchTransition;
+                        NextPhaseTimestamp = _roundStartTimestamp + Timestamps.MatchCountdownStart;
                     }
                     else
                     {
-                        TournamentPhase = TournamentPhase.Match;
-                        NextPhaseTimestamp = 0;
+                        if (roundDuration < Timestamps.MatchStart)
+                        {
+                            TournamentPhase = TournamentPhase.MatchCountdown;
+                            NextPhaseTimestamp = _roundStartTimestamp + Timestamps.MatchStart;
+                        }
+                        else
+                        {
+                            TournamentPhase = TournamentPhase.Match;
+                            NextPhaseTimestamp = 0;
+                        }
                     }
                 }
             }
@@ -215,7 +223,7 @@ namespace NanoGames.Synchronization
 
             if (_roundSeed != 0)
             {
-                TournamentPhase = TournamentPhase.Countdown;
+                TournamentPhase = TournamentPhase.VoteCountdown;
 
                 if (Stopwatch.GetTimestamp() - _roundStartTimestamp > Timestamps.VoteStart)
                 {
@@ -226,22 +234,6 @@ namespace NanoGames.Synchronization
                     _voteOptions.Insert(0, null);
                 }
             }
-        }
-
-        private void UpdateVote()
-        {
-            if (Stopwatch.GetTimestamp() - _roundStartTimestamp > Timestamps.VoteStart)
-            {
-                TournamentPhase = TournamentPhase.Preparation;
-
-                _roundRandom = new Random(_roundSeed);
-                _voteOptions = _roundRandom.Shuffle(DisciplineDirectory.Disciplines.Take(3));
-                _voteOptions.Insert(0, null);
-            }
-        }
-
-        private void UpdateGame()
-        {
         }
 
         private void SendPlayerState(Endpoint<PacketData> endpoint)
@@ -293,11 +285,8 @@ namespace NanoGames.Synchronization
             {
                 if (_roundSeed == 0 || packetData.RoundPriority < _roundPriority)
                 {
-                    _roundSeed = packetData.RoundSeed;
-                    _roundPriority = packetData.RoundPriority;
-
                     var matchStartTimeStamp = packet.ArrivalTimestamp - packetData.RoundMilliFrames * GameSpeed.FrameDuration / 1000;
-                    if (_roundStartTimestamp == 0)
+                    if (_roundStartTimestamp == 0 || packetData.RoundPriority < _roundPriority)
                     {
                         _roundStartTimestamp = matchStartTimeStamp;
                     }
@@ -305,6 +294,9 @@ namespace NanoGames.Synchronization
                     {
                         _roundStartTimestamp = Math.Min(_roundStartTimestamp, matchStartTimeStamp);
                     }
+
+                    _roundSeed = packetData.RoundSeed;
+                    _roundPriority = packetData.RoundPriority;
                 }
             }
         }

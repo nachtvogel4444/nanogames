@@ -26,6 +26,8 @@ namespace NanoGames.Application
 
         private Menu _voteMenu = new Menu(null);
 
+        private StarfieldView _warpStarfield = new StarfieldView();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TournamentView"/> class.
         /// </summary>
@@ -117,7 +119,7 @@ namespace NanoGames.Application
                 switch (_tournament.TournamentPhase)
                 {
                     case TournamentPhase.Lobby:
-                    case TournamentPhase.Countdown:
+                    case TournamentPhase.VoteCountdown:
                         if (enter)
                         {
                             _tournament.LocalPlayer.IsReady = !_tournament.LocalPlayer.IsReady;
@@ -130,7 +132,15 @@ namespace NanoGames.Application
                         UpdateVoteView(terminal);
                         break;
 
-                    case TournamentPhase.Preparation:
+                    case TournamentPhase.MatchTransition:
+                        double transitionTime = (Stopwatch.GetTimestamp() - _tournament.NextPhaseTimestamp + Durations.MatchTransition) / (double)Durations.MatchTransition;
+                        _warpStarfield.Velocity = 3 * (0.5 - 0.5 * Math.Cos(transitionTime * transitionTime * 2 * Math.PI));
+                        _warpStarfield.Warp = 1 + _warpStarfield.Velocity;
+                        _warpStarfield.Update(terminal);
+                        break;
+
+                    case TournamentPhase.MatchCountdown:
+                        terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, 96), SecondsUntilNextPhase().ToString());
                         break;
 
                     case TournamentPhase.Match:
@@ -167,7 +177,7 @@ namespace NanoGames.Application
                 y += fontSize;
             }
 
-            if (_tournament.TournamentPhase == TournamentPhase.Countdown)
+            if (_tournament.TournamentPhase == TournamentPhase.VoteCountdown)
             {
                 var title = string.Format("NEXT ROUND IN {0}", SecondsUntilNextPhase());
                 terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), title);

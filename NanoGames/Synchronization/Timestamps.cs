@@ -11,16 +11,21 @@ namespace NanoGames.Synchronization
         /// <summary>
         /// The timestamp where the vote starts.
         /// </summary>
-        public static readonly long VoteStart = Durations.Countdown;
+        public static readonly long VoteStart = Durations.VoteCountdown;
 
         /// <summary>
-        /// The timestamp where the vote ends and the pre-match preparation starts.
+        /// The timestamp where the vote ends and the pre-match transition starts.
         /// </summary>
-        public static readonly long PreparationStart = VoteStart + Durations.Vote;
+        public static readonly long MatchTransitionStart = VoteStart + Durations.Vote;
 
         /// <summary>
-        /// The timestamp where the match starts.
+        /// The timestamp where the pre-match transition ends and the pre-match countdown starts.
         /// </summary>
-        public static readonly long MatchStart = PreparationStart + Durations.Preparation;
+        public static readonly long MatchCountdownStart = MatchTransitionStart + Durations.MatchTransition;
+
+        /// <summary>
+        /// The timestamp where the pre-match countdown ends and the match starts.
+        /// </summary>
+        public static readonly long MatchStart = MatchCountdownStart + Durations.MatchCountdown;
     }
 }

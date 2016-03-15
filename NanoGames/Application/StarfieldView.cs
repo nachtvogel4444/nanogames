@@ -13,23 +13,30 @@ namespace NanoGames.Application
     /// </summary>
     internal sealed class StarfieldView : IView
     {
-        private const double _velocity = 0.25;
-        private const int _starsPerSecond = 1024;
-
+        private const double _starsPerInterval = 4096;
         private readonly Random _random = new Random();
         private readonly List<Star> _stars = new List<Star>();
         private readonly List<int> _freeIndexes = new List<int>();
-
         private long _lastTimestamp = 0;
-        private long _nextStarTimestamp = 0;
-        private long _starInterval = Stopwatch.Frequency / _starsPerSecond;
+
+        private long _lastStarTimestamp = 0;
+
+        /// <summary>
+        /// Gets or sets the velocity.
+        /// </summary>
+        public double Velocity { get; set; } = 0.25;
+
+        /// <summary>
+        /// Gets or sets the "warp" factor, which makes the star trails appear longer.
+        /// </summary>
+        public double Warp { get; set; } = 1.0;
 
         /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
             if (_stars.Count == 0)
             {
-                double starDistanceInterval = _velocity / _starsPerSecond;
+                double starDistanceInterval = 1 / _starsPerInterval;
                 for (double z = 1; z > 0; z -= starDistanceInterval)
                 {
                     var star = new Star();
@@ -44,7 +51,7 @@ namespace NanoGames.Application
             _lastTimestamp = currentTimestamp;
             if (currentTimestamp == deltaTimestamp)
             {
-                _nextStarTimestamp = currentTimestamp;
+                _lastStarTimestamp = currentTimestamp;
                 return;
             }
 
@@ -60,7 +67,7 @@ namespace NanoGames.Application
                 }
 
                 var oldZ = star.Z;
-                var z = oldZ - _velocity * deltaTime;
+                var z = oldZ - Velocity * deltaTime;
 
                 if (z < 0)
                 {
@@ -77,13 +84,16 @@ namespace NanoGames.Application
 
                 terminal.Graphics.Line(
                     new Color(c, c, c),
-                    GetScreenVector(x, y, z + _velocity / 32),
+                    GetScreenVector(x, y, z + Velocity / 32 * Warp),
                     GetScreenVector(x, y, z));
             }
 
-            while (currentTimestamp > _nextStarTimestamp)
+            double starsPerSecond = Velocity * _starsPerInterval;
+            long starInterval = (long)(Stopwatch.Frequency / starsPerSecond);
+
+            while (currentTimestamp > _lastStarTimestamp + starInterval)
             {
-                _nextStarTimestamp += _starInterval;
+                _lastStarTimestamp += starInterval;
 
                 int f = _freeIndexes.Count - 1;
                 if (f >= 0)
