@@ -35,5 +35,15 @@ namespace NanoGames
             G = g;
             B = b;
         }
+
+        public static Color operator *(double f, Color c)
+        {
+            return new Color(f * c.R, f * c.G, f * c.B);
+        }
+
+        public static Color operator *(Color c, double f)
+        {
+            return f * c;
+        }
     }
 }

@@ -5,6 +5,7 @@ using NanoGames.Application.Ui;
 using NanoGames.Engine;
 using NanoGames.Synchronization;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +23,8 @@ namespace NanoGames.Application
         private readonly Tournament _tournament;
 
         private IView _currentView;
+
+        private Menu _voteMenu = new Menu(null);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TournamentView"/> class.
@@ -87,27 +90,17 @@ namespace NanoGames.Application
 
             _tournament.LocalPlayer.Name = Settings.Instance.PlayerName;
 
-            if (enter)
-            {
-                _tournament.LocalPlayer.IsReady = !_tournament.LocalPlayer.IsReady;
-            }
-
-            _tournament.Update(null);
-
             if (_tournament.IsConnecting)
             {
                 if (escape || enter)
                 {
                     _goBack();
-                    return;
                 }
 
                 terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), "CONNECTING");
                 terminal.Graphics.PrintCenter(Colors.FocusedControl, 8, new Vector(160, 96), "CANCEL");
-                return;
             }
-
-            if (!_tournament.IsConnected)
+            else if (!_tournament.IsConnected)
             {
                 if (escape || enter)
                 {
@@ -118,13 +111,40 @@ namespace NanoGames.Application
                 var message = _tournament.WasConnected ? "CONNECTION LOST" : "CONNECTION FAILED";
                 terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, Menu.TitleY), message);
                 terminal.Graphics.PrintCenter(Colors.FocusedControl, 8, new Vector(160, 96), "BACK");
-                return;
+            }
+            else
+            {
+                switch (_tournament.TournamentPhase)
+                {
+                    case TournamentPhase.Lobby:
+                    case TournamentPhase.Countdown:
+                        if (enter)
+                        {
+                            _tournament.LocalPlayer.IsReady = !_tournament.LocalPlayer.IsReady;
+                        }
+
+                        UpdateLobbyView(terminal);
+                        break;
+
+                    case TournamentPhase.Vote:
+                        UpdateVoteView(terminal);
+                        break;
+
+                    case TournamentPhase.Preparation:
+                        break;
+
+                    case TournamentPhase.Match:
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
+                }
             }
 
-            DrawLobby(terminal);
+            _tournament.Update(null);
         }
 
-        private void DrawLobby(Terminal terminal)
+        private void UpdateLobbyView(Terminal terminal)
         {
             double fontSize = 8;
             double x = 160 - 0.5 * ((Settings.MaxPlayerNameLength + 6) * fontSize);
@@ -147,14 +167,61 @@ namespace NanoGames.Application
                 y += fontSize;
             }
 
-            if (_tournament.LocalPlayer.IsReady)
+            if (_tournament.TournamentPhase == TournamentPhase.Countdown)
             {
-                terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), "WAITING");
+                var title = string.Format("NEXT ROUND IN {0}", SecondsUntilNextPhase());
+                terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), title);
             }
             else
             {
-                terminal.Graphics.PrintCenter(Colors.Error, 8, new Vector(160, Menu.TitleY), "ENTER TO START");
+                if (_tournament.LocalPlayer.IsReady)
+                {
+                    terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), "WAITING FOR OTHERS");
+                }
+                else
+                {
+                    var c = Colors.Error * (0.5 + 0.5 * Math.Sin(Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency * 2 * Math.PI));
+                    terminal.Graphics.PrintCenter(c, 8, new Vector(160, Menu.TitleY), "PRESS ENTER");
+                }
             }
+        }
+
+        private void UpdateVoteView(Terminal terminal)
+        {
+            string skipTitle = "SKIP THIS ROUND";
+            var maxDisciplineNameLength = Math.Max(skipTitle.Length, _tournament.VoteOptions.Skip(1).Max(d => d.Name.Length));
+
+            if (_voteMenu.Items.Count != _tournament.VoteOptions.Count)
+            {
+                skipTitle += new string(' ', maxDisciplineNameLength + 3 - skipTitle.Length);
+
+                _voteMenu.Items = _tournament.VoteOptions
+                    .Select(discipline => new CommandMenuItem(skipTitle, null))
+                    .Cast<MenuItem>()
+                    .ToList();
+            }
+
+            var secondsToVote = SecondsUntilNextPhase();
+            _voteMenu.Title = secondsToVote == 1 ? "1 SECOND TO VOTE" : string.Format(CultureInfo.InvariantCulture, "{0} SECONDS TO VOTE", SecondsUntilNextPhase());
+
+            for (int i = 0; i < _tournament.VoteOptions.Count; ++i)
+            {
+                var discipline = _tournament.VoteOptions[i];
+                if (discipline != null)
+                {
+                    var count = _tournament.Players.Count(p => p.VoteOption == i);
+                    string disciplineName = discipline.Name + new string(' ', maxDisciplineNameLength - discipline.Name.Length);
+                    ((CommandMenuItem)_voteMenu.Items[i]).Text = string.Format(CultureInfo.InvariantCulture, "{0} {1:00}", disciplineName, count);
+                }
+            }
+
+            _voteMenu.Update(terminal);
+            _tournament.LocalPlayer.VoteOption = _voteMenu.SelectedIndex;
+        }
+
+        private int SecondsUntilNextPhase()
+        {
+            return (int)Math.Ceiling((_tournament.NextPhaseTimestamp - Stopwatch.GetTimestamp()) / (double)Stopwatch.Frequency);
         }
     }
 }

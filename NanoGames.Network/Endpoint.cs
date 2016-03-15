@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Threading;
 
 namespace NanoGames.Network
@@ -10,10 +11,10 @@ namespace NanoGames.Network
     /// <summary>
     /// Represents a network connection to a game.
     /// </summary>
-    /// <typeparam name="TPacket">The packet type.</typeparam>
-    public abstract class Endpoint<TPacket> : IDisposable
+    /// <typeparam name="TPacketData">The packet type.</typeparam>
+    public abstract class Endpoint<TPacketData> : IDisposable
     {
-        private readonly BlockingCollection<byte[]> _inbox = new BlockingCollection<byte[]>();
+        private readonly BlockingCollection<PacketData> _inbox = new BlockingCollection<PacketData>();
 
         private int _isDisposed = 0;
 
@@ -40,7 +41,7 @@ namespace NanoGames.Network
         /// Sends a packet. Packets are broadcast to all other clients.
         /// </summary>
         /// <param name="packet">The packet to send.</param>
-        public void Send(TPacket packet)
+        public void Send(TPacketData packet)
         {
             if (Volatile.Read(ref _isDisposed) != 0)
             {
@@ -55,23 +56,25 @@ namespace NanoGames.Network
         /// </summary>
         /// <param name="packet">The received packet.</param>
         /// <returns>A value indicating whether we successfully received a packet.</returns>
-        public bool TryReceive(out TPacket packet)
+        public bool TryReceive(out Packet<TPacketData> packet)
         {
             if (Volatile.Read(ref _isDisposed) != 0)
             {
-                packet = default(TPacket);
+                packet = default(Packet<TPacketData>);
                 return false;
             }
 
-            byte[] bytes;
-            if (_inbox.TryTake(out bytes))
+            PacketData packetData;
+            if (_inbox.TryTake(out packetData))
             {
-                packet = SerializationHelper.Deserialize<TPacket>(bytes);
+                packet = default(Packet<TPacketData>);
+                packet.Data = SerializationHelper.Deserialize<TPacketData>(packetData.Bytes);
+                packet.ArrivalTimestamp = packetData.ArrivalTimestamp;
                 return true;
             }
             else
             {
-                packet = default(TPacket);
+                packet = default(Packet<TPacketData>);
                 return false;
             }
         }
@@ -87,7 +90,7 @@ namespace NanoGames.Network
                 return;
             }
 
-            _inbox.Add(bytes);
+            _inbox.Add(new PacketData(Stopwatch.GetTimestamp(), bytes));
         }
 
         /// <summary>
@@ -118,5 +121,18 @@ namespace NanoGames.Network
         /// </summary>
         /// <param name="bytes">The bytes to send.</param>
         protected abstract void SendBytes(byte[] bytes);
+
+        private struct PacketData
+        {
+            public long ArrivalTimestamp;
+
+            public byte[] Bytes;
+
+            public PacketData(long arrivalTimestamp, byte[] bytes)
+            {
+                ArrivalTimestamp = arrivalTimestamp;
+                Bytes = bytes;
+            }
+        }
     }
 }

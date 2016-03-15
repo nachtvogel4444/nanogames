@@ -9,8 +9,8 @@ namespace NanoGames.Network
     /// <summary>
     /// Represents a network client.
     /// </summary>
-    /// <typeparam name="TPacket">The packet type.</typeparam>
-    public sealed class Client<TPacket> : Endpoint<TPacket>
+    /// <typeparam name="TPacketData">The packet type.</typeparam>
+    public sealed class Client<TPacketData> : Endpoint<TPacketData>
     {
         private TcpClient _tcpClient;
 
@@ -29,9 +29,9 @@ namespace NanoGames.Network
         /// </summary>
         /// <param name="server">The server (hostname or IP) to connect to.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task<Endpoint<TPacket>> ConnectAsync(string server)
+        public static async Task<Endpoint<TPacketData>> ConnectAsync(string server)
         {
-            var client = await Task.Run(() => new Client<TPacket>());
+            var client = await Task.Run(() => new Client<TPacketData>());
             await client.ConnectInternalAsync(server);
             return client;
         }

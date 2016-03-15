@@ -9,7 +9,7 @@ namespace NanoGames.Synchronization
     /// Represents a packet sent over the network.
     /// </summary>
     [ProtoContract]
-    internal sealed class Packet
+    internal sealed class PacketData
     {
         /// <summary>
         /// The sending player id.
@@ -34,5 +34,30 @@ namespace NanoGames.Synchronization
         /// </summary>
         [ProtoMember(4)]
         public bool IsReady;
+
+        /// <summary>
+        /// A random priority value for the current round.
+        /// In case multiple clients call a new round at nearly the same time, this is used to break the tie.
+        /// </summary>
+        [ProtoMember(5)]
+        public int RoundPriority;
+
+        /// <summary>
+        /// The time since the start of the round in thousandths of a frame.
+        /// </summary>
+        [ProtoMember(6)]
+        public long RoundMilliFrames;
+
+        /// <summary>
+        /// The random number generation seed of the current round.
+        /// </summary>
+        [ProtoMember(7)]
+        public int RoundSeed;
+
+        /// <summary>
+        /// The option the current player votes for.
+        /// </summary>
+        [ProtoMember(8)]
+        public int VoteOption;
     }
 }

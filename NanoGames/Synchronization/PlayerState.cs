@@ -36,5 +36,10 @@ namespace NanoGames.Synchronization
         /// Gets or sets a value indicating whether the player is ready for the next match.
         /// </summary>
         public bool IsReady { get; set; }
+
+        /// <summary>
+        /// Gets or sets the option the current player votes for.
+        /// </summary>
+        public int VoteOption { get; set; }
     }
 }

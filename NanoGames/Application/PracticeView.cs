@@ -83,7 +83,7 @@ namespace NanoGames.Application
             }
 
             /* Check if the buffered frame is still valid and compute new frames as needed. */
-            while (Stopwatch.GetTimestamp() - _matchStartTimestamp - _matchFrameCount * GameSpeed.FrameInterval > GameSpeed.FrameInterval)
+            while (Stopwatch.GetTimestamp() - _matchStartTimestamp - _matchFrameCount * GameSpeed.FrameDuration > GameSpeed.FrameDuration)
             {
                 ++_matchFrameCount;
                 _bufferedRenderer.Clear();

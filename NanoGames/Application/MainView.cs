@@ -57,7 +57,7 @@ namespace NanoGames.Application
                         {
                             _currentView = new TournamentView(
                                 () => _currentView = _multiplayerMenu,
-                                new Tournament(Task.Run(() => new Server().GetLocalEndpoint<Packet>())));
+                                new Tournament(Task.Run(() => new Server().GetLocalEndpoint<PacketData>())));
                         }),
                     new TextMenuItem("CONNECT TO")
                     {
@@ -68,7 +68,7 @@ namespace NanoGames.Application
                             Settings.Instance.LastServer = _server;
                             _currentView = new TournamentView(
                                 () => _currentView = _multiplayerMenu,
-                                new Tournament(Client<Packet>.ConnectAsync(_server)));
+                                new Tournament(Client<PacketData>.ConnectAsync(_server)));
                         },
                     },
                     new CommandMenuItem("BACK", () => _currentView = _mainMenu),

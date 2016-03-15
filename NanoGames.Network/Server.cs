@@ -84,13 +84,13 @@ namespace NanoGames.Network
         /// Gets an endpoint connected to this server.
         /// Disposing the endpoint also disposes the server.
         /// </summary>
-        /// <typeparam name="TPacket">The packet type.</typeparam>
+        /// <typeparam name="TPacketData">The packet type.</typeparam>
         /// <returns>The new endpoint.</returns>
-        public Endpoint<TPacket> GetLocalEndpoint<TPacket>()
+        public Endpoint<TPacketData> GetLocalEndpoint<TPacketData>()
         {
             lock (_mutex)
             {
-                var connection = new LocalConnection<TPacket>(this);
+                var connection = new LocalConnection<TPacketData>(this);
                 _connections.Add(connection);
                 return connection;
             }
@@ -130,7 +130,7 @@ namespace NanoGames.Network
             }
         }
 
-        private class LocalConnection<T> : Endpoint<T>, IConnection
+        private class LocalConnection<TPacket> : Endpoint<TPacket>, IConnection
         {
             private readonly Server _server;
 

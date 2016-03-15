@@ -73,7 +73,8 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Application\TournamentView.cs" />
-    <Compile Include="Synchronization\Packet.cs" />
+    <Compile Include="Synchronization\Durations.cs" />
+    <Compile Include="Synchronization\PacketData.cs" />
     <Compile Include="Synchronization\PlayerId.cs" />
     <Compile Include="Application\Settings.cs" />
     <Compile Include="Application\SettingsView.cs" />
@@ -107,7 +108,9 @@
     <Compile Include="Synchronization\GameSpeed.cs" />
     <Compile Include="Synchronization\NonClonableAttribute.cs" />
     <Compile Include="Synchronization\PlayerState.cs" />
+    <Compile Include="Synchronization\Timestamps.cs" />
     <Compile Include="Synchronization\Tournament.cs" />
+    <Compile Include="Synchronization\TournamentPhase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

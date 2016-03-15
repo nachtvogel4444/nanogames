@@ -18,6 +18,6 @@ namespace NanoGames.Synchronization
         /// <summary>
         /// The interval between frames in Stopwatch ticks.
         /// </summary>
-        public static readonly long FrameInterval = Stopwatch.Frequency / FramesPerSecond;
+        public static readonly long FrameDuration = Stopwatch.Frequency / FramesPerSecond;
     }
 }

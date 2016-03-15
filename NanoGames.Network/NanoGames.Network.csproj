@@ -55,6 +55,7 @@
     </Compile>
     <Compile Include="Client.cs" />
     <Compile Include="Endpoint.cs" />
+    <Compile Include="Packet.cs" />
     <Compile Include="SerializationHelper.cs" />
     <Compile Include="StreamReader.cs" />
     <Compile Include="StreamWriter.cs" />
