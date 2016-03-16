@@ -97,6 +97,11 @@ namespace NanoGames.Synchronization
         public IReadOnlyList<Discipline> VoteOptions => _voteOptions.AsReadOnly();
 
         /// <summary>
+        /// Gets the name of the current discipline.
+        /// </summary>
+        public string DiscipleName { get; private set; }
+
+        /// <summary>
         /// Disposes this object asynchronously.
         /// </summary>
         /// <returns>A value representing the asynchronous task.</returns>
@@ -220,6 +225,8 @@ namespace NanoGames.Synchronization
 
                             var winningDiscipline = _voteOptions[activePlayers[_roundRandom.Next(activePlayers.Count)].VoteOption];
                             _voteOptions.Clear();
+
+                            DiscipleName = winningDiscipline.Name;
 
                             var playerDescriptions = activePlayers.Select(
                                 p => new PlayerDescription

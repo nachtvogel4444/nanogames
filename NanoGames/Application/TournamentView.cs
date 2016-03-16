@@ -140,6 +140,7 @@ namespace NanoGames.Application
                         break;
 
                     case TournamentPhase.MatchCountdown:
+                        terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), _tournament.DiscipleName);
                         terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, 96), SecondsUntilNextPhase().ToString());
                         break;
 

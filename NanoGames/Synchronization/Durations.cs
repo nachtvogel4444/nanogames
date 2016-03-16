@@ -13,21 +13,21 @@ namespace NanoGames.Synchronization
         /// <summary>
         /// The pre-vote countdown duration in Stopwatch ticks.
         /// </summary>
-        public static readonly long VoteCountdown = 5 * Stopwatch.Frequency;
+        public static readonly long VoteCountdown = 3 * Stopwatch.Frequency;
 
         /// <summary>
         /// The vote duration in Stopwatch ticks.
         /// </summary>
-        public static readonly long Vote = 15 * Stopwatch.Frequency;
+        public static readonly long Vote = 10 * Stopwatch.Frequency;
 
         /// <summary>
         /// The pre-match transition duration in Stopwatch ticks.
         /// </summary>
-        public static readonly long MatchTransition = 5 * Stopwatch.Frequency;
+        public static readonly long MatchTransition = 4 * Stopwatch.Frequency;
 
         /// <summary>
         /// The pre-match countdown duration in Stopwatch ticks.
         /// </summary>
-        public static readonly long MatchCountdown = 5 * Stopwatch.Frequency;
+        public static readonly long MatchCountdown = 3 * Stopwatch.Frequency;
     }
 }
