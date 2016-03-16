@@ -151,7 +151,7 @@ namespace NanoGames.Application
                 }
             }
 
-            _tournament.Update(null);
+            _tournament.Update(terminal);
         }
 
         private void UpdateLobbyView(Terminal terminal)

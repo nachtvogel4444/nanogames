@@ -12,14 +12,14 @@ namespace NanoGames.Games
     public abstract class Match
     {
         /// <summary>
-        /// Gets a random number generator.
+        /// Gets or sets the random number generator.
         /// </summary>
-        public Random Random { get; } = new Random();
+        public Random Random { get; internal set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the match is completed.
         /// </summary>
-        public bool IsCompleted { get; set; }
+        public bool IsCompleted { get; protected set; }
 
         /// <summary>
         /// Updates and renders the match.

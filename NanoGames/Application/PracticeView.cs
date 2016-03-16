@@ -124,6 +124,8 @@ namespace NanoGames.Application
                         Color = _playerColor,
                     },
                 },
+
+                Random = new Random(),
             };
 
             _match = discipline.CreateMatch(description);

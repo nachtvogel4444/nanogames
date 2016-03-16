@@ -1,8 +1,6 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
-using System;
-
 namespace NanoGames.Games
 {
     /// <summary>
@@ -29,11 +27,6 @@ namespace NanoGames.Games
         /// Gets or sets the player's input.
         /// </summary>
         public Input Input { get; set; }
-
-        /// <summary>
-        /// Gets a random number generator.
-        /// </summary>
-        public Random Random { get; } = new Random();
 
         /// <summary>
         /// Gets or sets the player's score.

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using System;
 using System.Collections.Generic;
 
 namespace NanoGames.Games
@@ -15,5 +16,7 @@ namespace NanoGames.Games
         /// Gets or sets the list of players.
         /// </summary>
         public List<PlayerDescription> Players { get; set; } = new List<PlayerDescription>();
+
+        public Random Random { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using NanoGames.Engine;
 using NanoGames.Games;
 using NanoGames.Network;
 using System;
@@ -31,6 +32,9 @@ namespace NanoGames.Synchronization
         private int _roundSeed;
 
         private Random _roundRandom;
+
+        private Match _match;
+        private BufferedRenderer _matchRenderer = new BufferedRenderer();
 
         private List<Discipline> _voteOptions = new List<Discipline>();
 
@@ -106,8 +110,8 @@ namespace NanoGames.Synchronization
         /// <summary>
         /// Updates the state of the tournament.
         /// </summary>
-        /// <param name="gameInput">The current input to the game, if any.</param>
-        public void Update(Input gameInput)
+        /// <param name="terminal">The local player's terminal.</param>
+        public void Update(Terminal terminal)
         {
             if (!_endpointTask.IsCompleted)
             {
@@ -154,13 +158,13 @@ namespace NanoGames.Synchronization
             }
             else
             {
-                UpdateRound();
+                UpdateRound(terminal);
             }
 
             SendPlayerState(endpoint);
         }
 
-        private void UpdateRound()
+        private void UpdateRound(Terminal terminal)
         {
             var roundDuration = Stopwatch.GetTimestamp() - _roundStartTimestamp;
 
@@ -185,11 +189,6 @@ namespace NanoGames.Synchronization
                 }
                 else
                 {
-                    if (_voteOptions.Count > 0)
-                    {
-                        _voteOptions.Clear();
-                    }
-
                     if (roundDuration < Timestamps.MatchCountdownStart)
                     {
                         TournamentPhase = TournamentPhase.MatchTransition;
@@ -197,6 +196,43 @@ namespace NanoGames.Synchronization
                     }
                     else
                     {
+                        if (_match == null)
+                        {
+                            var activePlayers = _roundRandom.Shuffle(_players.Values.Where(p => p.VoteOption != 0).OrderBy(p => p.Id));
+                            if (activePlayers.Count < 2)
+                            {
+                                TournamentPhase = TournamentPhase.Lobby;
+                                _roundSeed = 0;
+                                _roundStartTimestamp = 0;
+                                _roundPriority = 0;
+                                _voteOptions.Clear();
+                                return;
+                            }
+
+                            var winningDiscipline = _voteOptions[activePlayers[_roundRandom.Next(activePlayers.Count)].VoteOption];
+                            _voteOptions.Clear();
+
+                            var playerDescriptions = activePlayers.Select(
+                                p => new PlayerDescription
+                                {
+                                    Color = new Color(0, 0.5, 1),
+                                    Graphics = Graphics.Null,
+                                    Input = new Input(),
+                                }).ToList();
+
+                            var matchDescription = new MatchDescription
+                            {
+                                Players = playerDescriptions,
+                                Random = _roundRandom,
+                            };
+
+                            _match = winningDiscipline.CreateMatch(matchDescription);
+
+                            playerDescriptions[0].Graphics = new Graphics(_matchRenderer);
+
+                            _match.Update(playerDescriptions);
+                        }
+
                         if (roundDuration < Timestamps.MatchStart)
                         {
                             TournamentPhase = TournamentPhase.MatchCountdown;
@@ -207,31 +243,9 @@ namespace NanoGames.Synchronization
                             TournamentPhase = TournamentPhase.Match;
                             NextPhaseTimestamp = 0;
                         }
+
+                        _matchRenderer.RenderTo(terminal.Renderer);
                     }
-                }
-            }
-        }
-
-        private void UpdateLobby()
-        {
-            if (_roundSeed == 0 && _players.Count >= 2 && _players.Values.Count(p => p.IsReady) * 3 / 2 > _players.Count)
-            {
-                _roundSeed = _random.Next();
-                _roundPriority = _random.Next();
-                _roundStartTimestamp = Stopwatch.GetTimestamp();
-            }
-
-            if (_roundSeed != 0)
-            {
-                TournamentPhase = TournamentPhase.VoteCountdown;
-
-                if (Stopwatch.GetTimestamp() - _roundStartTimestamp > Timestamps.VoteStart)
-                {
-                    TournamentPhase = TournamentPhase.Vote;
-
-                    _roundRandom = new Random(_roundSeed);
-                    _voteOptions = _roundRandom.Shuffle(DisciplineDirectory.Disciplines.Take(3));
-                    _voteOptions.Insert(0, null);
                 }
             }
         }

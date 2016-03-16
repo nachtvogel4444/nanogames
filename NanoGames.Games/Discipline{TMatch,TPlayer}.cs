@@ -31,6 +31,7 @@ namespace NanoGames.Games
         public override Match CreateMatch(MatchDescription description)
         {
             var match = new TMatch();
+            match.Random = description.Random;
 
             var players = new List<TPlayer>();
             for (int i = 0; i < description.Players.Count; ++i)
