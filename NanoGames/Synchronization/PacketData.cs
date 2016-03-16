@@ -59,5 +59,17 @@ namespace NanoGames.Synchronization
         /// </summary>
         [ProtoMember(8)]
         public int VoteOption;
+
+        /// <summary>
+        /// The index of the player in the current round.
+        /// </summary>
+        [ProtoMember(9)]
+        public int RoundPlayerIndex;
+
+        /// <summary>
+        /// The input entries for the player.
+        /// </summary>
+        [ProtoMember(10)]
+        public InputEntry[] InputEntries;
     }
 }

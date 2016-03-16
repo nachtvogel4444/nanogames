@@ -74,6 +74,7 @@
     </Compile>
     <Compile Include="Application\TournamentView.cs" />
     <Compile Include="Synchronization\Durations.cs" />
+    <Compile Include="Synchronization\InputEntry.cs" />
     <Compile Include="Synchronization\MatchBuffer.cs" />
     <Compile Include="Synchronization\PacketData.cs" />
     <Compile Include="Synchronization\PlayerId.cs" />

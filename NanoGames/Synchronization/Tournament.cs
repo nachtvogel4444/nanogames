@@ -17,6 +17,8 @@ namespace NanoGames.Synchronization
     /// </summary>
     internal sealed class Tournament
     {
+        private const int _latencyFrames = 3;
+
         private readonly Random _random = new Random();
 
         private readonly Task<Endpoint<PacketData>> _endpointTask;
@@ -40,6 +42,8 @@ namespace NanoGames.Synchronization
         private MatchBuffer _matchBuffer;
 
         private List<Discipline> _voteOptions = new List<Discipline>();
+
+        private List<InputEntry> _inputEntries = new List<InputEntry>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Tournament"/> class.
@@ -250,11 +254,13 @@ namespace NanoGames.Synchronization
                             while (currentFrame > _lastUpdatedFrame)
                             {
                                 ++_lastUpdatedFrame;
-                                _matchBuffer.SetInput(_lastUpdatedFrame, _localPlayerIndex, terminal.Input);
+                                _matchBuffer.SetInput(_lastUpdatedFrame, _localPlayerIndex, input);
+                                _inputEntries.Add(new InputEntry(_lastUpdatedFrame, input));
                             }
                         }
 
-                        _matchBuffer.RenderFrame(currentFrame, terminal);
+                        /* Render a 50ms old frame to hide a certain amount of lag. */
+                        _matchBuffer.RenderFrame(currentFrame - _latencyFrames, terminal);
                     }
                 }
             }
@@ -278,6 +284,11 @@ namespace NanoGames.Synchronization
             packet.RoundSeed = _roundSeed;
             packet.RoundPriority = _roundPriority;
             packet.RoundMilliFrames = (Stopwatch.GetTimestamp() - _roundStartTimestamp) * 1000 / GameSpeed.FrameDuration;
+
+            packet.RoundPlayerIndex = _localPlayerIndex;
+
+            packet.InputEntries = _inputEntries.ToArray();
+            _inputEntries.Clear();
 
             endpoint.Send(packet);
         }
@@ -321,6 +332,14 @@ namespace NanoGames.Synchronization
 
                     _roundSeed = packetData.RoundSeed;
                     _roundPriority = packetData.RoundPriority;
+                }
+            }
+
+            if (packetData.InputEntries != null && _matchBuffer != null)
+            {
+                foreach (var inputEntry in packetData.InputEntries)
+                {
+                    _matchBuffer.SetInput(inputEntry.Frame, packetData.RoundPlayerIndex, inputEntry.Input);
                 }
             }
         }

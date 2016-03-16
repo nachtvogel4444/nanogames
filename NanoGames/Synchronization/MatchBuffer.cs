@@ -21,7 +21,7 @@ namespace NanoGames.Synchronization
         private readonly BufferedRenderer _bufferedRenderer;
         private readonly Graphics _bufferedGraphics;
 
-        private readonly List<List<Input?>> _knownPlayerInputs = new List<List<Input?>>();
+        private readonly List<Input?[]> _knownPlayerInputs = new List<Input?[]>();
 
         private Match _match;
 
@@ -47,7 +47,7 @@ namespace NanoGames.Synchronization
             _playerDescriptions[localPlayerIndex].Graphics = _bufferedGraphics;
             _match.Update(playerDescriptions);
 
-            _knownPlayerInputs.Add(CreateInputRecord(default(Input)));
+            _knownPlayerInputs.Add(CreateInitialInputRecord());
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace NanoGames.Synchronization
             int frameIndex = frame - _lastValidFrame;
             while (frameIndex >= _knownPlayerInputs.Count)
             {
-                _knownPlayerInputs.Add(CreateInputRecord(null));
+                _knownPlayerInputs.Add(new Input?[_playerCount]);
             }
 
             _knownPlayerInputs[frameIndex][playerIndex] = input;
@@ -86,7 +86,7 @@ namespace NanoGames.Synchronization
         {
             int currentFrame = _lastValidFrame;
             int currentFrameIndex = 0;
-            var currentFrameInput = new List<Input>(_knownPlayerInputs[0].Select(i => (Input)i));
+            var currentFrameInput = _knownPlayerInputs[0].Select(i => (Input)i).ToArray();
 
             bool allInputWasValid = true;
             bool matchWasAlreadyCloned = false;
@@ -108,7 +108,7 @@ namespace NanoGames.Synchronization
                     Input input;
                     if (_knownPlayerInputs[currentFrameIndex][playerIndex] == null)
                     {
-                        allInputWasValid = true;
+                        allInputWasValid = false;
                         input = currentFrameInput[playerIndex];
                     }
                     else
@@ -132,7 +132,7 @@ namespace NanoGames.Synchronization
                     }
                 }
 
-                if (!allInputWasValid)
+                if (allInputWasValid)
                 {
                     /*
                      * The frame we want to compute is valid (i.e. all inputs are known).
@@ -158,10 +158,15 @@ namespace NanoGames.Synchronization
             }
         }
 
-        private List<Input?> CreateInputRecord(Input? value)
+        private Input?[] CreateInitialInputRecord()
         {
-            /* Creates a list containing [null, null, ... null] _playerCount times. */
-            return Enumerable.Repeat<Input?>(value, _playerCount).ToList();
+            var record = new Input?[_playerCount];
+            for (int i = 0; i < _playerCount; ++i)
+            {
+                record[i] = default(Input);
+            }
+
+            return record;
         }
     }
 }
