@@ -6,7 +6,7 @@ namespace NanoGames
     /// <summary>
     /// Represents the input state of a player.
     /// </summary>
-    public sealed class Input
+    public struct Input
     {
         /// <summary>
         /// Gets or sets a value indicating whether the up button is pressed.

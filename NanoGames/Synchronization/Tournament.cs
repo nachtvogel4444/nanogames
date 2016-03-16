@@ -33,8 +33,11 @@ namespace NanoGames.Synchronization
 
         private Random _roundRandom;
 
-        private Match _match;
-        private BufferedRenderer _matchRenderer = new BufferedRenderer();
+        private int _localPlayerIndex;
+
+        private int _lastUpdatedFrame;
+
+        private MatchBuffer _matchBuffer;
 
         private List<Discipline> _voteOptions = new List<Discipline>();
 
@@ -196,7 +199,7 @@ namespace NanoGames.Synchronization
                     }
                     else
                     {
-                        if (_match == null)
+                        if (_matchBuffer == null)
                         {
                             var activePlayers = _roundRandom.Shuffle(_players.Values.Where(p => p.VoteOption != 0).OrderBy(p => p.Id));
                             if (activePlayers.Count < 2)
@@ -209,6 +212,8 @@ namespace NanoGames.Synchronization
                                 return;
                             }
 
+                            _localPlayerIndex = activePlayers.IndexOf(LocalPlayer);
+
                             var winningDiscipline = _voteOptions[activePlayers[_roundRandom.Next(activePlayers.Count)].VoteOption];
                             _voteOptions.Clear();
 
@@ -216,8 +221,6 @@ namespace NanoGames.Synchronization
                                 p => new PlayerDescription
                                 {
                                     Color = new Color(0, 0.5, 1),
-                                    Graphics = Graphics.Null,
-                                    Input = new Input(),
                                 }).ToList();
 
                             var matchDescription = new MatchDescription
@@ -226,25 +229,32 @@ namespace NanoGames.Synchronization
                                 Random = _roundRandom,
                             };
 
-                            _match = winningDiscipline.CreateMatch(matchDescription);
-
-                            playerDescriptions[0].Graphics = new Graphics(_matchRenderer);
-
-                            _match.Update(playerDescriptions);
+                            var match = winningDiscipline.CreateMatch(matchDescription);
+                            _matchBuffer = new MatchBuffer(match, playerDescriptions, _localPlayerIndex);
                         }
 
+                        int currentFrame;
                         if (roundDuration < Timestamps.MatchStart)
                         {
                             TournamentPhase = TournamentPhase.MatchCountdown;
                             NextPhaseTimestamp = _roundStartTimestamp + Timestamps.MatchStart;
+                            currentFrame = 0;
                         }
                         else
                         {
                             TournamentPhase = TournamentPhase.Match;
                             NextPhaseTimestamp = 0;
+                            currentFrame = (int)((roundDuration - Timestamps.MatchStart) / GameSpeed.FrameDuration);
+
+                            var input = terminal.Input;
+                            while (currentFrame > _lastUpdatedFrame)
+                            {
+                                ++_lastUpdatedFrame;
+                                _matchBuffer.SetInput(_lastUpdatedFrame, _localPlayerIndex, terminal.Input);
+                            }
                         }
 
-                        _matchRenderer.RenderTo(terminal.Renderer);
+                        _matchBuffer.RenderFrame(currentFrame, terminal);
                     }
                 }
             }

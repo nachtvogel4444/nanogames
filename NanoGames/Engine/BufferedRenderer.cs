@@ -1,6 +1,7 @@
 ﻿// Copyright (c) the authors of NanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using NanoGames.Synchronization;
 using System;
 using System.Collections.Generic;
 
@@ -9,6 +10,7 @@ namespace NanoGames.Engine
     /// <summary>
     /// A renderer implementation that writes to an internal buffer for later rendering.
     /// </summary>
+    [NonClonable]
     public sealed class BufferedRenderer : IRenderer
     {
         private readonly List<Tuple<Color, float, float, float, float>> _lines = new List<Tuple<Color, float, float, float, float>>();

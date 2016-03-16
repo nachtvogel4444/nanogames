@@ -12,7 +12,7 @@ namespace NanoGames.Games.FallingBlocks
         private readonly Color[,] _color = new Color[Constants.Width, Constants.Height];
 
         /// <inheritdoc/>
-        public override void Initialize()
+        internal override void Initialize()
         {
             for (int y = Constants.Height - Constants.InitialGarbageLines; y < Constants.Height; ++y)
             {
@@ -28,7 +28,7 @@ namespace NanoGames.Games.FallingBlocks
         }
 
         /// <inheritdoc/>
-        public override void Update()
+        internal override void Update()
         {
             Graphics.Line(Constants.ContainerColor, Constants.TopLeft + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
             Graphics.Line(Constants.ContainerColor, Constants.TopLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));

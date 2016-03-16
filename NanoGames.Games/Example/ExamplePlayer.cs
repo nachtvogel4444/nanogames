@@ -14,12 +14,12 @@ namespace NanoGames.Games.Example
 
         public Vector Velocity;
 
-        public override void Initialize()
+        internal override void Initialize()
         {
             /* This is called once for every player after ExampleMatch.Initialize. */
         }
 
-        public override void Update()
+        internal override void Update()
         {
             /* This is called by the framework once every frame for every player. */
 

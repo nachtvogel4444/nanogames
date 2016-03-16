@@ -21,9 +21,9 @@ namespace NanoGames.Engine
         }
 
         /// <summary>
-        /// Gets the player's input state.
+        /// Gets or sets the player's input state.
         /// </summary>
-        public Input Input { get; } = new Input();
+        public Input Input { get; set; }
 
         /// <summary>
         /// Gets the key events since the last frame.

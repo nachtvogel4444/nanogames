@@ -19,6 +19,11 @@ namespace NanoGames.Games
         public IReadOnlyList<TPlayer> Players { get; private set; }
 
         /// <summary>
+        /// Gets or sets the random number generator.
+        /// </summary>
+        public Random Random { get; internal set; }
+
+        /// <summary>
         /// Sets the list of players.
         /// </summary>
         /// <param name="localPlayerIndex">The index of the local player, or -1 if there is no local player.</param>
@@ -40,7 +45,7 @@ namespace NanoGames.Games
         {
             for (int i = 0; i < Players.Count; ++i)
             {
-                Players[i].Graphics = playerDescriptions[i].Graphics;
+                Players[i].Graphics = playerDescriptions[i].Graphics ?? Graphics.Null;
                 Players[i].Input = playerDescriptions[i].Input;
             }
 

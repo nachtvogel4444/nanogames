@@ -127,7 +127,8 @@ namespace NanoGames.Engine
                             var height = _gameWindow.Height;
 
                             renderer.BeginFrame(width, height);
-                            UpdateInput(terminal.Input, terminal.KeyEvents);
+                            UpdateKeyEvents(terminal.KeyEvents);
+                            terminal.Input = GetInput();
                             mainView.Update(terminal);
                             renderer.EndFrame();
 
@@ -193,20 +194,27 @@ namespace NanoGames.Engine
             }
         }
 
-        private void UpdateInput(Input input, List<KeyEvent> keyEvents)
+        private void UpdateKeyEvents(List<KeyEvent> keyEvents)
         {
             keyEvents.Clear();
             keyEvents.AddRange(_keyEvents);
             _keyEvents.Clear();
+        }
 
+        private Input GetInput()
+        {
             var hasFocus = _gameWindow.Focused;
             var keyboardState = hasFocus ? Keyboard.GetState() : default(KeyboardState);
+
+            var input = default(Input);
             input.Up = hasFocus && keyboardState[Key.Up];
             input.Down = hasFocus && keyboardState[Key.Down];
             input.Left = hasFocus && keyboardState[Key.Left];
             input.Right = hasFocus && keyboardState[Key.Right];
             input.Fire = hasFocus && keyboardState[Key.Space];
             input.AltFire = hasFocus && (keyboardState[Key.ControlLeft] || keyboardState[Key.ControlRight] || keyboardState[Key.AltLeft] || keyboardState[Key.AltRight]);
+
+            return input;
         }
 
         private void OnClose(object sender, EventArgs e)
