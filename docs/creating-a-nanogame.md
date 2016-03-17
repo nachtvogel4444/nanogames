@@ -41,9 +41,9 @@ All nanoGames are in the NanoGames.Games project. To create a new game called (f
 
   - Create a new folder named "Foo".
 
-      * Create a class FooMatch : Match<FooPlayer>. This class represents the current state of a single match.
+      * Create a class `FooMatch : Match<FooPlayer>`. This class represents the current state of a single match.
 
-      * Create a class FooPlayer : Player<FooMatch>. This class represents the current state of a player in the match.
+      * Create a class `FooPlayer : Player<FooMatch>`. This class represents the current state of a player in the match.
 
   - Add your nanoGame as a new "discipline" to the class DisciplineDirectory in the root folder of NanoGames.Games.
 
@@ -52,6 +52,8 @@ After this, the game will be available in the practice menu and also (randomly) 
 
 Match lifecycle
 ---------------
+
+### Beginning
 
 At the start of a round, the framework will perform these tasks:
 
@@ -75,6 +77,7 @@ At the start of a round, the framework will perform these tasks:
 
   - For every player instance, Player.Initialize() is called. This is an abstract method that performs initialization specific to the game.
 
+### During the match
 
 The, for every frame, the framework will do this:
 
@@ -88,8 +91,9 @@ The, for every frame, the framework will do this:
 
   - For every player, Player.Update() is called. This is an abstract method that performs update and/or rendering code specific to the game.
 
-  - Everything drawn onto a player's Graphics object is shown on the real screen.
+  - Everything drawn onto a player's Graphics object during either the match or player Update method is shown on the player's screen.
 
+### End
 
 The game ends when Match.IsCompleted is set to true by an Update() method. In this case:
 
@@ -109,11 +113,11 @@ Determinism and Netcode
 
 To ensure smooth gameplay, the netcode will sometimes "predict" the game state even when it hasn't received the input from all players. To do this, the netcode saves a copy of the game state, computes the next frames with the best known input, and when a correction arrives, "rolls back" to fix the mistake retroactively.
 
-When coding a game, you don't usually need to worry about any of this, but you do have to make sure that you game runs deterministically, that is, produces the same results when receiving the same input on every machine. This is not hard, but you have to avoid any construct or API call that would depend on the specific machine or time of execution.
+When coding a game, you don't usually need to worry about any of this, but you do have to make sure that you game runs deterministically, that is, produces the same results when receiving the same input, and runs the same way on every machine. You have to avoid any construct or API call that would depend on the specific machine or time of execution.
 
 For example:
 
-  - Don't store any match state in static variables, only in instance variables. (Static readonly variables for constants are perfectly okay.)
+  - Don't store any match state in static variables, only in instance variables. (Static readonly variables for constants are fine.)
 
   - Don't access the system time in any way.
 
