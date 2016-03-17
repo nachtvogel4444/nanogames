@@ -47,9 +47,21 @@ namespace NanoGames.Games.Example
                 }
             }
 
-            if (_finishedPlayers == Players.Count)
+            if (Players.Count == 1)
             {
-                IsCompleted = true;
+                /* Practice mode. */
+                if (_finishedPlayers == 1)
+                {
+                    IsCompleted = true;
+                }
+            }
+            else
+            {
+                /* Tournament mode. The match ends when the second-to-last player has reached the goal. */
+                if (_finishedPlayers >= Players.Count - 1)
+                {
+                    IsCompleted = true;
+                }
             }
 
             /* After this, ExamplePlayer.Update is called by the framework for every individual player. */

@@ -16,6 +16,11 @@ namespace NanoGames.Games
         public bool IsCompleted { get; protected set; }
 
         /// <summary>
+        /// Gets the current scores for all players.
+        /// </summary>
+        public abstract IEnumerable<double> PlayerScores { get; }
+
+        /// <summary>
         /// Updates and renders the match.
         /// </summary>
         /// <param name="playerDescriptions">The player descriptions.</param>

@@ -33,6 +33,8 @@ namespace NanoGames.Synchronization
 
         private int _roundSeed;
 
+        private int _lastRoundSeed;
+
         private Random _roundRandom;
 
         private int _localPlayerIndex;
@@ -100,6 +102,11 @@ namespace NanoGames.Synchronization
         /// Gets the name of the current discipline.
         /// </summary>
         public string DiscipleName { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether a round is in progress.
+        /// </summary>
+        public bool IsRoundInProgress => _roundSeed != 0 || _players.Any(p => p.Value.IsInMatch);
 
         /// <summary>
         /// Disposes this object asynchronously.
@@ -184,11 +191,14 @@ namespace NanoGames.Synchronization
             {
                 TournamentPhase = TournamentPhase.VoteCountdown;
                 NextPhaseTimestamp = _roundStartTimestamp + Timestamps.VoteStart;
+                LocalPlayer.VoteOption = 0;
             }
             else
             {
                 if (roundDuration < Timestamps.MatchTransitionStart)
                 {
+                    LocalPlayer.IsReady = false;
+
                     if (_voteOptions.Count == 0)
                     {
                         _roundRandom = new Random(_roundSeed);
@@ -208,6 +218,14 @@ namespace NanoGames.Synchronization
                     }
                     else
                     {
+                        if (LocalPlayer.VoteOption == 0)
+                        {
+                            /* Local player opted out of the match. */
+                            _roundSeed = 0;
+                            TournamentPhase = TournamentPhase.Lobby;
+                            return;
+                        }
+
                         if (_matchBuffer == null)
                         {
                             var activePlayers = _roundRandom.Shuffle(_players.Values.Where(p => p.VoteOption != 0).OrderBy(p => p.Id));
@@ -242,6 +260,7 @@ namespace NanoGames.Synchronization
 
                             var match = winningDiscipline.CreateMatch(matchDescription);
                             _matchBuffer = new MatchBuffer(match, playerDescriptions, _localPlayerIndex);
+                            _lastUpdatedFrame = 0;
                         }
 
                         int currentFrame;
@@ -268,6 +287,13 @@ namespace NanoGames.Synchronization
 
                         /* Render a 50ms old frame to hide a certain amount of lag. */
                         _matchBuffer.RenderFrame(currentFrame - _latencyFrames, terminal);
+
+                        if (_matchBuffer.IsCompleted)
+                        {
+                            _lastRoundSeed = _roundSeed;
+                            _roundSeed = 0;
+                            _matchBuffer = null;
+                        }
                     }
                 }
             }
@@ -323,22 +349,29 @@ namespace NanoGames.Synchronization
             playerState.IsReady = packetData.IsReady;
             playerState.VoteOption = packetData.VoteOption;
 
-            if (packetData.RoundSeed != _roundSeed)
+            playerState.IsInMatch = packetData.RoundSeed != 0;
+
+            if (packetData.RoundSeed != _roundSeed && packetData.RoundSeed != _lastRoundSeed)
             {
                 if (_roundSeed == 0 || packetData.RoundPriority < _roundPriority)
                 {
                     var matchStartTimeStamp = packet.ArrivalTimestamp - packetData.RoundMilliFrames * GameSpeed.FrameDuration / 1000;
-                    if (_roundStartTimestamp == 0 || packetData.RoundPriority < _roundPriority)
-                    {
-                        _roundStartTimestamp = matchStartTimeStamp;
-                    }
-                    else
-                    {
-                        _roundStartTimestamp = Math.Min(_roundStartTimestamp, matchStartTimeStamp);
-                    }
 
-                    _roundSeed = packetData.RoundSeed;
-                    _roundPriority = packetData.RoundPriority;
+                    /* Only accepts rounds if they aren't yet in the voting phase. */
+                    if (Stopwatch.GetTimestamp() - matchStartTimeStamp < Timestamps.VoteStart)
+                    {
+                        if (_roundSeed == 0 || packetData.RoundPriority < _roundPriority)
+                        {
+                            _roundStartTimestamp = matchStartTimeStamp;
+                        }
+                        else
+                        {
+                            _roundStartTimestamp = Math.Min(_roundStartTimestamp, matchStartTimeStamp);
+                        }
+
+                        _roundSeed = packetData.RoundSeed;
+                        _roundPriority = packetData.RoundPriority;
+                    }
                 }
             }
 

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NanoGames.Games
 {
@@ -22,6 +23,9 @@ namespace NanoGames.Games
         /// Gets or sets the random number generator.
         /// </summary>
         public Random Random { get; internal set; }
+
+        /// <inheritdoc/>
+        public override IEnumerable<double> PlayerScores => Players.Select(p => p.Score);
 
         /// <summary>
         /// Sets the list of players.
@@ -43,6 +47,11 @@ namespace NanoGames.Games
         /// <inheritdoc/>
         public override sealed void Update(List<PlayerDescription> playerDescriptions)
         {
+            if (IsCompleted)
+            {
+                return;
+            }
+
             for (int i = 0; i < Players.Count; ++i)
             {
                 Players[i].Graphics = playerDescriptions[i].Graphics ?? Graphics.Null;

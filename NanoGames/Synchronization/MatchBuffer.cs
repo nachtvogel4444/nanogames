@@ -51,6 +51,17 @@ namespace NanoGames.Synchronization
         }
 
         /// <summary>
+        /// Gets a value indicating whether the match is confirmed to be completed.
+        /// This only returns true if the match result is confirmed, i.e. can't change due to a prediction correction.
+        /// </summary>
+        public bool IsCompleted => _match.IsCompleted;
+
+        /// <summary>
+        /// Gets the current scores for all players.
+        /// </summary>
+        public IEnumerable<double> PlayerScores => _match.PlayerScores;
+
+        /// <summary>
         /// Sets the input for a certain player for a certain frame.
         /// </summary>
         /// <param name="frame">The frame for which to set the input.</param>

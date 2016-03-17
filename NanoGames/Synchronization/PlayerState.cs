@@ -41,5 +41,10 @@ namespace NanoGames.Synchronization
         /// Gets or sets the option the current player votes for.
         /// </summary>
         public int VoteOption { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the player is currently in a match.
+        /// </summary>
+        public bool IsInMatch { get; set; }
     }
 }

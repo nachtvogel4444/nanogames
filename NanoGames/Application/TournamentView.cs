@@ -185,7 +185,11 @@ namespace NanoGames.Application
             }
             else
             {
-                if (_tournament.LocalPlayer.IsReady)
+                if (_tournament.IsRoundInProgress)
+                {
+                    terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), "GAME IN PROGRESS");
+                }
+                else if (_tournament.LocalPlayer.IsReady)
                 {
                     terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), "WAITING FOR OTHERS");
                 }
@@ -226,6 +230,7 @@ namespace NanoGames.Application
                 }
             }
 
+            _voteMenu.SelectedIndex = _tournament.LocalPlayer.VoteOption;
             _voteMenu.Update(terminal);
             _tournament.LocalPlayer.VoteOption = _voteMenu.SelectedIndex;
         }
