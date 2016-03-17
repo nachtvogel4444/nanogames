@@ -7,8 +7,9 @@ namespace NanoGames.Games.Example
 {
     internal class ExampleMatch : Match<ExamplePlayer>
     {
-        private const double _acceleration = 0.1;
-        private const double _maxSpeed = 10;
+        private const int _stepsPerFrame = 10;
+        private const double _acceleration = 0.005;
+        private const double _maxSpeed = 0.5;
 
         private int _finishedPlayers;
 
@@ -21,7 +22,7 @@ namespace NanoGames.Games.Example
             for (int i = 0; i < Players.Count; ++i)
             {
                 double angle = start + i * 2 * Math.PI / Players.Count;
-                Players[i].Position = new Vector(160 + 100 * Math.Cos(angle), 90 + 100 * Math.Sin(angle));
+                Players[i].Position = new Vector(160 + 88 * Math.Cos(angle), 100 + 88 * Math.Sin(angle));
             }
 
             /* After this, ExamplePlayer.Initialize is called by the framework for every individual player. */
@@ -34,9 +35,16 @@ namespace NanoGames.Games.Example
              * We can either draw onto every player's graphics interface here, or do that in ExamplePlayer.Update.
              */
 
-            foreach (var player in Players)
+            for (int i = 0; i < _stepsPerFrame; ++i)
             {
-                MovePlayer(player);
+                /*
+                 * We update in tiny increments to make the physics more robust.
+                 */
+
+                foreach (var player in Players)
+                {
+                    MovePlayer(player);
+                }
             }
 
             if (_finishedPlayers == Players.Count)
@@ -45,6 +53,17 @@ namespace NanoGames.Games.Example
             }
 
             /* After this, ExamplePlayer.Update is called by the framework for every individual player. */
+        }
+
+        private static Vector LimitSpeed(Vector velocity)
+        {
+            var speed = velocity.Length;
+            if (speed > _maxSpeed)
+            {
+                velocity *= _maxSpeed / speed;
+            }
+
+            return velocity;
         }
 
         private void MovePlayer(ExamplePlayer player)
@@ -76,10 +95,7 @@ namespace NanoGames.Games.Example
             }
 
             /* Cap the speed at the maximum. */
-            if (player.Velocity.Length > _maxSpeed)
-            {
-                player.Velocity *= _maxSpeed / player.Velocity.Length;
-            }
+            player.Velocity = LimitSpeed(player.Velocity);
 
             /* Move the player by their velocity. */
             player.Position += player.Velocity;
@@ -104,6 +120,35 @@ namespace NanoGames.Games.Example
             if (player.Position.Y > 200)
             {
                 player.Position.Y -= 200;
+            }
+
+            /* Check for collisions. */
+            foreach (var otherPlayer in Players)
+            {
+                if (otherPlayer != player
+                    && !otherPlayer.HasFinished
+                    && (otherPlayer.Position - player.Position).Length < 2 * ExamplePlayer.Radius)
+                {
+                    /*
+                     * We overlap with the other player.
+                     * This is only a collision if the players are moving towards each other, otherwise, let them move apart naturally.
+                     */
+
+                    var relativePosition = otherPlayer.Position - player.Position;
+                    var relativeVelocity = otherPlayer.Velocity - player.Velocity;
+
+                    /* The dot product tells us if the vectors are oriented towards each other. */
+                    if (Vector.Dot(relativePosition, relativeVelocity) < 0)
+                    {
+                        /*
+                         * The other player is moving towards us, relatively.
+                         * Compute the result of a perfectly elastic condition.
+                         */
+
+                        player.Velocity = LimitSpeed(player.Velocity + relativeVelocity);
+                        otherPlayer.Velocity = LimitSpeed(otherPlayer.Velocity - relativeVelocity);
+                    }
+                }
             }
 
             /* Check for the victory condition. */

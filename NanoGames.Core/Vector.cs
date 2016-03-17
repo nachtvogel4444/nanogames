@@ -96,6 +96,17 @@ namespace NanoGames
             return !(a == b);
         }
 
+        /// <summary>
+        /// Returns the dot product of two vectors.
+        /// </summary>
+        /// <param name="a">The first vector.</param>
+        /// <param name="b">The second vector.</param>
+        /// <returns>The dot product.</returns>
+        public static double Dot(Vector a, Vector b)
+        {
+            return a.X * b.X + a.Y + b.Y;
+        }
+
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
