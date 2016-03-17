@@ -8,7 +8,7 @@ namespace NanoGames.Games.Example
     internal class ExampleMatch : Match<ExamplePlayer>
     {
         private const int _stepsPerFrame = 10;
-        private const double _acceleration = 0.005;
+        private const double _acceleration = 0.002;
         private const double _maxSpeed = 0.5;
 
         private int _finishedPlayers;

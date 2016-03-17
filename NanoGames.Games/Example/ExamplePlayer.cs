@@ -5,8 +5,8 @@ namespace NanoGames.Games.Example
 {
     internal class ExamplePlayer : Player<ExampleMatch>
     {
-        public const double Radius = 4;
-        public const double Tolerance = 1;
+        public const double Radius = 8;
+        public const double Tolerance = 2;
 
         public bool HasFinished = false;
 

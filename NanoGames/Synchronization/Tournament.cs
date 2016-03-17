@@ -17,7 +17,7 @@ namespace NanoGames.Synchronization
     /// </summary>
     internal sealed class Tournament
     {
-        private const int _latencyFrames = 3;
+        private const int _latencyFrames = 1;
 
         private readonly Random _random = new Random();
 
@@ -157,7 +157,7 @@ namespace NanoGames.Synchronization
             }
 
             /* We suggest a new round if no other round was started and at least 2/3 of the players are ready. */
-            if (_roundSeed == 0 && _players.Count >= 2 && _players.Values.Count(p => p.IsReady) * 3 > 2 * _players.Count)
+            if (_roundSeed == 0 && _players.Count >= 2 && _players.Values.Count(p => p.IsReady) * 3 >= 2 * _players.Count)
             {
                 _roundSeed = _random.Next();
                 _roundPriority = _random.Next();
