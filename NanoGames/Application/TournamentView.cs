@@ -161,7 +161,7 @@ namespace NanoGames.Application
             double x = 160 - 0.5 * ((Settings.MaxPlayerNameLength + 6) * fontSize);
             double y = 100 - 0.5 * _tournament.Players.Count * fontSize;
 
-            foreach (var playerInfo in _tournament.Players.OrderBy(p => p.TournamentScore).ThenBy(p => p.Name, StringComparer.InvariantCultureIgnoreCase).ThenBy(p => p.Id))
+            foreach (var playerInfo in _tournament.Players.OrderByDescending(p => p.TournamentScore).ThenBy(p => p.Name, StringComparer.InvariantCultureIgnoreCase).ThenBy(p => p.Id))
             {
                 terminal.Graphics.Print(Colors.Control, fontSize, new Vector(x + fontSize, y), playerInfo.Name);
                 terminal.Graphics.Print(

@@ -19,6 +19,12 @@ namespace NanoGames.Synchronization
     {
         private const int _latencyFrames = 1;
 
+        private const int _winScore = 20;
+
+        private const int _tieScore = 10;
+
+        private const double _scoreDecay = 0.875;
+
         private readonly Random _random = new Random();
 
         private readonly Task<Endpoint<PacketData>> _endpointTask;
@@ -201,6 +207,8 @@ namespace NanoGames.Synchronization
 
                     if (_voteOptions.Count == 0)
                     {
+                        LocalPlayer.TournamentScore = (int)(LocalPlayer.TournamentScore * _scoreDecay);
+
                         _roundRandom = new Random(_roundSeed);
                         _voteOptions = _roundRandom.Shuffle(DisciplineDirectory.Disciplines.Take(3));
                         _voteOptions.Insert(0, null);
@@ -290,6 +298,11 @@ namespace NanoGames.Synchronization
 
                         if (_matchBuffer.IsCompleted)
                         {
+                            var scores = _matchBuffer.PlayerScores.ToList();
+                            var localPlayerScore = scores[_localPlayerIndex];
+                            int roundScore = scores.Sum(s => s < localPlayerScore ? _winScore : (s == localPlayerScore ? _tieScore : 0));
+                            LocalPlayer.TournamentScore += roundScore;
+
                             _lastRoundSeed = _roundSeed;
                             _roundSeed = 0;
                             _matchBuffer = null;
