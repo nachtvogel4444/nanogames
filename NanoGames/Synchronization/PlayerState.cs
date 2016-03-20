@@ -46,5 +46,15 @@ namespace NanoGames.Synchronization
         /// Gets or sets a value indicating whether the player is currently in a match.
         /// </summary>
         public bool IsInMatch { get; set; }
+
+        /// <summary>
+        /// Gets or sets the index of the player in the current round.
+        /// </summary>
+        public int RoundPlayerIndex { get; set; }
+
+        /// <summary>
+        /// Gets or sets the arrival timestamp of the last packet we received from this player.
+        /// </summary>
+        public long LastPacketArrivalTimestamp { get; set; }
     }
 }

@@ -187,7 +187,8 @@ namespace NanoGames.Application
             {
                 if (_tournament.IsRoundInProgress)
                 {
-                    terminal.Graphics.PrintCenter(Colors.Title, 8, new Vector(160, Menu.TitleY), "GAME IN PROGRESS");
+                    var c = Colors.Title * (0.5 + 0.5 * Math.Sin(Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency * 2 * Math.PI));
+                    terminal.Graphics.PrintCenter(c, 8, new Vector(160, Menu.TitleY), "GAME IN PROGRESS");
                 }
                 else if (_tournament.LocalPlayer.IsReady)
                 {
@@ -203,6 +204,11 @@ namespace NanoGames.Application
 
         private void UpdateVoteView(Terminal terminal)
         {
+            if (_tournament.VoteOptions.Count <= 1)
+            {
+                return;
+            }
+
             string skipTitle = "SKIP THIS ROUND";
             var maxDisciplineNameLength = Math.Max(skipTitle.Length, _tournament.VoteOptions.Skip(1).Max(d => d.Name.Length));
 

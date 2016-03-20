@@ -17,6 +17,11 @@ namespace NanoGames.Synchronization
     /// </summary>
     internal sealed class Tournament
     {
+        /*
+         * This is basically a huge state machine that attempts to figure out the current state of the tournament
+         * based on what it knows and what it receives from other players.
+         */
+
         private const int _latencyFrames = 1;
 
         private const int _winScore = 20;
@@ -43,7 +48,7 @@ namespace NanoGames.Synchronization
 
         private Random _roundRandom;
 
-        private int _localPlayerIndex;
+        private int _localPlayerIndex = -1;
 
         private int _lastUpdatedFrame;
 
@@ -169,6 +174,8 @@ namespace NanoGames.Synchronization
                 HandlePacket(packet);
             }
 
+            RemoveDisconnectedPlayers();
+
             /* We suggest a new round if no other round was started and at least 2/3 of the players are ready. */
             if (_roundSeed == 0 && _players.Count >= 2 && _players.Values.Count(p => p.IsReady) * 3 >= 2 * _players.Count)
             {
@@ -219,6 +226,13 @@ namespace NanoGames.Synchronization
                 }
                 else
                 {
+                    if (LocalPlayer.VoteOption == 0)
+                    {
+                        /* Local player opted out of the match. */
+                        ResetRound();
+                        return;
+                    }
+
                     if (roundDuration < Timestamps.MatchCountdownStart)
                     {
                         TournamentPhase = TournamentPhase.MatchTransition;
@@ -226,24 +240,12 @@ namespace NanoGames.Synchronization
                     }
                     else
                     {
-                        if (LocalPlayer.VoteOption == 0)
-                        {
-                            /* Local player opted out of the match. */
-                            _roundSeed = 0;
-                            TournamentPhase = TournamentPhase.Lobby;
-                            return;
-                        }
-
                         if (_matchBuffer == null)
                         {
                             var activePlayers = _roundRandom.Shuffle(_players.Values.Where(p => p.VoteOption != 0).OrderBy(p => p.Id));
                             if (activePlayers.Count < 2)
                             {
-                                TournamentPhase = TournamentPhase.Lobby;
-                                _roundSeed = 0;
-                                _roundStartTimestamp = 0;
-                                _roundPriority = 0;
-                                _voteOptions.Clear();
+                                ResetRound();
                                 return;
                             }
 
@@ -302,14 +304,22 @@ namespace NanoGames.Synchronization
                             var localPlayerScore = scores[_localPlayerIndex];
                             int roundScore = scores.Sum(s => s < localPlayerScore ? _winScore : (s == localPlayerScore ? _tieScore : 0));
                             LocalPlayer.TournamentScore += roundScore;
-
-                            _lastRoundSeed = _roundSeed;
-                            _roundSeed = 0;
-                            _matchBuffer = null;
+                            ResetRound();
                         }
                     }
                 }
             }
+        }
+
+        private void ResetRound()
+        {
+            _voteOptions.Clear();
+            _lastRoundSeed = _roundSeed;
+            _roundSeed = 0;
+            _roundPriority = 0;
+            _roundStartTimestamp = 0;
+            _localPlayerIndex = -1;
+            _matchBuffer = null;
         }
 
         private void SendPlayerState(Endpoint<PacketData> endpoint)
@@ -358,13 +368,15 @@ namespace NanoGames.Synchronization
                 playerState.Name = packetData.PlayerName;
             }
 
+            playerState.LastPacketArrivalTimestamp = packet.ArrivalTimestamp;
             playerState.TournamentScore = packetData.TournamentScore;
             playerState.IsReady = packetData.IsReady;
             playerState.VoteOption = packetData.VoteOption;
 
             playerState.IsInMatch = packetData.RoundSeed != 0;
+            playerState.RoundPlayerIndex = packetData.RoundPlayerIndex;
 
-            if (packetData.RoundSeed != _roundSeed && packetData.RoundSeed != _lastRoundSeed)
+            if (packetData.RoundSeed != 0 && packetData.RoundSeed != _roundSeed && packetData.RoundSeed != _lastRoundSeed)
             {
                 if (_roundSeed == 0 || packetData.RoundPriority < _roundPriority)
                 {
@@ -373,7 +385,7 @@ namespace NanoGames.Synchronization
                     /* Only accepts rounds if they aren't yet in the voting phase. */
                     if (Stopwatch.GetTimestamp() - matchStartTimeStamp < Timestamps.VoteStart)
                     {
-                        if (_roundSeed == 0 || packetData.RoundPriority < _roundPriority)
+                        if (_roundSeed == 0)
                         {
                             _roundStartTimestamp = matchStartTimeStamp;
                         }
@@ -388,11 +400,43 @@ namespace NanoGames.Synchronization
                 }
             }
 
-            if (packetData.InputEntries != null && _matchBuffer != null)
+            if (packetData.InputEntries != null && _matchBuffer != null && packetData.RoundPlayerIndex >= 0)
             {
                 foreach (var inputEntry in packetData.InputEntries)
                 {
                     _matchBuffer.SetInput(inputEntry.Frame, packetData.RoundPlayerIndex, inputEntry.Input);
+                }
+            }
+        }
+
+        private void RemoveDisconnectedPlayers()
+        {
+            long currentTimestamp = Stopwatch.GetTimestamp();
+
+            List<PlayerId> playersToRemove = null;
+            foreach (var entry in _players)
+            {
+                if (entry.Value != LocalPlayer && currentTimestamp - entry.Value.LastPacketArrivalTimestamp > Durations.IdleDisconnect)
+                {
+                    if (playersToRemove == null)
+                    {
+                        playersToRemove = new List<PlayerId>();
+                    }
+
+                    playersToRemove.Add(entry.Key);
+                }
+            }
+
+            if (playersToRemove != null)
+            {
+                foreach (var playerId in playersToRemove)
+                {
+                    _players.Remove(playerId);
+                }
+
+                if (_roundSeed != 0)
+                {
+                    ResetRound();
                 }
             }
         }

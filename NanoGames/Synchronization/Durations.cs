@@ -29,5 +29,10 @@ namespace NanoGames.Synchronization
         /// The pre-match countdown duration in Stopwatch ticks.
         /// </summary>
         public static readonly long MatchCountdown = 3 * Stopwatch.Frequency;
+
+        /// <summary>
+        /// The duration after which we disconnect a player when not receiving any packets.
+        /// </summary>
+        public static readonly long IdleDisconnect = 3 * Stopwatch.Frequency;
     }
 }
