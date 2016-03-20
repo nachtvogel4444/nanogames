@@ -11,6 +11,20 @@ namespace NanoGames.Games.FallingBlocks
         /// <inheritdoc/>
         protected override void Initialize()
         {
+            if (Players.Count == 2)
+            {
+                Players[0].RightPlayer = Players[1];
+                Players[1].LeftPlayer = Players[0];
+            }
+            else if (Players.Count > 2)
+            {
+                for (int i = 0; i < Players.Count; ++i)
+                {
+                    int j = (i + 1) % Players.Count;
+                    Players[i].RightPlayer = Players[j];
+                    Players[j].LeftPlayer = Players[i];
+                }
+            }
         }
 
         /// <inheritdoc/>

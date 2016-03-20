@@ -56,6 +56,7 @@ namespace NanoGames.Games
         {
             player.Index = index;
             player.Color = description.Color;
+            player.Name = description.Name;
             player.Graphics = Graphics.Null;
         }
     }

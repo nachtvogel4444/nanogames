@@ -262,6 +262,7 @@ namespace NanoGames.Synchronization
                                 p => new PlayerDescription
                                 {
                                     Color = p.PlayerColor,
+                                    Name = p.Name,
                                 }).ToList();
 
                             var matchDescription = new MatchDescription

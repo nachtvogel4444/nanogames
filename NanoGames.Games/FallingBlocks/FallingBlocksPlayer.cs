@@ -9,7 +9,12 @@ namespace NanoGames.Games.FallingBlocks
     internal sealed class FallingBlocksPlayer : Player<FallingBlocksMatch>
     {
         private readonly bool[,] _isBlocked = new bool[Constants.Width, Constants.Height];
+
         private readonly Color[,] _color = new Color[Constants.Width, Constants.Height];
+
+        public FallingBlocksPlayer LeftPlayer { get; set; }
+
+        public FallingBlocksPlayer RightPlayer { get; set; }
 
         /// <inheritdoc/>
         internal override void Initialize()
@@ -30,9 +35,21 @@ namespace NanoGames.Games.FallingBlocks
         /// <inheritdoc/>
         internal override void Update()
         {
-            Graphics.Line(Constants.ContainerColor, Constants.TopLeft + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
-            Graphics.Line(Constants.ContainerColor, Constants.TopLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
-            Graphics.Line(Constants.ContainerColor, Constants.TopLeft + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder), Constants.TopLeft + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
+            Render(Graphics, default(Vector));
+            LeftPlayer?.Render(Graphics, new Vector(-100, 0));
+            RightPlayer?.Render(Graphics, new Vector(100, 0));
+        }
+
+        private void Render(Graphics graphics, Vector offset)
+        {
+            if (graphics != Graphics)
+            {
+                graphics.PrintCenter(Color, 8, new Vector(160, 16) + offset, Name);
+            }
+
+            graphics.Line(Constants.ContainerColor, Constants.TopLeft + offset + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + offset + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
+            graphics.Line(Constants.ContainerColor, Constants.TopLeft + offset + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + offset + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
+            graphics.Line(Constants.ContainerColor, Constants.TopLeft + offset + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder), Constants.TopLeft + offset + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
 
             for (int x = 0; x < Constants.Width; ++x)
             {
@@ -40,10 +57,10 @@ namespace NanoGames.Games.FallingBlocks
                 {
                     if (_isBlocked[x, y])
                     {
-                        Graphics.Rectangle(
+                        graphics.Rectangle(
                             _color[x, y],
-                            Constants.TopLeft + new Vector(x * Constants.BlockSize + Constants.BlockBorder, y * Constants.BlockSize + Constants.BlockBorder),
-                            Constants.TopLeft + new Vector((x + 1) * Constants.BlockSize - Constants.BlockBorder, (y + 1) * Constants.BlockSize - Constants.BlockBorder));
+                            Constants.TopLeft + offset + new Vector(x * Constants.BlockSize + Constants.BlockBorder, y * Constants.BlockSize + Constants.BlockBorder),
+                            Constants.TopLeft + offset + new Vector((x + 1) * Constants.BlockSize - Constants.BlockBorder, (y + 1) * Constants.BlockSize - Constants.BlockBorder));
                     }
                 }
             }

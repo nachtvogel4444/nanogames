@@ -29,6 +29,11 @@ namespace NanoGames.Games
         public Input Input { get; set; }
 
         /// <summary>
+        /// Gets or sets the player's name.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// Gets or sets the player's score.
         /// This used to determine the player's ranking.
         /// It's never shown on the screen and can be a completely artificial number.
