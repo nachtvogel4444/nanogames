@@ -4,6 +4,7 @@
 using NanoGames.Application.Ui;
 using NanoGames.Engine;
 using System;
+using System.Collections.Generic;
 
 namespace NanoGames.Application
 {
@@ -33,6 +34,12 @@ namespace NanoGames.Application
                         Text = Settings.Instance.PlayerName,
                         MaxLength = Settings.MaxPlayerNameLength,
                         OnChange = value => Settings.Instance.PlayerName = value,
+                    },
+                    new ColorMenuItem("PLAYER COLOR")
+                    {
+                        Colors = new List<Color>(PlayerColors.Values),
+                        SelectedColor = Settings.Instance.PlayerColor,
+                        OnSelect = value => Settings.Instance.PlayerColor = value,
                     },
                     new ChoiceMenuItem<bool>("FULLSCREEN")
                     {

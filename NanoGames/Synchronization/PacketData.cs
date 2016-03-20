@@ -71,5 +71,11 @@ namespace NanoGames.Synchronization
         /// </summary>
         [ProtoMember(10)]
         public InputEntry[] InputEntries;
+
+        /// <summary>
+        /// The player color.
+        /// </summary>
+        [ProtoMember(11)]
+        public Color PlayerColor;
     }
 }

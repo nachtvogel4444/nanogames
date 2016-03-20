@@ -38,6 +38,8 @@ namespace NanoGames.Synchronization
 
         private string _sentPlayerName = null;
 
+        private Color _sentPlayerColor = default(Color);
+
         private int _roundPriority;
 
         private long _roundStartTimestamp;
@@ -259,7 +261,7 @@ namespace NanoGames.Synchronization
                             var playerDescriptions = activePlayers.Select(
                                 p => new PlayerDescription
                                 {
-                                    Color = new Color(0, 0.5, 1),
+                                    Color = p.PlayerColor,
                                 }).ToList();
 
                             var matchDescription = new MatchDescription
@@ -333,6 +335,12 @@ namespace NanoGames.Synchronization
                 _sentPlayerName = LocalPlayer.Name;
             }
 
+            if (LocalPlayer.PlayerColor != _sentPlayerColor)
+            {
+                packet.PlayerColor = LocalPlayer.PlayerColor;
+                _sentPlayerColor = LocalPlayer.PlayerColor;
+            }
+
             packet.TournamentScore = LocalPlayer.TournamentScore;
             packet.IsReady = LocalPlayer.IsReady;
             packet.VoteOption = LocalPlayer.VoteOption;
@@ -358,6 +366,7 @@ namespace NanoGames.Synchronization
             {
                 /* New player, resend all our info. */
                 _sentPlayerName = null;
+                _sentPlayerColor = default(Color);
 
                 playerState = new PlayerState(packetData.PlayerId);
                 _players[packetData.PlayerId] = playerState;
@@ -366,6 +375,11 @@ namespace NanoGames.Synchronization
             if (packetData.PlayerName != null)
             {
                 playerState.Name = packetData.PlayerName;
+            }
+
+            if (packetData.PlayerColor != default(Color))
+            {
+                playerState.PlayerColor = packetData.PlayerColor;
             }
 
             playerState.LastPacketArrivalTimestamp = packet.ArrivalTimestamp;

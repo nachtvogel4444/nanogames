@@ -91,6 +91,7 @@ namespace NanoGames.Application
             }
 
             _tournament.LocalPlayer.Name = Settings.Instance.PlayerName;
+            _tournament.LocalPlayer.PlayerColor = Settings.Instance.PlayerColor;
 
             if (_tournament.IsConnecting)
             {
@@ -163,7 +164,7 @@ namespace NanoGames.Application
 
             foreach (var playerInfo in _tournament.Players.OrderByDescending(p => p.TournamentScore).ThenBy(p => p.Name, StringComparer.InvariantCultureIgnoreCase).ThenBy(p => p.Id))
             {
-                terminal.Graphics.Print(Colors.Control, fontSize, new Vector(x + fontSize, y), playerInfo.Name);
+                terminal.Graphics.Print(playerInfo.PlayerColor, fontSize, new Vector(x + fontSize, y), playerInfo.Name);
                 terminal.Graphics.Print(
                     new Color(0.7, 0.7, 0.7),
                     fontSize,

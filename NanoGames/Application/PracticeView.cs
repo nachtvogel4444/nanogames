@@ -17,8 +17,6 @@ namespace NanoGames.Application
     /// </summary>
     internal sealed class PracticeView : IView
     {
-        private static readonly Color _playerColor = new Color(0.1, 0.4, 0.8);
-
         private readonly Action _goBack;
         private readonly Menu _selectDisciplineMenu;
 
@@ -121,7 +119,7 @@ namespace NanoGames.Application
                 {
                     new PlayerDescription
                     {
-                        Color = _playerColor,
+                        Color = Settings.Instance.PlayerColor,
                     },
                 },
 

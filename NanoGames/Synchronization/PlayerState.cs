@@ -28,6 +28,11 @@ namespace NanoGames.Synchronization
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the player color.
+        /// </summary>
+        public Color PlayerColor { get; set; }
+
+        /// <summary>
         /// Gets or sets the player's tournament score.
         /// </summary>
         public int TournamentScore { get; set; }

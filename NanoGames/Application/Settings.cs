@@ -25,7 +25,8 @@ namespace NanoGames.Application
         private bool _showFps = false;
         private bool _isFullscreen = false;
         private bool _isVSynced = true;
-        private string _playerName = "ANON";
+        private string _playerName = "ANONYMOUS";
+        private Color _playerColor = PlayerColors.Values[0];
         private string _lastServer = string.Empty;
 
         private Settings()
@@ -101,6 +102,23 @@ namespace NanoGames.Application
             set
             {
                 _playerName = value;
+                Save();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the player color.
+        /// </summary>
+        public Color PlayerColor
+        {
+            get
+            {
+                return _playerColor;
+            }
+
+            set
+            {
+                _playerColor = value;
                 Save();
             }
         }
