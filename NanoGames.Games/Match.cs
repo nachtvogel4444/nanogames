@@ -23,7 +23,8 @@ namespace NanoGames.Games
         /// <summary>
         /// Updates and renders the match.
         /// </summary>
+        /// <param name="matchGraphics">A Graphics instance used to draw onto the screen of all players.</param>
         /// <param name="playerDescriptions">The player descriptions.</param>
-        public abstract void Update(List<PlayerDescription> playerDescriptions);
+        public abstract void Update(Graphics matchGraphics, List<PlayerDescription> playerDescriptions);
     }
 }

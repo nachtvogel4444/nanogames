@@ -86,13 +86,14 @@ namespace NanoGames.Application
                 ++_matchFrameCount;
                 _bufferedRenderer.Clear();
                 _match.Update(
+                    _bufferedGraphics,
                     new List<PlayerDescription>
                     {
-                                new PlayerDescription
-                                {
-                                    Graphics = _bufferedGraphics,
-                                    Input = terminal.Input,
-                                },
+                        new PlayerDescription
+                        {
+                            Graphics = _bufferedGraphics,
+                            Input = terminal.Input,
+                        },
                     });
 
                 if (_match.IsCompleted)

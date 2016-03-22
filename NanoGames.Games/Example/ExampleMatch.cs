@@ -24,15 +24,13 @@ namespace NanoGames.Games.Example
                 double angle = start + i * 2 * Math.PI / Players.Count;
                 Players[i].Position = new Vector(160 + 88 * Math.Cos(angle), 100 + 88 * Math.Sin(angle));
             }
-
-            /* After this, ExamplePlayer.Initialize is called by the framework for every individual player. */
         }
 
         protected override void Update()
         {
             /*
              * This is called by the framework once every frame.
-             * We can either draw onto every player's graphics interface here, or do that in ExamplePlayer.Update.
+             * We have to draw draw onto every player's Graphics interface.
              */
 
             for (int i = 0; i < _stepsPerFrame; ++i)
@@ -64,7 +62,14 @@ namespace NanoGames.Games.Example
                 }
             }
 
-            /* After this, ExamplePlayer.Update is called by the framework for every individual player. */
+            /* Draw the goal for all players. */
+            var v = new Vector(ExamplePlayer.Radius + ExamplePlayer.Tolerance, ExamplePlayer.Radius + ExamplePlayer.Tolerance);
+            Graphics.Rectangle(new Color(0.25, 0.25, 0.25), Graphics.Center - v, Graphics.Center + v);
+
+            foreach (var player in Players)
+            {
+                player.DrawScreen();
+            }
         }
 
         private static Vector LimitSpeed(Vector velocity)

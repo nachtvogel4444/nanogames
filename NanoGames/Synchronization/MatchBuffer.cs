@@ -45,7 +45,7 @@ namespace NanoGames.Synchronization
 
             _match = initialMatch;
             _playerDescriptions[localPlayerIndex].Graphics = _bufferedGraphics;
-            _match.Update(playerDescriptions);
+            _match.Update(_bufferedGraphics, playerDescriptions);
 
             _knownPlayerInputs.Add(CreateInitialInputRecord());
         }
@@ -114,6 +114,20 @@ namespace NanoGames.Synchronization
                 ++currentFrameIndex;
                 ++currentFrame;
 
+                Graphics localGraphics;
+                if (currentFrame == requestedFrame)
+                {
+                    /* This is the frame we actually want to render. */
+                    _bufferedRenderer.Clear();
+                    localGraphics = _bufferedGraphics;
+                    _bufferedFrame = currentFrame;
+                }
+                else
+                {
+                    /* Discard the output of this frame. */
+                    localGraphics = Graphics.Null;
+                }
+
                 for (int playerIndex = 0; playerIndex < _playerCount; ++playerIndex)
                 {
                     Input input;
@@ -129,18 +143,7 @@ namespace NanoGames.Synchronization
                     }
 
                     _playerDescriptions[playerIndex].Input = input;
-                    if (currentFrame == requestedFrame && playerIndex == _localPlayerIndex)
-                    {
-                        /* This is the frame we actually want to render. */
-                        _bufferedRenderer.Clear();
-                        _playerDescriptions[playerIndex].Graphics = _bufferedGraphics;
-                        _bufferedFrame = requestedFrame;
-                    }
-                    else
-                    {
-                        /* Set this to null just to make sure. */
-                        _playerDescriptions[playerIndex].Graphics = Graphics.Null;
-                    }
+                    _playerDescriptions[playerIndex].Graphics = playerIndex == _localPlayerIndex ? localGraphics : Graphics.Null;
                 }
 
                 if (allInputWasValid)
@@ -165,7 +168,7 @@ namespace NanoGames.Synchronization
                     }
                 }
 
-                match.Update(_playerDescriptions);
+                match.Update(localGraphics, _playerDescriptions);
             }
         }
 

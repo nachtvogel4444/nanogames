@@ -25,11 +25,20 @@ namespace NanoGames.Games.FallingBlocks
                     Players[j].LeftPlayer = Players[i];
                 }
             }
+
+            foreach (var player in Players)
+            {
+                player.Initialize();
+            }
         }
 
         /// <inheritdoc/>
         protected override void Update()
         {
+            foreach (var player in Players)
+            {
+                player.DrawScreen();
+            }
         }
     }
 }

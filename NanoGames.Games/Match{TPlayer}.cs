@@ -24,6 +24,11 @@ namespace NanoGames.Games
         /// </summary>
         public Random Random { get; internal set; }
 
+        /// <summary>
+        /// Gets the match Graphics instance, which draws onto the screen of every player.
+        /// </summary>
+        public Graphics Graphics { get; private set; }
+
         /// <inheritdoc/>
         public override IEnumerable<double> PlayerScores => Players.Select(p => p.Score);
 
@@ -45,12 +50,14 @@ namespace NanoGames.Games
         }
 
         /// <inheritdoc/>
-        public override sealed void Update(List<PlayerDescription> playerDescriptions)
+        public override sealed void Update(Graphics graphics, List<PlayerDescription> playerDescriptions)
         {
             if (IsCompleted)
             {
                 return;
             }
+
+            Graphics = graphics;
 
             for (int i = 0; i < Players.Count; ++i)
             {
@@ -60,12 +67,6 @@ namespace NanoGames.Games
 
             /* Update the match. */
             Update();
-
-            /* Update each individual player. */
-            foreach (var player in Players)
-            {
-                player.Update();
-            }
         }
 
         /// <summary>

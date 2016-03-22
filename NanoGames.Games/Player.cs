@@ -40,15 +40,5 @@ namespace NanoGames.Games
         /// Higher scores are better.
         /// </summary>
         public double Score { get; internal set; }
-
-        /// <summary>
-        /// Initializes the player. This is called after <see cref="Match{TPlayer}.Initialize()"/>.
-        /// </summary>
-        internal abstract void Initialize();
-
-        /// <summary>
-        /// Updates and optionally renders the player's state. This is runs after calling <see cref="Match{TPlayer}.Update()"/>.
-        /// </summary>
-        internal abstract void Update();
     }
 }

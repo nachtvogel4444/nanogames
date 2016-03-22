@@ -44,11 +44,6 @@ namespace NanoGames.Games
 
             match.Initialize(players);
 
-            foreach (var player in players)
-            {
-                player.Initialize();
-            }
-
             return match;
         }
 

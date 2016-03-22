@@ -14,19 +14,8 @@ namespace NanoGames.Games.Example
 
         public Vector Velocity;
 
-        internal override void Initialize()
+        public void DrawScreen()
         {
-            /* This is called once for every player after ExampleMatch.Initialize. */
-        }
-
-        internal override void Update()
-        {
-            /* This is called by the framework once every frame for every player. */
-
-            /* Draw the goal. */
-            var v = new Vector(Radius + Tolerance, Radius + Tolerance);
-            Graphics.Rectangle(new Color(0.25, 0.25, 0.25), Graphics.Center - v, Graphics.Center + v);
-
             /* Draw each player. */
             foreach (var player in Match.Players)
             {

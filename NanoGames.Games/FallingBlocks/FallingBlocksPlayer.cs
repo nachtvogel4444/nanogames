@@ -16,8 +16,7 @@ namespace NanoGames.Games.FallingBlocks
 
         public FallingBlocksPlayer RightPlayer { get; set; }
 
-        /// <inheritdoc/>
-        internal override void Initialize()
+        public void Initialize()
         {
             for (int y = Constants.Height - Constants.InitialGarbageLines; y < Constants.Height; ++y)
             {
@@ -32,15 +31,14 @@ namespace NanoGames.Games.FallingBlocks
             }
         }
 
-        /// <inheritdoc/>
-        internal override void Update()
+        public void DrawScreen()
         {
-            Render(Graphics, default(Vector));
-            LeftPlayer?.Render(Graphics, new Vector(-100, 0));
-            RightPlayer?.Render(Graphics, new Vector(100, 0));
+            Draw(Graphics, default(Vector));
+            LeftPlayer?.Draw(Graphics, new Vector(-100, 0));
+            RightPlayer?.Draw(Graphics, new Vector(100, 0));
         }
 
-        private void Render(Graphics graphics, Vector offset)
+        private void Draw(Graphics graphics, Vector offset)
         {
             if (graphics != Graphics)
             {

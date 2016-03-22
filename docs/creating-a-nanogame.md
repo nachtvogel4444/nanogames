@@ -75,27 +75,25 @@ At the start of a round, the framework will perform these tasks:
 
   - Match.Initialize() is called. This is an abstract method that performs initialization specific to the game.
 
-  - For every player instance, Player.Initialize() is called. This is an abstract method that performs initialization specific to the game.
-
 ### During the match
 
 The, for every frame, the framework will do this:
+
+  - Match.Graphics is set to a graphics object that can be used to draw things for every player. You can use this to draw the game board, for example.
 
   - For every player instance:
 
       * Player.Input is set to the current input state of the player (which buttons the player has currently pressed).
 
-      * Player.Graphics is set to the current render output.
+      * Player.Graphics is set to the specific player's current render output. In multiplayer games, the screen of every player can be different, you can use this to draw things only an individual player can see.
 
-  - Match.Update() is called. This is an abstract method that performs update and/or rendering code specific to the game.
+  - Match.Update() is called. This is an abstract method that performs update and/or rendering code specific to the game. During Update(), you need to draw onto the Match.Graphics instance and/or onto everyplayer's Graphics instance.
 
-  - For every player, Player.Update() is called. This is an abstract method that performs update and/or rendering code specific to the game.
-
-  - Everything drawn onto a player's Graphics object during either the match or player Update method is shown on the player's screen.
+  - Everything drawn is shown on the screen in a single step.
 
 ### End
 
-The game ends when Match.IsCompleted is set to true by an Update() method. In this case:
+The game ends when Match.IsCompleted is set to true during the Update() method. In this case:
 
   - The match ends and no further frames are updated/rendered.
 
