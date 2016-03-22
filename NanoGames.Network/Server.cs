@@ -4,7 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading;
 
 namespace NanoGames.Network
@@ -32,7 +35,7 @@ namespace NanoGames.Network
         /// </summary>
         public Server()
         {
-            _listener = TcpListener.Create(Port);
+            _listener = CreateListener(Port);
             _listener.Start();
             _listenerThread = new WorkerThread(RunListener);
         }
@@ -93,6 +96,34 @@ namespace NanoGames.Network
                 var connection = new LocalConnection<TPacketData>(this);
                 _connections.Add(connection);
                 return connection;
+            }
+        }
+
+        private static TcpListener CreateListener(int port)
+        {
+            /*
+             * TcpListener.Create(int port) is only available in Microsoft .NET, not in Mono.
+             * However, we'd like to use it if available because it creates a convenient hybrid (IPv4/IPv6) socket.
+             * So we attempt to fetch the method via reflection.
+             * If it's there, invoke it, if it's not there, fall back to new TcpListener(...), which creates an IPv4 socket.
+             */
+
+            var createMethod =
+                typeof(TcpListener)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Where(
+                    m => m.Name == "Create"
+                        && m.GetParameters().Length == 1
+                        && m.GetParameters()[0].ParameterType == typeof(int))
+                .SingleOrDefault();
+
+            if (createMethod != null)
+            {
+                return (TcpListener)createMethod.Invoke(null, new object[] { port });
+            }
+            else
+            {
+                return new TcpListener(IPAddress.Any, port);
             }
         }
 
