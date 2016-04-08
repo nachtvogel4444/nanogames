@@ -11,6 +11,11 @@ namespace NanoGames.Games.Bomberguy
             get { return true; }
         }
 
+        public bool Passable
+        {
+            get { return true; }
+        }
+
         public Vector Position
         {
             get; set;
@@ -21,21 +26,14 @@ namespace NanoGames.Games.Bomberguy
             get; set;
         }
 
+        public Vector Center { get { return Position + new Vector(Size.X / 2d, Size.Y / 2d); } }
+
         public void Draw(Graphics g)
         {
             g.Line(Colors.White, Position + new Vector(Size.X / 2d, 0), Position + new Vector(Size.X, Size.Y / 2d));
             g.Line(Colors.White, Position + new Vector(Size.X, Size.Y / 2d), Position + new Vector(Size.X / 2d, Size.Y));
             g.Line(Colors.White, Position + new Vector(Size.X / 2d, Size.Y), Position + new Vector(0, Size.Y / 2d));
             g.Line(Colors.White, Position + new Vector(0, Size.Y / 2d), Position + new Vector(Size.X / 2d, 0));
-        }
-
-        internal override void Initialize()
-        {
-        }
-
-        internal override void Update()
-        {
-            Draw(this.Graphics);
         }
     }
 }

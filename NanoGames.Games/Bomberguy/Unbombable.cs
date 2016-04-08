@@ -6,7 +6,7 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class Unbombable : AbstractBomberThing
     {
-        public Unbombable(Vector position, Vector size) : base(false, position, size)
+        public Unbombable(Vector position, Vector size) : base(false, false, position, size)
         {
         }
 

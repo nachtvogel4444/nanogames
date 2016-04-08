@@ -10,7 +10,11 @@ namespace NanoGames.Games.Bomberguy
 
         Vector Size { get; }
 
+        Vector Center { get; }
+
         bool Destroyable { get; }
+
+        bool Passable { get; }
 
         void Draw(Graphics g);
     }
