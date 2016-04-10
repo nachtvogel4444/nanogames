@@ -9,8 +9,8 @@ namespace NanoGames.Games.Bomberguy
     internal class BomberMatch : Match<BomberGuy>
     {
         public const int FIELD_SIZE = 15;
-        public const double PLAYER_RATIO = 4d / 5d;
-        public const double SPEED = 0.4;
+        public const double PLAYER_RATIO = .9;
+        public const double SPEED = 0.35;
 
         private double _pixelsPerUnit;
         private double _widthOffset;
@@ -106,60 +106,125 @@ namespace NanoGames.Games.Bomberguy
 
             if (p.Input.Up && !p.Input.Down)
             {
-                var neighbor1 = this[GetCell(p.Position + new Vector(0, -SPEED))];
-                var neighbor2 = this[GetCell(p.Position + new Vector(p.Size.X, -SPEED))];
-                if ((neighbor1 == null || neighbor1.Passable) && (neighbor2 == null || neighbor2.Passable))
+                var neighborLeft = this[GetCell(p.Position + new Vector(0, -SPEED))];
+                if (neighborLeft != null)
+                {
+                    var xDistance = p.Center.X - (neighborLeft.Position + neighborLeft.Size).X;
+                    var yDistance = p.Center.Y - (neighborLeft.Position + neighborLeft.Size).Y;
+
+                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    {
+                        neighborLeft = null;
+                    }
+                }
+
+                var neighborRight = this[GetCell(p.Position + new Vector(p.Size.X, -SPEED))];
+                if (neighborRight != null)
+                {
+                    var xDistance = (neighborRight.Position).X - p.Center.X;
+                    var yDistance = p.Center.Y - (neighborRight.Position + neighborRight.Size).Y;
+
+                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    {
+                        neighborRight = null;
+                    }
+                }
+                if ((neighborLeft == null || neighborLeft.Passable) && (neighborRight == null || neighborRight.Passable))
                 {
                     y = -1;
                 }
             }
             if (p.Input.Down && !p.Input.Up)
             {
-                var neighbor1 = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, SPEED))];
-                var neighbor2 = this[GetCell(p.Position + p.Size + new Vector(0, SPEED))];
-                if ((neighbor1 == null || neighbor1.Passable) && (neighbor2 == null || neighbor2.Passable))
+                var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, SPEED))];
+                if (neighborLeft != null)
+                {
+                    var xDistance = p.Center.X - (neighborLeft.Position + neighborLeft.Size).X;
+                    var yDistance = (neighborLeft.Position).Y - p.Center.Y;
+
+                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    {
+                        neighborLeft = null;
+                    }
+                }
+
+                var neighborRight = this[GetCell(p.Position + p.Size + new Vector(0, SPEED))];
+                if (neighborRight != null)
+                {
+                    var xDistance = (neighborRight.Position).X - p.Center.X;
+                    var yDistance = (neighborRight.Position).Y - p.Center.Y;
+
+                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    {
+                        neighborRight = null;
+                    }
+                }
+                if ((neighborLeft == null || neighborLeft.Passable) && (neighborRight == null || neighborRight.Passable))
                 {
                     y = 1;
                 }
             }
             if (p.Input.Left && !p.Input.Right)
             {
-                var neighbor1 = this[GetCell(p.Position + new Vector(-SPEED, 0))];
+                var neighborAbove = this[GetCell(p.Position + new Vector(-SPEED, 0))];
 
-                if (neighbor1 != null)
+                if (neighborAbove != null)
                 {
-                    var yDistance = p.Center.Y - (neighbor1.Position + neighbor1.Size).Y;
-                    var xDistance = p.Center.X - (neighbor1.Position + neighbor1.Size).X;
+                    var xDistance = p.Center.X - (neighborAbove.Position + neighborAbove.Size).X;
+                    var yDistance = p.Center.Y - (neighborAbove.Position + neighborAbove.Size).Y;
 
-                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.5)
+                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
                     {
-                        neighbor1 = null;
+                        neighborAbove = null;
                     }
                 }
 
-                var neighbor2 = this[GetCell(p.Position + new Vector(-SPEED, p.Size.Y))];
+                var neighborBelow = this[GetCell(p.Position + new Vector(-SPEED, p.Size.Y))];
 
-                if (neighbor2 != null)
+                if (neighborBelow != null)
                 {
-                    var yDistance2 = (neighbor2.Position + neighbor2.Size).Y - p.Center.Y;
-                    var xDistance2 = (neighbor2.Position + neighbor2.Size).X - p.Center.X;
+                    var xDistance = p.Center.X - (neighborBelow.Position + neighborBelow.Size).X;
+                    var yDistance = (neighborBelow.Position).Y - p.Center.Y;
 
-                    if (yDistance2 / p.Size.Y < xDistance2 / p.Size.X)
+                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
                     {
-                        neighbor2 = null;
+                        neighborBelow = null;
                     }
                 }
 
-                if ((neighbor1 == null || neighbor1.Passable) && (neighbor2 == null || neighbor2.Passable))
+                if ((neighborAbove == null || neighborAbove.Passable) && (neighborBelow == null || neighborBelow.Passable))
                 {
                     x = -1;
                 }
             }
             if (p.Input.Right && !p.Input.Left)
             {
-                var neighbor1 = this[GetCell(p.Position + p.Size + new Vector(SPEED, -p.Size.Y))];
-                var neighbor2 = this[GetCell(p.Position + p.Size + new Vector(SPEED, 0))];
-                if ((neighbor1 == null || neighbor1.Passable) && (neighbor2 == null || neighbor2.Passable))
+                var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + SPEED, 0))];
+
+                if (neighborAbove != null)
+                {
+                    var xDistance = (neighborAbove.Position).X - p.Center.X;
+                    var yDistance = p.Center.Y - (neighborAbove.Position + neighborAbove.Size).Y;
+
+                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    {
+                        neighborAbove = null;
+                    }
+                }
+
+                var neighborBelow = this[GetCell(p.Position + new Vector(p.Size.X + SPEED, p.Size.Y))];
+
+                if (neighborBelow != null)
+                {
+                    var xDistance = (neighborBelow.Position).X - p.Center.X;
+                    var yDistance = (neighborBelow.Position).Y - p.Center.Y;
+
+                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    {
+                        neighborBelow = null;
+                    }
+                }
+                if ((neighborAbove == null || neighborAbove.Passable) && (neighborBelow == null || neighborBelow.Passable))
                 {
                     x = 1;
                 }
@@ -176,14 +241,14 @@ namespace NanoGames.Games.Bomberguy
         {
             var c = (thing.Center.X - _widthOffset) / _pixelsPerUnit;
             var r = thing.Center.Y / _pixelsPerUnit;
-            return new Vector(Math.Floor(c), Math.Floor(r));
+            return new Vector(Math.Floor(r), Math.Floor(c));
         }
 
         private Vector GetCell(Vector position)
         {
             var c = (position.X - _widthOffset) / _pixelsPerUnit;
             var r = position.Y / _pixelsPerUnit;
-            return new Vector(Math.Floor(c), Math.Floor(r));
+            return new Vector(Math.Floor(r), Math.Floor(c));
         }
     }
 }
