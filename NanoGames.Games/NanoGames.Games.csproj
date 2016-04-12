@@ -53,6 +53,7 @@
     <Compile Include="Bomberguy\BomberMatch.cs" />
     <Compile Include="Bomberguy\BomberThing.cs" />
     <Compile Include="Bomberguy\Bombstacle.cs" />
+    <Compile Include="Bomberguy\Explosion.cs" />
     <Compile Include="Bomberguy\Unbombable.cs" />
     <Compile Include="Discipline.cs" />
     <Compile Include="DisciplineDirectory.cs" />

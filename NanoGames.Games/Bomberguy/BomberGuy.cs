@@ -35,5 +35,10 @@ namespace NanoGames.Games.Bomberguy
             g.Line(Colors.White, Position + new Vector(Size.X / 2d, Size.Y), Position + new Vector(0, Size.Y / 2d));
             g.Line(Colors.White, Position + new Vector(0, Size.Y / 2d), Position + new Vector(Size.X / 2d, 0));
         }
+
+        public void Destroy()
+        {
+            this.Score = Match.DeadPlayers++;
+        }
     }
 }

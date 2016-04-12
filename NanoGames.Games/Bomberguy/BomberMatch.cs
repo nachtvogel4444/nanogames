@@ -10,11 +10,33 @@ namespace NanoGames.Games.Bomberguy
     {
         public const int FIELD_SIZE = 15;
         public const double PLAYER_RATIO = .9;
+        public const double BOMB_RATIO = 1;
+        public const int BOMB_REACH = 3;
         public const double SPEED = 0.35;
 
         private double _pixelsPerUnit;
         private double _widthOffset;
         private BomberThing[,] _field = new BomberThing[FIELD_SIZE, FIELD_SIZE];
+        private int _deadPlayers;
+
+        public int DeadPlayers
+        {
+            get
+            {
+                return _deadPlayers;
+            }
+
+            set
+            {
+                _deadPlayers = value;
+                CheckCompleted();
+            }
+        }
+
+        public Vector CellSize
+        {
+            get { return new Vector(_pixelsPerUnit, _pixelsPerUnit); }
+        }
 
         public BomberThing this[Vector v]
         {
@@ -42,6 +64,25 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
+        public Vector GetCell(BomberThing thing)
+        {
+            var c = (thing.Center.X - _widthOffset) / _pixelsPerUnit;
+            var r = thing.Center.Y / _pixelsPerUnit;
+            return new Vector(Math.Floor(r), Math.Floor(c));
+        }
+
+        public Vector GetCell(Vector position)
+        {
+            var c = (position.X - _widthOffset) / _pixelsPerUnit;
+            var r = position.Y / _pixelsPerUnit;
+            return new Vector(Math.Floor(r), Math.Floor(c));
+        }
+
+        public Vector GetCoordinates(Vector cellCoordinates)
+        {
+            return new Vector(_widthOffset + cellCoordinates.Y * _pixelsPerUnit, cellCoordinates.X * _pixelsPerUnit);
+        }
+
         protected override void Initialize()
         {
             _pixelsPerUnit = Graphics.Height / FIELD_SIZE;
@@ -54,7 +95,7 @@ namespace NanoGames.Games.Bomberguy
                 {
                     if (r == 0 || r == FIELD_SIZE - 1 || c == 0 || c == FIELD_SIZE - 1 || r % 2 == 0 && c % 2 == 0)
                     {
-                        _field[r, c] = new Unbombable(new Vector(_widthOffset + c * _pixelsPerUnit, r * _pixelsPerUnit), new Vector(_pixelsPerUnit, _pixelsPerUnit));
+                        _field[r, c] = new Unbombable(this, new Vector(_widthOffset + c * _pixelsPerUnit, r * _pixelsPerUnit), new Vector(_pixelsPerUnit, _pixelsPerUnit));
                     }
                 }
             }
@@ -68,8 +109,8 @@ namespace NanoGames.Games.Bomberguy
             {
                 p.Size = new Vector(_pixelsPerUnit * PLAYER_RATIO, _pixelsPerUnit * PLAYER_RATIO);
                 p.Position = pos;
-                var cell = GetCell(p);
-                this[cell] = p;
+                //var cell = GetCell(p);
+                //this[cell] = p;
 
                 direction = direction.RotatedRight;
 
@@ -87,6 +128,10 @@ namespace NanoGames.Games.Bomberguy
             {
                 MovePlayer(p);
 
+                p.Draw(p.Graphics);
+
+                DropBomb(p);
+
                 for (int r = 0; r < FIELD_SIZE; r++)
                 {
                     for (int c = 0; c < FIELD_SIZE; c++)
@@ -98,6 +143,22 @@ namespace NanoGames.Games.Bomberguy
                     }
                 }
             }
+        }
+
+        private void CheckCompleted()
+        {
+            this.IsCompleted = DeadPlayers == Players.Count;
+        }
+
+        private void DropBomb(BomberGuy p)
+        {
+            if (!p.Input.Fire) return;
+
+            var cell = GetCell(p);
+
+            var bomb = new Bomb(BOMB_REACH, this, GetCoordinates(cell), new Vector(_pixelsPerUnit * BOMB_RATIO, _pixelsPerUnit * BOMB_RATIO));
+
+            this[cell] = bomb;
         }
 
         private void MovePlayer(BomberGuy p)
@@ -112,7 +173,7 @@ namespace NanoGames.Games.Bomberguy
                     var xDistance = p.Center.X - (neighborLeft.Position + neighborLeft.Size).X;
                     var yDistance = p.Center.Y - (neighborLeft.Position + neighborLeft.Size).Y;
 
-                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
                     {
                         neighborLeft = null;
                     }
@@ -124,7 +185,7 @@ namespace NanoGames.Games.Bomberguy
                     var xDistance = (neighborRight.Position).X - p.Center.X;
                     var yDistance = p.Center.Y - (neighborRight.Position + neighborRight.Size).Y;
 
-                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
                     {
                         neighborRight = null;
                     }
@@ -142,7 +203,7 @@ namespace NanoGames.Games.Bomberguy
                     var xDistance = p.Center.X - (neighborLeft.Position + neighborLeft.Size).X;
                     var yDistance = (neighborLeft.Position).Y - p.Center.Y;
 
-                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
                     {
                         neighborLeft = null;
                     }
@@ -154,7 +215,7 @@ namespace NanoGames.Games.Bomberguy
                     var xDistance = (neighborRight.Position).X - p.Center.X;
                     var yDistance = (neighborRight.Position).Y - p.Center.Y;
 
-                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
                     {
                         neighborRight = null;
                     }
@@ -173,7 +234,7 @@ namespace NanoGames.Games.Bomberguy
                     var xDistance = p.Center.X - (neighborAbove.Position + neighborAbove.Size).X;
                     var yDistance = p.Center.Y - (neighborAbove.Position + neighborAbove.Size).Y;
 
-                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
                     {
                         neighborAbove = null;
                     }
@@ -186,7 +247,7 @@ namespace NanoGames.Games.Bomberguy
                     var xDistance = p.Center.X - (neighborBelow.Position + neighborBelow.Size).X;
                     var yDistance = (neighborBelow.Position).Y - p.Center.Y;
 
-                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
                     {
                         neighborBelow = null;
                     }
@@ -206,7 +267,7 @@ namespace NanoGames.Games.Bomberguy
                     var xDistance = (neighborAbove.Position).X - p.Center.X;
                     var yDistance = p.Center.Y - (neighborAbove.Position + neighborAbove.Size).Y;
 
-                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
                     {
                         neighborAbove = null;
                     }
@@ -219,7 +280,7 @@ namespace NanoGames.Games.Bomberguy
                     var xDistance = (neighborBelow.Position).X - p.Center.X;
                     var yDistance = (neighborBelow.Position).Y - p.Center.Y;
 
-                    if (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55)
+                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
                     {
                         neighborBelow = null;
                     }
@@ -235,20 +296,6 @@ namespace NanoGames.Games.Bomberguy
             var direction = new Vector(x, y).Normalized;
 
             p.Position += direction * SPEED;
-        }
-
-        private Vector GetCell(BomberThing thing)
-        {
-            var c = (thing.Center.X - _widthOffset) / _pixelsPerUnit;
-            var r = thing.Center.Y / _pixelsPerUnit;
-            return new Vector(Math.Floor(r), Math.Floor(c));
-        }
-
-        private Vector GetCell(Vector position)
-        {
-            var c = (position.X - _widthOffset) / _pixelsPerUnit;
-            var r = position.Y / _pixelsPerUnit;
-            return new Vector(Math.Floor(r), Math.Floor(c));
         }
     }
 }

@@ -4,13 +4,14 @@
 
 namespace NanoGames.Games.Bomberguy
 {
-    public abstract class AbstractBomberThing : BomberThing
+    internal abstract class AbstractBomberThing : BomberThing
     {
-        public AbstractBomberThing(bool destroyable, bool passable, Vector position, Vector size)
+        public AbstractBomberThing(BomberMatch match, bool destroyable, bool passable, Vector position, Vector size)
         {
             this.Destroyable = destroyable;
             this.Position = position;
             this.Size = size;
+            this.Match = match;
         }
 
         public bool Destroyable { get; private set; }
@@ -23,6 +24,23 @@ namespace NanoGames.Games.Bomberguy
 
         public Vector Center { get { return Position + new Vector(Size.X / 2d, Size.Y / 2d); } }
 
+        internal BomberMatch Match { get; private set; }
+
         public abstract void Draw(Graphics g);
+
+        public void Destroy()
+        {
+            if (!Destroyable) return;
+
+            var cell = Match.GetCell(this);
+
+            OnDestroy(cell);
+
+            Match[cell] = null;
+        }
+
+        protected virtual void OnDestroy(Vector cell)
+        {
+        }
     }
 }
