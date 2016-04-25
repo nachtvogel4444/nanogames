@@ -8,7 +8,7 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class Bombstacle : AbstractBomberThing
     {
-        public Bombstacle(BomberMatch match, Vector position, Vector size) : base(match, true, false, position, size)
+        public Bombstacle(BomberMatch match, Vector position, Vector size) : base(match, true, false, false, position, size)
         {
         }
 

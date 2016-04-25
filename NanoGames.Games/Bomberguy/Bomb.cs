@@ -11,7 +11,7 @@ namespace NanoGames.Games.Bomberguy
         private Timer bombTimer;
         private int reach;
 
-        public Bomb(int reach, BomberMatch match, Vector position, Vector size) : base(match, true, false, position, size)
+        public Bomb(int reach, BomberMatch match, Vector position, Vector size) : base(match, true, false, false, position, size)
         {
             bombTimer = new Timer(3000);
             bombTimer.Elapsed += BombTimer_Elapsed;
@@ -31,6 +31,8 @@ namespace NanoGames.Games.Bomberguy
         protected override void OnDestroy(Vector cell)
         {
             CreateExplosions(cell);
+
+            Match.CheckExplosions();
         }
 
         private void BombTimer_Elapsed(object sender, ElapsedEventArgs e)

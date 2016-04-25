@@ -6,6 +6,8 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class BomberGuy : Player<BomberMatch>, BomberThing
     {
+        private bool dead;
+
         public bool Destroyable
         {
             get { return true; }
@@ -14,6 +16,11 @@ namespace NanoGames.Games.Bomberguy
         public bool Passable
         {
             get { return true; }
+        }
+
+        public bool Deadly
+        {
+            get { return false; }
         }
 
         public Vector Position
@@ -38,6 +45,10 @@ namespace NanoGames.Games.Bomberguy
 
         public void Destroy()
         {
+            if (dead) return;
+
+            dead = true;
+
             this.Score = Match.DeadPlayers++;
         }
     }

@@ -12,7 +12,7 @@ namespace NanoGames.Games.Bomberguy
         public const double PLAYER_RATIO = .9;
         public const double BOMB_RATIO = 1;
         public const int BOMB_REACH = 3;
-        public const double SPEED = 0.35;
+        public const double SPEED = 0.45;
 
         private double _pixelsPerUnit;
         private double _widthOffset;
@@ -83,6 +83,14 @@ namespace NanoGames.Games.Bomberguy
             return new Vector(_widthOffset + cellCoordinates.Y * _pixelsPerUnit, cellCoordinates.X * _pixelsPerUnit);
         }
 
+        public void CheckExplosions()
+        {
+            foreach (var p in Players)
+            {
+                CheckExplosions(p);
+            }
+        }
+
         protected override void Initialize()
         {
             _pixelsPerUnit = Graphics.Height / FIELD_SIZE;
@@ -132,6 +140,8 @@ namespace NanoGames.Games.Bomberguy
 
                 DropBomb(p);
 
+                CheckExplosions(p);
+
                 for (int r = 0; r < FIELD_SIZE; r++)
                 {
                     for (int c = 0; c < FIELD_SIZE; c++)
@@ -143,6 +153,13 @@ namespace NanoGames.Games.Bomberguy
                     }
                 }
             }
+        }
+
+        private void CheckExplosions(BomberGuy p)
+        {
+            var cell = this[GetCell(p)];
+
+            if (cell != null && cell.Deadly) p.Destroy();
         }
 
         private void CheckCompleted()
