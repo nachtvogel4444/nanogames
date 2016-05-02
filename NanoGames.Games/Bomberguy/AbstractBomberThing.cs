@@ -6,6 +6,10 @@ namespace NanoGames.Games.Bomberguy
 {
     internal abstract class AbstractBomberThing : BomberThing
     {
+        public AbstractBomberThing(BomberMatch match, bool destroyable, bool passable, bool deadly, Vector size) : this(match, destroyable, passable, deadly, new Vector(), size)
+        {
+        }
+
         public AbstractBomberThing(BomberMatch match, bool destroyable, bool passable, bool deadly, Vector position, Vector size)
         {
             this.Destroyable = destroyable;
@@ -22,7 +26,7 @@ namespace NanoGames.Games.Bomberguy
 
         public bool Deadly { get; private set; }
 
-        public Vector Position { get; private set; }
+        public Vector Position { get; set; }
 
         public Vector Size { get; private set; }
 

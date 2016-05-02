@@ -1,4 +1,7 @@
-﻿using System.Timers;
+﻿// Copyright (c) the authors of nanoGames. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt in the project root.
+
+using System.Timers;
 
 namespace NanoGames.Games.Bomberguy
 {
@@ -7,10 +10,14 @@ namespace NanoGames.Games.Bomberguy
         private Type type;
         private Timer explosionTimer;
 
+        public Explosion(Type type, BomberMatch match, Vector size) : this(type, match, new Vector(), size)
+        {
+        }
+
         public Explosion(Type type, BomberMatch match, Vector position, Vector size) : base(match, true, true, true, position, size)
         {
             this.type = type;
-            explosionTimer = new Timer(500000);
+            explosionTimer = new Timer(3000);
             explosionTimer.Elapsed += ExplosionTimer_Elapsed;
             explosionTimer.Start();
         }

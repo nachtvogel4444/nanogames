@@ -11,6 +11,10 @@ namespace NanoGames.Games.Bomberguy
         private Timer bombTimer;
         private int reach;
 
+        public Bomb(int reach, BomberMatch match, Vector size) : this(reach, match, new Vector(), size)
+        {
+        }
+
         public Bomb(int reach, BomberMatch match, Vector position, Vector size) : base(match, true, false, false, position, size)
         {
             bombTimer = new Timer(3000);

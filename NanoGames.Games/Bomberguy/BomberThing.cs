@@ -6,7 +6,7 @@ namespace NanoGames.Games.Bomberguy
 {
     internal interface BomberThing
     {
-        Vector Position { get; }
+        Vector Position { get; set; }
 
         Vector Size { get; }
 

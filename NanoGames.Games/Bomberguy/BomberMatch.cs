@@ -61,6 +61,7 @@ namespace NanoGames.Games.Bomberguy
             set
             {
                 _field[x, y] = value;
+                if (value != null) value.Position = GetCoordinates(new Vector(x, y));
             }
         }
 
@@ -97,37 +98,13 @@ namespace NanoGames.Games.Bomberguy
             _widthOffset = (Graphics.Width - Graphics.Height) / 2d;
 
             // initialize static obstacles
-            for (int r = 0; r < FIELD_SIZE; r++)
-            {
-                for (int c = 0; c < FIELD_SIZE; c++)
-                {
-                    if (r == 0 || r == FIELD_SIZE - 1 || c == 0 || c == FIELD_SIZE - 1 || r % 2 == 0 && c % 2 == 0)
-                    {
-                        _field[r, c] = new Unbombable(this, new Vector(_widthOffset + c * _pixelsPerUnit, r * _pixelsPerUnit), new Vector(_pixelsPerUnit, _pixelsPerUnit));
-                    }
-                }
-            }
+            InitializeUnbombables();
 
             // initialize players
-            double distance = FIELD_SIZE - 2;
-            int count = 0;
-            Vector pos = new Vector(_widthOffset + Math.Ceiling(_pixelsPerUnit), Math.Ceiling(_pixelsPerUnit));
-            Vector direction = new Vector(1, 0);
-            foreach (BomberGuy p in this.Players)
-            {
-                p.Size = new Vector(_pixelsPerUnit * PLAYER_RATIO, _pixelsPerUnit * PLAYER_RATIO);
-                p.Position = pos;
-                //var cell = GetCell(p);
-                //this[cell] = p;
+            InitializePlayers();
 
-                direction = direction.RotatedRight;
-
-                pos = pos + direction * (distance * _pixelsPerUnit);
-
-                count++;
-                if (count % 4 == 0)
-                    distance = System.Math.Floor(distance / 2d);
-            }
+            // initialize destroyable obstacles
+            InitializeBombstacles();
         }
 
         protected override void Update()
@@ -153,6 +130,63 @@ namespace NanoGames.Games.Bomberguy
                     }
                 }
             }
+        }
+
+        private void InitializePlayers()
+        {
+            int playersPerSide = (int)Math.Ceiling(Players.Count / 4d);
+            BomberGuy[,] playerArray = new BomberGuy[4, playersPerSide];
+            int side = 0;
+            int playerCount = 0;
+            foreach (BomberGuy p in Players)
+            {
+                playerArray[side, playerCount] = p;
+                if (side++ > 3)
+                {
+                    side = 0;
+                    playerCount++;
+                }
+            }
+
+            Vector direction = new Vector(1, 0);
+            int distance = (int)Math.Floor((double)(FIELD_SIZE - 2) / playersPerSide);
+            Vector currPos = new Vector(1, 1);
+            for (int i = 0; i < 4; i++)
+            {
+                if (i == 1) currPos = new Vector(FIELD_SIZE - 2, 1);
+                if (i == 2) currPos = new Vector(FIELD_SIZE - 2, FIELD_SIZE - 2);
+                if (i == 3) currPos = new Vector(1, FIELD_SIZE - 2);
+
+                for (int j = 0; j < playersPerSide; j++)
+                {
+                    var p = playerArray[i, j];
+                    if (p == null) continue;
+                    p.Size = new Vector(_pixelsPerUnit * PLAYER_RATIO, _pixelsPerUnit * PLAYER_RATIO);
+                    this[(int)currPos.Y, (int)currPos.X] = p;
+                    currPos += direction * distance;
+                }
+
+                direction = direction.RotatedRight;
+            }
+        }
+
+        private void InitializeUnbombables()
+        {
+            for (int r = 0; r < FIELD_SIZE; r++)
+            {
+                for (int c = 0; c < FIELD_SIZE; c++)
+                {
+                    if (r == 0 || r == FIELD_SIZE - 1 || c == 0 || c == FIELD_SIZE - 1 || r % 2 == 0 && c % 2 == 0)
+                    {
+                        _field[r, c] = new Unbombable(this, new Vector(_widthOffset + c * _pixelsPerUnit, r * _pixelsPerUnit), new Vector(_pixelsPerUnit, _pixelsPerUnit));
+                    }
+                }
+            }
+        }
+
+        private void InitializeBombstacles()
+        {
+            // TODO
         }
 
         private void CheckExplosions(BomberGuy p)
