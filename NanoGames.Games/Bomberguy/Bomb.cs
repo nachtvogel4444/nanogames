@@ -8,7 +8,7 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class Bomb : AbstractBomberThing
     {
-        private Timer bombTimer;
+        private IMatchTimer bombTimer;
         private int reach;
 
         public Bomb(int reach, BomberMatch match, Vector size) : this(reach, match, new Vector(), size)
@@ -17,15 +17,11 @@ namespace NanoGames.Games.Bomberguy
 
         public Bomb(int reach, BomberMatch match, Vector position, Vector size) : base(match, true, false, false, position, size)
         {
-            bombTimer = new Timer(3000);
+            bombTimer = match.GetTimer(3000);
             bombTimer.Elapsed += BombTimer_Elapsed;
             bombTimer.Start();
             this.reach = reach;
         }
-
-        public delegate void ExplodingHandler();
-
-        public event ExplodingHandler Exploding;
 
         public override void Draw(Graphics g)
         {

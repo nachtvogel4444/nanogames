@@ -113,7 +113,7 @@ namespace NanoGames.Games.Bomberguy
             {
                 MovePlayer(p);
 
-                p.Draw(p.Graphics);
+                p.DrawScreen();
 
                 DropBomb(p);
 
@@ -162,7 +162,8 @@ namespace NanoGames.Games.Bomberguy
                     var p = playerArray[i, j];
                     if (p == null) continue;
                     p.Size = new Vector(_pixelsPerUnit * PLAYER_RATIO, _pixelsPerUnit * PLAYER_RATIO);
-                    this[(int)currPos.Y, (int)currPos.X] = p;
+                    p.Position = GetCoordinates(new Vector(currPos.Y, currPos.X));
+                    p.Color = new Color(0, 0, 1);
                     currPos += direction * distance;
                 }
 
