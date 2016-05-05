@@ -15,7 +15,7 @@ namespace NanoGames.Games.Bomberguy
         public Explosion(Type type, BomberMatch match, Vector position, Vector size) : base(match, true, true, true, position, size)
         {
             this.type = type;
-            explosionTimer = match.GetTimer(3000);
+            explosionTimer = match.GetTimer(1500);
             explosionTimer.Elapsed += ExplosionTimer_Elapsed;
             explosionTimer.Start();
         }
