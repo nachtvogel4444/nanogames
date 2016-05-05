@@ -2,8 +2,6 @@
 
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
-using System;
-
 namespace NanoGames.Games.Bomberguy
 {
     internal class Bombstacle : AbstractBomberThing
@@ -18,7 +16,12 @@ namespace NanoGames.Games.Bomberguy
 
         public override void Draw(Graphics g)
         {
-            throw new NotImplementedException();
+            g.Line(Colors.White, Position, Position + new Vector(Size.X, 0));
+            g.Line(Colors.White, Position + new Vector(Size.X, 0), Position + new Vector(Size.X, Size.Y));
+            g.Line(Colors.White, Position + new Vector(Size.X, Size.Y), Position + new Vector(0, Size.Y));
+            g.Line(Colors.White, Position + new Vector(0, Size.Y), Position);
+            g.Line(Colors.White, Position, Position + new Vector(Size.X, Size.Y));
+            g.Line(Colors.White, Position + new Vector(Size.X, 0), Position + new Vector(0, Size.Y));
         }
     }
 }

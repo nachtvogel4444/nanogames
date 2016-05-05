@@ -97,37 +97,62 @@ namespace NanoGames.Games.Bomberguy
             _pixelsPerUnit = Graphics.Height / FIELD_SIZE;
             _widthOffset = (Graphics.Width - Graphics.Height) / 2d;
 
-            // initialize static obstacles
-            InitializeUnbombables();
+            // initialize all obstacles
+            InitializeField();
 
             // initialize players
             InitializePlayers();
-
-            // initialize destroyable obstacles
-            InitializeBombstacles();
         }
 
         protected override void Update()
         {
             foreach (var p in this.Players)
             {
-                MovePlayer(p);
+                DrawField(p);
 
-                p.DrawScreen();
+                /* Skip players that have already finished. */
+                if (p.Dead) continue;
+
+                MovePlayer(p);
 
                 DropBomb(p);
 
                 CheckExplosions(p);
 
-                for (int r = 0; r < FIELD_SIZE; r++)
-                {
-                    for (int c = 0; c < FIELD_SIZE; c++)
-                    {
-                        BomberThing thing = _field[r, c];
+                DrawPlayer(p);
+            }
+        }
 
-                        if (thing != null)
-                            thing.Draw(p.Graphics);
-                    }
+        private void DrawField(BomberGuy p)
+        {
+            for (int r = 0; r < FIELD_SIZE; r++)
+            {
+                for (int c = 0; c < FIELD_SIZE; c++)
+                {
+                    BomberThing thing = _field[r, c];
+
+                    if (thing != null)
+                        thing.Draw(p.Graphics);
+                }
+            }
+        }
+
+        private void DrawPlayer(BomberGuy p)
+        {
+            /* Draw each player. */
+            foreach (var player in Players)
+            {
+                if (player == p)
+                {
+                    /* Always show the current player in white. */
+                    Color playerColor = player.Color;
+                    player.Color = new Color(1, 1, 1);
+                    player.Draw(p.Graphics);
+                    player.Color = playerColor;
+                }
+                else
+                {
+                    player.Draw(p.Graphics);
                 }
             }
         }
@@ -162,7 +187,12 @@ namespace NanoGames.Games.Bomberguy
                     var p = playerArray[i, j];
                     if (p == null) continue;
                     p.Size = new Vector(_pixelsPerUnit * PLAYER_RATIO, _pixelsPerUnit * PLAYER_RATIO);
-                    p.Position = GetCoordinates(new Vector(currPos.Y, currPos.X));
+
+                    var cellCoordinates = new Vector(currPos.Y, currPos.X);
+
+                    MakeSpaceAroundPlayer(cellCoordinates);
+
+                    p.Position = GetCoordinates(cellCoordinates);
                     p.Color = new Color(0, 0, 1);
                     currPos += direction * distance;
                 }
@@ -171,7 +201,22 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
-        private void InitializeUnbombables()
+        private void MakeSpaceAroundPlayer(Vector cellCoordinates)
+        {
+            var cellContent = this[cellCoordinates];
+            if (cellContent != null && cellContent.Destroyable) cellContent.Destroy();
+
+            var directionVector = new Vector(1, 0);
+
+            for (int i = 0; i < 4; i++)
+            {
+                cellContent = this[cellCoordinates + directionVector];
+                if (cellContent != null && cellContent.Destroyable) cellContent.Destroy();
+                directionVector = directionVector.RotatedRight;
+            }
+        }
+
+        private void InitializeField()
         {
             for (int r = 0; r < FIELD_SIZE; r++)
             {
@@ -179,15 +224,15 @@ namespace NanoGames.Games.Bomberguy
                 {
                     if (r == 0 || r == FIELD_SIZE - 1 || c == 0 || c == FIELD_SIZE - 1 || r % 2 == 0 && c % 2 == 0)
                     {
-                        _field[r, c] = new Unbombable(this, new Vector(_widthOffset + c * _pixelsPerUnit, r * _pixelsPerUnit), new Vector(_pixelsPerUnit, _pixelsPerUnit));
+                        //_field[r, c] = new Unbombable(this, new Vector(_widthOffset + c * _pixelsPerUnit, r * _pixelsPerUnit), new Vector(_pixelsPerUnit, _pixelsPerUnit));
+                        this[r, c] = new Unbombable(this, CellSize);
+                    }
+                    else
+                    {
+                        this[r, c] = new Bombstacle(this, CellSize);
                     }
                 }
             }
-        }
-
-        private void InitializeBombstacles()
-        {
-            // TODO
         }
 
         private void CheckExplosions(BomberGuy p)

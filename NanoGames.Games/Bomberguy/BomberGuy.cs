@@ -38,32 +38,6 @@ namespace NanoGames.Games.Bomberguy
 
         public Vector Center { get { return Position + new Vector(Size.X / 2d, Size.Y / 2d); } }
 
-        public void DrawScreen()
-        {
-            /* Draw each player. */
-            foreach (var player in Match.Players)
-            {
-                /* Skip players that have already finished. */
-                if (player.Dead)
-                {
-                    continue;
-                }
-
-                Color color;
-                if (player == this)
-                {
-                    /* Always show the current player in white. */
-                    color = new Color(1, 1, 1);
-                }
-                else
-                {
-                    color = player.Color;
-                }
-
-                Draw(Graphics, player, color);
-            }
-        }
-
         public void Draw(Graphics g)
         {
             Draw(g, this, this.Color);
