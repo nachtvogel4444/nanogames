@@ -1,10 +1,13 @@
-﻿using System.Timers;
+﻿// Copyright (c) the authors of nanoGames. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt in the project root.
 
 namespace NanoGames.Games
 {
+    public delegate void MatchTimerElapsedHandler();
+
     public interface IMatchTimer
     {
-        event ElapsedEventHandler Elapsed;
+        event MatchTimerElapsedHandler Elapsed;
 
         double Interval { get; set; }
 

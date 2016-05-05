@@ -1,5 +1,4 @@
 ﻿// Copyright (c) the authors of nanoGames. All rights reserved.
-
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using System;
@@ -84,11 +83,11 @@ namespace NanoGames.Games.Bomberguy
             return new Vector(_widthOffset + cellCoordinates.Y * _pixelsPerUnit, cellCoordinates.X * _pixelsPerUnit);
         }
 
-        public void CheckExplosions()
+        public void CheckAllDeaths()
         {
             foreach (var p in Players)
             {
-                CheckExplosions(p);
+                CheckDeath(p);
             }
         }
 
@@ -110,6 +109,8 @@ namespace NanoGames.Games.Bomberguy
             {
                 DrawField(p);
 
+                DrawPlayers(p);
+
                 /* Skip players that have already finished. */
                 if (p.Dead) continue;
 
@@ -117,42 +118,25 @@ namespace NanoGames.Games.Bomberguy
 
                 DropBomb(p);
 
-                CheckExplosions(p);
-
-                DrawPlayer(p);
+                CheckDeath(p);
             }
         }
 
-        private void DrawField(BomberGuy p)
+        private void InitializeField()
         {
             for (int r = 0; r < FIELD_SIZE; r++)
             {
                 for (int c = 0; c < FIELD_SIZE; c++)
                 {
-                    BomberThing thing = _field[r, c];
-
-                    if (thing != null)
-                        thing.Draw(p.Graphics);
-                }
-            }
-        }
-
-        private void DrawPlayer(BomberGuy p)
-        {
-            /* Draw each player. */
-            foreach (var player in Players)
-            {
-                if (player == p)
-                {
-                    /* Always show the current player in white. */
-                    Color playerColor = player.Color;
-                    player.Color = new Color(1, 1, 1);
-                    player.Draw(p.Graphics);
-                    player.Color = playerColor;
-                }
-                else
-                {
-                    player.Draw(p.Graphics);
+                    if (r == 0 || r == FIELD_SIZE - 1 || c == 0 || c == FIELD_SIZE - 1 || r % 2 == 0 && c % 2 == 0)
+                    {
+                        //_field[r, c] = new Unbombable(this, new Vector(_widthOffset + c * _pixelsPerUnit, r * _pixelsPerUnit), new Vector(_pixelsPerUnit, _pixelsPerUnit));
+                        this[r, c] = new Unbombable(this, CellSize);
+                    }
+                    else
+                    {
+                        this[r, c] = new Bombstacle(this, CellSize);
+                    }
                 }
             }
         }
@@ -216,46 +200,18 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
-        private void InitializeField()
+        private void DrawField(BomberGuy p)
         {
             for (int r = 0; r < FIELD_SIZE; r++)
             {
                 for (int c = 0; c < FIELD_SIZE; c++)
                 {
-                    if (r == 0 || r == FIELD_SIZE - 1 || c == 0 || c == FIELD_SIZE - 1 || r % 2 == 0 && c % 2 == 0)
-                    {
-                        //_field[r, c] = new Unbombable(this, new Vector(_widthOffset + c * _pixelsPerUnit, r * _pixelsPerUnit), new Vector(_pixelsPerUnit, _pixelsPerUnit));
-                        this[r, c] = new Unbombable(this, CellSize);
-                    }
-                    else
-                    {
-                        this[r, c] = new Bombstacle(this, CellSize);
-                    }
+                    BomberThing thing = _field[r, c];
+
+                    if (thing != null)
+                        thing.Draw(p.Graphics);
                 }
             }
-        }
-
-        private void CheckExplosions(BomberGuy p)
-        {
-            var cell = this[GetCell(p)];
-
-            if (cell != null && cell.Deadly) p.Destroy();
-        }
-
-        private void CheckCompleted()
-        {
-            this.IsCompleted = DeadPlayers == Players.Count;
-        }
-
-        private void DropBomb(BomberGuy p)
-        {
-            if (!p.Input.Fire) return;
-
-            var cell = GetCell(p);
-
-            var bomb = new Bomb(BOMB_REACH, this, GetCoordinates(cell), new Vector(_pixelsPerUnit * BOMB_RATIO, _pixelsPerUnit * BOMB_RATIO));
-
-            this[cell] = bomb;
         }
 
         private void MovePlayer(BomberGuy p)
@@ -393,6 +349,52 @@ namespace NanoGames.Games.Bomberguy
             var direction = new Vector(x, y).Normalized;
 
             p.Position += direction * SPEED;
+        }
+
+        private void DropBomb(BomberGuy p)
+        {
+            if (!p.Input.Fire) return;
+
+            var cell = GetCell(p);
+
+            var bomb = new Bomb(BOMB_REACH, this, GetCoordinates(cell), new Vector(_pixelsPerUnit * BOMB_RATIO, _pixelsPerUnit * BOMB_RATIO));
+
+            this[cell] = bomb;
+        }
+
+        private void DrawPlayers(BomberGuy p)
+        {
+            /* Draw each player. */
+            foreach (var player in Players)
+            {
+                /* Skip players that have already finished. */
+                if (player.Dead) continue;
+
+                if (player == p)
+                {
+                    /* Always show the current player in white. */
+                    Color playerColor = player.Color;
+                    player.Color = new Color(1, 1, 1);
+                    player.Draw(p.Graphics);
+                    player.Color = playerColor;
+                }
+                else
+                {
+                    player.Draw(p.Graphics);
+                }
+            }
+        }
+
+        private void CheckDeath(BomberGuy p)
+        {
+            var cell = this[GetCell(p)];
+
+            if (cell != null && cell.Deadly) p.Destroy();
+        }
+
+        private void CheckCompleted()
+        {
+            this.IsCompleted = DeadPlayers == Players.Count;
         }
     }
 }

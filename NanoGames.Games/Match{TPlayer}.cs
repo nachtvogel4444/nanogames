@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Timers;
 
 namespace NanoGames.Games
 {
@@ -118,7 +117,7 @@ namespace NanoGames.Games
                 _match = match;
             }
 
-            public event ElapsedEventHandler Elapsed;
+            public event MatchTimerElapsedHandler Elapsed;
 
             public double Interval { get; set; }
 
@@ -133,7 +132,7 @@ namespace NanoGames.Games
                     {
                         if (Elapsed != null)
                         {
-                            Elapsed(this, null);
+                            Elapsed();
                         }
                         _runningTime = 0;
                     }

@@ -1,8 +1,5 @@
 ﻿// Copyright (c) the authors of nanoGames. All rights reserved.
-
 // Licensed under the MIT license. See LICENSE.txt in the project root.
-
-using System.Timers;
 
 namespace NanoGames.Games.Bomberguy
 {
@@ -32,10 +29,10 @@ namespace NanoGames.Games.Bomberguy
         {
             CreateExplosions(cell);
 
-            Match.CheckExplosions();
+            Match.CheckAllDeaths();
         }
 
-        private void BombTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void BombTimer_Elapsed()
         {
             bombTimer.Stop();
             bombTimer.Dispose();

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) the authors of nanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
-using System.Timers;
-
 namespace NanoGames.Games.Bomberguy
 {
     internal class Explosion : AbstractBomberThing
@@ -38,7 +36,7 @@ namespace NanoGames.Games.Bomberguy
             g.Circle(new Color(1, 0, 0), Center, Size.X / 10);
         }
 
-        private void ExplosionTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void ExplosionTimer_Elapsed()
         {
             explosionTimer.Stop();
             explosionTimer.Dispose();
