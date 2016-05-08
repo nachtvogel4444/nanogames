@@ -55,6 +55,7 @@
     <Compile Include="FallingBlocks\Constants.cs" />
     <Compile Include="FallingBlocks\FallingBlocksMatch.cs" />
     <Compile Include="FallingBlocks\FallingBlocksPlayer.cs" />
+    <Compile Include="FallingBlocks\KeyRepeater.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="MatchDescription.cs" />
     <Compile Include="Match{TPlayer}.cs" />

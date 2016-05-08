@@ -62,5 +62,72 @@ namespace NanoGames.Games.FallingBlocks
         /// The top-left corner of the playing field on the screen.
         /// </summary>
         public static readonly Vector TopLeft = new Vector(0.5 * (Graphics.Width - BlockSize * Width), 0.5 * (Graphics.Height - BlockSize * (Height - ExtraHeight)));
+
+        public static readonly byte[][][,] RotatedPieces;
+
+        private static readonly byte[][,] _rawPieces = new byte[][,]
+        {
+            new byte[,]
+            {
+                { 1, 0, 0 },
+                { 1, 1, 1 },
+            },
+            new byte[,]
+            {
+                { 0, 0, 1 },
+                { 1, 1, 1 },
+            },
+            new byte[,]
+            {
+                { 1, 1 },
+                { 1, 1 },
+            },
+            new byte[,]
+            {
+                { 1, 1, 1, 1 },
+            },
+            new byte[,]
+            {
+                { 0, 1, 1 },
+                { 1, 1, 0 },
+            },
+            new byte[,]
+            {
+                { 1, 1, 0 },
+                { 0, 1, 1 },
+            },
+            new byte[,]
+            {
+                { 0, 1, 0 },
+                { 1, 1, 1 },
+            },
+        };
+
+        static Constants()
+        {
+            RotatedPieces = new byte[_rawPieces.Length][][,];
+
+            for (int i = 0; i < _rawPieces.Length; ++i)
+            {
+                var rotatedPiece = RotatedPieces[i] = new byte[4][,];
+                var piece = rotatedPiece[0] = _rawPieces[i];
+                var w = piece.GetLength(0);
+                var h = piece.GetLength(1);
+                var piece90 = rotatedPiece[1] = new byte[h, w];
+                var piece180 = rotatedPiece[2] = new byte[w, h];
+                var piece270 = rotatedPiece[3] = new byte[h, w];
+
+                for (int x = 0; x < w; ++x)
+                {
+                    for (int y = 0; y < h; ++y)
+                    {
+                        var v = piece[x, y];
+                        piece90[h - y - 1, x] = v;
+                        piece180[w - x - 1, h - y - 1] = v;
+                        piece270[y, w - x - 1] = v;
+                    }
+                }
+            }
+        }
     }
 }

@@ -8,9 +8,17 @@ namespace NanoGames.Games.FallingBlocks
     /// </summary>
     internal sealed class FallingBlocksMatch : Match<FallingBlocksPlayer>
     {
+        private int _activePlayers;
+
+        public int Frame { get; private set; }
+
+        public double FallSpeed { get; private set; }
+
         /// <inheritdoc/>
         protected override void Initialize()
         {
+            _activePlayers = Players.Count;
+
             if (Players.Count == 2)
             {
                 Players[0].RightPlayer = Players[1];
@@ -35,9 +43,55 @@ namespace NanoGames.Games.FallingBlocks
         /// <inheritdoc/>
         protected override void Update()
         {
+            ++Frame;
+
+            foreach (var player in Players)
+            {
+                player.Update();
+            }
+
+            foreach (var player in Players)
+            {
+                if (player.HasLost && (player.LeftPlayer != null || player.RightPlayer != null))
+                {
+                    --_activePlayers;
+                    if (player.LeftPlayer != null)
+                    {
+                        if (player.RightPlayer != player.LeftPlayer.LeftPlayer)
+                        {
+                            player.LeftPlayer.RightPlayer = player.RightPlayer;
+                        }
+                        else
+                        {
+                            player.LeftPlayer.RightPlayer = null;
+                        }
+                    }
+
+                    if (player.RightPlayer != null)
+                    {
+                        if (player.RightPlayer.RightPlayer != player.LeftPlayer)
+                        {
+                            player.RightPlayer.LeftPlayer = player.LeftPlayer;
+                        }
+                        else
+                        {
+                            player.RightPlayer.LeftPlayer = null;
+                        }
+                    }
+
+                    player.LeftPlayer = null;
+                    player.RightPlayer = null;
+                }
+            }
+
             foreach (var player in Players)
             {
                 player.DrawScreen();
+            }
+
+            if (_activePlayers <= 0 || (_activePlayers <= 1 && Players.Count >= 2))
+            {
+                IsCompleted = true;
             }
         }
     }
