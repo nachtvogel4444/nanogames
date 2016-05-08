@@ -30,6 +30,8 @@ namespace NanoGames.Games.FallingBlocks
         private KeyRepeater _slowDropRepeater = new KeyRepeater(6);
         private KeyRepeater _fastDropRepeater = new KeyRepeater(12);
 
+        private int _lastGravityFrame = 0;
+
         private bool _hasLost;
 
         public FallingBlocksPlayer LeftPlayer { get; set; }
@@ -131,7 +133,7 @@ namespace NanoGames.Games.FallingBlocks
                     }
                 }
 
-                if (_slowDropRepeater.IsPressed(Match.Frame, Input.Down))
+                if (_slowDropRepeater.IsPressed(Match.Frame, Input.Down) || _lastGravityFrame + 30 <= Match.Frame)
                 {
                     DropOne();
                 }
@@ -165,6 +167,8 @@ namespace NanoGames.Games.FallingBlocks
         private void DropOne()
         {
             if (_fallingPiece == null) return;
+
+            _lastGravityFrame = Match.Frame;
 
             if (TryToMove(_fallingPieceX, _fallingPieceY + 1, _fallingPieceRotation))
             {
