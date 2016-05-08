@@ -26,5 +26,7 @@ namespace NanoGames.Games
         /// <param name="matchGraphics">A Graphics instance used to draw onto the screen of all players.</param>
         /// <param name="playerDescriptions">The player descriptions.</param>
         public abstract void Update(Graphics matchGraphics, List<PlayerDescription> playerDescriptions);
+
+        public abstract IMatchTimer GetTimer(int interval);
     }
 }

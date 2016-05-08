@@ -14,6 +14,9 @@ namespace NanoGames.Games
     internal abstract class Match<TPlayer> : Match
         where TPlayer : Player
     {
+        private List<MatchTimer> _timers = new List<MatchTimer>();
+        private object _timersLock = new object();
+
         /// <summary>
         /// Gets the list of players.
         /// </summary>
@@ -65,8 +68,23 @@ namespace NanoGames.Games
                 Players[i].Input = playerDescriptions[i].Input;
             }
 
+            foreach (var t in new List<MatchTimer>(_timers))
+            {
+                t.Tick();
+            }
+
             /* Update the match. */
             Update();
+        }
+
+        public override IMatchTimer GetTimer(int interval)
+        {
+            var matchTimer = new MatchTimer(this, interval);
+            lock (_timersLock)
+            {
+                _timers.Add(matchTimer);
+            }
+            return matchTimer;
         }
 
         /// <summary>
@@ -78,5 +96,66 @@ namespace NanoGames.Games
         /// Updates and renders the match for all players. This is called before <see cref="Player.Update"/>.
         /// </summary>
         protected abstract void Update();
+
+        private void DisposeTimer(MatchTimer timer)
+        {
+            lock (_timersLock)
+            {
+                _timers.Remove(timer);
+            }
+        }
+
+        private sealed class MatchTimer : IMatchTimer
+        {
+            private double _runningTime = 0;
+            private Match<TPlayer> _match;
+            private bool _disposed = false;
+
+            public MatchTimer(Match<TPlayer> match, int interval)
+            {
+                Interval = interval;
+                _match = match;
+            }
+
+            public event MatchTimerElapsedHandler Elapsed;
+
+            public double Interval { get; set; }
+
+            public bool Enabled { get; set; }
+
+            public void Tick()
+            {
+                if (Enabled && !_disposed)
+                {
+                    _runningTime += 1d / 60d * 1000d;
+                    if (_runningTime >= Interval)
+                    {
+                        if (Elapsed != null)
+                        {
+                            Elapsed();
+                        }
+                        _runningTime = 0;
+                    }
+                }
+            }
+
+            public void Start()
+            {
+                // TODO : throw exception if disposed?
+                Enabled = true;
+            }
+
+            public void Stop()
+            {
+                // TODO : throw exception if disposed?
+                Enabled = false;
+                _runningTime = 0;
+            }
+
+            public void Dispose()
+            {
+                _match.DisposeTimer(this);
+            }
+        }
     }
 }

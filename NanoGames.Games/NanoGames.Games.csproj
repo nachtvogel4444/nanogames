@@ -47,6 +47,14 @@
     <Compile Include="..\NanoGames.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Bomberguy\AbstractBomberThing.cs" />
+    <Compile Include="Bomberguy\Bomb.cs" />
+    <Compile Include="Bomberguy\BomberGuy.cs" />
+    <Compile Include="Bomberguy\BomberMatch.cs" />
+    <Compile Include="Bomberguy\BomberThing.cs" />
+    <Compile Include="Bomberguy\Bombstacle.cs" />
+    <Compile Include="Bomberguy\Explosion.cs" />
+    <Compile Include="Bomberguy\Unbombable.cs" />
     <Compile Include="Discipline.cs" />
     <Compile Include="DisciplineDirectory.cs" />
     <Compile Include="Discipline{TMatch,TPlayer}.cs" />
@@ -56,6 +64,7 @@
     <Compile Include="FallingBlocks\FallingBlocksMatch.cs" />
     <Compile Include="FallingBlocks\FallingBlocksPlayer.cs" />
     <Compile Include="FallingBlocks\KeyRepeater.cs" />
+    <Compile Include="IMatchTimer.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="MatchDescription.cs" />
     <Compile Include="Match{TPlayer}.cs" />
