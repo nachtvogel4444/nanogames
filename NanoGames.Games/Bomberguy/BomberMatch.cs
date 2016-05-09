@@ -7,15 +7,18 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class BomberMatch : Match<BomberGuy>
     {
-        public const int FIELD_SIZE = 15;
+        public const int FIELD_MIN_SIZE = 9;
         public const double PLAYER_RATIO = .9;
         public const double BOMB_RATIO = 1;
-        public const int BOMB_REACH = 3;
-        public const double SPEED = 0.45;
+        public const int BOMB_REACH = 2;
+        public const double PLAYER_SPEED = 9;
+        public const double BOMBSTACLE_PROBABILITY = 0.5;
 
+        private int _fieldSize;
+        private double _playerSpeed;
         private double _pixelsPerUnit;
         private double _widthOffset;
-        private BomberThing[,] _field = new BomberThing[FIELD_SIZE, FIELD_SIZE];
+        private BomberThing[,] _field;
         private int _deadPlayers;
 
         public int DeadPlayers
@@ -93,7 +96,13 @@ namespace NanoGames.Games.Bomberguy
 
         protected override void Initialize()
         {
-            _pixelsPerUnit = Graphics.Height / FIELD_SIZE;
+            _fieldSize = FIELD_MIN_SIZE + ((int)(Players.Count / 4)) * 2;
+
+            _field = new BomberThing[_fieldSize, _fieldSize];
+
+            _playerSpeed = PLAYER_SPEED / _fieldSize;
+
+            _pixelsPerUnit = Graphics.Height / _fieldSize;
             _widthOffset = (Graphics.Width - Graphics.Height) / 2d;
 
             // initialize all obstacles
@@ -124,18 +133,21 @@ namespace NanoGames.Games.Bomberguy
 
         private void InitializeField()
         {
-            for (int r = 0; r < FIELD_SIZE; r++)
+            for (int r = 0; r < _fieldSize; r++)
             {
-                for (int c = 0; c < FIELD_SIZE; c++)
+                for (int c = 0; c < _fieldSize; c++)
                 {
-                    if (r == 0 || r == FIELD_SIZE - 1 || c == 0 || c == FIELD_SIZE - 1 || r % 2 == 0 && c % 2 == 0)
+                    if (r == 0 || r == _fieldSize - 1 || c == 0 || c == _fieldSize - 1 || r % 2 == 0 && c % 2 == 0)
                     {
                         //_field[r, c] = new Unbombable(this, new Vector(_widthOffset + c * _pixelsPerUnit, r * _pixelsPerUnit), new Vector(_pixelsPerUnit, _pixelsPerUnit));
                         this[r, c] = new Unbombable(this, CellSize);
                     }
                     else
                     {
-                        this[r, c] = new Bombstacle(this, CellSize);
+                        if (this.Random.NextDouble() <= BOMBSTACLE_PROBABILITY)
+                        {
+                            this[r, c] = new Bombstacle(this, CellSize);
+                        }
                     }
                 }
             }
@@ -158,13 +170,13 @@ namespace NanoGames.Games.Bomberguy
             }
 
             Vector direction = new Vector(1, 0);
-            int distance = (int)Math.Floor((double)(FIELD_SIZE - 2) / playersPerSide);
+            int distance = (int)Math.Floor((double)(_fieldSize - 2) / playersPerSide);
             Vector currPos = new Vector(1, 1);
             for (int i = 0; i < 4; i++)
             {
-                if (i == 1) currPos = new Vector(FIELD_SIZE - 2, 1);
-                if (i == 2) currPos = new Vector(FIELD_SIZE - 2, FIELD_SIZE - 2);
-                if (i == 3) currPos = new Vector(1, FIELD_SIZE - 2);
+                if (i == 1) currPos = new Vector(_fieldSize - 2, 1);
+                if (i == 2) currPos = new Vector(_fieldSize - 2, _fieldSize - 2);
+                if (i == 3) currPos = new Vector(1, _fieldSize - 2);
 
                 for (int j = 0; j < playersPerSide; j++)
                 {
@@ -177,7 +189,6 @@ namespace NanoGames.Games.Bomberguy
                     MakeSpaceAroundPlayer(cellCoordinates);
 
                     p.Position = GetCoordinates(cellCoordinates);
-                    p.Color = new Color(0, 0, 1);
                     currPos += direction * distance;
                 }
 
@@ -202,9 +213,9 @@ namespace NanoGames.Games.Bomberguy
 
         private void DrawField(BomberGuy p)
         {
-            for (int r = 0; r < FIELD_SIZE; r++)
+            for (int r = 0; r < _fieldSize; r++)
             {
-                for (int c = 0; c < FIELD_SIZE; c++)
+                for (int c = 0; c < _fieldSize; c++)
                 {
                     BomberThing thing = _field[r, c];
 
@@ -220,7 +231,7 @@ namespace NanoGames.Games.Bomberguy
 
             if (p.Input.Up && !p.Input.Down)
             {
-                var neighborLeft = this[GetCell(p.Position + new Vector(0, -SPEED))];
+                var neighborLeft = this[GetCell(p.Position + new Vector(0, -_playerSpeed))];
                 if (neighborLeft != null)
                 {
                     var xDistance = p.Center.X - (neighborLeft.Position + neighborLeft.Size).X;
@@ -232,7 +243,7 @@ namespace NanoGames.Games.Bomberguy
                     }
                 }
 
-                var neighborRight = this[GetCell(p.Position + new Vector(p.Size.X, -SPEED))];
+                var neighborRight = this[GetCell(p.Position + new Vector(p.Size.X, -_playerSpeed))];
                 if (neighborRight != null)
                 {
                     var xDistance = (neighborRight.Position).X - p.Center.X;
@@ -250,7 +261,7 @@ namespace NanoGames.Games.Bomberguy
             }
             if (p.Input.Down && !p.Input.Up)
             {
-                var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, SPEED))];
+                var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, _playerSpeed))];
                 if (neighborLeft != null)
                 {
                     var xDistance = p.Center.X - (neighborLeft.Position + neighborLeft.Size).X;
@@ -262,7 +273,7 @@ namespace NanoGames.Games.Bomberguy
                     }
                 }
 
-                var neighborRight = this[GetCell(p.Position + p.Size + new Vector(0, SPEED))];
+                var neighborRight = this[GetCell(p.Position + p.Size + new Vector(0, _playerSpeed))];
                 if (neighborRight != null)
                 {
                     var xDistance = (neighborRight.Position).X - p.Center.X;
@@ -280,7 +291,7 @@ namespace NanoGames.Games.Bomberguy
             }
             if (p.Input.Left && !p.Input.Right)
             {
-                var neighborAbove = this[GetCell(p.Position + new Vector(-SPEED, 0))];
+                var neighborAbove = this[GetCell(p.Position + new Vector(-_playerSpeed, 0))];
 
                 if (neighborAbove != null)
                 {
@@ -293,7 +304,7 @@ namespace NanoGames.Games.Bomberguy
                     }
                 }
 
-                var neighborBelow = this[GetCell(p.Position + new Vector(-SPEED, p.Size.Y))];
+                var neighborBelow = this[GetCell(p.Position + new Vector(-_playerSpeed, p.Size.Y))];
 
                 if (neighborBelow != null)
                 {
@@ -313,7 +324,7 @@ namespace NanoGames.Games.Bomberguy
             }
             if (p.Input.Right && !p.Input.Left)
             {
-                var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + SPEED, 0))];
+                var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed, 0))];
 
                 if (neighborAbove != null)
                 {
@@ -326,7 +337,7 @@ namespace NanoGames.Games.Bomberguy
                     }
                 }
 
-                var neighborBelow = this[GetCell(p.Position + new Vector(p.Size.X + SPEED, p.Size.Y))];
+                var neighborBelow = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed, p.Size.Y))];
 
                 if (neighborBelow != null)
                 {
@@ -348,7 +359,7 @@ namespace NanoGames.Games.Bomberguy
 
             var direction = new Vector(x, y).Normalized;
 
-            p.Position += direction * SPEED;
+            p.Position += direction * _playerSpeed;
         }
 
         private void DropBomb(BomberGuy p)
@@ -394,7 +405,15 @@ namespace NanoGames.Games.Bomberguy
 
         private void CheckCompleted()
         {
-            this.IsCompleted = DeadPlayers == Players.Count;
+            this.IsCompleted = DeadPlayers >= Players.Count - 1;
+
+            if (IsCompleted)
+            {
+                foreach (var p in Players)
+                {
+                    if (!p.Dead) p.Score = DeadPlayers + 1;
+                }
+            }
         }
     }
 }

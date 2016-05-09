@@ -14,7 +14,7 @@ namespace NanoGames.Games.Bomberguy
 
         public Bomb(int reach, BomberMatch match, Vector position, Vector size) : base(match, true, false, false, position, size)
         {
-            bombTimer = match.GetTimer(3000);
+            bombTimer = match.GetTimer(2000);
             bombTimer.Elapsed += BombTimer_Elapsed;
             bombTimer.Start();
             this.reach = reach;
