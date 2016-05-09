@@ -15,7 +15,6 @@ namespace NanoGames.Games
         where TPlayer : Player
     {
         private List<MatchTimer> _timers = new List<MatchTimer>();
-        private object _timersLock = new object();
 
         /// <summary>
         /// Gets the list of players.
@@ -80,11 +79,30 @@ namespace NanoGames.Games
         public override IMatchTimer GetTimer(int interval)
         {
             var matchTimer = new MatchTimer(this, interval);
-            lock (_timersLock)
-            {
-                _timers.Add(matchTimer);
-            }
+            _timers.Add(matchTimer);
             return matchTimer;
+        }
+
+        public void TimeOnce(int interval, Action action)
+        {
+            var timer = GetTimer(interval);
+            timer.Elapsed += () =>
+            {
+                action.Invoke();
+                timer.Stop();
+                timer.Dispose();
+            };
+            timer.Start();
+        }
+
+        public void TimeCyclic(int interval, Action<IMatchTimer> action)
+        {
+            var timer = GetTimer(interval);
+            timer.Elapsed += () =>
+            {
+                action.Invoke(timer);
+            };
+            timer.Start();
         }
 
         /// <summary>
@@ -99,10 +117,7 @@ namespace NanoGames.Games
 
         private void DisposeTimer(MatchTimer timer)
         {
-            lock (_timersLock)
-            {
-                _timers.Remove(timer);
-            }
+            _timers.Remove(timer);
         }
 
         private sealed class MatchTimer : IMatchTimer

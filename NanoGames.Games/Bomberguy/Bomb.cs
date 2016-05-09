@@ -5,7 +5,6 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class Bomb : AbstractBomberThing
     {
-        private IMatchTimer bombTimer;
         private int reach;
 
         public Bomb(int reach, BomberMatch match, Vector size) : this(reach, match, new Vector(), size)
@@ -14,9 +13,7 @@ namespace NanoGames.Games.Bomberguy
 
         public Bomb(int reach, BomberMatch match, Vector position, Vector size) : base(match, true, false, false, position, size)
         {
-            bombTimer = match.GetTimer(2000);
-            bombTimer.Elapsed += BombTimer_Elapsed;
-            bombTimer.Start();
+            match.TimeOnce(2000, () => Destroy());
             this.reach = reach;
         }
 
@@ -30,13 +27,6 @@ namespace NanoGames.Games.Bomberguy
             CreateExplosions(cell);
 
             Match.CheckAllDeaths();
-        }
-
-        private void BombTimer_Elapsed()
-        {
-            bombTimer.Stop();
-            bombTimer.Dispose();
-            Destroy();
         }
 
         private void CreateExplosions(Vector cell)
