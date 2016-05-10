@@ -6,7 +6,6 @@ namespace NanoGames.Games.Bomberguy
     internal class Explosion : AbstractBomberThing
     {
         private Type type;
-        private IMatchTimer explosionTimer;
 
         public Explosion(Type type, BomberMatch match, Vector size) : this(type, match, new Vector(), size)
         {
@@ -15,9 +14,8 @@ namespace NanoGames.Games.Bomberguy
         public Explosion(Type type, BomberMatch match, Vector position, Vector size) : base(match, true, true, true, position, size)
         {
             this.type = type;
-            explosionTimer = match.GetTimer(1500);
-            explosionTimer.Elapsed += ExplosionTimer_Elapsed;
-            explosionTimer.Start();
+
+            match.TimeOnce(1500, () => Destroy());
         }
 
         public enum Type
@@ -34,13 +32,6 @@ namespace NanoGames.Games.Bomberguy
         public override void Draw(Graphics g)
         {
             g.Circle(new Color(1, 0, 0), Center, Size.X / 10);
-        }
-
-        private void ExplosionTimer_Elapsed()
-        {
-            explosionTimer.Stop();
-            explosionTimer.Dispose();
-            Destroy();
         }
     }
 }
