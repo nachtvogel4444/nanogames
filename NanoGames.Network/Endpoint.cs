@@ -14,9 +14,15 @@ namespace NanoGames.Network
     /// <typeparam name="TPacketData">The packet type.</typeparam>
     public abstract class Endpoint<TPacketData> : IDisposable
     {
-        private readonly BlockingCollection<PacketData> _inbox = new BlockingCollection<PacketData>();
+        /* This can be used to introduce an artificial latency to packet arrival for testing purposes. */
+        private const double _simulatedLagSeconds = 0.0;
 
+        private static readonly long _simulatedLag = (long)(_simulatedLagSeconds * Stopwatch.Frequency);
+        private readonly BlockingCollection<PacketData> _inbox = new BlockingCollection<PacketData>();
         private int _isDisposed = 0;
+
+        private bool _hasNextPacket;
+        private PacketData _nextPacket;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Endpoint{TPacket}"/> class.
@@ -64,12 +70,20 @@ namespace NanoGames.Network
                 return false;
             }
 
-            PacketData packetData;
-            if (_inbox.TryTake(out packetData))
+            if (!_hasNextPacket)
+            {
+                _hasNextPacket = _inbox.TryTake(out _nextPacket);
+            }
+
+            if (_hasNextPacket && (_simulatedLag < 0 || _nextPacket.ArrivalTimestamp <= Stopwatch.GetTimestamp()))
             {
                 packet = default(Packet<TPacketData>);
-                packet.Data = SerializationHelper.Deserialize<TPacketData>(packetData.Bytes);
-                packet.ArrivalTimestamp = packetData.ArrivalTimestamp;
+                packet.Data = SerializationHelper.Deserialize<TPacketData>(_nextPacket.Bytes);
+                packet.ArrivalTimestamp = _nextPacket.ArrivalTimestamp;
+
+                _hasNextPacket = false;
+                _nextPacket = default(PacketData);
+
                 return true;
             }
             else
@@ -90,7 +104,7 @@ namespace NanoGames.Network
                 return;
             }
 
-            _inbox.Add(new PacketData(Stopwatch.GetTimestamp(), bytes));
+            _inbox.Add(new PacketData(Stopwatch.GetTimestamp() + _simulatedLag, bytes));
         }
 
         /// <summary>
