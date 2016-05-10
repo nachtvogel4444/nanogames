@@ -15,7 +15,7 @@ namespace NanoGames.Synchronization
     /// Helper class to create a deep clone of an entire object graph including its relationships.
     /// This is used by the netcode to create "snapshots" of the game states that can be rolled back to in order to synchronize the clients.
     /// </summary>
-    internal static class Cloning
+    public static class Cloning
     {
         /*
          * Clones objects by copying all fields via reflection while keeping a dictionary of already cloned objects to preserve relationships and cycles.
@@ -26,24 +26,7 @@ namespace NanoGames.Synchronization
          * There are unit tests for many relevant special cases in NanoGames.Tests.CloningTests.
          */
 
-        private static readonly ConcurrentDictionary<Type, object> _cloners = new ConcurrentDictionary<Type, object>();
-
-        private static readonly MethodInfo _internalCloneMethodDefinition =
-            typeof(Cloning).GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
-            .Where(m => m.Name == nameof(InternalClone) && m.IsGenericMethodDefinition)
-            .Single();
-
-        private static readonly MethodInfo _cloneArray1MethodDefinition =
-            typeof(Cloning).GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
-            .Where(m => m.Name == nameof(CloneArray1) && m.IsGenericMethodDefinition)
-            .Single();
-
-        private static readonly MethodInfo _cloneArray2MethodDefinition =
-            typeof(Cloning).GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
-            .Where(m => m.Name == nameof(CloneArray2) && m.IsGenericMethodDefinition)
-            .Single();
-
-        private static readonly ConcurrentDictionary<Type, MethodInfo> _internalCloneMethods = new ConcurrentDictionary<Type, MethodInfo>();
+        private static readonly ConcurrentDictionary<Type, Cloner> _cloners = new ConcurrentDictionary<Type, Cloner>();
 
         /// <summary>
         /// Recursively clones the specified object and all objects referenced by it.
@@ -54,59 +37,79 @@ namespace NanoGames.Synchronization
         /// <returns>The copied value.</returns>
         public static T Clone<T>(T value)
         {
-            return InternalClone(new Dictionary<object, object>(ReferenceComparer<object>.Instance), value);
+            return GetCloner<T>().Clone(new Dictionary<object, object>(ReferenceComparer<object>.Instance), value);
         }
 
-        private static T InternalClone<T>(Dictionary<object, object> clones, T value)
+        private static Cloner<T> GetCloner<T>()
         {
-            if (typeof(T).IsPrimitive || typeof(T) == typeof(string))
+            return (Cloner<T>)_cloners.GetOrAdd(typeof(T), CreateCloner);
+        }
+
+        private static Cloner GetCloner(Type type)
+        {
+            return _cloners.GetOrAdd(type, CreateCloner);
+        }
+
+        private static Cloner CreateCloner(Type t)
+        {
+            if (CloningIsNoop(t))
             {
-                return value;
+                return InstantiateCloner(typeof(NoopCloner<>), t);
             }
-            else if (typeof(T).IsValueType)
+            else if (t.IsValueType)
             {
-                var cloner = (StructCloner<T>)_cloners.GetOrAdd(typeof(T), StructCloner<T>.Create);
-                return cloner.Clone(clones, value);
+                return InstantiateCloner(typeof(StructCloner<>), t);
             }
-            else if (typeof(T).IsArray)
+            else if (t.IsArray)
             {
-                var rank = typeof(T).GetArrayRank();
+                var rank = t.GetArrayRank();
                 if (rank == 1)
                 {
-                    return (T)_cloneArray1MethodDefinition
-                        .MakeGenericMethod(typeof(T).GetElementType())
-                        .Invoke(null, new object[] { clones, value });
+                    return InstantiateCloner(typeof(Array1Cloner<>), t.GetElementType());
                 }
                 else if (rank == 2)
                 {
-                    return (T)_cloneArray2MethodDefinition
-                        .MakeGenericMethod(typeof(T).GetElementType())
-                        .Invoke(null, new object[] { clones, value });
+                    return InstantiateCloner(typeof(Array2Cloner<>), t.GetElementType());
                 }
                 else
                 {
                     throw new NotImplementedException($"Cloning {rank}-dimensional arrays is not implemented yet.");
                 }
             }
-            else if (ReferenceEquals(null, value))
+            else if (t.IsSealed)
             {
-                return default(T);
-            }
-            else if (typeof(T).IsSealed || value.GetType() == typeof(T))
-            {
-                var cloner = (ClassCloner<T>)_cloners.GetOrAdd(typeof(T), ClassCloner<T>.Create);
-                return cloner.Clone(clones, value);
+                return InstantiateCloner(typeof(ConcreteClassCloner<>), t);
             }
             else
             {
-                var internalCloneMethod = _internalCloneMethods.GetOrAdd(value.GetType(), CreateInternalCloneMethod);
-                return (T)internalCloneMethod.Invoke(null, new object[] { clones, value });
+                return InstantiateCloner(typeof(BaseClassCloner<>), t);
             }
         }
 
-        private static MethodInfo CreateInternalCloneMethod(Type t)
+        private static Cloner InstantiateCloner(Type cloner)
         {
-            return _internalCloneMethodDefinition.MakeGenericMethod(t);
+            return (Cloner)Activator.CreateInstance(cloner);
+        }
+
+        private static Cloner InstantiateCloner(Type cloner, params Type[] typeArguments)
+        {
+            return (Cloner)Activator.CreateInstance(cloner.MakeGenericType(typeArguments));
+        }
+
+        private static bool CloningIsNoop(Type t)
+        {
+            if (t.IsPrimitive || t == typeof(string))
+            {
+                return true;
+            }
+            else if (t.IsValueType)
+            {
+                return GetFields(t).All(f => CloningIsNoop(f.FieldType));
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private static IEnumerable<FieldInfo> GetFields(Type type)
@@ -121,56 +124,111 @@ namespace NanoGames.Synchronization
                 .Concat(GetFields(type.BaseType));
         }
 
-        private static T[] CloneArray1<T>(Dictionary<object, object> clones, T[] value)
+        private abstract class Cloner
         {
-            long length = value.LongLength;
-
-            var clone = new T[length];
-            clones[value] = clone;
-
-            for (long i = 0; i < length; ++i)
-            {
-                clone[i] = InternalClone(clones, value[i]);
-            }
-
-            return clone;
+            public abstract object Clone(Dictionary<object, object> clones, object value);
         }
 
-        private static T[,] CloneArray2<T>(Dictionary<object, object> clones, T[,] value)
+        private abstract class Cloner<T> : Cloner
         {
-            long length0 = value.GetLongLength(0);
-            long length1 = value.GetLongLength(1);
-
-            var clone = new T[length0, length1];
-            clones[value] = clone;
-
-            for (long i0 = 0; i0 < length0; ++i0)
+            public sealed override object Clone(Dictionary<object, object> clones, object value)
             {
-                for (long i1 = 0; i1 < length1; ++i1)
+                return Clone(clones, (T)value);
+            }
+
+            public abstract T Clone(Dictionary<object, object> clones, T value);
+        }
+
+        private sealed class NoopCloner<T> : Cloner<T>
+        {
+            public override T Clone(Dictionary<object, object> clones, T value)
+            {
+                return value;
+            }
+        }
+
+        private sealed class Array1Cloner<T> : Cloner<T[]>
+        {
+            private Cloner<T> _cloner;
+
+            public override T[] Clone(Dictionary<object, object> clones, T[] value)
+            {
+                if (value == null)
                 {
-                    clone[i0, i1] = InternalClone(clones, value[i0, i1]);
+                    return null;
                 }
-            }
 
-            return clone;
+                if (_cloner == null)
+                {
+                    _cloner = GetCloner<T>();
+                }
+
+                long length = value.LongLength;
+
+                var clone = new T[length];
+                clones[value] = clone;
+
+                for (long i = 0; i < length; ++i)
+                {
+                    clone[i] = _cloner.Clone(clones, value[i]);
+                }
+
+                return clone;
+            }
         }
 
-        private sealed class StructCloner<T>
+        private sealed class Array2Cloner<T> : Cloner<T[,]>
+        {
+            private Cloner<T> _cloner;
+
+            public override T[,] Clone(Dictionary<object, object> clones, T[,] value)
+            {
+                if (value == null)
+                {
+                    return null;
+                }
+
+                if (_cloner == null)
+                {
+                    _cloner = GetCloner<T>();
+                }
+
+                long length0 = value.GetLongLength(0);
+                long length1 = value.GetLongLength(1);
+
+                var clone = new T[length0, length1];
+                clones[value] = clone;
+
+                for (long i0 = 0; i0 < length0; ++i0)
+                {
+                    for (long i1 = 0; i1 < length1; ++i1)
+                    {
+                        clone[i0, i1] = _cloner.Clone(clones, value[i0, i1]);
+                    }
+                }
+
+                return clone;
+            }
+        }
+
+        private sealed class StructCloner<T> : Cloner<T>
+            where T : struct
         {
             private readonly FieldInfo[] _fields;
+            private Cloner[] _cloners;
 
-            private StructCloner()
+            public StructCloner()
             {
                 _fields = GetFields(typeof(T)).ToArray();
             }
 
-            public static StructCloner<T> Create(Type unused)
+            public override T Clone(Dictionary<object, object> clones, T value)
             {
-                return new StructCloner<T>();
-            }
+                if (_cloners == null)
+                {
+                    _cloners = _fields.Select(f => CreateCloner(f.FieldType)).ToArray();
+                }
 
-            public T Clone(Dictionary<object, object> clones, T value)
-            {
                 var clone = default(T);
 
                 var valueRef = __makeref(value);
@@ -179,7 +237,7 @@ namespace NanoGames.Synchronization
                 for (int i = 0; i < _fields.Length; ++i)
                 {
                     var field = _fields[i];
-                    var fieldValue = InternalClone(clones, field.GetValueDirect(valueRef));
+                    var fieldValue = _cloners[i].Clone(clones, field.GetValueDirect(valueRef));
                     field.SetValueDirect(copyRef, fieldValue);
                 }
 
@@ -187,11 +245,35 @@ namespace NanoGames.Synchronization
             }
         }
 
-        private sealed class ClassCloner<T>
+        private sealed class BaseClassCloner<T> : Cloner<T>
+            where T : class
+        {
+            private ConcreteClassCloner<T> _cloner = new ConcreteClassCloner<T>();
+
+            public override T Clone(Dictionary<object, object> clones, T value)
+            {
+                if (value == null)
+                {
+                    return null;
+                }
+
+                var type = value.GetType();
+                if (type == typeof(T))
+                {
+                    return _cloner.Clone(clones, value);
+                }
+
+                return (T)GetCloner(type).Clone(clones, value);
+            }
+        }
+
+        private sealed class ConcreteClassCloner<T> : Cloner<T>
+            where T : class
         {
             private readonly FieldInfo[] _fields;
+            private Cloner[] _cloners;
 
-            private ClassCloner()
+            public ConcreteClassCloner()
             {
                 if (typeof(T).GetCustomAttributes<NonClonableAttribute>(true).Any())
                 {
@@ -203,32 +285,37 @@ namespace NanoGames.Synchronization
                 }
             }
 
-            public static ClassCloner<T> Create(Type unused)
+            public override T Clone(Dictionary<object, object> clones, T value)
             {
-                return new ClassCloner<T>();
-            }
+                if (value == null)
+                {
+                    return null;
+                }
 
-            public T Clone(Dictionary<object, object> copies, T value)
-            {
                 if (_fields == null)
                 {
                     return default(T);
                 }
 
+                if (_cloners == null)
+                {
+                    _cloners = _fields.Select(f => CreateCloner(f.FieldType)).ToArray();
+                }
+
                 object copy;
-                if (copies.TryGetValue(value, out copy))
+                if (clones.TryGetValue(value, out copy))
                 {
                     return (T)copy;
                 }
 
                 /* Create an instance of T without running the default constructor. */
                 copy = FormatterServices.GetUninitializedObject(typeof(T));
-                copies[value] = copy;
+                clones[value] = copy;
 
                 var data = FormatterServices.GetObjectData(value, _fields);
                 for (int i = 0; i < data.Length; ++i)
                 {
-                    data[i] = InternalClone(copies, data[i]);
+                    data[i] = _cloners[i].Clone(clones, data[i]);
                 }
 
                 FormatterServices.PopulateObjectMembers(copy, _fields, data);
