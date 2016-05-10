@@ -11,40 +11,100 @@ namespace NanoGames
     [ProtoContract]
     public struct Input
     {
+        [ProtoMember(1)]
+        private int _value;
+
         /// <summary>
         /// Gets or sets a value indicating whether the up button is pressed.
         /// </summary>
-        [ProtoMember(1)]
-        public bool Up { get; set; }
+        public bool Up
+        {
+            get { return GetBit(0); }
+            set { SetBit(0, value); }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the down button is pressed.
         /// </summary>
-        [ProtoMember(2)]
-        public bool Down { get; set; }
+        public bool Down
+        {
+            get { return GetBit(1); }
+            set { SetBit(1, value); }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the left button is pressed.
         /// </summary>
-        [ProtoMember(3)]
-        public bool Left { get; set; }
+        public bool Left
+        {
+            get { return GetBit(2); }
+            set { SetBit(2, value); }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the right button is pressed.
         /// </summary>
-        [ProtoMember(4)]
-        public bool Right { get; set; }
+        public bool Right
+        {
+            get { return GetBit(3); }
+            set { SetBit(3, value); }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the fire button is pressed.
         /// </summary>
-        [ProtoMember(5)]
-        public bool Fire { get; set; }
+        public bool Fire
+        {
+            get { return GetBit(4); }
+            set { SetBit(4, value); }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the alt fire button is pressed.
         /// </summary>
-        [ProtoMember(6)]
-        public bool AltFire { get; set; }
+        public bool AltFire
+        {
+            get { return GetBit(5); }
+            set { SetBit(5, value); }
+        }
+
+        public static bool operator ==(Input a, Input b)
+        {
+            return a._value == b._value;
+        }
+
+        public static bool operator !=(Input a, Input b)
+        {
+            return a._value != b._value;
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            return obj is Input && this == (Input)obj;
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return _value.GetHashCode();
+        }
+
+        private bool GetBit(int n)
+        {
+            return (_value & (1 << n)) != 0;
+        }
+
+        private void SetBit(int n, bool value)
+        {
+            if (value)
+            {
+                _value |= 1 << n;
+            }
+            else
+            {
+                _value &= ~(1 << n);
+            }
+        }
     }
 }

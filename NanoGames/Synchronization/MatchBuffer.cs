@@ -4,7 +4,6 @@
 using NanoGames.Engine;
 using NanoGames.Games;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace NanoGames.Synchronization
 {
@@ -21,12 +20,13 @@ namespace NanoGames.Synchronization
         private readonly BufferedRenderer _bufferedRenderer;
         private readonly Graphics _bufferedGraphics;
 
-        private readonly List<Input?[]> _knownPlayerInputs = new List<Input?[]>();
+        private readonly List<PlayerInputState[]> _playerInputs = new List<PlayerInputState[]>();
 
-        private Match _match;
+        private Match _predictedMatch;
+        private Match _knownMatch;
 
-        private int _bufferedFrame = 0;
-        private int _lastValidFrame = 0;
+        private int _knownFrame = 0;
+        private int _predictedFrame = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MatchBuffer"/> class.
@@ -43,23 +43,24 @@ namespace NanoGames.Synchronization
             _bufferedRenderer = new BufferedRenderer();
             _bufferedGraphics = new Graphics(_bufferedRenderer);
 
-            _match = initialMatch;
             _playerDescriptions[localPlayerIndex].Graphics = _bufferedGraphics;
-            _match.Update(_bufferedGraphics, playerDescriptions);
+            initialMatch.Update(_bufferedGraphics, playerDescriptions);
 
-            _knownPlayerInputs.Add(CreateInitialInputRecord());
+            _knownMatch = _predictedMatch = initialMatch;
+
+            _playerInputs.Add(CreateInitialInputRecord());
         }
 
         /// <summary>
         /// Gets a value indicating whether the match is confirmed to be completed.
         /// This only returns true if the match result is confirmed, i.e. can't change due to a prediction correction.
         /// </summary>
-        public bool IsCompleted => _match.IsCompleted;
+        public bool IsCompleted => _knownMatch.IsCompleted;
 
         /// <summary>
         /// Gets the current scores for all players.
         /// </summary>
-        public IEnumerable<double> PlayerScores => _match.PlayerScores;
+        public IEnumerable<double> PlayerScores => _knownMatch.PlayerScores;
 
         /// <summary>
         /// Sets the input for a certain player for a certain frame.
@@ -69,22 +70,24 @@ namespace NanoGames.Synchronization
         /// <param name="input">The player's input.</param>
         public void SetInput(int frame, int playerIndex, Input input)
         {
-            if (frame < _lastValidFrame)
+            if (frame <= _knownFrame)
             {
                 return;
             }
 
-            int frameIndex = frame - _lastValidFrame;
-            while (frameIndex >= _knownPlayerInputs.Count)
-            {
-                _knownPlayerInputs.Add(new Input?[_playerCount]);
-            }
+            int frameIndex = frame - _knownFrame;
+            FillInputsUpToIndex(frameIndex);
 
-            _knownPlayerInputs[frameIndex][playerIndex] = input;
+            _playerInputs[frameIndex][playerIndex].IsKnown = true;
 
-            if (frame <= _bufferedFrame)
+            var oldInput = _playerInputs[frameIndex][playerIndex].Input;
+            _playerInputs[frameIndex][playerIndex].Input = input;
+
+            if (frame > _knownFrame && frame <= _predictedFrame && input != oldInput)
             {
-                _bufferedFrame = -1;
+                /* Misprediction. Roll back to the last known state. */
+                _predictedMatch = _knownMatch;
+                _predictedFrame = _knownFrame;
             }
         }
 
@@ -95,32 +98,50 @@ namespace NanoGames.Synchronization
         /// <param name="terminal">The terminal to render to.</param>
         public void RenderFrame(int requestedFrame, Terminal terminal)
         {
-            int currentFrame = _lastValidFrame;
-            int currentFrameIndex = 0;
-            var currentFrameInput = _knownPlayerInputs[0].Select(i => (Input)i).ToArray();
-
-            bool allInputWasValid = true;
-            bool matchWasAlreadyCloned = false;
-            var match = _match;
-
             while (true)
             {
-                if (requestedFrame <= _bufferedFrame)
+                if (requestedFrame <= _predictedFrame)
                 {
                     _bufferedRenderer.RenderTo(terminal.Renderer);
                     return;
                 }
 
-                ++currentFrameIndex;
-                ++currentFrame;
+                if (_predictedMatch != _knownMatch)
+                {
+                    /*
+                     * We are currently successfully predicting the future game state,
+                     * but we can "commit" any frames in the past where the input is now confirmed.
+                     */
+
+                    while (_knownFrame + 1 < requestedFrame && AllInputsKnown())
+                    {
+                        var knownInputs = _playerInputs[1];
+                        for (int playerIndex = 0; playerIndex < _playerCount; ++playerIndex)
+                        {
+                            _playerDescriptions[playerIndex].Input = knownInputs[playerIndex].Input;
+                            _playerDescriptions[playerIndex].Graphics = Graphics.Null;
+                        }
+
+                        _playerInputs.RemoveAt(0);
+                        _knownMatch.Update(Graphics.Null, _playerDescriptions);
+                        ++_knownFrame;
+                    }
+
+                    if (_predictedFrame < _knownFrame)
+                    {
+                        _predictedMatch = _knownMatch;
+                        _predictedFrame = _knownFrame;
+                    }
+                }
+
+                ++_predictedFrame;
 
                 Graphics localGraphics;
-                if (currentFrame == requestedFrame)
+                if (_predictedFrame == requestedFrame)
                 {
                     /* This is the frame we actually want to render. */
                     _bufferedRenderer.Clear();
                     localGraphics = _bufferedGraphics;
-                    _bufferedFrame = currentFrame;
                 }
                 else
                 {
@@ -128,59 +149,97 @@ namespace NanoGames.Synchronization
                     localGraphics = Graphics.Null;
                 }
 
+                FillInputsUpToIndex(_predictedFrame - _knownFrame);
+
+                bool isInputKnown = true;
+                var inputs = _playerInputs[_predictedFrame - _knownFrame];
                 for (int playerIndex = 0; playerIndex < _playerCount; ++playerIndex)
                 {
-                    Input input;
-                    if (_knownPlayerInputs[currentFrameIndex][playerIndex] == null)
-                    {
-                        allInputWasValid = false;
-                        input = currentFrameInput[playerIndex];
-                    }
-                    else
-                    {
-                        input = (Input)_knownPlayerInputs[currentFrameIndex][playerIndex];
-                        currentFrameInput[playerIndex] = input;
-                    }
-
-                    _playerDescriptions[playerIndex].Input = input;
+                    isInputKnown &= inputs[playerIndex].IsKnown;
+                    _playerDescriptions[playerIndex].Input = inputs[playerIndex].Input;
                     _playerDescriptions[playerIndex].Graphics = playerIndex == _localPlayerIndex ? localGraphics : Graphics.Null;
                 }
 
-                if (allInputWasValid)
+                if (_predictedMatch == _knownMatch)
                 {
-                    /*
-                     * The frame we want to compute is valid (i.e. all inputs are known).
-                     * Throw away the current _lastValidFrame because we never need to roll back to it.
-                     */
-                    _knownPlayerInputs.RemoveAt(0);
-                    ++_lastValidFrame;
-                    --currentFrameIndex;
-                }
-                else
-                {
-                    if (!matchWasAlreadyCloned)
+                    if (isInputKnown)
+                    {
+                        /*
+                         * The frame we want to compute is valid (i.e. all inputs are known).
+                         * This means that the _predictedMatch is also the _knownMatch, that is,
+                         * we commit the changes we make.
+                         */
+                        _playerInputs.RemoveAt(0);
+                        ++_knownFrame;
+                    }
+                    else
                     {
                         /*
                          * From now on, we are in prediction mode.
-                         * Clone the match state and work on a copy.
+                         * Clone the match state and work on a copy called _predictedMatch.
                          */
-                        match = Cloning.Clone(match);
+                        _predictedMatch = Cloning.Clone(_knownMatch);
                     }
                 }
 
-                match.Update(localGraphics, _playerDescriptions);
+                _predictedMatch.Update(localGraphics, _playerDescriptions);
             }
         }
 
-        private Input?[] CreateInitialInputRecord()
+        private bool AllInputsKnown()
         {
-            var record = new Input?[_playerCount];
+            if (_playerInputs.Count <= 1)
+            {
+                return false;
+            }
+
+            for (int p = 0; p < _playerCount; ++p)
+            {
+                if (!_playerInputs[1][p].IsKnown)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void FillInputsUpToIndex(int frameIndex)
+        {
+            while (frameIndex >= _playerInputs.Count)
+            {
+                var inputs = new PlayerInputState[_playerCount];
+                for (int i = 0; i < _playerCount; ++i)
+                {
+                    inputs[i] = new PlayerInputState(false, _playerInputs[_playerInputs.Count - 1][i].Input);
+                }
+
+                _playerInputs.Add(inputs);
+            }
+        }
+
+        private PlayerInputState[] CreateInitialInputRecord()
+        {
+            var record = new PlayerInputState[_playerCount];
             for (int i = 0; i < _playerCount; ++i)
             {
-                record[i] = default(Input);
+                record[i].IsKnown = true;
             }
 
             return record;
+        }
+
+        private struct PlayerInputState
+        {
+            public bool IsKnown;
+
+            public Input Input;
+
+            public PlayerInputState(bool isKnown, Input input)
+            {
+                IsKnown = isKnown;
+                Input = input;
+            }
         }
     }
 }
