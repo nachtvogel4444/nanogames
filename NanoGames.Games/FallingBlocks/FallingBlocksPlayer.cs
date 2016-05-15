@@ -30,6 +30,7 @@ namespace NanoGames.Games.FallingBlocks
         private KeyRepeater _slowDropRepeater = new KeyRepeater(6);
         private KeyRepeater _fastDropRepeater = new KeyRepeater(12);
         private KeyRepeater _lockInRepeater = new KeyRepeater(12);
+        private KeyRepeater _lastCallLockInRepeater = new KeyRepeater(300);
 
         private int _lastGravityFrame = 0;
 
@@ -99,6 +100,7 @@ namespace NanoGames.Games.FallingBlocks
                 _fallingPieceY = -_fallingPiece[_fallingPieceRotation].GetLength(1);
 
                 _lockInRepeater.Block(Match.Frame);
+                _lastCallLockInRepeater.Block(Match.Frame);
             }
 
             if (_fallingPiece != null)
@@ -229,7 +231,7 @@ namespace NanoGames.Games.FallingBlocks
                 return;
             }
 
-            if (_lockInRepeater.IsBlocked(Match.Frame) && !Input.Down && !Input.Fire)
+            if (_lockInRepeater.IsBlocked(Match.Frame) && !Input.Down && !Input.Fire && _lastCallLockInRepeater.IsBlocked(Match.Frame))
             {
                 return;
             }

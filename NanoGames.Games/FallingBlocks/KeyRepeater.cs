@@ -2,7 +2,7 @@
 {
     internal class KeyRepeater
     {
-        private readonly int _keyCooldown = 6;
+        private readonly int _keyCooldown;
 
         private int _lastFrame = int.MinValue;
 
