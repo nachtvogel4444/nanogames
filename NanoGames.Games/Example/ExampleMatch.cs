@@ -83,6 +83,31 @@ namespace NanoGames.Games.Example
             return velocity;
         }
 
+        private static Vector NormalizeVector(Vector vector)
+        {
+            if (vector.X < -160)
+            {
+                vector.X += 320;
+            }
+
+            if (vector.X > 160)
+            {
+                vector.X -= 320;
+            }
+
+            if (vector.Y < -100)
+            {
+                vector.Y += 200;
+            }
+
+            if (vector.Y > 100)
+            {
+                vector.Y -= 200;
+            }
+
+            return vector;
+        }
+
         private void MovePlayer(ExamplePlayer player)
         {
             /* Skip players that have already finished. */
@@ -142,16 +167,17 @@ namespace NanoGames.Games.Example
             /* Check for collisions. */
             foreach (var otherPlayer in Players)
             {
+                var relativePosition = NormalizeVector(otherPlayer.Position - player.Position);
+
                 if (otherPlayer != player
                     && !otherPlayer.HasFinished
-                    && (otherPlayer.Position - player.Position).Length < 2 * ExamplePlayer.Radius)
+                    && relativePosition.Length < 2 * ExamplePlayer.Radius)
                 {
                     /*
                      * We overlap with the other player.
                      * This is only a collision if the players are moving towards each other, otherwise, let them move apart naturally.
                      */
 
-                    var relativePosition = otherPlayer.Position - player.Position;
                     var relativeVelocity = otherPlayer.Velocity - player.Velocity;
 
                     /* The dot product tells us if the vectors are oriented towards each other. */

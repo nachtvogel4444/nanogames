@@ -36,7 +36,17 @@ namespace NanoGames.Games.Example
                     color = player.Color;
                 }
 
-                Graphics.Circle(color, player.Position, Radius);
+                /* Due to the wrap around, a single player can be visible on both edges of the screen. */
+
+                var x1 = player.Position.X;
+                var y1 = player.Position.Y;
+                var x2 = x1 + (x1 < 160 ? 320 : -320);
+                var y2 = y1 + (y1 < 100 ? 200 : -200);
+
+                Graphics.Circle(color, new Vector(x1, y1), Radius);
+                Graphics.Circle(color, new Vector(x1, y2), Radius);
+                Graphics.Circle(color, new Vector(x2, y1), Radius);
+                Graphics.Circle(color, new Vector(x2, y2), Radius);
             }
         }
     }
