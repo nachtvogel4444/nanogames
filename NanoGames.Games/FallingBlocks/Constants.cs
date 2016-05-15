@@ -8,6 +8,10 @@ namespace NanoGames.Games.FallingBlocks
     /// </summary>
     internal static class Constants
     {
+        public const double InitialFallSpeed = 1;
+
+        public const double FallAcceleration = 0.05;
+
         /// <summary>
         /// The playing field width, in blocks.
         /// </summary>

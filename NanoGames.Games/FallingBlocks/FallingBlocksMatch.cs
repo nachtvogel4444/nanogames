@@ -1,6 +1,7 @@
 ﻿// Copyright (c) the authors of nanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using System;
 using System.Linq;
 
 namespace NanoGames.Games.FallingBlocks
@@ -14,11 +15,13 @@ namespace NanoGames.Games.FallingBlocks
 
         public int Frame { get; private set; }
 
-        public double FallSpeed { get; private set; }
+        public int FallSpeed { get; private set; }
 
         /// <inheritdoc/>
         protected override void Initialize()
         {
+            FallSpeed = 30;
+
             _activePlayers = Players.Count;
 
             if (Players.Count == 2)
@@ -46,6 +49,8 @@ namespace NanoGames.Games.FallingBlocks
         protected override void Update()
         {
             ++Frame;
+
+            FallSpeed = (int)Math.Ceiling(60 / (Constants.InitialFallSpeed + Frame / 60.0 * Constants.FallAcceleration));
 
             foreach (var player in Players)
             {

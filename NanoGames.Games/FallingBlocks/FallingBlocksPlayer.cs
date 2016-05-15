@@ -29,6 +29,7 @@ namespace NanoGames.Games.FallingBlocks
         private KeyRepeater _rightRepeater = new KeyRepeater(6);
         private KeyRepeater _slowDropRepeater = new KeyRepeater(6);
         private KeyRepeater _fastDropRepeater = new KeyRepeater(12);
+        private KeyRepeater _lockInRepeater = new KeyRepeater(12);
 
         private int _lastGravityFrame = 0;
 
@@ -96,6 +97,8 @@ namespace NanoGames.Games.FallingBlocks
                 _fallingPieceX = (Constants.Width - _fallingPiece[_fallingPieceRotation].GetLength(0)) / 2;
 
                 _fallingPieceY = -_fallingPiece[_fallingPieceRotation].GetLength(1);
+
+                _lockInRepeater.Block(Match.Frame);
             }
 
             if (_fallingPiece != null)
@@ -106,6 +109,10 @@ namespace NanoGames.Games.FallingBlocks
                     {
                         _leftRepeater.Release();
                     }
+                    else
+                    {
+                        _lockInRepeater.Block(Match.Frame);
+                    }
                 }
 
                 if (_rightRepeater.IsPressed(Match.Frame, Input.Right))
@@ -113,6 +120,10 @@ namespace NanoGames.Games.FallingBlocks
                     if (!TryToMove(_fallingPieceX + 1, _fallingPieceY, _fallingPieceRotation))
                     {
                         _rightRepeater.Release();
+                    }
+                    else
+                    {
+                        _lockInRepeater.Block(Match.Frame);
                     }
                 }
 
@@ -131,9 +142,13 @@ namespace NanoGames.Games.FallingBlocks
                     {
                         _rotationRepeater.Release();
                     }
+                    else
+                    {
+                        _lockInRepeater.Block(Match.Frame);
+                    }
                 }
 
-                if (_slowDropRepeater.IsPressed(Match.Frame, Input.Down) || _lastGravityFrame + 30 <= Match.Frame)
+                if (_slowDropRepeater.IsPressed(Match.Frame, Input.Down) || _lastGravityFrame + Match.FallSpeed <= Match.Frame)
                 {
                     DropOne();
                 }
@@ -209,6 +224,12 @@ namespace NanoGames.Games.FallingBlocks
             _lastGravityFrame = Match.Frame;
 
             if (TryToMove(_fallingPieceX, _fallingPieceY + 1, _fallingPieceRotation))
+            {
+                _lockInRepeater.Block(Match.Frame);
+                return;
+            }
+
+            if (_lockInRepeater.IsBlocked(Match.Frame) && !Input.Down && !Input.Fire)
             {
                 return;
             }

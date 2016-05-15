@@ -15,9 +15,9 @@
         {
             if (currentInput)
             {
-                if (_lastFrame < currentFrame - _keyCooldown)
+                if (!IsBlocked(currentFrame))
                 {
-                    _lastFrame = currentFrame;
+                    Block(currentFrame);
                     return true;
                 }
             }
@@ -29,9 +29,19 @@
             return false;
         }
 
+        public void Block(int currentFrame)
+        {
+            _lastFrame = currentFrame;
+        }
+
         public void Release()
         {
             _lastFrame = int.MinValue;
+        }
+
+        public bool IsBlocked(int currentFrame)
+        {
+            return _lastFrame >= currentFrame - _keyCooldown;
         }
     }
 }
