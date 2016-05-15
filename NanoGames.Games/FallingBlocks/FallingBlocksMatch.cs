@@ -1,6 +1,8 @@
 ﻿// Copyright (c) the authors of nanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using System.Linq;
+
 namespace NanoGames.Games.FallingBlocks
 {
     /// <summary>
@@ -86,12 +88,29 @@ namespace NanoGames.Games.FallingBlocks
 
             foreach (var player in Players)
             {
-                player.DrawScreen();
+                if (player.HasLost)
+                {
+                    DrawSpectatorMode(player.Graphics);
+                }
+                else
+                {
+                    player.DrawScreen();
+                }
             }
 
             if (_activePlayers <= 0 || (_activePlayers <= 1 && Players.Count >= 2))
             {
                 IsCompleted = true;
+            }
+        }
+
+        private void DrawSpectatorMode(Graphics graphics)
+        {
+            var o = new Vector(-100, 0);
+            foreach (var player in Players.Where(p => !p.HasLost).Take(3))
+            {
+                player.Draw(graphics, o);
+                o += new Vector(100, 0);
             }
         }
     }

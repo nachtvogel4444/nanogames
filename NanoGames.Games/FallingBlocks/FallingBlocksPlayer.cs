@@ -155,6 +155,44 @@ namespace NanoGames.Games.FallingBlocks
             RightPlayer?.Draw(Graphics, new Vector(100, 0));
         }
 
+        public void Draw(Graphics graphics, Vector offset)
+        {
+            if (graphics != Graphics)
+            {
+                graphics.PrintCenter(Color, 8, new Vector(160, 16) + offset, Name);
+            }
+
+            graphics.Line(Constants.ContainerColor, Constants.TopLeft + offset + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + offset + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
+            graphics.Line(Constants.ContainerColor, Constants.TopLeft + offset + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + offset + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
+            graphics.Line(Constants.ContainerColor, Constants.TopLeft + offset + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder), Constants.TopLeft + offset + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
+
+            for (int x = 0; x < Constants.Width; ++x)
+            {
+                for (int y = 0; y < Constants.Height; ++y)
+                {
+                    if (_isOccupied[x, y])
+                    {
+                        DrawBlock(graphics, _blockColor[x, y], offset, x, y);
+                    }
+                }
+            }
+
+            if (_fallingPiece != null)
+            {
+                var piece = _fallingPiece[_fallingPieceRotation];
+                for (int x = 0; x < piece.GetLength(0); ++x)
+                {
+                    for (int y = 0; y < piece.GetLength(1); ++y)
+                    {
+                        if (piece[x, y] != 0)
+                        {
+                            DrawBlock(graphics, new Color(1, 1, 1), offset, x + _fallingPieceX, y + _fallingPieceY);
+                        }
+                    }
+                }
+            }
+        }
+
         private void SetLost()
         {
             if (!_hasLost)
@@ -265,44 +303,6 @@ namespace NanoGames.Games.FallingBlocks
             _fallingPieceY = y;
             _fallingPieceRotation = rotation;
             return true;
-        }
-
-        private void Draw(Graphics graphics, Vector offset)
-        {
-            if (graphics != Graphics)
-            {
-                graphics.PrintCenter(Color, 8, new Vector(160, 16) + offset, Name);
-            }
-
-            graphics.Line(Constants.ContainerColor, Constants.TopLeft + offset + new Vector(-Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + offset + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
-            graphics.Line(Constants.ContainerColor, Constants.TopLeft + offset + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, -Constants.ContainerBorder), Constants.TopLeft + offset + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
-            graphics.Line(Constants.ContainerColor, Constants.TopLeft + offset + new Vector(-Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder), Constants.TopLeft + offset + new Vector(Constants.Width * Constants.BlockSize + Constants.ContainerBorder, Constants.Height * Constants.BlockSize + Constants.ContainerBorder));
-
-            for (int x = 0; x < Constants.Width; ++x)
-            {
-                for (int y = 0; y < Constants.Height; ++y)
-                {
-                    if (_isOccupied[x, y])
-                    {
-                        DrawBlock(graphics, _blockColor[x, y], offset, x, y);
-                    }
-                }
-            }
-
-            if (_fallingPiece != null)
-            {
-                var piece = _fallingPiece[_fallingPieceRotation];
-                for (int x = 0; x < piece.GetLength(0); ++x)
-                {
-                    for (int y = 0; y < piece.GetLength(1); ++y)
-                    {
-                        if (piece[x, y] != 0)
-                        {
-                            DrawBlock(graphics, new Color(1, 1, 1), offset, x + _fallingPieceX, y + _fallingPieceY);
-                        }
-                    }
-                }
-            }
         }
 
         private void DrawBlock(Graphics graphics, Color color, Vector offset, int x, int y)
