@@ -11,14 +11,6 @@ namespace NanoGames.Games.Bomberguy
 
         Vector Center { get; }
 
-        Vector TopLeft { get; }
-
-        Vector TopRight { get; }
-
-        Vector BottomLeft { get; }
-
-        Vector BottomRight { get; }
-
         bool Destroyable { get; }
 
         bool Passable { get; }

@@ -3,13 +3,13 @@
 
 namespace NanoGames.Games.Bomberguy
 {
-    internal abstract class AbstractBomberThing : BomberThing
+    internal abstract class AbstractRectbombularThing : RectbombularThing
     {
-        public AbstractBomberThing(BomberMatch match, bool destroyable, bool passable, bool deadly, Vector size) : this(match, destroyable, passable, deadly, new Vector(), size)
+        public AbstractRectbombularThing(BomberMatch match, bool destroyable, bool passable, bool deadly, Vector size) : this(match, destroyable, passable, deadly, new Vector(), size)
         {
         }
 
-        public AbstractBomberThing(BomberMatch match, bool destroyable, bool passable, bool deadly, Vector position, Vector size)
+        public AbstractRectbombularThing(BomberMatch match, bool destroyable, bool passable, bool deadly, Vector position, Vector size)
         {
             this.Destroyable = destroyable;
             this.Passable = passable;

@@ -3,7 +3,7 @@
 
 namespace NanoGames.Games.Bomberguy
 {
-    internal class Explosion : AbstractBomberThing
+    internal class Explosion : AbstractRectbombularThing
     {
         private Type type;
 

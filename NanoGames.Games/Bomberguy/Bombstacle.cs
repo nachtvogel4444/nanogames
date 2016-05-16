@@ -3,7 +3,7 @@
 
 namespace NanoGames.Games.Bomberguy
 {
-    internal class Bombstacle : AbstractBomberThing
+    internal class Bombstacle : AbstractRectbombularThing
     {
         public Bombstacle(BomberMatch match, Vector size) : this(match, new Vector(), size)
         {

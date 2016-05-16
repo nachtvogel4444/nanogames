@@ -18,7 +18,7 @@ namespace NanoGames.Games.Bomberguy
         private double _playerSpeed;
         private double _pixelsPerUnit;
         private double _widthOffset;
-        private BomberThing[,] _field;
+        private RectbombularThing[,] _field;
         private int _deadPlayers;
 
         public int DeadPlayers
@@ -40,7 +40,7 @@ namespace NanoGames.Games.Bomberguy
             get { return new Vector(_pixelsPerUnit, _pixelsPerUnit); }
         }
 
-        public BomberThing this[Vector v]
+        public RectbombularThing this[Vector v]
         {
             get
             {
@@ -53,7 +53,7 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
-        public BomberThing this[int x, int y]
+        public RectbombularThing this[int x, int y]
         {
             get
             {
@@ -98,7 +98,7 @@ namespace NanoGames.Games.Bomberguy
         {
             _fieldSize = FIELD_MIN_SIZE + ((int)(Players.Count / 4)) * 2;
 
-            _field = new BomberThing[_fieldSize, _fieldSize];
+            _field = new RectbombularThing[_fieldSize, _fieldSize];
 
             _playerSpeed = PLAYER_SPEED / _fieldSize;
 

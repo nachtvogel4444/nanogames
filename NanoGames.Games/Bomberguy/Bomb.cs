@@ -3,7 +3,7 @@
 
 namespace NanoGames.Games.Bomberguy
 {
-    internal class Bomb : AbstractBomberThing
+    internal class Bomb : AbstractRectbombularThing
     {
         private int reach;
 
