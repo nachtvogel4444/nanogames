@@ -28,7 +28,7 @@ namespace NanoGames.Games
         /// </summary>
         /// <param name="description">The match description.</param>
         /// <returns>The new match.</returns>
-        public override Match CreateMatch(MatchDescription description)
+        public override IMatch CreateMatch(MatchDescription description)
         {
             var match = new TMatch();
             match.Random = description.Random;

@@ -21,7 +21,7 @@ namespace NanoGames.Application
         private readonly Menu _selectDisciplineMenu;
 
         private Terminal _currentTerminal;
-        private Match _match;
+        private IMatch _match;
 
         private BufferedRenderer _bufferedRenderer;
         private Graphics _bufferedGraphics;

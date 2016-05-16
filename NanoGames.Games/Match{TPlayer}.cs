@@ -11,7 +11,7 @@ namespace NanoGames.Games
     /// Represents a single match.
     /// </summary>
     /// <typeparam name="TPlayer">The player type associated with the match.</typeparam>
-    internal abstract class Match<TPlayer> : Match
+    internal abstract class Match<TPlayer> : IMatch
         where TPlayer : Player
     {
         private List<MatchTimer> _timers = new List<MatchTimer>();
@@ -32,7 +32,14 @@ namespace NanoGames.Games
         public Graphics Graphics { get; private set; }
 
         /// <inheritdoc/>
-        public override IEnumerable<double> PlayerScores => Players.Select(p => p.Score);
+        public IEnumerable<double> PlayerScores => Players.Select(p => p.Score);
+
+        public bool IsCompleted { get; protected set; }
+
+        /// <summary>
+        /// The current frame index, count from 0 at the start of the match up.
+        /// </summary>
+        public int Frame { get; private set; }
 
         /// <summary>
         /// Sets the list of players.
@@ -52,7 +59,7 @@ namespace NanoGames.Games
         }
 
         /// <inheritdoc/>
-        public override sealed void Update(Graphics graphics, List<PlayerDescription> playerDescriptions)
+        public void Update(Graphics graphics, List<PlayerDescription> playerDescriptions)
         {
             if (IsCompleted)
             {
@@ -67,6 +74,8 @@ namespace NanoGames.Games
                 Players[i].Input = playerDescriptions[i].Input;
             }
 
+            ++Frame;
+
             foreach (var t in new List<MatchTimer>(_timers))
             {
                 t.Tick();
@@ -76,7 +85,7 @@ namespace NanoGames.Games
             Update();
         }
 
-        public override IMatchTimer GetTimer(int interval)
+        public IMatchTimer GetTimer(int interval)
         {
             var matchTimer = new MatchTimer(this, interval);
             _timers.Add(matchTimer);

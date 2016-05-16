@@ -22,8 +22,8 @@ namespace NanoGames.Synchronization
 
         private readonly List<PlayerInputState[]> _playerInputs = new List<PlayerInputState[]>();
 
-        private Match _predictedMatch;
-        private Match _knownMatch;
+        private IMatch _predictedMatch;
+        private IMatch _knownMatch;
 
         private int _knownFrame = 0;
         private int _predictedFrame = 0;
@@ -34,7 +34,7 @@ namespace NanoGames.Synchronization
         /// <param name="initialMatch">The initial state of the match.</param>
         /// <param name="playerDescriptions">A list of player descriptions.</param>
         /// <param name="localPlayerIndex">The index of the local player in the list of player descriptions.</param>
-        public MatchBuffer(Match initialMatch, List<PlayerDescription> playerDescriptions, int localPlayerIndex)
+        public MatchBuffer(IMatch initialMatch, List<PlayerDescription> playerDescriptions, int localPlayerIndex)
         {
             _playerCount = playerDescriptions.Count;
             _playerDescriptions = playerDescriptions;

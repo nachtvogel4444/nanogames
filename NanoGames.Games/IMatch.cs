@@ -8,25 +8,23 @@ namespace NanoGames.Games
     /// <summary>
     /// Represents a single match of a discipline.
     /// </summary>
-    public abstract class Match
+    public interface IMatch
     {
         /// <summary>
         /// Gets or sets a value indicating whether the match is completed.
         /// </summary>
-        public bool IsCompleted { get; protected set; }
+        bool IsCompleted { get; }
 
         /// <summary>
         /// Gets the current scores for all players.
         /// </summary>
-        public abstract IEnumerable<double> PlayerScores { get; }
+        IEnumerable<double> PlayerScores { get; }
 
         /// <summary>
         /// Updates and renders the match.
         /// </summary>
         /// <param name="matchGraphics">A Graphics instance used to draw onto the screen of all players.</param>
         /// <param name="playerDescriptions">The player descriptions.</param>
-        public abstract void Update(Graphics matchGraphics, List<PlayerDescription> playerDescriptions);
-
-        public abstract IMatchTimer GetTimer(int interval);
+        void Update(Graphics matchGraphics, List<PlayerDescription> playerDescriptions);
     }
 }

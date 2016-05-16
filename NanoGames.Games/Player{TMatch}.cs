@@ -8,7 +8,7 @@ namespace NanoGames.Games
     /// </summary>
     /// <typeparam name="TMatch">The match type this player type belongs to.</typeparam>
     internal abstract class Player<TMatch> : Player
-        where TMatch : Match
+        where TMatch : IMatch
     {
         /// <summary>
         /// Gets or sets the match this player belongs to.

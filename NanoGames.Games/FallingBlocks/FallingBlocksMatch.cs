@@ -13,8 +13,6 @@ namespace NanoGames.Games.FallingBlocks
     {
         private int _activePlayers;
 
-        public int Frame { get; private set; }
-
         public int FallSpeed { get; private set; }
 
         /// <inheritdoc/>
@@ -48,8 +46,6 @@ namespace NanoGames.Games.FallingBlocks
         /// <inheritdoc/>
         protected override void Update()
         {
-            ++Frame;
-
             FallSpeed = (int)Math.Ceiling(60 / (Constants.InitialFallSpeed + Frame / 60.0 * Constants.FallAcceleration));
 
             foreach (var player in Players)
