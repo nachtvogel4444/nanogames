@@ -5,21 +5,23 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class Bomb : AbstractRectbombularThing
     {
+        private BomberGuy player;
         private int reach;
 
-        public Bomb(int reach, BomberMatch match, Vector size) : this(reach, match, new Vector(), size)
+        public Bomb(int reach, BomberGuy player, BomberMatch match, Vector size) : this(reach, player, match, new Vector(), size)
         {
         }
 
-        public Bomb(int reach, BomberMatch match, Vector position, Vector size) : base(match, true, false, false, position, size)
+        public Bomb(int reach, BomberGuy player, BomberMatch match, Vector position, Vector size) : base(match, true, false, false, position, size)
         {
             match.TimeOnce(2000, () => Destroy());
             this.reach = reach;
+            this.player = player;
         }
 
         public override void Draw(Graphics g)
         {
-            g.Circle(Colors.White, this.Center, this.Size.X / 2d * 0.8);
+            g.Circle(player.Color, this.Center, this.Size.X / 2d * 0.8);
         }
 
         protected override void OnDestroy(Vector cell)

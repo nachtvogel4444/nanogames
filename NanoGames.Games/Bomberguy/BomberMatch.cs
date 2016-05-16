@@ -391,7 +391,7 @@ namespace NanoGames.Games.Bomberguy
 
             var cell = GetCell(p);
 
-            var bomb = new Bomb(BOMB_REACH, this, GetCoordinates(cell), new Vector(_pixelsPerUnit * BOMB_RATIO, _pixelsPerUnit * BOMB_RATIO));
+            var bomb = new Bomb(BOMB_REACH, p, this, GetCoordinates(cell), new Vector(_pixelsPerUnit * BOMB_RATIO, _pixelsPerUnit * BOMB_RATIO));
 
             this[cell] = bomb;
         }

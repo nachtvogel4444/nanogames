@@ -15,7 +15,7 @@ namespace NanoGames.Games.Bomberguy
         {
             this.type = type;
 
-            match.TimeOnce(1500, () => Destroy());
+            match.TimeOnce(1000, () => Destroy());
         }
 
         public enum Type
