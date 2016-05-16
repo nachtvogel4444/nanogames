@@ -229,129 +229,127 @@ namespace NanoGames.Games.Bomberguy
         {
             double x = 0, y = 0;
 
+            Vector inputVector = GetInputVector(p.Input);
+            inputVector = inputVector.Normalized;
+
             if (p.Input.Up && !p.Input.Down)
             {
-                var neighborLeft = this[GetCell(p.Position + new Vector(0, -_playerSpeed))];
+                var neighborLeft = this[GetCell(p.Position + new Vector(0, _playerSpeed * inputVector.Y))];
+                bool neighborLeftPassable = neighborLeft == null;
+                bool slideToRightAllowed = false;
                 if (neighborLeft != null)
                 {
-                    var xDistance = p.Center.X - (neighborLeft.Position + neighborLeft.Size).X;
-                    var yDistance = p.Center.Y - (neighborLeft.Position + neighborLeft.Size).Y;
+                    neighborLeftPassable = neighborLeft.Passable;
+                    var xDistance = p.Center.X - neighborLeft.BottomRight.X;
+                    var yDistance = p.Center.Y - neighborLeft.BottomRight.Y;
 
-                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborLeft = null;
-                    }
+                    DetermineMovement(out neighborLeftPassable, out slideToRightAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
 
-                var neighborRight = this[GetCell(p.Position + new Vector(p.Size.X, -_playerSpeed))];
+                var neighborRight = this[GetCell(p.Position + new Vector(p.Size.X, _playerSpeed * inputVector.Y))];
+                bool neighborRightPassable = neighborRight == null;
+                bool slideToLeftAllowed = false;
                 if (neighborRight != null)
                 {
-                    var xDistance = (neighborRight.Position).X - p.Center.X;
-                    var yDistance = p.Center.Y - (neighborRight.Position + neighborRight.Size).Y;
+                    neighborRightPassable = neighborRight.Passable;
+                    var xDistance = neighborRight.BottomLeft.X - p.Center.X;
+                    var yDistance = p.Center.Y - neighborRight.BottomRight.Y;
 
-                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborRight = null;
-                    }
+                    DetermineMovement(out neighborRightPassable, out slideToLeftAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
-                if ((neighborLeft == null || neighborLeft.Passable) && (neighborRight == null || neighborRight.Passable))
+                if (neighborLeftPassable && neighborRightPassable)
                 {
                     y = -1;
+                    x = slideToRightAllowed ? 1 : slideToLeftAllowed ? -1 : x;
                 }
             }
             if (p.Input.Down && !p.Input.Up)
             {
-                var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, _playerSpeed))];
+                var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, _playerSpeed * inputVector.Y))];
+                bool neighborLeftPassable = neighborLeft == null;
+                bool slideToRightAllowed = false;
                 if (neighborLeft != null)
                 {
-                    var xDistance = p.Center.X - (neighborLeft.Position + neighborLeft.Size).X;
-                    var yDistance = (neighborLeft.Position).Y - p.Center.Y;
+                    neighborLeftPassable = neighborLeft.Passable;
+                    var xDistance = p.Center.X - neighborLeft.TopRight.X;
+                    var yDistance = neighborLeft.TopRight.Y - p.Center.Y;
 
-                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborLeft = null;
-                    }
+                    DetermineMovement(out neighborLeftPassable, out slideToRightAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
 
-                var neighborRight = this[GetCell(p.Position + p.Size + new Vector(0, _playerSpeed))];
+                var neighborRight = this[GetCell(p.Position + p.Size + new Vector(0, _playerSpeed * inputVector.Y))];
+                bool neighborRightPassable = neighborRight == null;
+                bool slideToLeftAllowed = false;
                 if (neighborRight != null)
                 {
-                    var xDistance = (neighborRight.Position).X - p.Center.X;
-                    var yDistance = (neighborRight.Position).Y - p.Center.Y;
+                    var xDistance = neighborRight.TopLeft.X - p.Center.X;
+                    var yDistance = neighborRight.TopLeft.Y - p.Center.Y;
 
-                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborRight = null;
-                    }
+                    DetermineMovement(out neighborRightPassable, out slideToLeftAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
-                if ((neighborLeft == null || neighborLeft.Passable) && (neighborRight == null || neighborRight.Passable))
+                if (neighborLeftPassable && neighborRightPassable)
                 {
                     y = 1;
+                    x = slideToRightAllowed ? 1 : slideToLeftAllowed ? -1 : x;
                 }
             }
             if (p.Input.Left && !p.Input.Right)
             {
-                var neighborAbove = this[GetCell(p.Position + new Vector(-_playerSpeed, 0))];
-
+                var neighborAbove = this[GetCell(p.Position + new Vector(_playerSpeed * inputVector.X, 0))];
+                bool neighborAbovePassable = neighborAbove == null;
+                bool slideToDownAllowed = false;
                 if (neighborAbove != null)
                 {
-                    var xDistance = p.Center.X - (neighborAbove.Position + neighborAbove.Size).X;
-                    var yDistance = p.Center.Y - (neighborAbove.Position + neighborAbove.Size).Y;
+                    var xDistance = p.Center.X - neighborAbove.BottomRight.X;
+                    var yDistance = p.Center.Y - neighborAbove.BottomRight.Y;
 
-                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborAbove = null;
-                    }
+                    DetermineMovement(out neighborAbovePassable, out slideToDownAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
 
-                var neighborBelow = this[GetCell(p.Position + new Vector(-_playerSpeed, p.Size.Y))];
-
+                var neighborBelow = this[GetCell(p.Position + new Vector(_playerSpeed * inputVector.X, p.Size.Y))];
+                bool neighborBelowPassable = neighborBelow == null;
+                bool slideToUpAllowed = false;
                 if (neighborBelow != null)
                 {
-                    var xDistance = p.Center.X - (neighborBelow.Position + neighborBelow.Size).X;
-                    var yDistance = (neighborBelow.Position).Y - p.Center.Y;
+                    var xDistance = p.Center.X - neighborBelow.TopRight.X;
+                    var yDistance = neighborBelow.TopRight.Y - p.Center.Y;
 
-                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborBelow = null;
-                    }
+                    DetermineMovement(out neighborBelowPassable, out slideToUpAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
 
-                if ((neighborAbove == null || neighborAbove.Passable) && (neighborBelow == null || neighborBelow.Passable))
+                if (neighborAbovePassable && neighborBelowPassable)
                 {
                     x = -1;
+                    y = slideToDownAllowed ? 1 : slideToUpAllowed ? -1 : y;
                 }
             }
             if (p.Input.Right && !p.Input.Left)
             {
-                var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed, 0))];
-
+                var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed * inputVector.X, 0))];
+                bool neighborAbovePassable = neighborAbove == null;
+                bool slideToDownAllowed = false;
                 if (neighborAbove != null)
                 {
-                    var xDistance = (neighborAbove.Position).X - p.Center.X;
-                    var yDistance = p.Center.Y - (neighborAbove.Position + neighborAbove.Size).Y;
+                    var xDistance = neighborAbove.BottomLeft.X - p.Center.X;
+                    var yDistance = p.Center.Y - neighborAbove.BottomLeft.Y;
 
-                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborAbove = null;
-                    }
+                    DetermineMovement(out neighborAbovePassable, out slideToDownAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
 
-                var neighborBelow = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed, p.Size.Y))];
-
+                var neighborBelow = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed * inputVector.X, p.Size.Y))];
+                bool neighborBelowPassable = neighborBelow == null;
+                bool slideToUpAllowed = false;
                 if (neighborBelow != null)
                 {
-                    var xDistance = (neighborBelow.Position).X - p.Center.X;
-                    var yDistance = (neighborBelow.Position).Y - p.Center.Y;
+                    var xDistance = neighborBelow.TopLeft.X - p.Center.X;
+                    var yDistance = neighborBelow.TopLeft.Y - p.Center.Y;
 
-                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborBelow = null;
-                    }
+                    DetermineMovement(out neighborBelowPassable, out slideToUpAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
-                if ((neighborAbove == null || neighborAbove.Passable) && (neighborBelow == null || neighborBelow.Passable))
+                if (neighborAbovePassable && neighborBelowPassable)
                 {
                     x = 1;
+                    y = slideToDownAllowed ? 1 : slideToUpAllowed ? -1 : y;
                 }
             }
 
@@ -360,6 +358,31 @@ namespace NanoGames.Games.Bomberguy
             var direction = new Vector(x, y).Normalized;
 
             p.Position += direction * _playerSpeed;
+        }
+
+        private Vector GetInputVector(Input input)
+        {
+            Vector v = new Vector();
+            if (input.Up && !input.Down) v.Y = -1;
+            if (input.Down && !input.Up) v.Y = 1;
+            if (input.Left && !input.Right) v.X = -1;
+            if (input.Right && !input.Left) v.X = 1;
+
+            return v;
+        }
+
+        private void DetermineMovement(out bool neighborPassable, out bool slideAllowed, double movementDirectionDistance, double sideDistance, double movementDirectionSize, double sideSize)
+        {
+            neighborPassable = false;
+            slideAllowed = false;
+            if (movementDirectionDistance < 0 || (movementDirectionDistance > 0 && (movementDirectionDistance / movementDirectionSize + sideDistance / sideSize) > 0.55))
+            {
+                neighborPassable = true;
+                if (sideSize / 2d - sideDistance < 3d)
+                {
+                    slideAllowed = true;
+                }
+            }
         }
 
         private void DropBomb(BomberGuy p)

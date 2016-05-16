@@ -37,6 +37,14 @@ namespace NanoGames.Games.Bomberguy
 
         public Vector Center { get { return Position + new Vector(Size.X / 2d, Size.Y / 2d); } }
 
+        public Vector TopLeft { get { return Position; } }
+
+        public Vector TopRight { get { return Position + new Vector(Size.X, 0); } }
+
+        public Vector BottomLeft { get { return Position + new Vector(0, Size.Y); } }
+
+        public Vector BottomRight { get { return Position + Size; } }
+
         public void Draw(Graphics g)
         {
             Draw(g, this, this.Color);
