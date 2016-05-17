@@ -38,6 +38,7 @@ namespace NanoGames.Engine
         private readonly TriangleBuffer _pointBuffer = new TriangleBuffer(_pointVertexSpecification);
         private readonly VertexArray _pointVertexArray = new VertexArray(_pointVertexSpecification);
 
+        private readonly PreProcessor _preProcessor = new PreProcessor();
         private readonly PostProcessor _postProcessor = new PostProcessor();
 
         private readonly int _framebufferId;
@@ -77,6 +78,7 @@ namespace NanoGames.Engine
         {
             GL.DeleteFramebuffer(_framebufferId);
             _postProcessor.Dispose();
+            _preProcessor.Dispose();
             _pointVertexArray.Dispose();
             _pointBuffer.Dispose();
             _pointShader.Dispose();
@@ -92,6 +94,8 @@ namespace NanoGames.Engine
         /// <param name="height">The height in pixels.</param>
         public void BeginFrame(int width, int height)
         {
+            GL.Enable(EnableCap.FramebufferSrgb);
+
             _postProcessor.BeginFrame(width, height);
 
             if ((double)width / (double)height > Graphics.Width / Graphics.Height)
@@ -108,7 +112,7 @@ namespace NanoGames.Engine
                 _width = width;
                 _height = height;
                 GL.BindTexture(TextureTarget.Texture2D, _frameTextureId);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, width, height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, IntPtr.Zero);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba32f, width, height, 0, PixelFormat.Rgba, PixelType.Float, IntPtr.Zero);
             }
 
             _lineBuffer.Clear();
@@ -141,18 +145,19 @@ namespace NanoGames.Engine
             GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, _framebufferId);
 
             GL.Viewport(0, 0, _width, _height);
-            GL.ClearColor(0.0625f, 0.0625f, 0.0625f, 1);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            _preProcessor.Clear();
 
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
 
             _lineShader.Bind();
+            GL.Uniform1(0, _preProcessor.Fade);
             _lineVertexArray.SetData(_lineBuffer, BufferUsageHint.StreamDraw);
             _lineVertexArray.Draw();
             _lineVertexArray.Dispose();
 
             _pointShader.Bind();
+            GL.Uniform1(0, _preProcessor.Fade);
             _pointVertexArray.SetData(_pointBuffer, BufferUsageHint.StreamDraw);
             _pointVertexArray.Draw();
             _pointVertexArray.Dispose();

@@ -18,7 +18,7 @@ namespace NanoGames.Application
         public void Update(Terminal terminal)
         {
             var fontSize = 6;
-            var color = new Color(0.8, 0.6, 0.2);
+            var color = new Color(0.60, 0.35, 0.05);
 
             if (DebugMode.IsEnabled)
             {
