@@ -5,9 +5,21 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class BomberGuy : Player<BomberMatch>, BomberThing
     {
+        private Vector _position;
+
+        public bool Dying
+        {
+            get; private set;
+        }
+
         public bool Dead
         {
-            get; set;
+            get; private set;
+        }
+
+        public bool Alive
+        {
+            get { return !Dead && !Dying; }
         }
 
         public bool Destroyable
@@ -27,7 +39,13 @@ namespace NanoGames.Games.Bomberguy
 
         public Vector Position
         {
-            get; set;
+            get { return _position; }
+
+            set
+            {
+                if (!Alive) return;
+                _position = value;
+            }
         }
 
         public Vector Size
@@ -39,24 +57,50 @@ namespace NanoGames.Games.Bomberguy
 
         public void Draw(Graphics g)
         {
-            Draw(g, this, this.Color);
+            /* Draw each player. */
+            foreach (var player in Match.Players)
+            {
+                /* Skip players that have already finished. */
+                if (player.Dead) continue;
+
+                Color color = player.Color;
+
+                if (player == this && Alive)
+                {
+                    /* Always show the current player in white. */
+                    color = new Color(1, 1, 1);
+                }
+
+                g.Line(color, player.Position + new Vector(player.Size.X / 2d, 0), player.Position + new Vector(player.Size.X, player.Size.Y / 2d));
+                g.Line(color, player.Position + new Vector(player.Size.X, player.Size.Y / 2d), player.Position + new Vector(player.Size.X / 2d, player.Size.Y));
+                g.Line(color, player.Position + new Vector(player.Size.X / 2d, player.Size.Y), player.Position + new Vector(0, player.Size.Y / 2d));
+                g.Line(color, player.Position + new Vector(0, player.Size.Y / 2d), player.Position + new Vector(player.Size.X / 2d, 0));
+            }
         }
 
         public void Destroy()
         {
-            if (Dead) return;
+            if (!Alive) return;
 
-            Dead = true;
+            Dying = true;
 
-            this.Score = Match.DeadPlayers++;
+            Match.TimeCyclic(200, (t) =>
+            {
+                if (Dead)
+                {
+                    t.Stop();
+                    t.Dispose();
+                    return;
+                }
+                this.Color = GetComplementary(Color);
+            });
+
+            Match.TimeOnce(1400, () => { Dead = true; });
         }
 
-        private void Draw(Graphics g, BomberGuy p, Color c)
+        private Color GetComplementary(Color color)
         {
-            g.Line(c, p.Position + new Vector(p.Size.X / 2d, 0), p.Position + new Vector(p.Size.X, p.Size.Y / 2d));
-            g.Line(c, p.Position + new Vector(p.Size.X, p.Size.Y / 2d), p.Position + new Vector(p.Size.X / 2d, p.Size.Y));
-            g.Line(c, p.Position + new Vector(p.Size.X / 2d, p.Size.Y), p.Position + new Vector(0, p.Size.Y / 2d));
-            g.Line(c, p.Position + new Vector(0, p.Size.Y / 2d), p.Position + new Vector(p.Size.X / 2d, 0));
+            return new Color(255 - color.R, 255 - color.G, 255 - color.B);
         }
     }
 }
