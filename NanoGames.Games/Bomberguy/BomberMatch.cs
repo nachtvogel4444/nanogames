@@ -20,8 +20,6 @@ namespace NanoGames.Games.Bomberguy
         private double _widthOffset;
         private RectbombularThing[,] _field;
 
-        public int Frame { get; private set; }
-
         public Vector CellSize
         {
             get { return new Vector(_pixelsPerUnit, _pixelsPerUnit); }
@@ -101,8 +99,6 @@ namespace NanoGames.Games.Bomberguy
 
         protected override void Update()
         {
-            ++Frame;
-
             CheckCompleted();
 
             foreach (var p in this.Players)
