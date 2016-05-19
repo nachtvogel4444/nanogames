@@ -19,5 +19,7 @@ namespace NanoGames.Games.Banana
         public const int WaitBullet = 6;
         public const double Gravity = 0.01;
 
+        public const int test = 1;
+
     }
 }
