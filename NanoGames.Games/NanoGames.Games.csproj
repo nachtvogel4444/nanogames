@@ -47,6 +47,11 @@
     <Compile Include="..\NanoGames.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Banana\BananaMatch.cs" />
+    <Compile Include="Banana\BananaPlayer.cs" />
+    <Compile Include="Banana\Bullet.cs" />
+    <Compile Include="Banana\Constants.cs" />
+    <Compile Include="Banana\Methods.cs" />
     <Compile Include="Bomberguy\AbstractBomberThing.cs" />
     <Compile Include="Bomberguy\Bomb.cs" />
     <Compile Include="Bomberguy\BomberGuy.cs" />
@@ -78,6 +83,9 @@
       <Project>{be63934a-7c7f-45b4-ba4e-65ce906e5efe}</Project>
       <Name>NanoGames.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Banana\tmpcode.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

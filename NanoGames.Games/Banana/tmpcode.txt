@@ -1,0 +1,72 @@
+﻿// Copyright (c) the authors of nanoGames. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt in the project root.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace NanoGames.Games.Banana
+{
+    class Gun : BananaPlayer
+    {
+        private double _thickness = 2.0;
+        public double Angle = 0.0;
+
+        public void DrawGun(BananaPlayer player)
+        {
+            Color color = player.Color;
+            List<Vector> list = Methods.RotateRectangle(new Vector(-0.5 * Body.Radius, _thickness), new Vector(0.5 * Body.Radius, -_thickness), new Vector(0, 0), Angle);
+            Graphics.Line(color, list[1], list[2]);
+            Graphics.Line(color, list[2], list[3]);
+            Graphics.Line(color, list[3], list[4]);
+        }
+
+        public void RotateGun(BananaPlayer player)
+        {
+            /* Skip players that have already finished. */
+            if (player.HasFinished)
+            {
+                return;
+            }
+
+            if (player.Input.Left)
+            {
+                Angle -= Constants.Angle;
+            }
+
+            if (player.Input.Right)
+            {
+                Angle += Constants.Angle;
+            }
+        }
+    }
+}
+
+
+################################################################ Body ####################
+
+// Copyright (c) the authors of nanoGames. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt in the project root.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace NanoGames.Games.Banana
+{
+    class Body : BananaPlayer
+    {
+        public double Radius = 4.0;
+
+        public void DrawBody(BananaPlayer player)
+        {
+            Color color = player.Color;
+            //Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), 4.0);
+        }
+
+    }
+}
