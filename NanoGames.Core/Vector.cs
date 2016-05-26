@@ -104,7 +104,19 @@ namespace NanoGames
         /// <returns>The dot product.</returns>
         public static double Dot(Vector a, Vector b)
         {
-            return a.X * b.X + a.Y + b.Y;
+            return a.X * b.X + a.Y * b.Y;
+        }
+
+        /// <summary>
+        /// Returns a new Vector, rotated by the given angle.
+        /// </summary>
+        /// <param name="angle">The angle to rotate.</param>
+        /// <returns>The rotated vector.</returns>
+        public Vector Rotated(double angle)
+        {
+            var ca = Math.Cos(angle);
+            var sa = Math.Sin(angle);
+            return new Vector(ca * X - sa * Y, sa * X + ca * Y);
         }
 
         /// <inheritdoc/>

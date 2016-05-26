@@ -133,6 +133,34 @@ namespace NanoGames
         }
 
         /// <summary>
+        /// Draws a circle segemt.
+        /// </summary>
+        /// <param name="color">The color.</param>
+        /// <param name="center">The center point.</param>
+        /// <param name="radius">The radius.</param>
+        public void CircleSegment(Color color, Vector center, double radius, double startAngle, double endAngle)
+        {
+            if (radius == 0)
+            {
+                return;
+            }
+
+            double angle = endAngle - startAngle;
+
+            int steps = Math.Max(8, (int)Math.Ceiling(Math.Abs(radius) * 2 * Math.PI));
+            for (int i = 0; i < steps; ++i)
+            {
+                var angleA = startAngle + i * angle / steps;
+                var angleB = startAngle + (i + 1) * angle / steps;
+
+                var vectorA = center + new Vector(radius * Math.Cos(angleA), radius * Math.Sin(angleA));
+                var vectorB = center + new Vector(radius * Math.Cos(angleB), radius * Math.Sin(angleB));
+
+                Line(color, vectorA, vectorB);
+            }
+        }
+
+        /// <summary>
         /// Draws a circle.
         /// </summary>
         /// <param name="color">The color.</param>
@@ -140,22 +168,7 @@ namespace NanoGames
         /// <param name="radius">The radius.</param>
         public void Circle(Color color, Vector center, double radius)
         {
-            if (radius == 0)
-            {
-                return;
-            }
-
-            int steps = Math.Max(8, (int)Math.Ceiling(Math.Abs(radius) * 2 * Math.PI));
-            for (int i = 0; i < steps; ++i)
-            {
-                var angleA = i * 2 * Math.PI / steps;
-                var angleB = (i + 1) * 2 * Math.PI / steps;
-
-                var vectorA = center + new Vector(radius * Math.Cos(angleA), radius * Math.Sin(angleA));
-                var vectorB = center + new Vector(radius * Math.Cos(angleB), radius * Math.Sin(angleB));
-
-                Line(color, vectorA, vectorB);
-            }
+            CircleSegment(color, center, radius, 0, 2 * Math.PI);
         }
 
         /// <summary>
