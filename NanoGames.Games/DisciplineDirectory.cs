@@ -18,6 +18,7 @@ namespace NanoGames.Games
             Add<Example.ExampleMatch, Example.ExamplePlayer>("EXAMPLE GAME");
             Add<FallingBlocks.FallingBlocksMatch, FallingBlocks.FallingBlocksPlayer>("FALLING BLOCKS");
             Add<Bomberguy.BomberMatch, Bomberguy.BomberGuy>("BOMBERGUY");
+            Add<NanoSoccer.NanoSoccerMatch, NanoSoccer.NanoSoccerPlayer>("NANO SOCCER");
         }
 
         /// <summary>
