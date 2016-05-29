@@ -219,7 +219,7 @@ namespace NanoGames.Synchronization
                         LocalPlayer.TournamentScore = (int)(LocalPlayer.TournamentScore * _scoreDecay);
 
                         _roundRandom = new Random(_roundSeed);
-                        _voteOptions = _roundRandom.Shuffle(DisciplineDirectory.Disciplines.Take(3));
+                        _voteOptions = _roundRandom.Shuffle(DisciplineDirectory.Disciplines).Take(3).ToList();
                         _voteOptions.Insert(0, null);
                     }
 
