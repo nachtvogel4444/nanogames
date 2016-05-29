@@ -151,7 +151,7 @@ namespace NanoGames.Games.Bomberguy
             foreach (BomberGuy p in Players)
             {
                 playerArray[side, playerCount] = p;
-                if (side++ > 3)
+                if (++side > 3)
                 {
                     side = 0;
                     playerCount++;
