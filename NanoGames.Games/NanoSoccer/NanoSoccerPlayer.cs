@@ -35,15 +35,10 @@ namespace NanoGames.Games.NanoSoccer
                 {
                     /* Always show the current player in white. */
                     color = new Color(1, 1, 1);
-                }
-                else
-                {
-                    color = player.Color;
+                    Graphics.Circle(color, player.Position, Radius - 2);
                 }
 
-                Graphics.Circle(color, player.Position, Radius);
-
-                Graphics.Circle(Team == 0 ? new Color(1, 0, 0) : new Color(0, 0, 1), player.Position, Radius * 0.8d);
+                Graphics.Circle(player.Team == 0 ? new Color(1, 0, 0) : new Color(0, 0, 1), player.Position, Radius);
             }
         }
     }
