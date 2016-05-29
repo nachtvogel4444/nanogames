@@ -188,8 +188,9 @@ namespace NanoGames.Games.Example
                          * Compute the result of a perfectly elastic condition.
                          */
 
-                        player.Velocity = LimitSpeed(player.Velocity + relativeVelocity);
-                        otherPlayer.Velocity = LimitSpeed(otherPlayer.Velocity - relativeVelocity);
+                        var velocityExchange = Vector.Dot(relativeVelocity, relativePosition.Normalized) * relativePosition.Normalized;
+                        player.Velocity = LimitSpeed(player.Velocity + velocityExchange);
+                        otherPlayer.Velocity = LimitSpeed(otherPlayer.Velocity - velocityExchange);
                     }
                 }
             }
