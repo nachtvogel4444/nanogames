@@ -17,6 +17,22 @@
             }
         }
 
+        public double MaximumVelocity
+        {
+            get
+            {
+                return NanoSoccerMatch.MaxBallVelocity;
+            }
+        }
+
+        public double Mass
+        {
+            get
+            {
+                return NanoSoccerMatch.BallMass;
+            }
+        }
+
         public void Draw(Graphics g)
         {
             g.Circle(Colors.White, Position, Radius);

@@ -7,5 +7,9 @@
         double Radius { get; }
 
         Vector Velocity { get; set; }
+
+        double MaximumVelocity { get; }
+
+        double Mass { get; }
     }
 }

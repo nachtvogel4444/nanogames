@@ -2,37 +2,81 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using System;
-using System.Collections.Generic;
 
 namespace NanoGames.Games.NanoSoccer
 {
     internal class NanoSoccerMatch : Match<NanoSoccerPlayer>
     {
+        public const double MaxPlayerVelocity = 0.2;
+        public const double MaxBallVelocity = 1;
+        public const double PlayerMass = 1;
+        public const double BallMass = 0.01;
         private const int _stepsPerFrame = 10;
         private const double _acceleration = 0.001;
-        private const double _maxSpeed = 0.2;
-        private const double _maxBallSpeed = 0.6;
-        private const double _goalEdgeRadius = 5;
+
         private const double _frictionFactor = 0.99;
-        private const double _ballFrictionFactor = 0.997;
-        private const int _leftGoalX = 30;
-        private const int _rightGoalX = 290;
-        private static readonly Vector _topLeftEdge = new Vector(30, 10);
-        private static readonly Vector _topRightEdge = new Vector(290, 10);
-        private static readonly Vector _rightGoalTopEdge = new Vector(_rightGoalX, 70);
-        private static readonly Vector _rightGoalBottomEdge = new Vector(_rightGoalX, 130);
-        private static readonly Vector _bottomRightEdge = new Vector(290, 190);
-        private static readonly Vector _bottomLeftEdge = new Vector(30, 190);
-        private static readonly Vector _leftGoalBottomEdge = new Vector(_leftGoalX, 130);
-        private static readonly Vector _leftGoalTopEdge = new Vector(_leftGoalX, 70);
+        private const double _ballFrictionFactor = 0.9975;
 
-        //private static readonly GoalEdge _rightGoalTopEdge = new GoalEdge(new Vector(295, 70), 5, Math.PI / 2d, Math.PI);
-        //private static readonly GoalEdge _rightGoalBottomEdge = new GoalEdge(new Vector(295, 130), 5, Math.PI, 3 * Math.PI / 2d);
-        //private static readonly GoalEdge _leftGoalBottomEdge = new GoalEdge(new Vector(25, 130), 5, 3 * Math.PI / 2d, 2 * Math.PI);
-        //private static readonly GoalEdge _leftGoalTopEdge = new GoalEdge(new Vector(25, 70), 5, 0, Math.PI / 2d);
-
-        private List<Wall> _walls = new List<Wall>();
+        private Field _field;
         private Ball _ball;
+
+        public void CalculateCircleCollision(Circle c1, Circle c2)
+        {
+            if ((c1.Position - c2.Position).Length < c1.Radius + c2.Radius)
+            {
+                /*
+                 * We overlap with the ball.
+                 * This is only a collision if the objects are moving towards each other, otherwise, let them move apart naturally.
+                 */
+
+                var relativePosition = c1.Position - c2.Position;
+                var relativeVelocity = c1.Velocity - c2.Velocity;
+
+                /* The dot product tells us if the vectors are oriented towards each other. */
+                if (Vector.Dot(relativePosition, relativeVelocity) < 0)
+                {
+                    /*
+                     * The ball is moving towards us, relatively.
+                     * Compute the result of a perfectly elastic condition.
+                     */
+
+                    var velocityExchange = Vector.Dot(relativeVelocity, relativePosition.Normalized) * relativePosition.Normalized;
+                    var massRelation = c2.Mass / (c1.Mass + c2.Mass);
+                    c2.Velocity = LimitSpeed(c2.Velocity + velocityExchange * 2 * (1 - massRelation), c2.MaximumVelocity);
+                    c1.Velocity = LimitSpeed(c1.Velocity - velocityExchange * 2 * massRelation, c1.MaximumVelocity);
+                }
+            }
+        }
+
+        public void CalculateWallCollision(Wall wall, Circle circle)
+        {
+            Vector wallNormal = wall.Length.RotatedRight;
+            Vector playerToWallOrigin = circle.Position - wall.Origin;
+            Vector playerToWallEnd = circle.Position - (wall.Origin + wall.Length);
+            Vector playerToWall = Vector.Dot(wallNormal, playerToWallOrigin) / (wallNormal.Length * wallNormal.Length) * wallNormal;
+            double wallDistance = playerToWall.Length;
+
+            if (wallDistance > circle.Radius)
+                return;
+
+            if (Vector.Dot(playerToWallOrigin, wall.Length) < 0)
+            {
+                return;
+            }
+
+            if (Vector.Dot(playerToWallEnd, wall.Length) > 0)
+            {
+                return;
+            }
+
+            circle.Position += wallNormal.Normalized * (circle.Radius - wallDistance);
+
+            double angle = Math.Acos(Vector.Dot(wall.Length.Normalized, circle.Velocity.Normalized));
+            if (angle < Math.PI)
+            {
+                circle.Velocity = circle.Velocity.Rotated(-(Math.PI + 2 * (Math.PI / 2d - angle)));
+            }
+        }
 
         protected override void Initialize()
         {
@@ -47,7 +91,7 @@ namespace NanoGames.Games.NanoSoccer
                 Players[i].Team = i % 2;
             }
 
-            InitializeWalls();
+            _field = new Field(this);
             _ball = new Ball();
             _ball.Position = new Vector(160, 100);
         }
@@ -73,27 +117,19 @@ namespace NanoGames.Games.NanoSoccer
                 MoveBall();
             }
 
-            /* Draw the field boundaries */
-            /* walls */
-            foreach (var w in _walls)
-            {
-                w.Draw(Graphics);
-            }
-            ///* right goal top edge */
-            //_rightGoalTopEdge.Draw(Graphics);
-            ///* right goal bottom edge */
-            //_rightGoalBottomEdge.Draw(Graphics);
-            ///* left goal bottom edge */
-            //_leftGoalBottomEdge.Draw(Graphics);
-            ///* left goal top edge */
-            //_leftGoalTopEdge.Draw(Graphics);
+            /* Draw the field */
+            _field.Draw(Graphics);
 
+            /* Draw the ball */
+            _ball.Draw(Graphics);
+
+            /* Draw all players */
             foreach (var player in Players)
             {
                 player.DrawScreen();
-                _ball.Draw(player.Graphics);
             }
 
+            /* Check victory condition */
             CheckCompleted();
         }
 
@@ -110,7 +146,7 @@ namespace NanoGames.Games.NanoSoccer
 
         private void CheckCompleted()
         {
-            if (_ball.Position.X + Ball.BallRadius < _leftGoalX)
+            if (_ball.Position.X + Ball.BallRadius < _field.LeftGoalX)
             {
                 /* Blue team (1) has won */
                 foreach (var p in Players)
@@ -120,7 +156,7 @@ namespace NanoGames.Games.NanoSoccer
                 IsCompleted = true;
             }
 
-            if (_ball.Position.X - Ball.BallRadius > _rightGoalX)
+            if (_ball.Position.X - Ball.BallRadius > _field.RightGoalX)
             {
                 /* Red team (0) has won */
                 foreach (var p in Players)
@@ -129,48 +165,6 @@ namespace NanoGames.Games.NanoSoccer
                 }
                 IsCompleted = true;
             }
-        }
-
-        private void InitializeWalls()
-        {
-            /* top wall */
-            _walls.Add(new Wall(_topLeftEdge, _topRightEdge - _topLeftEdge, WallType.SIDE));
-            /* right wall, upper part */
-            //_walls.Add(new Wall(_topRightEdge, _rightGoalTopEdge.Position - new Vector(_rightGoalTopEdge.Radius, 0) - _topRightEdge));
-            _walls.Add(new Wall(_topRightEdge, _rightGoalTopEdge - _topRightEdge, WallType.SIDE));
-
-            /* right goal inner part */
-            //Vector rightGoalTopLeftCorner = _rightGoalTopEdge.Position + new Vector(0, _rightGoalTopEdge.Radius);
-            Vector rightGoalTopLeftCorner = _rightGoalTopEdge;
-            Vector rightGoalTopRightCorner = new Vector(320, rightGoalTopLeftCorner.Y);
-            Vector rightGoalBottomRightCorner = rightGoalTopRightCorner + new Vector(0, 60);
-            Vector rightGoalBottomLeftCorner = rightGoalTopLeftCorner + new Vector(0, 60);
-            _walls.Add(new Wall(rightGoalTopLeftCorner, rightGoalTopRightCorner - rightGoalTopLeftCorner, WallType.RIGHTGOAL));
-            _walls.Add(new Wall(rightGoalTopRightCorner, rightGoalBottomRightCorner - rightGoalTopRightCorner, WallType.RIGHTGOAL));
-            _walls.Add(new Wall(rightGoalBottomRightCorner, rightGoalBottomLeftCorner - rightGoalBottomRightCorner, WallType.RIGHTGOAL));
-            /* right boundary, lower half */
-            //Vector rightLowerBoundaryStart = _rightGoalBottomEdge.Position - new Vector(_rightGoalTopEdge.Radius, 0);
-            //_walls.Add(new Wall(rightLowerBoundaryStart, _bottomRightEdge - rightLowerBoundaryStart));
-            _walls.Add(new Wall(_rightGoalBottomEdge, _bottomRightEdge - _rightGoalBottomEdge, WallType.SIDE));
-            /* bottom boundary */
-            _walls.Add(new Wall(_bottomRightEdge, _bottomLeftEdge - _bottomRightEdge, WallType.SIDE));
-            /* left boundary, lower half */
-            //Vector leftLowerBoundaryEnd = _leftGoalBottomEdge.Position + new Vector(_leftGoalBottomEdge.Radius, 0);
-            //_walls.Add(new Wall(_bottomLeftEdge, leftLowerBoundaryEnd - _bottomLeftEdge));
-            _walls.Add(new Wall(_bottomLeftEdge, _leftGoalBottomEdge - _bottomLeftEdge, WallType.SIDE));
-            /* left goal inner part */
-            //Vector leftGoalBottomRightCorner = _leftGoalBottomEdge.Position - new Vector(0, _rightGoalTopEdge.Radius);
-            Vector leftGoalBottomRightCorner = _leftGoalBottomEdge;
-            Vector leftGoalBottomLeftCorner = new Vector(0, leftGoalBottomRightCorner.Y);
-            Vector leftGoalTopLeftCorner = leftGoalBottomLeftCorner - new Vector(0, 60);
-            Vector leftGoalTopRightCorner = leftGoalBottomRightCorner - new Vector(0, 60);
-            _walls.Add(new Wall(leftGoalBottomRightCorner, leftGoalBottomLeftCorner - leftGoalBottomRightCorner, WallType.LEFTGOAL));
-            _walls.Add(new Wall(leftGoalBottomLeftCorner, leftGoalTopLeftCorner - leftGoalBottomLeftCorner, WallType.LEFTGOAL));
-            _walls.Add(new Wall(leftGoalTopLeftCorner, leftGoalTopRightCorner - leftGoalTopLeftCorner, WallType.LEFTGOAL));
-            /* right boundary, upper half */
-            //Vector leftUpperBoundaryStart = _leftGoalTopEdge.Position + new Vector(_leftGoalTopEdge.Radius, 0);
-            //_walls.Add(new Wall(leftUpperBoundaryStart, _topLeftEdge - leftUpperBoundaryStart));
-            _walls.Add(new Wall(_leftGoalTopEdge, _topLeftEdge - _leftGoalTopEdge, WallType.SIDE));
         }
 
         private void MovePlayer(NanoSoccerPlayer player)
@@ -202,7 +196,7 @@ namespace NanoGames.Games.NanoSoccer
             }
 
             /* Cap the speed at the maximum. */
-            player.Velocity = LimitSpeed(player.Velocity, _maxSpeed);
+            player.Velocity = LimitSpeed(player.Velocity, MaxPlayerVelocity);
 
             /* Decelerate by friction */
             if (!accelerating)
@@ -212,82 +206,20 @@ namespace NanoGames.Games.NanoSoccer
             /* Move the player by their velocity. */
             player.Position += player.Velocity;
 
-            /* Check for collisions with walls. */
-            foreach (var w in _walls)
-            {
-                CalculateWallCollision(w, player);
-            }
-
-            /* Check for collisions with goal edges. */
-            //if ((_rightGoalTopEdge.Position - player.Position).Length < NanoSoccerPlayer.Radius + _rightGoalTopEdge.Radius)
-            //{
-            //    var relativePosition = _rightGoalTopEdge.Position - player.Position;
-            //    var relativeVelocity = -player.Velocity;
-
-            //    /* The dot product tells us if the vectors are oriented towards each other. */
-            //    if (Vector.Dot(relativePosition, relativeVelocity) < 0)
-            //    {
-            //        /*
-            //         * The other player is moving towards us, relatively.
-            //         * Compute the result of a perfectly elastic condition.
-            //         */
-
-            //        player.Velocity = LimitSpeed(player.Velocity + 2 * relativeVelocity);
-            //    }
-            //}
+            /* Check for collisions with field boundaries. */
+            _field.CheckCollisions(player);
 
             /* Check for collisions with other players. */
             foreach (var otherPlayer in Players)
             {
-                if (otherPlayer != player
-                    && (otherPlayer.Position - player.Position).Length < 2 * NanoSoccerPlayer.PlayerRadius)
+                if (otherPlayer != player)
                 {
-                    /*
-                     * We overlap with the other player.
-                     * This is only a collision if the players are moving towards each other, otherwise, let them move apart naturally.
-                     */
-
-                    var relativePosition = otherPlayer.Position - player.Position;
-                    var relativeVelocity = otherPlayer.Velocity - player.Velocity;
-
-                    /* The dot product tells us if the vectors are oriented towards each other. */
-                    if (Vector.Dot(relativePosition, relativeVelocity) < 0)
-                    {
-                        /*
-                         * The other player is moving towards us, relatively.
-                         * Compute the result of a perfectly elastic condition.
-                         */
-
-                        player.Velocity = LimitSpeed(player.Velocity + relativeVelocity, _maxSpeed);
-                        otherPlayer.Velocity = LimitSpeed(otherPlayer.Velocity - relativeVelocity, _maxSpeed);
-                    }
+                    CalculateCircleCollision(player, otherPlayer);
                 }
             }
 
             /* Check for collision with ball */
-
-            if ((_ball.Position - player.Position).Length < Ball.BallRadius + NanoSoccerPlayer.PlayerRadius)
-            {
-                /*
-                 * We overlap with the ball.
-                 * This is only a collision if the objects are moving towards each other, otherwise, let them move apart naturally.
-                 */
-
-                var relativePosition = _ball.Position - player.Position;
-                var relativeVelocity = _ball.Velocity - player.Velocity;
-
-                /* The dot product tells us if the vectors are oriented towards each other. */
-                if (Vector.Dot(relativePosition, relativeVelocity) < 0)
-                {
-                    /*
-                     * The ball is moving towards us, relatively.
-                     * Compute the result of a perfectly elastic condition.
-                     */
-
-                    player.Velocity = LimitSpeed(player.Velocity + relativeVelocity, _maxSpeed);
-                    _ball.Velocity = LimitSpeed(_ball.Velocity - 2 * relativeVelocity, _maxBallSpeed);
-                }
-            }
+            CalculateCircleCollision(_ball, player);
         }
 
         private void MoveBall()
@@ -300,40 +232,7 @@ namespace NanoGames.Games.NanoSoccer
             _ball.Position += _ball.Velocity;
 
             /* Check for collisions with walls. */
-            foreach (var w in _walls)
-            {
-                CalculateWallCollision(w, _ball);
-            }
-        }
-
-        private void CalculateWallCollision(Wall wall, Circle circle)
-        {
-            Vector wallNormal = wall.Length.RotatedRight;
-            Vector playerToWallOrigin = circle.Position - wall.Origin;
-            Vector playerToWallEnd = circle.Position - (wall.Origin + wall.Length);
-            Vector playerToWall = Vector.Dot(wallNormal, playerToWallOrigin) / (wallNormal.Length * wallNormal.Length) * wallNormal;
-            double wallDistance = playerToWall.Length;
-
-            if (wallDistance > circle.Radius)
-                return;
-
-            if (Vector.Dot(playerToWallOrigin, wall.Length) < 0)
-            {
-                return;
-            }
-
-            if (Vector.Dot(playerToWallEnd, wall.Length) > 0)
-            {
-                return;
-            }
-
-            circle.Position += wallNormal.Normalized * (circle.Radius - wallDistance);
-
-            double angle = Math.Acos(Vector.Dot(wall.Length.Normalized, circle.Velocity.Normalized));
-            if (angle < Math.PI)
-            {
-                circle.Velocity = circle.Velocity.Rotated(-(Math.PI + 2 * (Math.PI / 2d - angle)));
-            }
+            _field.CheckCollisions(_ball);
         }
     }
 }

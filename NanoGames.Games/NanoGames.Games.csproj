@@ -61,7 +61,8 @@
     <Compile Include="Discipline{TMatch,TPlayer}.cs" />
     <Compile Include="NanoSoccer\Ball.cs" />
     <Compile Include="NanoSoccer\Circle.cs" />
-    <Compile Include="NanoSoccer\GoalEdge.cs" />
+    <Compile Include="NanoSoccer\Field.cs" />
+    <Compile Include="NanoSoccer\Goalpost.cs" />
     <Compile Include="NanoSoccer\NanoSoccerMatch.cs" />
     <Compile Include="NanoSoccer\NanoSoccerPlayer.cs" />
     <Compile Include="Example\ExampleMatch.cs" />

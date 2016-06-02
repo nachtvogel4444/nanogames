@@ -25,6 +25,22 @@ namespace NanoGames.Games.NanoSoccer
             get; set;
         }
 
+        public double MaximumVelocity
+        {
+            get
+            {
+                return NanoSoccerMatch.MaxPlayerVelocity;
+            }
+        }
+
+        public double Mass
+        {
+            get
+            {
+                return NanoSoccerMatch.PlayerMass;
+            }
+        }
+
         public void DrawScreen()
         {
             /* Draw each player. */
