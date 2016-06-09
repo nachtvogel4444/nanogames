@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) the authors of nanoGames. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt in the project root.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,23 +11,29 @@ namespace NanoGames.Games.Banana
 {
     internal class Bullet
     {
-        public double X0;
-        public double Y0;
-        public double Vx0;
-        public double Vy0;
-        public bool IsExploded = false;
-        public int LifeTime = 0;
-        public double X;
-        public double Y;
-        public double Vx;
-        public double Vy;
+        public Vector StartPosition;
+        public Vector Position;
+        public Vector PostionTail;
+        public Vector StartVelocity;
+        public Vector Velocity;
+        private Vector Accelaration;
+        public double LifeTime;
+        public bool IsExploded;
+
+        public Bullet(Vector startPosition, double angle, double velocity)
+        {
+            StartPosition = startPosition;
+            StartVelocity = velocity * new Vector(Math.Cos(angle), -Math.Sin(angle));
+            Accelaration = new Vector(0, Constants.Gravity);
+            LifeTime = 0;
+            IsExploded = false;
+        }
 
         public void MoveBullet()
         {
-            X = X0 + Vx0 * LifeTime;
-            Y = Y0 + Vy0 * LifeTime + 0.5 * Constants.Gravity * LifeTime * LifeTime;
-            Vx = Vx0;
-            Vy = Vy0 + Constants.Gravity * LifeTime;
+            Position = StartPosition + LifeTime * StartVelocity + 0.5 * LifeTime * LifeTime * Accelaration;
+            Velocity = StartVelocity + LifeTime * Accelaration;
+            PostionTail = Position - Velocity;
             LifeTime++;
         }
     }

@@ -22,7 +22,8 @@ namespace NanoGames.Games.Banana
             for (int i = 0; i < Players.Count; ++i)
             {
                 Players[i].Position = new Vector(start, 100);
-                Players[i].Angle = 0.0;
+                Players[i].Angle = 0;
+                Players[i].SpeedBullet = Constants.SpeedBullet;
             }
         }
 
@@ -38,6 +39,7 @@ namespace NanoGames.Games.Banana
 
             foreach (var player in Players)
             {
+                MovePlayer(player);
                 RotatePlayer(player);
                 ShootGun(player, BulletList);
             }
@@ -50,7 +52,7 @@ namespace NanoGames.Games.Banana
             FrameCounter++;
         }
 
-        private void RotatePlayer(BananaPlayer player)
+        private void MovePlayer(BananaPlayer player)
         {
             /* Skip players that have already finished. */
             if (player.HasFinished)
@@ -60,12 +62,64 @@ namespace NanoGames.Games.Banana
 
             if (player.Input.Left)
             {
-                player.Angle -= Constants.StepAngle;
+                player.Position -= new Vector(Constants.StepPlayer, 0);
             }
 
             if (player.Input.Right)
             {
-                player.Angle += Constants.StepAngle;
+                player.Position += new Vector(Constants.StepPlayer, 0);
+            }
+        }
+
+        private void RotatePlayer(BananaPlayer player)
+        {
+            /* Skip players that have already finished. */
+            if (player.HasFinished)
+            {
+                return;
+            }
+
+            if (player.Angle < 0)
+            {
+                player.Angle = 2 * Math.PI + player.Angle;
+            }
+
+            if (player.Angle > 2 * Math.PI)
+            {
+                player.Angle = player.Angle - 2 * Math.PI;
+            }
+            
+            if (player.Input.AltFire)
+            {
+                player.GunIsRight = !player.GunIsRight;
+                player.Angle = Math.PI - player.Angle;
+            }
+
+            if (player.Input.Up)
+            {
+                if (((player.Angle >= 0) && (player.Angle <= 0.5 * Math.PI)) || ((player.Angle >= 1.5 * Math.PI) && (player.Angle <= 2 * Math.PI)))
+                {
+                    player.Angle += Constants.StepAngle;
+                }
+
+                if (player.Angle > 0.5 * Math.PI && player.Angle < 1.5 * Math.PI)
+                {
+                    player.Angle -= Constants.StepAngle;
+                }
+            }
+
+            if (player.Input.Down)
+            {
+                if (((player.Angle >= 0) && (player.Angle <= 0.5 * Math.PI)) || ((player.Angle >= 1.5 * Math.PI) && (player.Angle <= 2 * Math.PI)))
+                {
+                    player.Angle -= Constants.StepAngle;
+                }
+
+                if (player.Angle > 0.5 * Math.PI && player.Angle < 1.5 * Math.PI)
+                {
+                    player.Angle += Constants.StepAngle;
+                }
+                
             }
         }
 
@@ -81,22 +135,14 @@ namespace NanoGames.Games.Banana
             {
                 if (bulletList.Count == 0)
                 {
-                    bulletList.Add(new Bullet());
-                    bulletList[bulletList.Count - 1].X0 = player.Position.X;
-                    bulletList[bulletList.Count - 1].Y0 = player.Position.Y;
-                    bulletList[bulletList.Count - 1].Vx0 = Constants.SpeedBullet * Math.Cos(player.Angle);
-                    bulletList[bulletList.Count - 1].Vy0 = Constants.SpeedBullet * Math.Sin(player.Angle);
+                    bulletList.Add(new Bullet(player.Position, player.Angle, player.SpeedBullet));
                 }
 
                 else
                 {
-                    if (bulletList[bulletList.Count - 1].LifeTime > Constants.WaitBullet)
+                    if (bulletList[bulletList.Count - 1].LifeTime > Constants.WaitToNextBullet)
                         {
-                            bulletList.Add(new Bullet());
-                            bulletList[bulletList.Count - 1].X0 = player.Position.X;
-                            bulletList[bulletList.Count - 1].Y0 = player.Position.Y;
-                            bulletList[bulletList.Count - 1].Vx0 = Constants.SpeedBullet * Math.Cos(player.Angle);
-                            bulletList[bulletList.Count - 1].Vy0 = Constants.SpeedBullet * Math.Sin(player.Angle);
+                            bulletList.Add(new Bullet(player.Position, player.Angle, player.SpeedBullet));
                         }
                 }
             }

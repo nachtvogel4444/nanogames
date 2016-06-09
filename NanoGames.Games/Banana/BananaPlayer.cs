@@ -11,10 +11,17 @@ namespace NanoGames.Games.Banana
 {
     class BananaPlayer : Player<BananaMatch>
     {
-        public Methods methods = new Methods();
         public Vector Position;
         public double Angle;
-        
+        public double SpeedBullet;
+        public bool GunIsRight = true;
+        private Polygon StartPolygonGun = new Polygon(new Vector[] {
+            new Vector(-Constants.RadiusPlayer, -Constants.ThicknessGun),
+            new Vector(1.2 * Constants.RadiusPlayer, -Constants.ThicknessGun),
+            new Vector(1.2 * Constants.RadiusPlayer, Constants.ThicknessGun),
+            new Vector(-Constants.RadiusPlayer, Constants.ThicknessGun),
+        }, false);
+        private int endIndex = 0;    
         public bool HasFinished = false;
 
         public void DrawScreen()
@@ -39,31 +46,35 @@ namespace NanoGames.Games.Banana
                     color = player.Color;
                 }
                 
+                /* Draw the body of the player. */
                 Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), Constants.RadiusPlayer);
-                
-                List<Vector> list = methods.RotateRectangle(
-                    new Vector(-Constants.RadiusPlayer, -Constants.ThicknessGun),
-                    new Vector(1.2 * Constants.RadiusPlayer, Constants.ThicknessGun),
-                    new Vector(0, 0),
-                    Angle);
 
-                for (int i = 0; i <= 2; i++)
+                /* Draw the Gun of the player. */
+                Polygon newPolygonGun = StartPolygonGun.RotatePolygon(player.Angle);
+                if (StartPolygonGun.IsClosed)
                 {
-                    Graphics.Line(color, methods.ShiftPoint(list[i], player.Position), methods.ShiftPoint(list[i+1], player.Position));
+                    endIndex = StartPolygonGun.Count() - 1;
+                }
+                if (!StartPolygonGun.IsClosed)
+                {
+                    endIndex = StartPolygonGun.Count() - 2;
+                }
+                
+                for (int i = 0; i <= endIndex ; i++)
+                {
+                    Graphics.Line(color, player.Position + newPolygonGun[i], player.Position + newPolygonGun[i + 1]);
                 }
             }
 
+            /* Draw all the bullets. */
             foreach (Bullet bullet in Match.BulletList)
             {
                 if (bullet.IsExploded)
                 {
                     continue;
                 }
-
-                Vector bulletTip = new Vector(bullet.X, bullet.Y);
-                Vector bulletTail = new Vector(bullet.X - Constants.LengthBullet * bullet.Vx, 
-                    bullet.Y - Constants.LengthBullet * bullet.Vy);
-                Graphics.Line(new Color(1, 1, 1), bulletTip, bulletTail);
+                
+                Graphics.Line(new Color(1, 1, 1), bullet.Position, bullet.PostionTail);
             }
         }
     }
