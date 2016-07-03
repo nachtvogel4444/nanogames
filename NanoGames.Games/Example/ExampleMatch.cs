@@ -116,24 +116,31 @@ namespace NanoGames.Games.Example
                 return;
             }
 
+            var acceleration = default(Vector);
+
             if (player.Input.Up.IsPressed)
             {
-                player.Velocity.Y -= _acceleration;
+                acceleration.Y -= 1;
             }
 
             if (player.Input.Down.IsPressed)
             {
-                player.Velocity.Y += _acceleration;
+                acceleration.Y += 1;
             }
 
             if (player.Input.Left.IsPressed)
             {
-                player.Velocity.X -= _acceleration;
+                acceleration.X -= 1;
             }
 
             if (player.Input.Right.IsPressed)
             {
-                player.Velocity.X += _acceleration;
+                acceleration.X += 1;
+            }
+
+            if (acceleration != default(Vector))
+            {
+                player.Velocity += _acceleration * acceleration.Normalized;
             }
 
             /* Cap the speed at the maximum. */
