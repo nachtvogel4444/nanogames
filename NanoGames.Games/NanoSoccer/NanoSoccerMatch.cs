@@ -8,14 +8,14 @@ namespace NanoGames.Games.NanoSoccer
     internal class NanoSoccerMatch : Match<NanoSoccerPlayer>
     {
         public const double MaxPlayerVelocity = 0.2;
-        public const double MaxBallVelocity = 1;
+        public const double MaxBallVelocity = 0.5;
         public const double PlayerMass = 1;
-        public const double BallMass = 0.01;
+        public const double BallMass = 0.005;
         private const int _stepsPerFrame = 10;
-        private const double _acceleration = 0.001;
-
-        private const double _frictionFactor = 0.99;
-        private const double _ballFrictionFactor = 0.9975;
+        private const double _acceleration = 0.0015;
+        private const double _playerFriction = 0.0001;
+        private const double _ballFriction = 0.0001;
+        private const double _ballDrag = 0.0025;
 
         private Field _field;
         private Ball _ball;
@@ -167,42 +167,52 @@ namespace NanoGames.Games.NanoSoccer
             }
         }
 
+        private Vector ApplyFriction(Vector velocity, double friction)
+        {
+            if (velocity != default(Vector))
+            {
+                double v = velocity.Length;
+                velocity *= Math.Max(0, v - friction) / v;
+            }
+
+            return velocity;
+        }
+
         private void MovePlayer(NanoSoccerPlayer player)
         {
-            bool accelerating = false;
+            /* Decelerate by friction */
+            player.Velocity = ApplyFriction(player.Velocity, _playerFriction);
+
+            var acceleration = default(Vector);
 
             if (player.Input.Up.IsPressed)
             {
-                accelerating = true;
-                player.Velocity -= new Vector(0, _acceleration);
+                acceleration -= new Vector(0, 1);
             }
 
             if (player.Input.Down.IsPressed)
             {
-                accelerating = true;
-                player.Velocity += new Vector(0, _acceleration);
+                acceleration += new Vector(0, 1);
             }
 
             if (player.Input.Left.IsPressed)
             {
-                accelerating = true;
-                player.Velocity -= new Vector(_acceleration, 0);
+                acceleration -= new Vector(1, 0);
             }
 
             if (player.Input.Right.IsPressed)
             {
-                accelerating = true;
-                player.Velocity += new Vector(_acceleration, 0);
+                acceleration += new Vector(1, 0);
+            }
+
+            if (acceleration != default(Vector))
+            {
+                player.Velocity += _acceleration * acceleration.Normalized;
             }
 
             /* Cap the speed at the maximum. */
             player.Velocity = LimitSpeed(player.Velocity, MaxPlayerVelocity);
 
-            /* Decelerate by friction */
-            if (!accelerating)
-            {
-                player.Velocity *= _frictionFactor;
-            }
             /* Move the player by their velocity. */
             player.Position += player.Velocity;
 
@@ -226,7 +236,7 @@ namespace NanoGames.Games.NanoSoccer
         {
             /* Decelerate by friction */
 
-            _ball.Velocity *= _ballFrictionFactor;
+            _ball.Velocity = ApplyFriction(_ball.Velocity, _ballFriction + _ball.Velocity.SquaredLength * _ballDrag);
 
             /* Move the ball by their velocity. */
             _ball.Position += _ball.Velocity;

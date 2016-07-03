@@ -36,6 +36,7 @@ namespace NanoGames.Games.NanoSoccer
 
         private List<Wall> _walls = new List<Wall>();
         private List<Goalpost> _posts = new List<Goalpost>();
+        private List<FieldLine> _lines = new List<FieldLine>();
 
         private NanoSoccerMatch _match;
 
@@ -74,6 +75,11 @@ namespace NanoGames.Games.NanoSoccer
             foreach (var p in _posts)
             {
                 p.Draw(g);
+            }
+
+            foreach (var l in _lines)
+            {
+                l.Draw(g);
             }
         }
 
@@ -121,6 +127,10 @@ namespace NanoGames.Games.NanoSoccer
             _posts.Add(_leftGoalBottomPost);
             _posts.Add(_rightGoalTopPost);
             _posts.Add(_rightGoalBottomPost);
+
+            _lines.Add(new FieldLine(_leftGoalTop, _leftGoalBottom));
+            _lines.Add(new FieldLine(_rightGoalTop, _rightGoalBottom));
+            _lines.Add(new FieldLine(0.5 * (_bottomLeftEdge + _bottomRightEdge), 0.5 * (_topLeftEdge + _topRightEdge)));
         }
     }
 }
