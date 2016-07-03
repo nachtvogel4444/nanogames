@@ -1,4 +1,7 @@
-﻿namespace NanoGames.Games.NanoSoccer
+﻿// Copyright (c) the authors of nanoGames. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt in the project root.
+
+namespace NanoGames.Games.NanoSoccer
 {
     internal interface Circle
     {

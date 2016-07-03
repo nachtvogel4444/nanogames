@@ -133,11 +133,13 @@ namespace NanoGames
         }
 
         /// <summary>
-        /// Draws a circle segemt.
+        /// Draws a circle segment.
         /// </summary>
         /// <param name="color">The color.</param>
         /// <param name="center">The center point.</param>
         /// <param name="radius">The radius.</param>
+        /// <param name="startAngle">The start angle of the segment.</param>
+        /// <param name="endAngle">The end angle of the segment.</param>
         public void CircleSegment(Color color, Vector center, double radius, double startAngle, double endAngle)
         {
             if (radius == 0)

@@ -1,4 +1,7 @@
-﻿using NanoGames.Engine.OpenGLWrappers;
+﻿// Copyright (c) the authors of nanoGames. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt in the project root.
+
+using NanoGames.Engine.OpenGLWrappers;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Diagnostics;
