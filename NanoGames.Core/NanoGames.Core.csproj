@@ -53,6 +53,7 @@
     <Compile Include="DebugMode.cs" />
     <Compile Include="Font.cs" />
     <Compile Include="Glyph.cs" />
+    <Compile Include="InputState.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="IRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

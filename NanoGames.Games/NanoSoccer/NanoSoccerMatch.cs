@@ -171,25 +171,25 @@ namespace NanoGames.Games.NanoSoccer
         {
             bool accelerating = false;
 
-            if (player.Input.Up)
+            if (player.Input.Up.IsPressed)
             {
                 accelerating = true;
                 player.Velocity -= new Vector(0, _acceleration);
             }
 
-            if (player.Input.Down)
+            if (player.Input.Down.IsPressed)
             {
                 accelerating = true;
                 player.Velocity += new Vector(0, _acceleration);
             }
 
-            if (player.Input.Left)
+            if (player.Input.Left.IsPressed)
             {
                 accelerating = true;
                 player.Velocity -= new Vector(_acceleration, 0);
             }
 
-            if (player.Input.Right)
+            if (player.Input.Right.IsPressed)
             {
                 accelerating = true;
                 player.Velocity += new Vector(_acceleration, 0);

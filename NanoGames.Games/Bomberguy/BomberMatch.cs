@@ -221,7 +221,7 @@ namespace NanoGames.Games.Bomberguy
             Vector inputVector = GetInputVector(p.Input);
             inputVector = inputVector.Normalized;
 
-            if (p.Input.Up && !p.Input.Down)
+            if (p.Input.Up.IsPressed && !p.Input.Down.IsPressed)
             {
                 var neighborLeft = this[GetCell(p.Position + new Vector(0, _playerSpeed * inputVector.Y))];
                 bool neighborLeftPassable = neighborLeft == null;
@@ -251,7 +251,7 @@ namespace NanoGames.Games.Bomberguy
                     x = slideToRightAllowed ? 1 : slideToLeftAllowed ? -1 : x;
                 }
             }
-            if (p.Input.Down && !p.Input.Up)
+            if (p.Input.Down.IsPressed && !p.Input.Up.IsPressed)
             {
                 var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, _playerSpeed * inputVector.Y))];
                 bool neighborLeftPassable = neighborLeft == null;
@@ -281,7 +281,7 @@ namespace NanoGames.Games.Bomberguy
                     x = slideToRightAllowed ? 1 : slideToLeftAllowed ? -1 : x;
                 }
             }
-            if (p.Input.Left && !p.Input.Right)
+            if (p.Input.Left.IsPressed && !p.Input.Right.IsPressed)
             {
                 var neighborAbove = this[GetCell(p.Position + new Vector(_playerSpeed * inputVector.X, 0))];
                 bool neighborAbovePassable = neighborAbove == null;
@@ -311,7 +311,7 @@ namespace NanoGames.Games.Bomberguy
                     y = slideToDownAllowed ? 1 : slideToUpAllowed ? -1 : y;
                 }
             }
-            if (p.Input.Right && !p.Input.Left)
+            if (p.Input.Right.IsPressed && !p.Input.Left.IsPressed)
             {
                 var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed * inputVector.X, 0))];
                 bool neighborAbovePassable = neighborAbove == null;
@@ -351,10 +351,10 @@ namespace NanoGames.Games.Bomberguy
         private Vector GetInputVector(Input input)
         {
             Vector v = new Vector();
-            if (input.Up && !input.Down) v.Y = -1;
-            if (input.Down && !input.Up) v.Y = 1;
-            if (input.Left && !input.Right) v.X = -1;
-            if (input.Right && !input.Left) v.X = 1;
+            if (input.Up.IsPressed && !input.Down.IsPressed) v.Y = -1;
+            if (input.Down.IsPressed && !input.Up.IsPressed) v.Y = 1;
+            if (input.Left.IsPressed && !input.Right.IsPressed) v.X = -1;
+            if (input.Right.IsPressed && !input.Left.IsPressed) v.X = 1;
 
             return v;
         }
@@ -375,7 +375,7 @@ namespace NanoGames.Games.Bomberguy
 
         private void DropBomb(BomberGuy p)
         {
-            if (!p.Input.Fire) return;
+            if (!p.Input.Fire.WasActivated) return;
 
             var cell = GetCell(p);
 

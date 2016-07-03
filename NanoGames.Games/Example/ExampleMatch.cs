@@ -116,22 +116,22 @@ namespace NanoGames.Games.Example
                 return;
             }
 
-            if (player.Input.Up)
+            if (player.Input.Up.IsPressed)
             {
                 player.Velocity.Y -= _acceleration;
             }
 
-            if (player.Input.Down)
+            if (player.Input.Down.IsPressed)
             {
                 player.Velocity.Y += _acceleration;
             }
 
-            if (player.Input.Left)
+            if (player.Input.Left.IsPressed)
             {
                 player.Velocity.X -= _acceleration;
             }
 
-            if (player.Input.Right)
+            if (player.Input.Right.IsPressed)
             {
                 player.Velocity.X += _acceleration;
             }

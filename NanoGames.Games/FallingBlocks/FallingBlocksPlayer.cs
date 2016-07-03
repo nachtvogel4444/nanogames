@@ -24,13 +24,9 @@ namespace NanoGames.Games.FallingBlocks
 
         private byte[][,] _fallingPiece;
 
-        private KeyRepeater _rotationRepeater = new KeyRepeater(6);
-        private KeyRepeater _leftRepeater = new KeyRepeater(6);
-        private KeyRepeater _rightRepeater = new KeyRepeater(6);
-        private KeyRepeater _slowDropRepeater = new KeyRepeater(6);
-        private KeyRepeater _fastDropRepeater = new KeyRepeater(12);
-        private KeyRepeater _lockInRepeater = new KeyRepeater(12);
-        private KeyRepeater _lastCallLockInRepeater = new KeyRepeater(300);
+        private int _lockInFrame = 0;
+
+        private int _lastResortLockInFrame = 0;
 
         private int _lastGravityFrame = 0;
 
@@ -99,67 +95,60 @@ namespace NanoGames.Games.FallingBlocks
 
                 _fallingPieceY = -_fallingPiece[_fallingPieceRotation].GetLength(1);
 
-                _lockInRepeater.Block(Match.Frame);
-                _lastCallLockInRepeater.Block(Match.Frame);
+                _lockInFrame = Match.Frame + Constants.LockInDelayFrames;
+                _lastResortLockInFrame = Match.Frame + Constants.LastResortLockInDelayFrames;
             }
 
             if (_fallingPiece != null)
             {
-                if (_leftRepeater.IsPressed(Match.Frame, Input.Left))
+                if (Input.Left.WasActivated)
                 {
-                    if (!TryToMove(_fallingPieceX - 1, _fallingPieceY, _fallingPieceRotation))
+                    if (TryToMove(_fallingPieceX - 1, _fallingPieceY, _fallingPieceRotation))
                     {
-                        _leftRepeater.Release();
-                    }
-                    else
-                    {
-                        _lockInRepeater.Block(Match.Frame);
+                        SetHasMoved();
                     }
                 }
 
-                if (_rightRepeater.IsPressed(Match.Frame, Input.Right))
+                if (Input.Right.WasActivated)
                 {
-                    if (!TryToMove(_fallingPieceX + 1, _fallingPieceY, _fallingPieceRotation))
+                    if (TryToMove(_fallingPieceX + 1, _fallingPieceY, _fallingPieceRotation))
                     {
-                        _rightRepeater.Release();
-                    }
-                    else
-                    {
-                        _lockInRepeater.Block(Match.Frame);
+                        SetHasMoved();
                     }
                 }
 
-                if (_rotationRepeater.IsPressed(Match.Frame, Input.Up))
+                if (Input.Up.WasActivated)
                 {
                     int rotation = (_fallingPieceRotation + 3) % 4;
                     int x = _fallingPieceX + (_fallingPiece[_fallingPieceRotation].GetLength(0) - _fallingPiece[rotation].GetLength(0)) / 2;
                     int y = _fallingPieceY + (_fallingPiece[_fallingPieceRotation].GetLength(1) - _fallingPiece[rotation].GetLength(1)) / 2;
 
-                    if (!TryToMove(x, y, rotation)
-                        && !TryToMove(x, y - 1, rotation)
-                        && !(_fallingPiece[rotation].GetLength(1) > 3 && TryToMove(x, y - 2, rotation))
-                        && !TryToMove(x + 1, y, rotation)
-                        && !TryToMove(x - 1, y, rotation)
-                        && !(_fallingPiece[rotation].GetLength(0) > 3 && TryToMove(x - 2, y, rotation)))
+                    if (TryToMove(x, y, rotation)
+                        || TryToMove(x, y - 1, rotation)
+                        || (_fallingPiece[rotation].GetLength(1) > 3 && TryToMove(x, y - 2, rotation))
+                        || TryToMove(x + 1, y, rotation)
+                        || TryToMove(x - 1, y, rotation)
+                        || (_fallingPiece[rotation].GetLength(0) > 3 && TryToMove(x - 2, y, rotation)))
                     {
-                        _rotationRepeater.Release();
-                    }
-                    else
-                    {
-                        _lockInRepeater.Block(Match.Frame);
+                        SetHasMoved();
                     }
                 }
 
-                if (_slowDropRepeater.IsPressed(Match.Frame, Input.Down) || _lastGravityFrame + Match.FallSpeed <= Match.Frame)
+                if (Input.Down.WasActivated || _lastGravityFrame + Match.FallSpeed <= Match.Frame)
                 {
-                    DropOne();
+                    DropOne(false);
                 }
 
-                if (_fastDropRepeater.IsPressed(Match.Frame, Input.Fire))
+                if (Match.Frame >= _lockInFrame)
+                {
+                    DropOne(true);
+                }
+
+                if (Input.Fire.WasActivated || Match.Frame >= _lastResortLockInFrame)
                 {
                     while (!HasLost && _fallingPiece != null)
                     {
-                        DropOne();
+                        DropOne(true);
                     }
                 }
             }
@@ -210,6 +199,11 @@ namespace NanoGames.Games.FallingBlocks
             }
         }
 
+        private void SetHasMoved()
+        {
+            _lockInFrame = Match.Frame + Constants.LockInDelayFrames;
+        }
+
         private void SetLost()
         {
             if (!_hasLost)
@@ -219,19 +213,19 @@ namespace NanoGames.Games.FallingBlocks
             }
         }
 
-        private void DropOne()
+        private void DropOne(bool allowLockIn)
         {
-            if (_fallingPiece == null) return;
+            if (_fallingPiece == null || HasLost) return;
 
             _lastGravityFrame = Match.Frame;
 
             if (TryToMove(_fallingPieceX, _fallingPieceY + 1, _fallingPieceRotation))
             {
-                _lockInRepeater.Block(Match.Frame);
+                SetHasMoved();
                 return;
             }
 
-            if (_lockInRepeater.IsBlocked(Match.Frame) && !Input.Down && !Input.Fire && _lastCallLockInRepeater.IsBlocked(Match.Frame))
+            if (!allowLockIn)
             {
                 return;
             }

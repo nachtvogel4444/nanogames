@@ -68,7 +68,7 @@ namespace NanoGames.Synchronization
         /// <param name="frame">The frame for which to set the input.</param>
         /// <param name="playerIndex">The index of the player for which to set the input.</param>
         /// <param name="input">The player's input.</param>
-        public void SetInput(int frame, int playerIndex, Input input)
+        public void SetInput(int frame, int playerIndex, InputState input)
         {
             if (frame <= _knownFrame)
             {
@@ -233,9 +233,9 @@ namespace NanoGames.Synchronization
         {
             public bool IsKnown;
 
-            public Input Input;
+            public InputState Input;
 
-            public PlayerInputState(bool isKnown, Input input)
+            public PlayerInputState(bool isKnown, InputState input)
             {
                 IsKnown = isKnown;
                 Input = input;

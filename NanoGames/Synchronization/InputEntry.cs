@@ -21,7 +21,7 @@ namespace NanoGames.Synchronization
         /// The input.
         /// </summary>
         [ProtoMember(2)]
-        public Input Input;
+        public InputState Input;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InputEntry"/> class.
@@ -35,7 +35,7 @@ namespace NanoGames.Synchronization
         /// </summary>
         /// <param name="frame">The frame index.</param>
         /// <param name="input">The input.</param>
-        public InputEntry(int frame, Input input)
+        public InputEntry(int frame, InputState input)
         {
             Frame = frame;
             Input = input;

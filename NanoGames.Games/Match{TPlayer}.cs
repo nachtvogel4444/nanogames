@@ -71,7 +71,7 @@ namespace NanoGames.Games
             for (int i = 0; i < Players.Count; ++i)
             {
                 Players[i].Graphics = playerDescriptions[i].Graphics ?? Graphics.Null;
-                Players[i].Input = playerDescriptions[i].Input;
+                Players[i].Input.SetState(Frame, playerDescriptions[i].Input);
             }
 
             ++Frame;

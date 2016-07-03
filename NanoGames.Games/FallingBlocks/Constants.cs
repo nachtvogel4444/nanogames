@@ -12,6 +12,10 @@ namespace NanoGames.Games.FallingBlocks
 
         public const double FallAcceleration = 0.05;
 
+        public const int LockInDelayFrames = 30;
+
+        public const int LastResortLockInDelayFrames = 600;
+
         /// <summary>
         /// The playing field width, in blocks.
         /// </summary>

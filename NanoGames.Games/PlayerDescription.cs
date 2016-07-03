@@ -21,7 +21,7 @@ namespace NanoGames.Games
         /// <summary>
         /// Gets or sets the player's input.
         /// </summary>
-        public Input Input { get; set; }
+        public InputState Input { get; set; }
 
         /// <summary>
         /// Gets or sets the player's name.

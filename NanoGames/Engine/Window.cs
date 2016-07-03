@@ -201,12 +201,12 @@ namespace NanoGames.Engine
             _keyEvents.Clear();
         }
 
-        private Input GetInput()
+        private InputState GetInput()
         {
             var hasFocus = _gameWindow.Focused;
             var keyboardState = hasFocus ? Keyboard.GetState() : default(KeyboardState);
 
-            var input = default(Input);
+            var input = default(InputState);
             input.Up = hasFocus && keyboardState[Key.Up];
             input.Down = hasFocus && keyboardState[Key.Down];
             input.Left = hasFocus && keyboardState[Key.Left];
