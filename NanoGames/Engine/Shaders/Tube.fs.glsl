@@ -3,15 +3,27 @@
 
 #version 430
 
-layout(location = 0) uniform sampler2D ScreenTexture;
+layout(location = 0) uniform sampler2D BlurTexture;
+layout(location = 1) uniform sampler2D ScreenTexture;
 
 in vec2 FragmentTextureCoordinate;
 
 out vec4 OutputColor;
 
-vec4 fetch(vec2 coord)
+vec3 gammaCorrect(vec3 color)
 {
-	return (1.0 +  0.2 * sin(200 * 2 * 3.14159265359 * coord.y)) * texture2D(ScreenTexture, coord);
+	color *= 1.5;
+	return vec3(pow(color.r, 2.2), pow(color.g, 2.2), pow(color.b, 2.2));
+}
+
+vec3 screenTexture(vec2 coord)
+{
+	return texture2D(ScreenTexture, coord).rgb + texture2D(BlurTexture, coord).rgb;
+}
+
+float matrixTexture(float y)
+{
+	return 1.0 +  0.25 * sin(200 * 2 * 3.14159265359 * y);
 }
 
 void main()
@@ -26,14 +38,13 @@ void main()
 	float f = xt / xs * d * r;
 	vec2 textureCoordinate = FragmentTextureCoordinate * f * 0.5 + vec2(0.5, 0.5);
 
-	float cr = fetch(textureCoordinate + 0.001 * vec2(-0.988, 0.154)).r;
-	float cg = fetch(textureCoordinate + 0.001 * vec2(0, -1)).g;
-	float cb = fetch(textureCoordinate + 0.001 * vec2(0.988, 0.154)).b;
+	float cr = screenTexture(textureCoordinate + 0.0005 * vec2(0.866, 0.5)).r;
+	float cg = screenTexture(textureCoordinate + 0.0005 * vec2(0, -1)).g;
+	float cb = screenTexture(textureCoordinate + 0.0005 * vec2(-0.866, 0.5)).b;
+	
+	float m = matrixTexture(textureCoordinate.y);
+	
 
 	/* Sample the input at slight offsets to simulate a slight chromatic aberration. */
-	OutputColor = vec4(
-		0.94 * cr + 0.03 * cg + 0.03 * cb,
-		0.03 * cr + 0.94 * cg + 0.03 * cb,
-		0.03 * cr + 0.03 * cg + 0.94 * cb,
-		1);
+	OutputColor = vec4(m * gammaCorrect(vec3(cr, cg, cb)), 1);
 }

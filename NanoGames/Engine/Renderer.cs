@@ -41,8 +41,7 @@ namespace NanoGames.Engine
         private readonly PreProcessor _preProcessor = new PreProcessor();
         private readonly PostProcessor _postProcessor = new PostProcessor();
 
-        private readonly int _framebufferId;
-        private readonly int _frameTextureId;
+        private readonly Framebuffer _framebuffer;
 
         private int _width;
         private int _height;
@@ -57,26 +56,13 @@ namespace NanoGames.Engine
         /// </summary>
         public Renderer()
         {
-            _framebufferId = GL.GenFramebuffer();
-            _frameTextureId = GL.GenTexture();
-
-            GL.BindTexture(TextureTarget.Texture2D, _frameTextureId);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToBorder);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToBorder);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBorderColor, new float[] { 0, 0, 0, 0 });
-
-            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, _framebufferId);
-            GL.FramebufferTexture(FramebufferTarget.DrawFramebuffer, FramebufferAttachment.ColorAttachment0, _frameTextureId, 0);
-
-            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+            _framebuffer = new Framebuffer();
         }
 
         /// <inheritdoc/>
         public void Dispose()
         {
-            GL.DeleteFramebuffer(_framebufferId);
+            _framebuffer.Dispose();
             _postProcessor.Dispose();
             _preProcessor.Dispose();
             _pointVertexArray.Dispose();
@@ -111,8 +97,7 @@ namespace NanoGames.Engine
             {
                 _width = width;
                 _height = height;
-                GL.BindTexture(TextureTarget.Texture2D, _frameTextureId);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba32f, width, height, 0, PixelFormat.Rgba, PixelType.Float, IntPtr.Zero);
+                _framebuffer.SetSize(width, height);
             }
 
             _lineBuffer.Clear();
@@ -142,7 +127,7 @@ namespace NanoGames.Engine
         /// </summary>
         public void EndFrame()
         {
-            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, _framebufferId);
+            _framebuffer.BindFramebuffer();
 
             GL.Viewport(0, 0, _width, _height);
             _preProcessor.Clear();
@@ -164,10 +149,9 @@ namespace NanoGames.Engine
 
             GL.Disable(EnableCap.Blend);
 
-            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+            Framebuffer.Unbind();
 
-            GL.BindTexture(TextureTarget.Texture2D, _frameTextureId);
-            _postProcessor.EndFrame();
+            _postProcessor.EndFrame(_framebuffer);
         }
 
         /// <inheritdoc/>

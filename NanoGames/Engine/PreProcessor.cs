@@ -13,7 +13,7 @@ namespace NanoGames.Engine
     /// </summary>
     internal sealed class PreProcessor : IDisposable
     {
-        private static readonly double _fadeFactor = Math.Log(0.5) / 0.01;
+        private static readonly double _fadeFactor = Math.Log(0.5) * 60;
 
         private static readonly VertexSpecification _fadeVertexSpecification = new VertexSpecification()
         {

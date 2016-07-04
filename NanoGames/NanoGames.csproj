@@ -75,6 +75,7 @@
     <Compile Include="Application\PlayerColors.cs" />
     <Compile Include="Application\TournamentView.cs" />
     <Compile Include="Application\Ui\ColorMenuItem.cs" />
+    <Compile Include="Engine\OpenGLWrappers\Framebuffer.cs" />
     <Compile Include="Engine\PreProcessor.cs" />
     <Compile Include="Synchronization\Durations.cs" />
     <Compile Include="Synchronization\InputEntry.cs" />
@@ -121,6 +122,8 @@
     <None Include="App.config" />
     <EmbeddedResource Include="Engine\Shaders\Fade.vs.glsl" />
     <EmbeddedResource Include="Engine\Shaders\Fade.fs.glsl" />
+    <EmbeddedResource Include="Engine\Shaders\Blur.fs.glsl" />
+    <EmbeddedResource Include="Engine\Shaders\Blur.vs.glsl" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Engine\Shaders\Line.fs.glsl" />
     <EmbeddedResource Include="Engine\Shaders\Line.vs.glsl" />

@@ -9,5 +9,5 @@ out vec4 OutputColor;
 
 void main()
 {
-	OutputColor = vec4(0.01, 0.01, 0.01, Fade);
+	OutputColor = vec4(0.02, 0.02, 0.02, Fade);
 }
