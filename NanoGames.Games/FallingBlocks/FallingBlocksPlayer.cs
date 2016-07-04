@@ -325,7 +325,7 @@ namespace NanoGames.Games.FallingBlocks
         private void DrawBlock(Graphics graphics, Color color, Vector offset, int x, int y)
         {
             graphics.Rectangle(
-                color,
+                0.75 * color,
                 Constants.TopLeft + offset + new Vector(x * Constants.BlockSize + Constants.BlockBorder, y * Constants.BlockSize + Constants.BlockBorder),
                 Constants.TopLeft + offset + new Vector((x + 1) * Constants.BlockSize - Constants.BlockBorder, (y + 1) * Constants.BlockSize - Constants.BlockBorder));
         }
