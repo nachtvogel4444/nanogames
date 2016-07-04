@@ -15,10 +15,11 @@ namespace NanoGames.Games
         static DisciplineDirectory()
         {
             /* Note: names must be in ALL-CAPS to render correctly. */
+            Add<Bomberguy.BomberMatch, Bomberguy.BomberGuy>("BOMBERGUY");
             Add<Example.ExampleMatch, Example.ExamplePlayer>("INTO THE SQUARE");
             Add<FallingBlocks.FallingBlocksMatch, FallingBlocks.FallingBlocksPlayer>("FALLING BLOCKS");
-            Add<Bomberguy.BomberMatch, Bomberguy.BomberGuy>("BOMBERGUY");
             Add<NanoSoccer.NanoSoccerMatch, NanoSoccer.NanoSoccerPlayer>("NANO SOCCER");
+            Add<Snake.SnakeMatch, Snake.SnakePlayer>("SNAKE");
         }
 
         /// <summary>
