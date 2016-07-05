@@ -81,15 +81,27 @@ namespace NanoGames.Engine.OutputSystems
 
             for (double p = 0; p < 1; p += distance)
             {
-                _particles.Add(new Particle
-                {
-                    Position = Vector.Mix(start, end, p),
-                    Velocity = Velocity + Intensity * Vector.FromAngle(_random.NextDouble() * 2 * Math.PI),
-                    Gravity = Gravity,
-                    Color = color + new Color(0.5, 0.5, 0.5),
-                    Frame = _frame,
-                });
+                var position = Vector.Mix(start, end, p);
+                CreateParticle(color, position);
             }
+        }
+
+        /// <inheritdoc/>
+        public void Point(Color color, Vector vector)
+        {
+            CreateParticle(color, vector);
+        }
+
+        private void CreateParticle(Color color, Vector position)
+        {
+            _particles.Add(new Particle
+            {
+                Position = position,
+                Velocity = Velocity + Intensity * Vector.FromAngle(_random.NextDouble() * 2 * Math.PI),
+                Gravity = Gravity,
+                Color = color + new Color(0.5, 0.5, 0.5),
+                Frame = _frame,
+            });
         }
 
         private sealed class Particle

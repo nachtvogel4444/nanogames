@@ -15,5 +15,12 @@ namespace NanoGames
         /// <param name="start">The line's starting point.</param>
         /// <param name="end">The line's end point.</param>
         void Line(Color color, Vector start, Vector end);
+
+        /// <summary>
+        /// Draws a point.
+        /// </summary>
+        /// <param name="color">The point color.</param>
+        /// <param name="vector">The point coordinates.</param>
+        void Point(Color color, Vector vector);
     }
 }

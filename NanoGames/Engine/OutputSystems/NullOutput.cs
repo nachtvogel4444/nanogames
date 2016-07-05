@@ -40,6 +40,10 @@ namespace NanoGames.Engine.OutputSystems
             public void Line(Color color, Vector start, Vector end)
             {
             }
+
+            public void Point(Color color, Vector vector)
+            {
+            }
         }
     }
 }
