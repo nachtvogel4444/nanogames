@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using NanoGames.Engine;
+using NanoGames.Engine.OutputSystems;
 using NanoGames.Games;
 using NanoGames.Network;
 using System;
@@ -263,6 +264,7 @@ namespace NanoGames.Synchronization
                                 {
                                     Color = p.PlayerColor,
                                     Name = p.Name,
+                                    Output = p == LocalPlayer ? new Output() : NullOutput.Instance,
                                 }).ToList();
 
                             var matchDescription = new MatchDescription
@@ -300,6 +302,13 @@ namespace NanoGames.Synchronization
 
                         /* Render a 50ms old frame to hide a certain amount of lag. */
                         _matchBuffer.RenderFrame(currentFrame - _latencyFrames, terminal);
+
+                        var output = _matchBuffer.PredictedMatch.Players[_localPlayerIndex].Output as Output;
+                        if (output != null)
+                        {
+                            double frame = (roundDuration - Timestamps.MatchStart) / (double)GameSpeed.FrameDuration;
+                            output.Render(frame, terminal.Graphics);
+                        }
 
                         if (_matchBuffer.IsCompleted)
                         {

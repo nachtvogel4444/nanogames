@@ -23,6 +23,8 @@ namespace NanoGames.Games
         /// </summary>
         public Graphics Graphics { get; set; }
 
+        public IOutput Output { get; set; }
+
         /// <summary>
         /// Gets or sets the player's input.
         /// </summary>

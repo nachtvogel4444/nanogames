@@ -21,6 +21,8 @@ namespace NanoGames.Games
         /// </summary>
         public IReadOnlyList<TPlayer> Players { get; private set; }
 
+        IReadOnlyList<Player> IMatch.Players => Players;
+
         /// <summary>
         /// Gets or sets the random number generator.
         /// </summary>
@@ -44,7 +46,6 @@ namespace NanoGames.Games
         /// <summary>
         /// Sets the list of players.
         /// </summary>
-        /// <param name="localPlayerIndex">The index of the local player, or -1 if there is no local player.</param>
         /// <param name="players">The list of players.</param>
         public void Initialize(List<TPlayer> players)
         {
@@ -70,11 +71,10 @@ namespace NanoGames.Games
 
             for (int i = 0; i < Players.Count; ++i)
             {
+                Players[i].Output.SetFrame(Frame);
                 Players[i].Graphics = playerDescriptions[i].Graphics ?? Graphics.Null;
                 Players[i].Input.SetState(Frame, playerDescriptions[i].Input);
             }
-
-            ++Frame;
 
             foreach (var t in new List<MatchTimer>(_timers))
             {
@@ -83,6 +83,8 @@ namespace NanoGames.Games
 
             /* Update the match. */
             Update();
+
+            ++Frame;
         }
 
         public IMatchTimer GetTimer(int interval)

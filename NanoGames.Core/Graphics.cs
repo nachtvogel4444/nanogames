@@ -10,7 +10,7 @@ namespace NanoGames
     /// The screen always has a virtual width of 320 and a height of 200 pixels.
     /// (0, 0) is at the top-left corner.
     /// </summary>
-    public sealed class Graphics
+    public sealed class Graphics : IGraphics
     {
         /// <summary>
         /// The virtual screen width.
@@ -171,23 +171,6 @@ namespace NanoGames
         public void Circle(Color color, Vector center, double radius)
         {
             CircleSegment(color, center, radius, 0, 2 * Math.PI);
-        }
-
-        /// <summary>
-        /// Draws a rectangle.
-        /// </summary>
-        /// <param name="color">The color.</param>
-        /// <param name="topLeft">The top-left point.</param>
-        /// <param name="bottomRight">The bottom-right point.</param>
-        public void Rectangle(Color color, Vector topLeft, Vector bottomRight)
-        {
-            var topRight = new Vector(bottomRight.X, topLeft.Y);
-            var bottomLeft = new Vector(topLeft.X, bottomRight.Y);
-
-            Line(color, topLeft, topRight);
-            Line(color, topRight, bottomRight);
-            Line(color, bottomRight, bottomLeft);
-            Line(color, bottomLeft, topLeft);
         }
     }
 }

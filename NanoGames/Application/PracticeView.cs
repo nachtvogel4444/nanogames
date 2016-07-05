@@ -3,6 +3,7 @@
 
 using NanoGames.Application.Ui;
 using NanoGames.Engine;
+using NanoGames.Engine.OutputSystems;
 using NanoGames.Games;
 using NanoGames.Synchronization;
 using System;
@@ -19,6 +20,8 @@ namespace NanoGames.Application
     {
         private readonly Action _goBack;
         private readonly Menu _selectDisciplineMenu;
+
+        private readonly Output _output = new Output();
 
         private Terminal _currentTerminal;
         private IMatch _match;
@@ -75,11 +78,6 @@ namespace NanoGames.Application
         {
             var currentTimestamp = Stopwatch.GetTimestamp();
 
-            if (_matchStartTimestamp == 0)
-            {
-                _matchStartTimestamp = currentTimestamp;
-            }
-
             /* Check if the buffered frame is still valid and compute new frames as needed. */
             while (Stopwatch.GetTimestamp() - _matchStartTimestamp - _matchFrameCount * GameSpeed.FrameDuration > GameSpeed.FrameDuration)
             {
@@ -105,6 +103,7 @@ namespace NanoGames.Application
 
             /* Render the buffered frame. */
             _bufferedRenderer.RenderTo(terminal.Renderer);
+            _output.Render((Stopwatch.GetTimestamp() - _matchStartTimestamp) / (double)GameSpeed.FrameDuration, terminal.Graphics);
         }
 
         private void GoBack()
@@ -121,6 +120,7 @@ namespace NanoGames.Application
                     new PlayerDescription
                     {
                         Color = Settings.Instance.PlayerColor,
+                        Output = _output,
                     },
                 },
 
@@ -128,6 +128,8 @@ namespace NanoGames.Application
             };
 
             _match = discipline.CreateMatch(description);
+            _matchStartTimestamp = Stopwatch.GetTimestamp();
+            _matchFrameCount = 0;
         }
     }
 }

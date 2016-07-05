@@ -63,6 +63,11 @@ namespace NanoGames.Synchronization
         public IEnumerable<double> PlayerScores => _knownMatch.PlayerScores;
 
         /// <summary>
+        /// Gets the current predicted match.
+        /// </summary>
+        public IMatch PredictedMatch => _predictedMatch;
+
+        /// <summary>
         /// Sets the input for a certain player for a certain frame.
         /// </summary>
         /// <param name="frame">The frame for which to set the input.</param>

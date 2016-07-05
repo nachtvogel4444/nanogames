@@ -52,6 +52,10 @@ namespace NanoGames.Games.FallingBlocks
             {
                 _inbox.Add(new Color(0.33, 0.33, 0.33));
             }
+
+            Output.Particles.Gravity = new Vector(0, 0.2);
+            Output.Particles.Velocity = new Vector(0, -2);
+            Output.Particles.Intensity = 4;
         }
 
         public void Update()
@@ -274,6 +278,14 @@ namespace NanoGames.Games.FallingBlocks
                 {
                     ++clearedLines;
 
+                    for (int x = 0; x < Constants.Width; ++x)
+                    {
+                        if (_isOccupied[x, yw])
+                        {
+                            DrawBlock(Output.Particles, _blockColor[x, yw], default(Vector), x, yw);
+                        }
+                    }
+
                     for (int y1 = yw; y1 > 0; --y1)
                     {
                         for (int x = 0; x < Constants.Width; ++x)
@@ -322,7 +334,7 @@ namespace NanoGames.Games.FallingBlocks
             return true;
         }
 
-        private void DrawBlock(Graphics graphics, Color color, Vector offset, int x, int y)
+        private void DrawBlock(IGraphics graphics, Color color, Vector offset, int x, int y)
         {
             graphics.Rectangle(
                 0.75 * color,

@@ -76,6 +76,9 @@
     <Compile Include="Application\TournamentView.cs" />
     <Compile Include="Application\Ui\ColorMenuItem.cs" />
     <Compile Include="Engine\OpenGLWrappers\Framebuffer.cs" />
+    <Compile Include="Engine\OutputSystems\NullOutput.cs" />
+    <Compile Include="Engine\OutputSystems\Output.cs" />
+    <Compile Include="Engine\OutputSystems\ParticleSystem.cs" />
     <Compile Include="Engine\PreProcessor.cs" />
     <Compile Include="Synchronization\Durations.cs" />
     <Compile Include="Synchronization\InputEntry.cs" />

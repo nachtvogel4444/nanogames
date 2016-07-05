@@ -20,6 +20,8 @@ namespace NanoGames.Games
         /// </summary>
         IEnumerable<double> PlayerScores { get; }
 
+        IReadOnlyList<Player> Players { get; }
+
         /// <summary>
         /// Updates and renders the match.
         /// </summary>

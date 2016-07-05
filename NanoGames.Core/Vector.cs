@@ -97,6 +97,18 @@ namespace NanoGames
         }
 
         /// <summary>
+        /// Computes the linear combination of two vectors.
+        /// </summary>
+        /// <param name="a">The first vector.</param>
+        /// <param name="b">The second vector.</param>
+        /// <param name="ratio">The mix ratio.</param>
+        /// <returns>The linear combination of two vectors.</returns>
+        public static Vector Mix(Vector a, Vector b, double ratio)
+        {
+            return a * (1 - ratio) + b * ratio;
+        }
+
+        /// <summary>
         /// Returns the dot product of two vectors.
         /// </summary>
         /// <param name="a">The first vector.</param>
@@ -105,6 +117,16 @@ namespace NanoGames
         public static double Dot(Vector a, Vector b)
         {
             return a.X * b.X + a.Y * b.Y;
+        }
+
+        /// <summary>
+        /// Computes the unit vector with the given angle.
+        /// </summary>
+        /// <param name="angle">The angle.</param>
+        /// <returns>The unit vector with the given angle.</returns>
+        public static Vector FromAngle(double angle)
+        {
+            return new Vector(Math.Cos(angle), Math.Sin(angle));
         }
 
         /// <summary>
