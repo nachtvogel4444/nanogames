@@ -12,7 +12,7 @@ namespace NanoGames.Engine
     /// </summary>
     internal sealed class PostProcessor : IDisposable
     {
-        private const double _blurRadius = 128;
+        private const double _blurRadius = 64;
 
         private static readonly VertexSpecification _vertexSpecification = new VertexSpecification()
         {
@@ -22,9 +22,8 @@ namespace NanoGames.Engine
 
         private static readonly Vector[] _blurVectors = new Vector[]
         {
-            new Vector(Math.Cos(15 / 180.0 * Math.PI), Math.Sin(15 / 180.0 * Math.PI)),
-            new Vector(Math.Cos(135 / 180.0 * Math.PI), Math.Sin(135 / 180.0 * Math.PI)),
-            new Vector(Math.Cos(255 / 180.0 * Math.PI), Math.Sin(255 / 180.0 * Math.PI)),
+            new Vector(Math.Cos(30 / 180.0 * Math.PI), Math.Sin(30 / 180.0 * Math.PI)),
+            new Vector(Math.Cos(120 / 180.0 * Math.PI), Math.Sin(120 / 180.0 * Math.PI)),
         };
 
         private readonly Shader _tubeShader = new Shader("NanoGames.Engine.Shaders.Tube");
@@ -78,7 +77,7 @@ namespace NanoGames.Engine
 
                 for (int i = 0; i < _blurFramebuffers.Length; ++i)
                 {
-                    _blurFramebuffers[i].SetSize(width / 2, height / 2);
+                    _blurFramebuffers[i].SetSize(width * 2 / 3, height * 2 / 3);
                 }
 
                 float w, h;

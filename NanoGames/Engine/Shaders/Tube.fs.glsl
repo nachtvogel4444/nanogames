@@ -12,18 +12,17 @@ out vec4 OutputColor;
 
 vec3 gammaCorrect(vec3 color)
 {
-	color *= 1.5;
 	return vec3(pow(color.r, 2.2), pow(color.g, 2.2), pow(color.b, 2.2));
 }
 
 vec3 screenTexture(vec2 coord)
 {
-	return texture2D(ScreenTexture, coord).rgb + texture2D(BlurTexture, coord).rgb;
+	return texture2D(ScreenTexture, coord).rgb + 2.0 * texture2D(BlurTexture, coord).rgb;
 }
 
 float matrixTexture(float y)
 {
-	return 1.0 +  0.25 * sin(200 * 2 * 3.14159265359 * y);
+	return 0.9 + 0.1 * sin(200 * 2 * 3.14159265359 * y);
 }
 
 void main()

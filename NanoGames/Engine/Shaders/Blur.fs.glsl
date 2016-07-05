@@ -19,12 +19,12 @@ out vec4 OutputColor;
 void main()
 {
 	OutputColor = 0.125 * (
-		texture2D(ScreenTexture, FragmentTextureCoordinate0, 3.5)
+		texture2D(ScreenTexture, FragmentTextureCoordinate0, 4.5)
 		+ texture2D(ScreenTexture, FragmentTextureCoordinate1, 3.5)
- 		+ texture2D(ScreenTexture, FragmentTextureCoordinate2, 2.5)
- 		+ texture2D(ScreenTexture, FragmentTextureCoordinate3, 1.5)
- 		+ texture2D(ScreenTexture, FragmentTextureCoordinate4, 1.5)
- 		+ texture2D(ScreenTexture, FragmentTextureCoordinate5, 2.5)
+ 		+ texture2D(ScreenTexture, FragmentTextureCoordinate2, 3.5)
+ 		+ texture2D(ScreenTexture, FragmentTextureCoordinate3, 3.5)
+ 		+ texture2D(ScreenTexture, FragmentTextureCoordinate4, 3.5)
+ 		+ texture2D(ScreenTexture, FragmentTextureCoordinate5, 3.5)
  		+ texture2D(ScreenTexture, FragmentTextureCoordinate6, 3.5)
- 		+ texture2D(ScreenTexture, FragmentTextureCoordinate7, 3.5));
+ 		+ texture2D(ScreenTexture, FragmentTextureCoordinate7, 4.5));
 }
