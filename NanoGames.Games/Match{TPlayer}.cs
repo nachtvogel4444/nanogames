@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace NanoGames.Games
 {
@@ -32,9 +31,6 @@ namespace NanoGames.Games
         /// Gets the match Output instance, which can be used to output sound or graphics for every player.
         /// </summary>
         public IOutput Output { get; internal set; }
-
-        /// <inheritdoc/>
-        public IEnumerable<double> PlayerScores => Players.Select(p => p.Score);
 
         public bool IsCompleted { get; protected set; }
 

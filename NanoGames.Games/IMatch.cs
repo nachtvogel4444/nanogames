@@ -15,11 +15,6 @@ namespace NanoGames.Games
         /// </summary>
         bool IsCompleted { get; }
 
-        /// <summary>
-        /// Gets the current scores for all players.
-        /// </summary>
-        IEnumerable<double> PlayerScores { get; }
-
         IReadOnlyList<Player> Players { get; }
 
         IOutput Output { get; }

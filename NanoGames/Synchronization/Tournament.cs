@@ -315,7 +315,7 @@ namespace NanoGames.Synchronization
 
                         if (_matchBuffer.IsCompleted)
                         {
-                            var scores = _matchBuffer.PlayerScores.ToList();
+                            var scores = _matchBuffer.KnownMatch.Players.Select(p => p.Score).ToList();
                             var localPlayerScore = scores[_localPlayerIndex];
                             int roundScore = scores.Sum(s => s < localPlayerScore ? _winScore : (s == localPlayerScore ? _tieScore : 0));
                             LocalPlayer.TournamentScore += roundScore;
