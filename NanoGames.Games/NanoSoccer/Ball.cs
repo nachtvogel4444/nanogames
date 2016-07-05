@@ -36,7 +36,7 @@ namespace NanoGames.Games.NanoSoccer
             }
         }
 
-        public void Draw(Graphics g)
+        public void Draw(IGraphics g)
         {
             g.Circle(Colors.White, Position, Radius);
             g.Circle(Colors.White, Position, Radius * 0.66d);

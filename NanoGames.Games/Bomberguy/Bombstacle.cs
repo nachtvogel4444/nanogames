@@ -13,7 +13,7 @@ namespace NanoGames.Games.Bomberguy
         {
         }
 
-        public override void Draw(Graphics g)
+        public override void Draw(IGraphics g)
         {
             g.Line(Colors.White, Position, Position + new Vector(Size.X, 0));
             g.Line(Colors.White, Position + new Vector(Size.X, 0), Position + new Vector(Size.X, Size.Y));

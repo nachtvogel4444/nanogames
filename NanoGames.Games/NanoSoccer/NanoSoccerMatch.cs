@@ -118,10 +118,10 @@ namespace NanoGames.Games.NanoSoccer
             }
 
             /* Draw the field */
-            _field.Draw(Graphics);
+            _field.Draw(Output.Graphics);
 
             /* Draw the ball */
-            _ball.Draw(Graphics);
+            _ball.Draw(Output.Graphics);
 
             /* Draw all players */
             foreach (var player in Players)

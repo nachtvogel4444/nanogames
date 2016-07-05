@@ -91,7 +91,7 @@ namespace NanoGames.Games.FallingBlocks
             {
                 if (player.HasLost)
                 {
-                    DrawSpectatorMode(player.Graphics);
+                    DrawSpectatorMode(player.Output.Graphics);
                 }
                 else
                 {
@@ -105,7 +105,7 @@ namespace NanoGames.Games.FallingBlocks
             }
         }
 
-        private void DrawSpectatorMode(Graphics graphics)
+        private void DrawSpectatorMode(IGraphics graphics)
         {
             var o = new Vector(-100, 0);
             foreach (var player in Players.Where(p => !p.HasLost).Take(3))

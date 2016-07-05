@@ -18,12 +18,7 @@ namespace NanoGames.Games
         /// </summary>
         public Color Color { get; internal set; }
 
-        /// <summary>
-        /// Gets or sets the player's terminal.
-        /// </summary>
-        public Graphics Graphics { get; set; }
-
-        public IOutput Output { get; set; }
+        public IOutput Output { get; internal set; }
 
         /// <summary>
         /// Gets or sets the player's input.

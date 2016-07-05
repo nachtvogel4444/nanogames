@@ -41,7 +41,7 @@ namespace NanoGames.Games.Bomberguy
 
         internal BomberMatch Match { get; private set; }
 
-        public abstract void Draw(Graphics g);
+        public abstract void Draw(IGraphics g);
 
         public void Destroy()
         {

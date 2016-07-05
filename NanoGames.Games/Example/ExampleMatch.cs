@@ -11,6 +11,8 @@ namespace NanoGames.Games.Example
         private const double _acceleration = 0.001;
         private const double _maxSpeed = 0.5;
 
+        private static readonly Vector _center = new Vector(160, 100);
+
         private int _finishedPlayers;
 
         protected override void Initialize()
@@ -64,7 +66,7 @@ namespace NanoGames.Games.Example
 
             /* Draw the goal for all players. */
             var v = new Vector(ExamplePlayer.Radius + ExamplePlayer.Tolerance, ExamplePlayer.Radius + ExamplePlayer.Tolerance);
-            Graphics.Rectangle(new Color(0.25, 0.25, 0.25), Graphics.Center - v, Graphics.Center + v);
+            Output.Graphics.Rectangle(new Color(0.25, 0.25, 0.25), _center - v, _center + v);
 
             foreach (var player in Players)
             {
@@ -203,7 +205,7 @@ namespace NanoGames.Games.Example
             }
 
             /* Check for the victory condition. */
-            if ((player.Position - Graphics.Center).Length < ExamplePlayer.Tolerance)
+            if ((player.Position - _center).Length < ExamplePlayer.Tolerance)
             {
                 ++_finishedPlayers;
                 player.HasFinished = true;

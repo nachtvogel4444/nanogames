@@ -65,7 +65,7 @@ namespace NanoGames.Games.NanoSoccer
             }
         }
 
-        public void Draw(Graphics g)
+        public void Draw(IGraphics g)
         {
             /* walls */
             foreach (var w in _walls)

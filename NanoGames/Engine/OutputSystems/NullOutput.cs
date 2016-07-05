@@ -21,13 +21,16 @@ namespace NanoGames.Engine.OutputSystems
         public IParticleSystem Particles => NullParticleSystem.Instance;
 
         /// <inheritdoc/>
+        public IGraphics Graphics => NullGraphics.Instance;
+
+        /// <inheritdoc/>
         public void SetFrame(int frame)
         {
         }
 
         private sealed class NullParticleSystem : IParticleSystem
         {
-            public static readonly NullParticleSystem Instance = new NullParticleSystem();
+            public static readonly IParticleSystem Instance = new NullParticleSystem();
 
             public double MeanDistance { get; set; }
 

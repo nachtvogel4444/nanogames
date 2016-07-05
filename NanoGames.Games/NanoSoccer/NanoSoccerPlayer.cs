@@ -51,10 +51,10 @@ namespace NanoGames.Games.NanoSoccer
                 {
                     /* Always show the current player in white. */
                     color = new Color(1, 1, 1);
-                    Graphics.Circle(color, player.Position, Radius - 2);
+                    Output.Graphics.Circle(color, player.Position, Radius - 2);
                 }
 
-                Graphics.Circle(player.Team == 0 ? new Color(1, 0, 0) : new Color(0, 0, 1), player.Position, Radius);
+                Output.Graphics.Circle(player.Team == 0 ? new Color(1, 0, 0) : new Color(0, 0, 1), player.Position, Radius);
             }
         }
     }

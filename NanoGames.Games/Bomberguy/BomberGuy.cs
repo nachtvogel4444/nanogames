@@ -55,7 +55,7 @@ namespace NanoGames.Games.Bomberguy
 
         public Vector Center { get { return Position + new Vector(Size.X / 2d, Size.Y / 2d); } }
 
-        public void Draw(Graphics g)
+        public void Draw(IGraphics g)
         {
             /* Draw each player. */
             foreach (var player in Match.Players)

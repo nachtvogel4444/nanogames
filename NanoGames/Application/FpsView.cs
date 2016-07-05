@@ -32,7 +32,7 @@ namespace NanoGames.Application
                 var fps = (double)Stopwatch.Frequency * _times.Count / (time - _times.Peek());
                 var fpsString = ((int)(fps + 0.5)).ToString("D2");
 
-                terminal.Graphics.Print(color, fontSize, new Vector(Graphics.Width - fpsString.Length * fontSize, 0), fpsString);
+                terminal.Graphics.Print(color, fontSize, new Vector(GraphicsConstants.Width - fpsString.Length * fontSize, 0), fpsString);
             }
 
             if (_times.Count > 128)

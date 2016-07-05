@@ -22,11 +22,12 @@ namespace NanoGames.Games
 
         IReadOnlyList<Player> Players { get; }
 
+        IOutput Output { get; }
+
         /// <summary>
         /// Updates and renders the match.
         /// </summary>
-        /// <param name="matchGraphics">A Graphics instance used to draw onto the screen of all players.</param>
-        /// <param name="playerDescriptions">The player descriptions.</param>
-        void Update(Graphics matchGraphics, List<PlayerDescription> playerDescriptions);
+        /// <param name="inputs">The player inputs.</param>
+        void Update(InputState[] inputs);
     }
 }

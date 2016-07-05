@@ -69,7 +69,7 @@ namespace NanoGames.Games.FallingBlocks
         /// <summary>
         /// The top-left corner of the playing field on the screen.
         /// </summary>
-        public static readonly Vector TopLeft = new Vector(0.5 * (Graphics.Width - BlockSize * Width), 0.5 * (Graphics.Height - BlockSize * (Height - ExtraHeight)));
+        public static readonly Vector TopLeft = new Vector(0.5 * (GraphicsConstants.Width - BlockSize * Width), 0.5 * (GraphicsConstants.Height - BlockSize * (Height - ExtraHeight)));
 
         public static readonly byte[][][,] RotatedPieces;
 

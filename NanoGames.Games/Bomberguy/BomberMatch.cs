@@ -87,8 +87,8 @@ namespace NanoGames.Games.Bomberguy
 
             _playerSpeed = PLAYER_SPEED / _fieldSize;
 
-            _pixelsPerUnit = Graphics.Height / _fieldSize;
-            _widthOffset = (Graphics.Width - Graphics.Height) / 2d;
+            _pixelsPerUnit = GraphicsConstants.Height / _fieldSize;
+            _widthOffset = (GraphicsConstants.Width - GraphicsConstants.Height) / 2d;
 
             // initialize all obstacles
             InitializeField();
@@ -105,7 +105,7 @@ namespace NanoGames.Games.Bomberguy
             {
                 DrawField(p);
 
-                p.Draw(p.Graphics);
+                p.Draw(p.Output.Graphics);
 
                 /* Skip players that have already finished. */
                 if (!p.Alive) continue;
@@ -209,7 +209,7 @@ namespace NanoGames.Games.Bomberguy
                     BomberThing thing = _field[r, c];
 
                     if (thing != null)
-                        thing.Draw(p.Graphics);
+                        thing.Draw(p.Output.Graphics);
                 }
             }
         }

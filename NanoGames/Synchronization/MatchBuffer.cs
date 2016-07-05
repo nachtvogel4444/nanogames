@@ -1,7 +1,6 @@
 ﻿// Copyright (c) the authors of nanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
-using NanoGames.Engine;
 using NanoGames.Games;
 using System.Collections.Generic;
 
@@ -14,12 +13,8 @@ namespace NanoGames.Synchronization
     internal class MatchBuffer
     {
         private readonly int _playerCount;
-        private readonly List<PlayerDescription> _playerDescriptions;
-        private readonly int _localPlayerIndex;
 
-        private readonly BufferedRenderer _bufferedRenderer;
-        private readonly Graphics _bufferedGraphics;
-
+        private readonly InputState[] _inputStates;
         private readonly List<PlayerInputState[]> _playerInputs = new List<PlayerInputState[]>();
 
         private IMatch _predictedMatch;
@@ -32,19 +27,11 @@ namespace NanoGames.Synchronization
         /// Initializes a new instance of the <see cref="MatchBuffer"/> class.
         /// </summary>
         /// <param name="initialMatch">The initial state of the match.</param>
-        /// <param name="playerDescriptions">A list of player descriptions.</param>
-        /// <param name="localPlayerIndex">The index of the local player in the list of player descriptions.</param>
-        public MatchBuffer(IMatch initialMatch, List<PlayerDescription> playerDescriptions, int localPlayerIndex)
+        public MatchBuffer(IMatch initialMatch)
         {
-            _playerCount = playerDescriptions.Count;
-            _playerDescriptions = playerDescriptions;
-            _localPlayerIndex = localPlayerIndex;
-
-            _bufferedRenderer = new BufferedRenderer();
-            _bufferedGraphics = new Graphics(_bufferedRenderer);
-
-            _playerDescriptions[localPlayerIndex].Graphics = _bufferedGraphics;
-            initialMatch.Update(_bufferedGraphics, playerDescriptions);
+            _playerCount = initialMatch.Players.Count;
+            _inputStates = new InputState[initialMatch.Players.Count];
+            initialMatch.Update(_inputStates);
 
             _knownMatch = _predictedMatch = initialMatch;
 
@@ -97,17 +84,15 @@ namespace NanoGames.Synchronization
         }
 
         /// <summary>
-        /// Renders the current best prediction of a certain frame.
+        /// Updates the current predicted match to a certain frame.
         /// </summary>
         /// <param name="requestedFrame">The index of the frame to render.</param>
-        /// <param name="terminal">The terminal to render to.</param>
-        public void RenderFrame(int requestedFrame, Terminal terminal)
+        public void UpdateToFrame(int requestedFrame)
         {
             while (true)
             {
                 if (requestedFrame <= _predictedFrame)
                 {
-                    _bufferedRenderer.RenderTo(terminal.Renderer);
                     return;
                 }
 
@@ -123,12 +108,11 @@ namespace NanoGames.Synchronization
                         var knownInputs = _playerInputs[1];
                         for (int playerIndex = 0; playerIndex < _playerCount; ++playerIndex)
                         {
-                            _playerDescriptions[playerIndex].Input = knownInputs[playerIndex].Input;
-                            _playerDescriptions[playerIndex].Graphics = Graphics.Null;
+                            _inputStates[playerIndex] = knownInputs[playerIndex].Input;
                         }
 
                         _playerInputs.RemoveAt(0);
-                        _knownMatch.Update(Graphics.Null, _playerDescriptions);
+                        _knownMatch.Update(_inputStates);
                         ++_knownFrame;
                     }
 
@@ -141,19 +125,6 @@ namespace NanoGames.Synchronization
 
                 ++_predictedFrame;
 
-                Graphics localGraphics;
-                if (_predictedFrame == requestedFrame)
-                {
-                    /* This is the frame we actually want to render. */
-                    _bufferedRenderer.Clear();
-                    localGraphics = _bufferedGraphics;
-                }
-                else
-                {
-                    /* Discard the output of this frame. */
-                    localGraphics = Graphics.Null;
-                }
-
                 FillInputsUpToIndex(_predictedFrame - _knownFrame);
 
                 bool isInputKnown = true;
@@ -161,8 +132,7 @@ namespace NanoGames.Synchronization
                 for (int playerIndex = 0; playerIndex < _playerCount; ++playerIndex)
                 {
                     isInputKnown &= inputs[playerIndex].IsKnown;
-                    _playerDescriptions[playerIndex].Input = inputs[playerIndex].Input;
-                    _playerDescriptions[playerIndex].Graphics = playerIndex == _localPlayerIndex ? localGraphics : Graphics.Null;
+                    _inputStates[playerIndex] = inputs[playerIndex].Input;
                 }
 
                 if (_predictedMatch == _knownMatch)
@@ -187,7 +157,7 @@ namespace NanoGames.Synchronization
                     }
                 }
 
-                _predictedMatch.Update(localGraphics, _playerDescriptions);
+                _predictedMatch.Update(_inputStates);
             }
         }
 

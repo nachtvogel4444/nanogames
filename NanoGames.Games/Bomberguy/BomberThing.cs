@@ -17,7 +17,7 @@ namespace NanoGames.Games.Bomberguy
 
         bool Deadly { get; }
 
-        void Draw(Graphics g);
+        void Draw(IGraphics g);
 
         void Destroy();
     }

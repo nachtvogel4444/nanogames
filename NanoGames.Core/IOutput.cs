@@ -14,6 +14,11 @@ namespace NanoGames
         IParticleSystem Particles { get; }
 
         /// <summary>
+        /// Gets the graphics system.
+        /// </summary>
+        IGraphics Graphics { get; }
+
+        /// <summary>
         /// Sets the current frame index.
         /// </summary>
         /// <param name="frame">The frame index.</param>

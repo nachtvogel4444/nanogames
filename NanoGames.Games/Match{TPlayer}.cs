@@ -29,9 +29,9 @@ namespace NanoGames.Games
         public Random Random { get; internal set; }
 
         /// <summary>
-        /// Gets the match Graphics instance, which draws onto the screen of every player.
+        /// Gets the match Output instance, which can be used to output sound or graphics for every player.
         /// </summary>
-        public Graphics Graphics { get; private set; }
+        public IOutput Output { get; internal set; }
 
         /// <inheritdoc/>
         public IEnumerable<double> PlayerScores => Players.Select(p => p.Score);
@@ -60,20 +60,19 @@ namespace NanoGames.Games
         }
 
         /// <inheritdoc/>
-        public void Update(Graphics graphics, List<PlayerDescription> playerDescriptions)
+        public void Update(InputState[] inputs)
         {
             if (IsCompleted)
             {
                 return;
             }
 
-            Graphics = graphics;
+            Output.SetFrame(Frame);
 
             for (int i = 0; i < Players.Count; ++i)
             {
                 Players[i].Output.SetFrame(Frame);
-                Players[i].Graphics = playerDescriptions[i].Graphics ?? Graphics.Null;
-                Players[i].Input.SetState(Frame, playerDescriptions[i].Input);
+                Players[i].Input.SetState(Frame, inputs[i]);
             }
 
             foreach (var t in new List<MatchTimer>(_timers))

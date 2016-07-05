@@ -259,22 +259,25 @@ namespace NanoGames.Synchronization
 
                             DiscipleName = winningDiscipline.Name;
 
+                            var newOutput = new Output();
+
                             var playerDescriptions = activePlayers.Select(
                                 p => new PlayerDescription
                                 {
                                     Color = p.PlayerColor,
                                     Name = p.Name,
-                                    Output = p == LocalPlayer ? new Output() : NullOutput.Instance,
+                                    Output = p == LocalPlayer ? newOutput : NullOutput.Instance,
                                 }).ToList();
 
                             var matchDescription = new MatchDescription
                             {
                                 Players = playerDescriptions,
                                 Random = _roundRandom,
+                                Output = newOutput,
                             };
 
                             var match = winningDiscipline.CreateMatch(matchDescription);
-                            _matchBuffer = new MatchBuffer(match, playerDescriptions, _localPlayerIndex);
+                            _matchBuffer = new MatchBuffer(match);
                             _lastUpdatedFrame = 0;
                         }
 
@@ -301,13 +304,13 @@ namespace NanoGames.Synchronization
                         }
 
                         /* Render a 50ms old frame to hide a certain amount of lag. */
-                        _matchBuffer.RenderFrame(currentFrame - _latencyFrames, terminal);
+                        _matchBuffer.UpdateToFrame(currentFrame - _latencyFrames);
 
-                        var output = _matchBuffer.PredictedMatch.Players[_localPlayerIndex].Output as Output;
+                        var output = _matchBuffer.PredictedMatch.Output as Output;
                         if (output != null)
                         {
-                            double frame = (roundDuration - Timestamps.MatchStart) / (double)GameSpeed.FrameDuration;
-                            output.Render(frame, terminal.Graphics);
+                            double frame = (roundDuration - Timestamps.MatchStart) / (double)GameSpeed.FrameDuration - _latencyFrames;
+                            output.Render(frame, terminal);
                         }
 
                         if (_matchBuffer.IsCompleted)

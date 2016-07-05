@@ -32,6 +32,7 @@ namespace NanoGames.Games
         {
             var match = new TMatch();
             match.Random = description.Random;
+            match.Output = description.Output;
 
             var players = new List<TPlayer>();
             for (int i = 0; i < description.Players.Count; ++i)
@@ -52,7 +53,6 @@ namespace NanoGames.Games
             player.Index = index;
             player.Color = description.Color;
             player.Name = description.Name;
-            player.Graphics = Graphics.Null;
             player.Output = description.Output;
         }
     }

@@ -25,7 +25,7 @@ namespace NanoGames.Games.NanoSoccer
 
         public Vector End { get; }
 
-        public void Draw(Graphics g)
+        public void Draw(IGraphics g)
         {
             for (double i = 0.5; i < _dashes; i += 2)
             {

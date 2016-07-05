@@ -31,7 +31,7 @@ namespace NanoGames.Games.NanoSoccer
             get; set;
         }
 
-        public void Draw(Graphics g)
+        public void Draw(IGraphics g)
         {
             Color color = Colors.White;
             switch (_type)

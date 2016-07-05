@@ -45,7 +45,7 @@ namespace NanoGames.Engine.OutputSystems
         /// </summary>
         /// <param name="frame">The frame index. Can be fractional.</param>
         /// <param name="graphics">The graphics to render to.</param>
-        public void Render(double frame, Graphics graphics)
+        public void Render(double frame, IGraphics graphics)
         {
             for (int i = 0; i < _particles.Count; ++i)
             {

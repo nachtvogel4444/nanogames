@@ -160,14 +160,14 @@ namespace NanoGames.Games.FallingBlocks
 
         public void DrawScreen()
         {
-            Draw(Graphics, default(Vector));
-            LeftPlayer?.Draw(Graphics, new Vector(-100, 0));
-            RightPlayer?.Draw(Graphics, new Vector(100, 0));
+            Draw(Output.Graphics, default(Vector));
+            LeftPlayer?.Draw(Output.Graphics, new Vector(-100, 0));
+            RightPlayer?.Draw(Output.Graphics, new Vector(100, 0));
         }
 
-        public void Draw(Graphics graphics, Vector offset)
+        public void Draw(IGraphics graphics, Vector offset)
         {
-            if (graphics != Graphics)
+            if (graphics != Output.Graphics)
             {
                 graphics.PrintCenter(Color, 8, new Vector(160, 16) + offset, Name);
             }

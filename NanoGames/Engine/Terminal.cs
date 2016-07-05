@@ -13,11 +13,10 @@ namespace NanoGames.Engine
         /// <summary>
         /// Initializes a new instance of the <see cref="Terminal"/> class.
         /// </summary>
-        /// <param name="renderer">The renderer.</param>
-        public Terminal(IRenderer renderer)
+        /// <param name="graphics">The graphics interface.</param>
+        public Terminal(IGraphics graphics)
         {
-            Renderer = renderer;
-            Graphics = renderer == null ? Graphics.Null : new Graphics(renderer);
+            Graphics = graphics;
         }
 
         /// <summary>
@@ -31,13 +30,8 @@ namespace NanoGames.Engine
         public List<KeyEvent> KeyEvents { get; } = new List<KeyEvent>();
 
         /// <summary>
-        /// Gets the backend renderer.
-        /// </summary>
-        public IRenderer Renderer { get; }
-
-        /// <summary>
         /// Gets the player's graphics interface.
         /// </summary>
-        public Graphics Graphics { get; }
+        public IGraphics Graphics { get; }
     }
 }

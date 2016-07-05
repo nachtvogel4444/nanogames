@@ -116,16 +116,16 @@ namespace NanoGames.Games.Snake
                 IsCompleted = true;
             }
 
-            Graphics.Line(Constants.WallColor, new Vector(_xOffset, _yOffset), new Vector(_xOffset + Width * _scale, _yOffset));
-            Graphics.Line(Constants.WallColor, new Vector(_xOffset + Width * _scale, _yOffset), new Vector(_xOffset + Width * _scale, _yOffset + Height * _scale));
-            Graphics.Line(Constants.WallColor, new Vector(_xOffset + Width * _scale, _yOffset + Height * _scale), new Vector(_xOffset, _yOffset + Height * _scale));
-            Graphics.Line(Constants.WallColor, new Vector(_xOffset, _yOffset + Height * _scale), new Vector(_xOffset, _yOffset));
+            Output.Graphics.Line(Constants.WallColor, new Vector(_xOffset, _yOffset), new Vector(_xOffset + Width * _scale, _yOffset));
+            Output.Graphics.Line(Constants.WallColor, new Vector(_xOffset + Width * _scale, _yOffset), new Vector(_xOffset + Width * _scale, _yOffset + Height * _scale));
+            Output.Graphics.Line(Constants.WallColor, new Vector(_xOffset + Width * _scale, _yOffset + Height * _scale), new Vector(_xOffset, _yOffset + Height * _scale));
+            Output.Graphics.Line(Constants.WallColor, new Vector(_xOffset, _yOffset + Height * _scale), new Vector(_xOffset, _yOffset));
 
-            Graphics.Circle(Constants.AppleColor, new Vector(_xOffset + _scale * (ApplePosition.X + 0.5), _yOffset + _scale * (ApplePosition.Y + 0.55)), 0.45 * _scale);
-            Graphics.Line(Constants.AppleLeafColor, new Vector(_xOffset + _scale * (ApplePosition.X + 0.5), _yOffset + _scale * (ApplePosition.Y + 0.3)), new Vector(_xOffset + _scale * (ApplePosition.X + 0.85), _yOffset + _scale * (ApplePosition.Y + 0.3)));
-            Graphics.Line(Constants.AppleLeafColor, new Vector(_xOffset + _scale * (ApplePosition.X + 0.85), _yOffset + _scale * (ApplePosition.Y + 0.3)), new Vector(_xOffset + _scale * (ApplePosition.X + 1.0), _yOffset + _scale * (ApplePosition.Y + 0.0)));
-            Graphics.Line(Constants.AppleLeafColor, new Vector(_xOffset + _scale * (ApplePosition.X + 1.0), _yOffset + _scale * (ApplePosition.Y + 0.0)), new Vector(_xOffset + _scale * (ApplePosition.X + 0.65), _yOffset + _scale * (ApplePosition.Y + 0.0)));
-            Graphics.Line(Constants.AppleLeafColor, new Vector(_xOffset + _scale * (ApplePosition.X + 0.65), _yOffset + _scale * (ApplePosition.Y + 0.0)), new Vector(_xOffset + _scale * (ApplePosition.X + 0.5), _yOffset + _scale * (ApplePosition.Y + 0.3)));
+            Output.Graphics.Circle(Constants.AppleColor, new Vector(_xOffset + _scale * (ApplePosition.X + 0.5), _yOffset + _scale * (ApplePosition.Y + 0.55)), 0.45 * _scale);
+            Output.Graphics.Line(Constants.AppleLeafColor, new Vector(_xOffset + _scale * (ApplePosition.X + 0.5), _yOffset + _scale * (ApplePosition.Y + 0.3)), new Vector(_xOffset + _scale * (ApplePosition.X + 0.85), _yOffset + _scale * (ApplePosition.Y + 0.3)));
+            Output.Graphics.Line(Constants.AppleLeafColor, new Vector(_xOffset + _scale * (ApplePosition.X + 0.85), _yOffset + _scale * (ApplePosition.Y + 0.3)), new Vector(_xOffset + _scale * (ApplePosition.X + 1.0), _yOffset + _scale * (ApplePosition.Y + 0.0)));
+            Output.Graphics.Line(Constants.AppleLeafColor, new Vector(_xOffset + _scale * (ApplePosition.X + 1.0), _yOffset + _scale * (ApplePosition.Y + 0.0)), new Vector(_xOffset + _scale * (ApplePosition.X + 0.65), _yOffset + _scale * (ApplePosition.Y + 0.0)));
+            Output.Graphics.Line(Constants.AppleLeafColor, new Vector(_xOffset + _scale * (ApplePosition.X + 0.65), _yOffset + _scale * (ApplePosition.Y + 0.0)), new Vector(_xOffset + _scale * (ApplePosition.X + 0.5), _yOffset + _scale * (ApplePosition.Y + 0.3)));
 
             foreach (var player in Players)
             {
@@ -137,7 +137,7 @@ namespace NanoGames.Games.Snake
                         var r = i == 0 ? 0.5 : 0.3;
                         var p = segments[i];
 
-                        Graphics.Circle(0.75 * player.Color, new Vector(_xOffset + _scale * (p.X + 0.5), _yOffset + _scale * (p.Y + 0.5)), r * _scale);
+                        Output.Graphics.Circle(0.75 * player.Color, new Vector(_xOffset + _scale * (p.X + 0.5), _yOffset + _scale * (p.Y + 0.5)), r * _scale);
                     }
                 }
             }

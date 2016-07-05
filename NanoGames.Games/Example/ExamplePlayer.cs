@@ -43,10 +43,10 @@ namespace NanoGames.Games.Example
                 var x2 = x1 + (x1 < 160 ? 320 : -320);
                 var y2 = y1 + (y1 < 100 ? 200 : -200);
 
-                Graphics.Circle(color, new Vector(x1, y1), Radius);
-                Graphics.Circle(color, new Vector(x1, y2), Radius);
-                Graphics.Circle(color, new Vector(x2, y1), Radius);
-                Graphics.Circle(color, new Vector(x2, y2), Radius);
+                Output.Graphics.Circle(color, new Vector(x1, y1), Radius);
+                Output.Graphics.Circle(color, new Vector(x1, y2), Radius);
+                Output.Graphics.Circle(color, new Vector(x2, y1), Radius);
+                Output.Graphics.Circle(color, new Vector(x2, y2), Radius);
             }
         }
     }

@@ -81,7 +81,7 @@ namespace NanoGames.Engine
                 }
 
                 float w, h;
-                float a = (float)(width / Graphics.Width * Graphics.Height / height);
+                float a = (float)(width / GraphicsConstants.Width * GraphicsConstants.Height / height);
                 if (a > 1)
                 {
                     h = 1;

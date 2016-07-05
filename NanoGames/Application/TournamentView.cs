@@ -3,6 +3,7 @@
 
 using NanoGames.Application.Ui;
 using NanoGames.Engine;
+using NanoGames.Engine.OutputSystems;
 using NanoGames.Synchronization;
 using System;
 using System.Diagnostics;
@@ -85,7 +86,7 @@ namespace NanoGames.Application
                 _currentView.Update(terminal);
 
                 /* Run the rest of the update method, but hide the output. */
-                terminal = new Terminal(null);
+                terminal = new Terminal(NullGraphics.Instance);
                 escape = false;
                 enter = false;
             }

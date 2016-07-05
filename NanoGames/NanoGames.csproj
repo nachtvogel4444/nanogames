@@ -76,6 +76,8 @@
     <Compile Include="Application\TournamentView.cs" />
     <Compile Include="Application\Ui\ColorMenuItem.cs" />
     <Compile Include="Engine\OpenGLWrappers\Framebuffer.cs" />
+    <Compile Include="Engine\OutputSystems\BufferedGraphics.cs" />
+    <Compile Include="Engine\OutputSystems\NullGraphics.cs" />
     <Compile Include="Engine\OutputSystems\NullOutput.cs" />
     <Compile Include="Engine\OutputSystems\Output.cs" />
     <Compile Include="Engine\OutputSystems\ParticleSystem.cs" />
@@ -88,7 +90,6 @@
     <Compile Include="Application\Settings.cs" />
     <Compile Include="Application\SettingsView.cs" />
     <Compile Include="Application\StarfieldView.cs" />
-    <Compile Include="Engine\BufferedRenderer.cs" />
     <Compile Include="Engine\KeyCode.cs" />
     <Compile Include="Engine\KeyEvent.cs" />
     <Compile Include="Synchronization\Cloning.cs" />

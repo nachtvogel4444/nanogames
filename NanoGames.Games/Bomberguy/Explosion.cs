@@ -29,7 +29,7 @@ namespace NanoGames.Games.Bomberguy
             LEFTEND
         }
 
-        public override void Draw(Graphics g)
+        public override void Draw(IGraphics g)
         {
             g.Circle(new Color(1, 0, 0), Center, Size.X / 10);
         }
