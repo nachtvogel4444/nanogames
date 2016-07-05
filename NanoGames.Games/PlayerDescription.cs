@@ -13,16 +13,11 @@ namespace NanoGames.Games
         /// </summary>
         public Color Color { get; set; }
 
-        public IOutput Output { get; set; }
-
-        /// <summary>
-        /// Gets or sets the player's input.
-        /// </summary>
-        public InputState Input { get; set; }
-
         /// <summary>
         /// Gets or sets the player's name.
         /// </summary>
         public string Name { get; set; }
+
+        public IOutput Output { get; set; }
     }
 }

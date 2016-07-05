@@ -18,6 +18,11 @@ namespace NanoGames.Games
         /// </summary>
         public Color Color { get; internal set; }
 
+        /// <summary>
+        /// Gets or sets the player's local color, which is equal to the player's color, except for the local player, where it is white.
+        /// </summary>
+        public Color LocalColor { get; internal set; }
+
         public IOutput Output { get; internal set; }
 
         /// <summary>

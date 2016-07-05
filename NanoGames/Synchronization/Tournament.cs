@@ -274,6 +274,7 @@ namespace NanoGames.Synchronization
                                 Players = playerDescriptions,
                                 Random = _roundRandom,
                                 Output = newOutput,
+                                LocalPlayerIndex = _localPlayerIndex,
                             };
 
                             var match = winningDiscipline.CreateMatch(matchDescription);

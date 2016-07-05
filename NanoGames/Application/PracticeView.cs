@@ -116,6 +116,7 @@ namespace NanoGames.Application
 
                 Random = new Random(),
                 Output = _output,
+                LocalPlayerIndex = 0,
             };
 
             _match = discipline.CreateMatch(description);

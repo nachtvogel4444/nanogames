@@ -39,7 +39,7 @@ namespace NanoGames.Games
             {
                 var player = new TPlayer();
                 player.Match = match;
-                SetPlayerValues(player, i, description.Players[i]);
+                SetPlayerValues(description, player, i, description.Players[i]);
                 players.Add(player);
             }
 
@@ -48,10 +48,11 @@ namespace NanoGames.Games
             return match;
         }
 
-        private void SetPlayerValues(Player player, int index, PlayerDescription description)
+        private void SetPlayerValues(MatchDescription matchDescription, Player player, int index, PlayerDescription description)
         {
             player.Index = index;
             player.Color = description.Color;
+            player.LocalColor = matchDescription.LocalPlayerIndex == index ? Colors.White : description.Color;
             player.Name = description.Name;
             player.Output = description.Output;
         }

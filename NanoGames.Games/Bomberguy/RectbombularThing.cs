@@ -12,5 +12,7 @@ namespace NanoGames.Games.Bomberguy
         Vector BottomLeft { get; }
 
         Vector BottomRight { get; }
+
+        void Draw(IGraphics g);
     }
 }

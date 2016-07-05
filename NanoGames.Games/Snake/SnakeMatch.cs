@@ -137,7 +137,7 @@ namespace NanoGames.Games.Snake
                         var r = i == 0 ? 0.5 : 0.3;
                         var p = segments[i];
 
-                        Output.Graphics.Circle(0.75 * player.Color, new Vector(_xOffset + _scale * (p.X + 0.5), _yOffset + _scale * (p.Y + 0.5)), r * _scale);
+                        Output.Graphics.Circle(0.75 * player.LocalColor, new Vector(_xOffset + _scale * (p.X + 0.5), _yOffset + _scale * (p.Y + 0.5)), r * _scale);
                     }
                 }
             }

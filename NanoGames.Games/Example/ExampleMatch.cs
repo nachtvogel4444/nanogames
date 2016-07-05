@@ -7,6 +7,9 @@ namespace NanoGames.Games.Example
 {
     internal class ExampleMatch : Match<ExamplePlayer>
     {
+        private const double _radius = 8;
+        private const double _tolerance = 2;
+
         private const int _stepsPerFrame = 10;
         private const double _acceleration = 0.001;
         private const double _maxSpeed = 0.5;
@@ -65,13 +68,10 @@ namespace NanoGames.Games.Example
             }
 
             /* Draw the goal for all players. */
-            var v = new Vector(ExamplePlayer.Radius + ExamplePlayer.Tolerance, ExamplePlayer.Radius + ExamplePlayer.Tolerance);
+            var v = new Vector(_radius + _tolerance, _radius + _tolerance);
             Output.Graphics.Rectangle(new Color(0.25, 0.25, 0.25), _center - v, _center + v);
 
-            foreach (var player in Players)
-            {
-                player.DrawScreen();
-            }
+            DrawScreen();
         }
 
         private static Vector LimitSpeed(Vector velocity)
@@ -108,6 +108,33 @@ namespace NanoGames.Games.Example
             }
 
             return vector;
+        }
+
+        private void DrawScreen()
+        {
+            /* Draw each player. */
+            foreach (var player in Players)
+            {
+                /* Skip players that have already finished. */
+                if (player.HasFinished)
+                {
+                    continue;
+                }
+
+                Color color = player.LocalColor;
+
+                /* Due to the wrap around, a single player can be visible on both edges of the screen. */
+
+                var x1 = player.Position.X;
+                var y1 = player.Position.Y;
+                var x2 = x1 + (x1 < 160 ? 320 : -320);
+                var y2 = y1 + (y1 < 100 ? 200 : -200);
+
+                Output.Graphics.Circle(color, new Vector(x1, y1), _radius);
+                Output.Graphics.Circle(color, new Vector(x1, y2), _radius);
+                Output.Graphics.Circle(color, new Vector(x2, y1), _radius);
+                Output.Graphics.Circle(color, new Vector(x2, y2), _radius);
+            }
         }
 
         private void MovePlayer(ExamplePlayer player)
@@ -180,7 +207,7 @@ namespace NanoGames.Games.Example
 
                 if (otherPlayer != player
                     && !otherPlayer.HasFinished
-                    && relativePosition.Length < 2 * ExamplePlayer.Radius)
+                    && relativePosition.Length < 2 * _radius)
                 {
                     /*
                      * We overlap with the other player.
@@ -205,7 +232,7 @@ namespace NanoGames.Games.Example
             }
 
             /* Check for the victory condition. */
-            if ((player.Position - _center).Length < ExamplePlayer.Tolerance)
+            if ((player.Position - _center).Length < _tolerance)
             {
                 ++_finishedPlayers;
                 player.HasFinished = true;

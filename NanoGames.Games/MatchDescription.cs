@@ -20,5 +20,7 @@ namespace NanoGames.Games
         public Random Random { get; set; }
 
         public IOutput Output { get; set; }
+
+        public int LocalPlayerIndex { get; set; }
     }
 }

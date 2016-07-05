@@ -103,10 +103,6 @@ namespace NanoGames.Games.Bomberguy
 
             foreach (var p in this.Players)
             {
-                DrawField(p);
-
-                p.Draw(p.Output.Graphics);
-
                 /* Skip players that have already finished. */
                 if (!p.Alive) continue;
 
@@ -118,6 +114,8 @@ namespace NanoGames.Games.Bomberguy
 
                 CheckDeath(p);
             }
+
+            DrawField(Output.Graphics);
         }
 
         private void InitializeField()
@@ -200,16 +198,30 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
-        private void DrawField(BomberGuy p)
+        private void DrawField(IGraphics g)
         {
+            /* Draw each player. */
+            foreach (var player in Players)
+            {
+                /* Skip players that have already finished. */
+                if (player.Dead) continue;
+
+                Color color = player.LocalColor;
+
+                g.Line(color, player.Position + new Vector(player.Size.X / 2d, 0), player.Position + new Vector(player.Size.X, player.Size.Y / 2d));
+                g.Line(color, player.Position + new Vector(player.Size.X, player.Size.Y / 2d), player.Position + new Vector(player.Size.X / 2d, player.Size.Y));
+                g.Line(color, player.Position + new Vector(player.Size.X / 2d, player.Size.Y), player.Position + new Vector(0, player.Size.Y / 2d));
+                g.Line(color, player.Position + new Vector(0, player.Size.Y / 2d), player.Position + new Vector(player.Size.X / 2d, 0));
+            }
+
             for (int r = 0; r < _fieldSize; r++)
             {
                 for (int c = 0; c < _fieldSize; c++)
                 {
-                    BomberThing thing = _field[r, c];
+                    var thing = _field[r, c];
 
                     if (thing != null)
-                        thing.Draw(p.Output.Graphics);
+                        thing.Draw(g);
                 }
             }
         }
