@@ -60,7 +60,7 @@ namespace NanoGames.Application.Ui
                 return;
             }
 
-            ProcessInput(terminal.KeyEvents);
+            ProcessInput(terminal);
 
             SelectedIndex = (SelectedIndex + items) % items;
 
@@ -76,26 +76,29 @@ namespace NanoGames.Application.Ui
             }
         }
 
-        private void ProcessInput(List<KeyEvent> keyEvents)
+        private void ProcessInput(Terminal terminal)
         {
-            foreach (var keyEvent in keyEvents)
+            foreach (var keyEvent in terminal.KeyEvents)
             {
                 switch (keyEvent.Code)
                 {
                     case KeyCode.Up:
                         --SelectedIndex;
+                        terminal.Audio.Play(Sounds.HighBeep);
                         break;
 
                     case KeyCode.Down:
                         ++SelectedIndex;
+                        terminal.Audio.Play(Sounds.HighBeep);
                         break;
 
                     case KeyCode.Escape:
+                        terminal.Audio.Play(Sounds.HighBeep);
                         OnBack?.Invoke();
                         break;
 
                     default:
-                        Items?[SelectedIndex]?.HandleKeyEvent(keyEvent);
+                        Items?[SelectedIndex]?.HandleKeyEvent(terminal, keyEvent);
                         break;
                 }
             }

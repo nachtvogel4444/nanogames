@@ -56,6 +56,15 @@ namespace NanoGames.Games.FallingBlocks
         /// </summary>
         public const double ContainerBorder = 1;
 
+        public static readonly Sound[] DropSounds = new[]
+        {
+            Sounds.LowBeep,
+            Sound.Sequence(Sounds.LowBeep, Sound.Chirp(0.1, Pitch.C(5), Pitch.C(6))),
+            Sound.Sequence(Sounds.LowBeep, Sound.Chirp(0.1, Pitch.C(5), Pitch.C(6)), Sound.Chirp(0.1, Pitch.E(5), Pitch.E(6))),
+            Sound.Sequence(Sounds.LowBeep, Sound.Chirp(0.1, Pitch.C(5), Pitch.C(6)), Sound.Chirp(0.1, Pitch.E(5), Pitch.E(6)), Sound.Chirp(0.1, Pitch.G(5), Pitch.G(6))),
+            Sound.Sequence(Sounds.LowBeep, Sound.Chirp(0.1, Pitch.C(5), Pitch.C(6)), Sound.Chirp(0.1, Pitch.E(5), Pitch.E(6)), Sound.Chirp(0.1, Pitch.G(5), Pitch.G(6)), Sound.Chirp(0.1, Pitch.Bb(5), Pitch.Bb(6))),
+        };
+
         /// <summary>
         /// The color of the container.
         /// </summary>

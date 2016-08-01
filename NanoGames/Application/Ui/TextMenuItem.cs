@@ -88,7 +88,7 @@ namespace NanoGames.Application.Ui
         }
 
         /// <inheritdoc/>
-        public override void HandleKeyEvent(KeyEvent keyEvent)
+        public override void HandleKeyEvent(Terminal terminal, KeyEvent keyEvent)
         {
             if (keyEvent.Char != 0)
             {
@@ -99,7 +99,12 @@ namespace NanoGames.Application.Ui
                 switch (keyEvent.Code)
                 {
                     case KeyCode.Enter:
-                        OnActivate?.Invoke();
+                        if (OnActivate != null)
+                        {
+                            terminal.Audio.Play(Sounds.LowBeep);
+                            OnActivate.Invoke();
+                        }
+
                         break;
 
                     case KeyCode.Left:

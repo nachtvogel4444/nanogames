@@ -21,8 +21,9 @@ namespace NanoGames.Application.Ui
         /// <summary>
         /// Handles a key event.
         /// </summary>
+        /// <param name="terminal">The current terminal.</param>
         /// <param name="keyEvent">The key event to handle.</param>
-        public virtual void HandleKeyEvent(KeyEvent keyEvent)
+        public virtual void HandleKeyEvent(Terminal terminal, KeyEvent keyEvent)
         {
         }
     }

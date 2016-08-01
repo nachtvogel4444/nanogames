@@ -91,7 +91,7 @@ namespace NanoGames.Application.Ui
         }
 
         /// <inheritdoc/>
-        public override void HandleKeyEvent(KeyEvent keyEvent)
+        public override void HandleKeyEvent(Terminal terminal, KeyEvent keyEvent)
         {
             if (Choices != null && Choices.Count > 0)
             {
@@ -99,13 +99,13 @@ namespace NanoGames.Application.Ui
                 {
                     case KeyCode.Left:
                         SelectedIndex = (SelectedIndex + Choices.Count - 1) % Choices.Count;
-                        InvokeOnSelect();
+                        InvokeOnSelect(terminal);
                         break;
 
                     case KeyCode.Right:
                     case KeyCode.Enter:
                         SelectedIndex = (SelectedIndex + 1) % Choices.Count;
-                        InvokeOnSelect();
+                        InvokeOnSelect(terminal);
                         break;
                 }
             }
@@ -126,8 +126,9 @@ namespace NanoGames.Application.Ui
             }
         }
 
-        private void InvokeOnSelect()
+        private void InvokeOnSelect(Terminal terminal)
         {
+            terminal.Audio.Play(Sounds.LowBeep);
             OnSelect?.Invoke(SelectedValue);
         }
     }

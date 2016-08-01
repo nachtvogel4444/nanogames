@@ -302,6 +302,8 @@ namespace NanoGames.Games.FallingBlocks
                 }
             }
 
+            Output.Audio.Play(Constants.DropSounds[clearedLines]);
+
             for (int i = 1; i < clearedLines; ++i)
             {
                 LeftPlayer?._inbox.Add(Color);

@@ -9,6 +9,11 @@ namespace NanoGames
     public interface IOutput
     {
         /// <summary>
+        /// Gets the audio system.
+        /// </summary>
+        IAudio Audio { get; }
+
+        /// <summary>
         /// Gets the particle system.
         /// </summary>
         IParticleSystem Particles { get; }

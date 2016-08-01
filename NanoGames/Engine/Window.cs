@@ -1,6 +1,7 @@
 ﻿// Copyright (c) the authors of nanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using NanoGames.Engine.OutputSystems;
 using OpenTK;
 using OpenTK.Input;
 using System;
@@ -108,31 +109,34 @@ namespace NanoGames.Engine
 
             try
             {
-                using (var renderer = new Renderer())
+                using (var audio = new Audio())
                 {
-                    var terminal = new Terminal(renderer);
-
-                    using (var mainView = createMainView())
+                    using (var renderer = new Renderer())
                     {
-                        while (true)
+                        var terminal = new Terminal(renderer, audio);
+
+                        using (var mainView = createMainView())
                         {
-                            _gameWindow.ProcessEvents();
-
-                            if (_closing)
+                            while (true)
                             {
-                                return;
+                                _gameWindow.ProcessEvents();
+
+                                if (_closing)
+                                {
+                                    return;
+                                }
+
+                                var width = _gameWindow.Width;
+                                var height = _gameWindow.Height;
+
+                                renderer.BeginFrame(width, height);
+                                UpdateKeyEvents(terminal.KeyEvents);
+                                terminal.Input = GetInput();
+                                mainView.Update(terminal);
+                                renderer.EndFrame();
+
+                                _gameWindow.SwapBuffers();
                             }
-
-                            var width = _gameWindow.Width;
-                            var height = _gameWindow.Height;
-
-                            renderer.BeginFrame(width, height);
-                            UpdateKeyEvents(terminal.KeyEvents);
-                            terminal.Input = GetInput();
-                            mainView.Update(terminal);
-                            renderer.EndFrame();
-
-                            _gameWindow.SwapBuffers();
                         }
                     }
                 }

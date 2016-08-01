@@ -18,6 +18,9 @@ namespace NanoGames.Engine.OutputSystems
         }
 
         /// <inheritdoc/>
+        public IAudio Audio => NullAudio.Instance;
+
+        /// <inheritdoc/>
         public IParticleSystem Particles => NullParticleSystem.Instance;
 
         /// <inheritdoc/>
@@ -28,9 +31,26 @@ namespace NanoGames.Engine.OutputSystems
         {
         }
 
+        private sealed class NullAudio : IAudio
+        {
+            public static readonly IAudio Instance = new NullAudio();
+
+            private NullAudio()
+            {
+            }
+
+            public void Play(Sound sound)
+            {
+            }
+        }
+
         private sealed class NullParticleSystem : IParticleSystem
         {
             public static readonly IParticleSystem Instance = new NullParticleSystem();
+
+            private NullParticleSystem()
+            {
+            }
 
             public double MeanDistance { get; set; }
 

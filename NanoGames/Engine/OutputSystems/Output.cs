@@ -8,9 +8,14 @@ namespace NanoGames.Engine.OutputSystems
     /// </summary>
     internal sealed class Output : IOutput
     {
+        private readonly BufferedAudio _audio = new BufferedAudio();
+
         private readonly ParticleSystem _particles = new ParticleSystem();
 
         private BufferedGraphics _graphics;
+
+        /// <inheritdoc/>
+        public IAudio Audio => _audio;
 
         /// <inheritdoc/>
         public IParticleSystem Particles => _particles;
@@ -32,6 +37,7 @@ namespace NanoGames.Engine.OutputSystems
         /// <inheritdoc/>
         public void SetFrame(int frame)
         {
+            _audio.SetFrame(frame);
             _graphics?.Clear();
             _particles.SetFrame(frame);
         }
@@ -43,6 +49,7 @@ namespace NanoGames.Engine.OutputSystems
         /// <param name="terminal">The terminal to render to.</param>
         public void Render(double frame, Terminal terminal)
         {
+            _audio.Render(frame, terminal.Audio);
             _graphics?.Render(terminal.Graphics);
             _particles.Render(frame, terminal.Graphics);
         }

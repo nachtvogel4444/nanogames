@@ -26,6 +26,8 @@ namespace NanoGames.Games.Bomberguy
 
         protected override void OnDestroy(Vector cell)
         {
+            Match.Output.Audio.Play(Sounds.Explosion);
+
             CreateExplosions(cell);
 
             Match.CheckAllDeaths();
