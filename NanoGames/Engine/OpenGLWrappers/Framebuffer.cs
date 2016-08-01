@@ -75,7 +75,7 @@ namespace NanoGames.Engine.OpenGLWrappers
                 _width = width;
                 _height = height;
                 GL.BindTexture(TextureTarget.Texture2D, _frameTextureId);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba32f, width, height, 0, PixelFormat.Rgba, PixelType.Float, IntPtr.Zero);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb16f, width, height, 0, PixelFormat.Rgb, PixelType.HalfFloat, IntPtr.Zero);
             }
         }
 

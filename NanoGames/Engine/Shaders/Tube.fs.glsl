@@ -10,14 +10,9 @@ in vec2 FragmentTextureCoordinate;
 
 out vec4 OutputColor;
 
-vec3 gammaCorrect(vec3 color)
-{
-	return vec3(pow(color.r, 2.2), pow(color.g, 2.2), pow(color.b, 2.2));
-}
-
 vec3 screenTexture(vec2 coord)
 {
-	return texture2D(ScreenTexture, coord).rgb + 2.0 * texture2D(BlurTexture, coord).rgb;
+	return 1.5 * texture2D(ScreenTexture, coord).rgb + 2.0 * texture2D(BlurTexture, coord).rgb;
 }
 
 float matrixTexture(float y)
@@ -41,9 +36,8 @@ void main()
 	float cg = screenTexture(textureCoordinate + 0.0005 * vec2(0, -1)).g;
 	float cb = screenTexture(textureCoordinate + 0.0005 * vec2(-0.866, 0.5)).b;
 	
-	float m = matrixTexture(textureCoordinate.y);
-	
+	float m = matrixTexture(textureCoordinate.y);	
 
 	/* Sample the input at slight offsets to simulate a slight chromatic aberration. */
-	OutputColor = vec4(m * gammaCorrect(vec3(cr, cg, cb)), 1);
+	OutputColor = vec4(m * vec3(cr, cg, cb), 1);
 }

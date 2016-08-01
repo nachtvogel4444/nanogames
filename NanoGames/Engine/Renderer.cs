@@ -80,8 +80,6 @@ namespace NanoGames.Engine
         /// <param name="height">The height in pixels.</param>
         public void BeginFrame(int width, int height)
         {
-            GL.Enable(EnableCap.FramebufferSrgb);
-
             _postProcessor.BeginFrame(width, height);
 
             if ((double)width / (double)height > GraphicsConstants.Width / GraphicsConstants.Height)
