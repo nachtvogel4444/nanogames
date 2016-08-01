@@ -23,6 +23,10 @@ namespace NanoGames.Application
             if (DebugMode.IsEnabled)
             {
                 terminal.Graphics.Print(color, fontSize, new Vector(0, 0), "DEBUG");
+                for (int i = 0; i <= System.GC.MaxGeneration; ++i)
+                {
+                    terminal.Graphics.Print(color, fontSize, new Vector(0, (i + 1) * fontSize), string.Format("GC{0}: {1}", i, System.GC.CollectionCount(i)));
+                }
             }
 
             var time = Stopwatch.GetTimestamp();
