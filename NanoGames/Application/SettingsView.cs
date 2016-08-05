@@ -69,6 +69,19 @@ namespace NanoGames.Application
                             Settings.Instance.IsVSynced = v;
                         },
                     },
+                    new ChoiceMenuItem<bool>("QUALITY")
+                    {
+                        Choices =
+                        {
+                            new Choice<bool>(false, "HIGH"),
+                            new Choice<bool>(true, "LOW"),
+                        },
+                        SelectedValue = Settings.Instance.ReducedDetails,
+                        OnSelect = v =>
+                        {
+                            Settings.Instance.ReducedDetails = v;
+                        },
+                    },
                     new ChoiceMenuItem<bool>("SHOW FPS")
                     {
                         Choices =
