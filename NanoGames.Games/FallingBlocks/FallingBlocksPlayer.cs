@@ -32,6 +32,8 @@ namespace NanoGames.Games.FallingBlocks
 
         private bool _hasLost;
 
+        private int _nextPiece;
+
         public FallingBlocksPlayer LeftPlayer { get; set; }
 
         public FallingBlocksPlayer RightPlayer { get; set; }
@@ -47,6 +49,8 @@ namespace NanoGames.Games.FallingBlocks
         public void Initialize()
         {
             Score = int.MaxValue;
+
+            SetNextPiece();
 
             for (int i = 0; i < Constants.InitialGarbageLines; ++i)
             {
@@ -93,9 +97,11 @@ namespace NanoGames.Games.FallingBlocks
 
             if (_fallingPiece == null)
             {
-                _fallingPiece = Constants.RotatedPieces[Match.Random.Next(Constants.RotatedPieces.Length)];
+                _fallingPiece = Constants.RotatedPieces[_nextPiece];
                 _fallingPieceRotation = 1;
                 _fallingPieceX = (Constants.Width - _fallingPiece[_fallingPieceRotation].GetLength(0)) / 2;
+
+                SetNextPiece();
 
                 _fallingPieceY = -_fallingPiece[_fallingPieceRotation].GetLength(1);
 
@@ -201,6 +207,11 @@ namespace NanoGames.Games.FallingBlocks
                     }
                 }
             }
+        }
+
+        private void SetNextPiece()
+        {
+            _nextPiece = Match.Random.Next(Constants.RotatedPieces.Length);
         }
 
         private void SetHasMoved()
