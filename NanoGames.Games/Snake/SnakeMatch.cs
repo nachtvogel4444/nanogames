@@ -46,6 +46,8 @@ namespace NanoGames.Games.Snake
             int spawnOffset = 0;
             foreach (var player in Players)
             {
+                player.Score = int.MaxValue;
+
                 Position spawnPosition;
                 Direction spawnDirection;
 
