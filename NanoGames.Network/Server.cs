@@ -203,6 +203,8 @@ namespace NanoGames.Network
 
             public TcpConnection(Server server, TcpClient tcpClient)
             {
+                tcpClient.NoDelay = true;
+
                 _server = server;
                 _tcpClient = tcpClient;
                 _stream = tcpClient.GetStream();

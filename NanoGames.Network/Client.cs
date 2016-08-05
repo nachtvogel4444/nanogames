@@ -22,6 +22,7 @@ namespace NanoGames.Network
         {
             _tcpClient = new TcpClient(AddressFamily.InterNetworkV6);
             _tcpClient.Client.DualMode = true;
+            _tcpClient.NoDelay = true;
         }
 
         /// <summary>
