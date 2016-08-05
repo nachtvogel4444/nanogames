@@ -19,6 +19,5 @@ namespace NanoGames.Games.Banana
         public const double LengthBullet = 1;
         public const int WaitToNextBullet = 6;
         public const double Gravity = 0.01;
-
     }
 }

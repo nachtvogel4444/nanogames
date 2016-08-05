@@ -67,7 +67,7 @@ namespace NanoGames.Games.Banana
             }
 
             /* Draw all the bullets. */
-            foreach (Bullet bullet in Match.BulletList)
+            foreach (SimpleBullet bullet in Match.BulletList)
             {
                 if (bullet.IsExploded)
                 {

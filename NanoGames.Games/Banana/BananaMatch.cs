@@ -11,13 +11,18 @@ namespace NanoGames.Games.Banana
 {
     class BananaMatch : Match<BananaPlayer>
     {
-        public List<Bullet> BulletList = new List<Bullet>();
         public int FrameCounter = 0;
+        public int StartRound = 0;
+        public BananaPlayer ActivePlayer;
+        public int PartOfRound = 0;
+        public List<object> bulletList = new List<object>();
 
         protected override void Initialize()
         {
             double offset = 20.0;
             int start = Convert.ToInt32(Random.NextDouble() * (320 - offset) + 0.5 * offset);
+
+            ActivePlayer = Players[(int) System.Math.Floor(Random.NextDouble() * Players.Count)];
 
             for (int i = 0; i < Players.Count; ++i)
             {
@@ -32,43 +37,34 @@ namespace NanoGames.Games.Banana
             int y = 100 + Constants.RadiusPlayer;
             Graphics.Line(new Color(1, 1, 1), new Vector(0, y), new Vector(320, y));
 
-            foreach (Bullet bullet in BulletList)
+            if (PartOfRound == 0)
             {
-                bullet.MoveBullet();
+                RotatePlayer(ActivePlayer);
+                //ChangePowerBar(player);
+                ShootGun(ActivePlayer, bulletList);
+
+                foreach (var player in Players)
+                {
+                    player.DrawScreen();
+                }
             }
 
-            foreach (var player in Players)
+            if (PartOfRound == 1)
             {
-                MovePlayer(player);
-                RotatePlayer(player);
-                ShootGun(player, BulletList);
+                if (StartRound == 0)
+                {
+                    StartRound = 1;
+
+                }
+
+                foreach (var player in Players)
+                {
+                    player.DrawScreen();
+                }
             }
 
-            foreach (var player in Players)
-            {
-                player.DrawScreen();
-            }
 
             FrameCounter++;
-        }
-
-        private void MovePlayer(BananaPlayer player)
-        {
-            /* Skip players that have already finished. */
-            if (player.HasFinished)
-            {
-                return;
-            }
-
-            if (player.Input.Left)
-            {
-                player.Position -= new Vector(Constants.StepPlayer, 0);
-            }
-
-            if (player.Input.Right)
-            {
-                player.Position += new Vector(Constants.StepPlayer, 0);
-            }
         }
 
         private void RotatePlayer(BananaPlayer player)
@@ -79,51 +75,27 @@ namespace NanoGames.Games.Banana
                 return;
             }
 
+            if (player.Input.Left)
+            {
+                player.Angle += player.Angle;
+            }
+
+            if (player.Input.Right)
+            {
+                player.Angle -= player.Angle;
+            }
             if (player.Angle < 0)
             {
-                player.Angle = 2 * Math.PI + player.Angle;
+                player.Angle = 0;
             }
 
-            if (player.Angle > 2 * Math.PI)
+            if (player.Angle > Math.PI)
             {
-                player.Angle = player.Angle - 2 * Math.PI;
-            }
-            
-            if (player.Input.AltFire)
-            {
-                player.GunIsRight = !player.GunIsRight;
-                player.Angle = Math.PI - player.Angle;
-            }
-
-            if (player.Input.Up)
-            {
-                if (((player.Angle >= 0) && (player.Angle <= 0.5 * Math.PI)) || ((player.Angle >= 1.5 * Math.PI) && (player.Angle <= 2 * Math.PI)))
-                {
-                    player.Angle += Constants.StepAngle;
-                }
-
-                if (player.Angle > 0.5 * Math.PI && player.Angle < 1.5 * Math.PI)
-                {
-                    player.Angle -= Constants.StepAngle;
-                }
-            }
-
-            if (player.Input.Down)
-            {
-                if (((player.Angle >= 0) && (player.Angle <= 0.5 * Math.PI)) || ((player.Angle >= 1.5 * Math.PI) && (player.Angle <= 2 * Math.PI)))
-                {
-                    player.Angle -= Constants.StepAngle;
-                }
-
-                if (player.Angle > 0.5 * Math.PI && player.Angle < 1.5 * Math.PI)
-                {
-                    player.Angle += Constants.StepAngle;
-                }
-                
+                player.Angle = Math.PI;
             }
         }
 
-        private void ShootGun(BananaPlayer player, List<Bullet> bulletList)
+        private void ShootGun(BananaPlayer player)
         {
             /* Skip players that have already finished. */
             if (player.HasFinished)
@@ -131,20 +103,9 @@ namespace NanoGames.Games.Banana
                 return;
             }
 
-            if (player.Input.Fire)
+            if ((player.Input.Fire) && (PartOfRound == 0))
             {
-                if (bulletList.Count == 0)
-                {
-                    bulletList.Add(new Bullet(player.Position, player.Angle, player.SpeedBullet));
-                }
-
-                else
-                {
-                    if (bulletList[bulletList.Count - 1].LifeTime > Constants.WaitToNextBullet)
-                        {
-                            bulletList.Add(new Bullet(player.Position, player.Angle, player.SpeedBullet));
-                        }
-                }
+                PartOfRound = 1;
             }
         }
     }

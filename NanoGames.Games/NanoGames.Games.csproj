@@ -49,7 +49,7 @@
     </Compile>
     <Compile Include="Banana\BananaMatch.cs" />
     <Compile Include="Banana\BananaPlayer.cs" />
-    <Compile Include="Banana\Bullet.cs" />
+    <Compile Include="Banana\SimpleBullet.cs" />
     <Compile Include="Banana\Polygon.cs" />
     <Compile Include="Banana\Constants.cs" />
     <Compile Include="Banana\Methods.cs" />

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace NanoGames.Games.Banana
 {
-    internal class Bullet
+    internal class SimpleBullet
     {
         public Vector StartPosition;
         public Vector Position;
@@ -20,7 +20,7 @@ namespace NanoGames.Games.Banana
         public double LifeTime;
         public bool IsExploded;
 
-        public Bullet(Vector startPosition, double angle, double velocity)
+        public SimpleBullet(Vector startPosition, double angle, double velocity)
         {
             StartPosition = startPosition;
             StartVelocity = velocity * new Vector(Math.Cos(angle), -Math.Sin(angle));
@@ -29,7 +29,7 @@ namespace NanoGames.Games.Banana
             IsExploded = false;
         }
 
-        public void MoveBullet()
+        public void MoveSimpleBullet()
         {
             Position = StartPosition + LifeTime * StartVelocity + 0.5 * LifeTime * LifeTime * Accelaration;
             Velocity = StartVelocity + LifeTime * Accelaration;
