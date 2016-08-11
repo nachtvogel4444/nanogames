@@ -18,29 +18,14 @@ namespace NanoGames.Games.Bomberguy
         private double _playerSpeed;
         private double _pixelsPerUnit;
         private double _widthOffset;
-        private BomberThing[,] _field;
-        private int _deadPlayers;
-
-        public int DeadPlayers
-        {
-            get
-            {
-                return _deadPlayers;
-            }
-
-            set
-            {
-                _deadPlayers = value;
-                CheckCompleted();
-            }
-        }
+        private RectbombularThing[,] _field;
 
         public Vector CellSize
         {
             get { return new Vector(_pixelsPerUnit, _pixelsPerUnit); }
         }
 
-        public BomberThing this[Vector v]
+        public RectbombularThing this[Vector v]
         {
             get
             {
@@ -53,7 +38,7 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
-        public BomberThing this[int x, int y]
+        public RectbombularThing this[int x, int y]
         {
             get
             {
@@ -98,12 +83,12 @@ namespace NanoGames.Games.Bomberguy
         {
             _fieldSize = FIELD_MIN_SIZE + ((int)(Players.Count / 4)) * 2;
 
-            _field = new BomberThing[_fieldSize, _fieldSize];
+            _field = new RectbombularThing[_fieldSize, _fieldSize];
 
             _playerSpeed = PLAYER_SPEED / _fieldSize;
 
-            _pixelsPerUnit = Graphics.Height / _fieldSize;
-            _widthOffset = (Graphics.Width - Graphics.Height) / 2d;
+            _pixelsPerUnit = GraphicsConstants.Height / _fieldSize;
+            _widthOffset = (GraphicsConstants.Width - GraphicsConstants.Height) / 2d;
 
             // initialize all obstacles
             InitializeField();
@@ -114,14 +99,14 @@ namespace NanoGames.Games.Bomberguy
 
         protected override void Update()
         {
+            CheckCompleted();
+
             foreach (var p in this.Players)
             {
-                DrawField(p);
-
-                DrawPlayers(p);
-
                 /* Skip players that have already finished. */
-                if (p.Dead) continue;
+                if (!p.Alive) continue;
+
+                p.Score = Frame;
 
                 MovePlayer(p);
 
@@ -129,6 +114,8 @@ namespace NanoGames.Games.Bomberguy
 
                 CheckDeath(p);
             }
+
+            DrawField(Output.Graphics);
         }
 
         private void InitializeField()
@@ -162,7 +149,7 @@ namespace NanoGames.Games.Bomberguy
             foreach (BomberGuy p in Players)
             {
                 playerArray[side, playerCount] = p;
-                if (side++ > 3)
+                if (++side > 3)
                 {
                     side = 0;
                     playerCount++;
@@ -211,16 +198,30 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
-        private void DrawField(BomberGuy p)
+        private void DrawField(IGraphics g)
         {
+            /* Draw each player. */
+            foreach (var player in Players)
+            {
+                /* Skip players that have already finished. */
+                if (player.Dead) continue;
+
+                Color color = player.LocalColor;
+
+                g.Line(color, player.Position + new Vector(player.Size.X / 2d, 0), player.Position + new Vector(player.Size.X, player.Size.Y / 2d));
+                g.Line(color, player.Position + new Vector(player.Size.X, player.Size.Y / 2d), player.Position + new Vector(player.Size.X / 2d, player.Size.Y));
+                g.Line(color, player.Position + new Vector(player.Size.X / 2d, player.Size.Y), player.Position + new Vector(0, player.Size.Y / 2d));
+                g.Line(color, player.Position + new Vector(0, player.Size.Y / 2d), player.Position + new Vector(player.Size.X / 2d, 0));
+            }
+
             for (int r = 0; r < _fieldSize; r++)
             {
                 for (int c = 0; c < _fieldSize; c++)
                 {
-                    BomberThing thing = _field[r, c];
+                    var thing = _field[r, c];
 
                     if (thing != null)
-                        thing.Draw(p.Graphics);
+                        thing.Draw(g);
                 }
             }
         }
@@ -229,129 +230,126 @@ namespace NanoGames.Games.Bomberguy
         {
             double x = 0, y = 0;
 
-            if (p.Input.Up && !p.Input.Down)
+            Vector inputVector = GetInputVector(p.Input);
+            inputVector = inputVector.Normalized;
+
+            if (p.Input.Up.IsPressed && !p.Input.Down.IsPressed)
             {
-                var neighborLeft = this[GetCell(p.Position + new Vector(0, -_playerSpeed))];
-                if (neighborLeft != null)
+                var neighborLeft = this[GetCell(p.Position + new Vector(0, _playerSpeed * inputVector.Y))];
+                bool neighborLeftPassable = neighborLeft == null;
+                bool slideToRightAllowed = false;
+                if (neighborLeft != null && !(neighborLeftPassable = neighborLeft.Passable))
                 {
-                    var xDistance = p.Center.X - (neighborLeft.Position + neighborLeft.Size).X;
-                    var yDistance = p.Center.Y - (neighborLeft.Position + neighborLeft.Size).Y;
+                    var xDistance = p.Center.X - neighborLeft.BottomRight.X;
+                    var yDistance = p.Center.Y - neighborLeft.BottomRight.Y;
 
-                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborLeft = null;
-                    }
+                    DetermineMovement(out neighborLeftPassable, out slideToRightAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
 
-                var neighborRight = this[GetCell(p.Position + new Vector(p.Size.X, -_playerSpeed))];
-                if (neighborRight != null)
+                var neighborRight = this[GetCell(p.Position + new Vector(p.Size.X, _playerSpeed * inputVector.Y))];
+                bool neighborRightPassable = neighborRight == null;
+                bool slideToLeftAllowed = false;
+                if (neighborRight != null && !(neighborRightPassable = neighborRight.Passable))
                 {
-                    var xDistance = (neighborRight.Position).X - p.Center.X;
-                    var yDistance = p.Center.Y - (neighborRight.Position + neighborRight.Size).Y;
+                    neighborRightPassable = neighborRight.Passable;
+                    var xDistance = neighborRight.BottomLeft.X - p.Center.X;
+                    var yDistance = p.Center.Y - neighborRight.BottomRight.Y;
 
-                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborRight = null;
-                    }
+                    DetermineMovement(out neighborRightPassable, out slideToLeftAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
-                if ((neighborLeft == null || neighborLeft.Passable) && (neighborRight == null || neighborRight.Passable))
+                if (neighborLeftPassable && neighborRightPassable)
                 {
                     y = -1;
+                    x = slideToRightAllowed ? 1 : slideToLeftAllowed ? -1 : x;
                 }
             }
-            if (p.Input.Down && !p.Input.Up)
+            if (p.Input.Down.IsPressed && !p.Input.Up.IsPressed)
             {
-                var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, _playerSpeed))];
-                if (neighborLeft != null)
+                var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, _playerSpeed * inputVector.Y))];
+                bool neighborLeftPassable = neighborLeft == null;
+                bool slideToRightAllowed = false;
+                if (neighborLeft != null && !(neighborLeftPassable = neighborLeft.Passable))
                 {
-                    var xDistance = p.Center.X - (neighborLeft.Position + neighborLeft.Size).X;
-                    var yDistance = (neighborLeft.Position).Y - p.Center.Y;
+                    neighborLeftPassable = neighborLeft.Passable;
+                    var xDistance = p.Center.X - neighborLeft.TopRight.X;
+                    var yDistance = neighborLeft.TopRight.Y - p.Center.Y;
 
-                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborLeft = null;
-                    }
+                    DetermineMovement(out neighborLeftPassable, out slideToRightAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
 
-                var neighborRight = this[GetCell(p.Position + p.Size + new Vector(0, _playerSpeed))];
-                if (neighborRight != null)
+                var neighborRight = this[GetCell(p.Position + p.Size + new Vector(0, _playerSpeed * inputVector.Y))];
+                bool neighborRightPassable = neighborRight == null;
+                bool slideToLeftAllowed = false;
+                if (neighborRight != null && !(neighborRightPassable = neighborRight.Passable))
                 {
-                    var xDistance = (neighborRight.Position).X - p.Center.X;
-                    var yDistance = (neighborRight.Position).Y - p.Center.Y;
+                    var xDistance = neighborRight.TopLeft.X - p.Center.X;
+                    var yDistance = neighborRight.TopLeft.Y - p.Center.Y;
 
-                    if (yDistance < 0 || (yDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborRight = null;
-                    }
+                    DetermineMovement(out neighborRightPassable, out slideToLeftAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
-                if ((neighborLeft == null || neighborLeft.Passable) && (neighborRight == null || neighborRight.Passable))
+                if (neighborLeftPassable && neighborRightPassable)
                 {
                     y = 1;
+                    x = slideToRightAllowed ? 1 : slideToLeftAllowed ? -1 : x;
                 }
             }
-            if (p.Input.Left && !p.Input.Right)
+            if (p.Input.Left.IsPressed && !p.Input.Right.IsPressed)
             {
-                var neighborAbove = this[GetCell(p.Position + new Vector(-_playerSpeed, 0))];
-
-                if (neighborAbove != null)
+                var neighborAbove = this[GetCell(p.Position + new Vector(_playerSpeed * inputVector.X, 0))];
+                bool neighborAbovePassable = neighborAbove == null;
+                bool slideToDownAllowed = false;
+                if (neighborAbove != null && !(neighborAbovePassable = neighborAbove.Passable))
                 {
-                    var xDistance = p.Center.X - (neighborAbove.Position + neighborAbove.Size).X;
-                    var yDistance = p.Center.Y - (neighborAbove.Position + neighborAbove.Size).Y;
+                    var xDistance = p.Center.X - neighborAbove.BottomRight.X;
+                    var yDistance = p.Center.Y - neighborAbove.BottomRight.Y;
 
-                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborAbove = null;
-                    }
+                    DetermineMovement(out neighborAbovePassable, out slideToDownAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
 
-                var neighborBelow = this[GetCell(p.Position + new Vector(-_playerSpeed, p.Size.Y))];
-
-                if (neighborBelow != null)
+                var neighborBelow = this[GetCell(p.Position + new Vector(_playerSpeed * inputVector.X, p.Size.Y))];
+                bool neighborBelowPassable = neighborBelow == null;
+                bool slideToUpAllowed = false;
+                if (neighborBelow != null && !(neighborBelowPassable = neighborBelow.Passable))
                 {
-                    var xDistance = p.Center.X - (neighborBelow.Position + neighborBelow.Size).X;
-                    var yDistance = (neighborBelow.Position).Y - p.Center.Y;
+                    var xDistance = p.Center.X - neighborBelow.TopRight.X;
+                    var yDistance = neighborBelow.TopRight.Y - p.Center.Y;
 
-                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborBelow = null;
-                    }
+                    DetermineMovement(out neighborBelowPassable, out slideToUpAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
 
-                if ((neighborAbove == null || neighborAbove.Passable) && (neighborBelow == null || neighborBelow.Passable))
+                if (neighborAbovePassable && neighborBelowPassable)
                 {
                     x = -1;
+                    y = slideToDownAllowed ? 1 : slideToUpAllowed ? -1 : y;
                 }
             }
-            if (p.Input.Right && !p.Input.Left)
+            if (p.Input.Right.IsPressed && !p.Input.Left.IsPressed)
             {
-                var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed, 0))];
-
-                if (neighborAbove != null)
+                var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed * inputVector.X, 0))];
+                bool neighborAbovePassable = neighborAbove == null;
+                bool slideToDownAllowed = false;
+                if (neighborAbove != null && !(neighborAbovePassable = neighborAbove.Passable))
                 {
-                    var xDistance = (neighborAbove.Position).X - p.Center.X;
-                    var yDistance = p.Center.Y - (neighborAbove.Position + neighborAbove.Size).Y;
+                    var xDistance = neighborAbove.BottomLeft.X - p.Center.X;
+                    var yDistance = p.Center.Y - neighborAbove.BottomLeft.Y;
 
-                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborAbove = null;
-                    }
+                    DetermineMovement(out neighborAbovePassable, out slideToDownAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
 
-                var neighborBelow = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed, p.Size.Y))];
-
-                if (neighborBelow != null)
+                var neighborBelow = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed * inputVector.X, p.Size.Y))];
+                bool neighborBelowPassable = neighborBelow == null;
+                bool slideToUpAllowed = false;
+                if (neighborBelow != null && !(neighborBelowPassable = neighborBelow.Passable))
                 {
-                    var xDistance = (neighborBelow.Position).X - p.Center.X;
-                    var yDistance = (neighborBelow.Position).Y - p.Center.Y;
+                    var xDistance = neighborBelow.TopLeft.X - p.Center.X;
+                    var yDistance = neighborBelow.TopLeft.Y - p.Center.Y;
 
-                    if (xDistance < 0 || (xDistance > 0 && (yDistance / p.Size.Y + xDistance / p.Size.X) > 0.55))
-                    {
-                        neighborBelow = null;
-                    }
+                    DetermineMovement(out neighborBelowPassable, out slideToUpAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
-                if ((neighborAbove == null || neighborAbove.Passable) && (neighborBelow == null || neighborBelow.Passable))
+                if (neighborAbovePassable && neighborBelowPassable)
                 {
                     x = 1;
+                    y = slideToDownAllowed ? 1 : slideToUpAllowed ? -1 : y;
                 }
             }
 
@@ -362,38 +360,40 @@ namespace NanoGames.Games.Bomberguy
             p.Position += direction * _playerSpeed;
         }
 
+        private Vector GetInputVector(Input input)
+        {
+            Vector v = new Vector();
+            if (input.Up.IsPressed && !input.Down.IsPressed) v.Y = -1;
+            if (input.Down.IsPressed && !input.Up.IsPressed) v.Y = 1;
+            if (input.Left.IsPressed && !input.Right.IsPressed) v.X = -1;
+            if (input.Right.IsPressed && !input.Left.IsPressed) v.X = 1;
+
+            return v;
+        }
+
+        private void DetermineMovement(out bool neighborPassable, out bool slideAllowed, double movementDirectionDistance, double sideDistance, double movementDirectionSize, double sideSize)
+        {
+            neighborPassable = false;
+            slideAllowed = false;
+            if (movementDirectionDistance < 0 || (movementDirectionDistance > 0 && (movementDirectionDistance / movementDirectionSize + sideDistance / sideSize) > 0.55))
+            {
+                neighborPassable = true;
+                if (sideSize / 2d - sideDistance < 3d)
+                {
+                    slideAllowed = true;
+                }
+            }
+        }
+
         private void DropBomb(BomberGuy p)
         {
-            if (!p.Input.Fire) return;
+            if (!p.Input.Fire.WasActivated) return;
 
             var cell = GetCell(p);
 
-            var bomb = new Bomb(BOMB_REACH, this, GetCoordinates(cell), new Vector(_pixelsPerUnit * BOMB_RATIO, _pixelsPerUnit * BOMB_RATIO));
+            var bomb = new Bomb(BOMB_REACH, p, this, GetCoordinates(cell), new Vector(_pixelsPerUnit * BOMB_RATIO, _pixelsPerUnit * BOMB_RATIO));
 
             this[cell] = bomb;
-        }
-
-        private void DrawPlayers(BomberGuy p)
-        {
-            /* Draw each player. */
-            foreach (var player in Players)
-            {
-                /* Skip players that have already finished. */
-                if (player.Dead) continue;
-
-                if (player == p)
-                {
-                    /* Always show the current player in white. */
-                    Color playerColor = player.Color;
-                    player.Color = new Color(1, 1, 1);
-                    player.Draw(p.Graphics);
-                    player.Color = playerColor;
-                }
-                else
-                {
-                    player.Draw(p.Graphics);
-                }
-            }
         }
 
         private void CheckDeath(BomberGuy p)
@@ -405,15 +405,16 @@ namespace NanoGames.Games.Bomberguy
 
         private void CheckCompleted()
         {
-            this.IsCompleted = DeadPlayers >= Players.Count - 1;
-
-            if (IsCompleted)
+            int deadPlayers = 0;
+            foreach (var p in Players)
             {
-                foreach (var p in Players)
+                if (p.Dead)
                 {
-                    if (!p.Dead) p.Score = DeadPlayers + 1;
+                    deadPlayers++;
                 }
             }
+
+            this.IsCompleted = deadPlayers == Players.Count || (Players.Count >= 2 && deadPlayers >= Players.Count - 1);
         }
     }
 }

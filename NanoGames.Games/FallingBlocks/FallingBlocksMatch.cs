@@ -13,8 +13,6 @@ namespace NanoGames.Games.FallingBlocks
     {
         private int _activePlayers;
 
-        public int Frame { get; private set; }
-
         public int FallSpeed { get; private set; }
 
         /// <inheritdoc/>
@@ -48,8 +46,6 @@ namespace NanoGames.Games.FallingBlocks
         /// <inheritdoc/>
         protected override void Update()
         {
-            ++Frame;
-
             FallSpeed = (int)Math.Ceiling(60 / (Constants.InitialFallSpeed + Frame / 60.0 * Constants.FallAcceleration));
 
             foreach (var player in Players)
@@ -95,7 +91,7 @@ namespace NanoGames.Games.FallingBlocks
             {
                 if (player.HasLost)
                 {
-                    DrawSpectatorMode(player.Graphics);
+                    DrawSpectatorMode(player.Output.Graphics);
                 }
                 else
                 {
@@ -109,7 +105,7 @@ namespace NanoGames.Games.FallingBlocks
             }
         }
 
-        private void DrawSpectatorMode(Graphics graphics)
+        private void DrawSpectatorMode(IGraphics graphics)
         {
             var o = new Vector(-100, 0);
             foreach (var player in Players.Where(p => !p.HasLost).Take(3))

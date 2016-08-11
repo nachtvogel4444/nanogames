@@ -1,6 +1,7 @@
 ﻿// Copyright (c) the authors of nanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using NanoGames.Engine.OutputSystems;
 using System.Collections.Generic;
 
 namespace NanoGames.Engine
@@ -13,17 +14,18 @@ namespace NanoGames.Engine
         /// <summary>
         /// Initializes a new instance of the <see cref="Terminal"/> class.
         /// </summary>
-        /// <param name="renderer">The renderer.</param>
-        public Terminal(IRenderer renderer)
+        /// <param name="graphics">The graphics interface.</param>
+        /// <param name="audio">The audio interface.</param>
+        public Terminal(IGraphics graphics, Audio audio)
         {
-            Renderer = renderer;
-            Graphics = renderer == null ? Graphics.Null : new Graphics(renderer);
+            Graphics = graphics;
+            Audio = audio;
         }
 
         /// <summary>
         /// Gets or sets the player's input state.
         /// </summary>
-        public Input Input { get; set; }
+        public InputState Input { get; set; }
 
         /// <summary>
         /// Gets the key events since the last frame.
@@ -31,13 +33,13 @@ namespace NanoGames.Engine
         public List<KeyEvent> KeyEvents { get; } = new List<KeyEvent>();
 
         /// <summary>
-        /// Gets the backend renderer.
-        /// </summary>
-        public IRenderer Renderer { get; }
-
-        /// <summary>
         /// Gets the player's graphics interface.
         /// </summary>
-        public Graphics Graphics { get; }
+        public IGraphics Graphics { get; }
+
+        /// <summary>
+        /// Gets the player's audio interface.
+        /// </summary>
+        public Audio Audio { get; }
     }
 }

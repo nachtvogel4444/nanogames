@@ -3,7 +3,7 @@
 
 namespace NanoGames.Games.Bomberguy
 {
-    internal class Unbombable : AbstractBomberThing
+    internal class Unbombable : AbstractRectbombularThing
     {
         public Unbombable(BomberMatch match, Vector size) : this(match, new Vector(), size)
         {
@@ -13,7 +13,7 @@ namespace NanoGames.Games.Bomberguy
         {
         }
 
-        public override void Draw(Graphics g)
+        public override void Draw(IGraphics g)
         {
             g.Rectangle(Colors.White, Position, Position + Size);
             for (double i = 1; i < Size.Y - 1; i++)

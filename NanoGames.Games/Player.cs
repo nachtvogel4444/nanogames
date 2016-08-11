@@ -19,14 +19,16 @@ namespace NanoGames.Games
         public Color Color { get; internal set; }
 
         /// <summary>
-        /// Gets or sets the player's terminal.
+        /// Gets or sets the player's local color, which is equal to the player's color, except for the local player, where it is white.
         /// </summary>
-        public Graphics Graphics { get; set; }
+        public Color LocalColor { get; internal set; }
+
+        public IOutput Output { get; internal set; }
 
         /// <summary>
         /// Gets or sets the player's input.
         /// </summary>
-        public Input Input { get; set; }
+        public Input Input { get; } = new Input();
 
         /// <summary>
         /// Gets or sets the player's name.

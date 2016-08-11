@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using NanoGames.Engine;
+using NanoGames.Engine.OutputSystems;
 using NanoGames.Games;
 using NanoGames.Network;
 using System;
@@ -219,7 +220,7 @@ namespace NanoGames.Synchronization
                         LocalPlayer.TournamentScore = (int)(LocalPlayer.TournamentScore * _scoreDecay);
 
                         _roundRandom = new Random(_roundSeed);
-                        _voteOptions = _roundRandom.Shuffle(DisciplineDirectory.Disciplines.Take(3));
+                        _voteOptions = _roundRandom.Shuffle(DisciplineDirectory.Disciplines).Take(3).ToList();
                         _voteOptions.Insert(0, null);
                     }
 
@@ -258,21 +259,26 @@ namespace NanoGames.Synchronization
 
                             DiscipleName = winningDiscipline.Name;
 
+                            var newOutput = new Output();
+
                             var playerDescriptions = activePlayers.Select(
                                 p => new PlayerDescription
                                 {
                                     Color = p.PlayerColor,
                                     Name = p.Name,
+                                    Output = p == LocalPlayer ? newOutput : NullOutput.Instance,
                                 }).ToList();
 
                             var matchDescription = new MatchDescription
                             {
                                 Players = playerDescriptions,
                                 Random = _roundRandom,
+                                Output = newOutput,
+                                LocalPlayerIndex = _localPlayerIndex,
                             };
 
                             var match = winningDiscipline.CreateMatch(matchDescription);
-                            _matchBuffer = new MatchBuffer(match, playerDescriptions, _localPlayerIndex);
+                            _matchBuffer = new MatchBuffer(match);
                             _lastUpdatedFrame = 0;
                         }
 
@@ -299,11 +305,18 @@ namespace NanoGames.Synchronization
                         }
 
                         /* Render a 50ms old frame to hide a certain amount of lag. */
-                        _matchBuffer.RenderFrame(currentFrame - _latencyFrames, terminal);
+                        _matchBuffer.UpdateToFrame(currentFrame - _latencyFrames);
+
+                        var output = _matchBuffer.PredictedMatch.Output as Output;
+                        if (output != null)
+                        {
+                            double frame = (roundDuration - Timestamps.MatchStart) / (double)GameSpeed.FrameDuration - _latencyFrames;
+                            output.Render(frame, terminal);
+                        }
 
                         if (_matchBuffer.IsCompleted)
                         {
-                            var scores = _matchBuffer.PlayerScores.ToList();
+                            var scores = _matchBuffer.KnownMatch.Players.Select(p => p.Score).ToList();
                             var localPlayerScore = scores[_localPlayerIndex];
                             int roundScore = scores.Sum(s => s < localPlayerScore ? _winScore : (s == localPlayerScore ? _tieScore : 0));
                             LocalPlayer.TournamentScore += roundScore;

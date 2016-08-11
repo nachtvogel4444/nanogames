@@ -28,17 +28,18 @@ namespace NanoGames.Games
         /// </summary>
         /// <param name="description">The match description.</param>
         /// <returns>The new match.</returns>
-        public override Match CreateMatch(MatchDescription description)
+        public override IMatch CreateMatch(MatchDescription description)
         {
             var match = new TMatch();
             match.Random = description.Random;
+            match.Output = description.Output;
 
             var players = new List<TPlayer>();
             for (int i = 0; i < description.Players.Count; ++i)
             {
                 var player = new TPlayer();
                 player.Match = match;
-                SetPlayerValues(player, i, description.Players[i]);
+                SetPlayerValues(description, player, i, description.Players[i]);
                 players.Add(player);
             }
 
@@ -47,12 +48,13 @@ namespace NanoGames.Games
             return match;
         }
 
-        private void SetPlayerValues(Player player, int index, PlayerDescription description)
+        private void SetPlayerValues(MatchDescription matchDescription, Player player, int index, PlayerDescription description)
         {
             player.Index = index;
             player.Color = description.Color;
+            player.LocalColor = matchDescription.LocalPlayerIndex == index ? Colors.White : description.Color;
             player.Name = description.Name;
-            player.Graphics = Graphics.Null;
+            player.Output = description.Output;
         }
     }
 }

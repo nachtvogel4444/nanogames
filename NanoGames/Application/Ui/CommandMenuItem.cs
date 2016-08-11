@@ -37,11 +37,15 @@ namespace NanoGames.Application.Ui
         }
 
         /// <inheritdoc/>
-        public override void HandleKeyEvent(KeyEvent keyEvent)
+        public override void HandleKeyEvent(Terminal terminal, KeyEvent keyEvent)
         {
             if (keyEvent.Code == KeyCode.Enter)
             {
-                _onActivate?.Invoke();
+                if (_onActivate != null)
+                {
+                    terminal.Audio.Play(Sounds.LowBeep);
+                    _onActivate.Invoke();
+                }
             }
         }
     }

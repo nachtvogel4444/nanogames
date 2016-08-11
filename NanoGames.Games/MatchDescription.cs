@@ -18,5 +18,9 @@ namespace NanoGames.Games
         public List<PlayerDescription> Players { get; set; } = new List<PlayerDescription>();
 
         public Random Random { get; set; }
+
+        public IOutput Output { get; set; }
+
+        public int LocalPlayerIndex { get; set; }
     }
 }

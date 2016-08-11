@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace NanoGames.Games
 {
@@ -11,7 +10,7 @@ namespace NanoGames.Games
     /// Represents a single match.
     /// </summary>
     /// <typeparam name="TPlayer">The player type associated with the match.</typeparam>
-    internal abstract class Match<TPlayer> : Match
+    internal abstract class Match<TPlayer> : IMatch
         where TPlayer : Player
     {
         private List<MatchTimer> _timers = new List<MatchTimer>();
@@ -21,23 +20,28 @@ namespace NanoGames.Games
         /// </summary>
         public IReadOnlyList<TPlayer> Players { get; private set; }
 
+        IReadOnlyList<Player> IMatch.Players => Players;
+
         /// <summary>
         /// Gets or sets the random number generator.
         /// </summary>
         public Random Random { get; internal set; }
 
         /// <summary>
-        /// Gets the match Graphics instance, which draws onto the screen of every player.
+        /// Gets the match Output instance, which can be used to output sound or graphics for every player.
         /// </summary>
-        public Graphics Graphics { get; private set; }
+        public IOutput Output { get; internal set; }
 
-        /// <inheritdoc/>
-        public override IEnumerable<double> PlayerScores => Players.Select(p => p.Score);
+        public bool IsCompleted { get; protected set; }
+
+        /// <summary>
+        /// The current frame index, count from 0 at the start of the match up.
+        /// </summary>
+        public int Frame { get; private set; }
 
         /// <summary>
         /// Sets the list of players.
         /// </summary>
-        /// <param name="localPlayerIndex">The index of the local player, or -1 if there is no local player.</param>
         /// <param name="players">The list of players.</param>
         public void Initialize(List<TPlayer> players)
         {
@@ -52,19 +56,19 @@ namespace NanoGames.Games
         }
 
         /// <inheritdoc/>
-        public override sealed void Update(Graphics graphics, List<PlayerDescription> playerDescriptions)
+        public void Update(InputState[] inputs)
         {
             if (IsCompleted)
             {
                 return;
             }
 
-            Graphics = graphics;
+            Output.SetFrame(Frame);
 
             for (int i = 0; i < Players.Count; ++i)
             {
-                Players[i].Graphics = playerDescriptions[i].Graphics ?? Graphics.Null;
-                Players[i].Input = playerDescriptions[i].Input;
+                Players[i].Output.SetFrame(Frame);
+                Players[i].Input.SetState(Frame, inputs[i]);
             }
 
             foreach (var t in new List<MatchTimer>(_timers))
@@ -74,9 +78,11 @@ namespace NanoGames.Games
 
             /* Update the match. */
             Update();
+
+            ++Frame;
         }
 
-        public override IMatchTimer GetTimer(int interval)
+        public IMatchTimer GetTimer(int interval)
         {
             var matchTimer = new MatchTimer(this, interval);
             _timers.Add(matchTimer);

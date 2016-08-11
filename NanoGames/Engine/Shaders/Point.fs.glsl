@@ -5,6 +5,8 @@
 
 #define PI 3.14159265359
 
+layout(location = 0) uniform float Fade;
+
 in vec2 FragmentTextureCoordinate;
 in vec4 FragmentColor;
 
@@ -23,5 +25,5 @@ void main()
 		i = cos(d * PI) * 0.5 + 0.5;
 	}
 
-	OutputColor = FragmentColor * i;
+	OutputColor = FragmentColor * i * Fade;
 }

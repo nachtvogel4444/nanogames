@@ -14,18 +14,10 @@ namespace NanoGames.Games
         public Color Color { get; set; }
 
         /// <summary>
-        /// Gets or sets the player's graphics.
-        /// </summary>
-        public Graphics Graphics { get; set; }
-
-        /// <summary>
-        /// Gets or sets the player's input.
-        /// </summary>
-        public Input Input { get; set; }
-
-        /// <summary>
         /// Gets or sets the player's name.
         /// </summary>
         public string Name { get; set; }
+
+        public IOutput Output { get; set; }
     }
 }

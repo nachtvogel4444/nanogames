@@ -27,6 +27,6 @@ namespace NanoGames.Games
         /// </summary>
         /// <param name="description">The match description.</param>
         /// <returns>The new match.</returns>
-        public abstract Match CreateMatch(MatchDescription description);
+        public abstract IMatch CreateMatch(MatchDescription description);
     }
 }

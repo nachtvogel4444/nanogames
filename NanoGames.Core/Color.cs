@@ -52,6 +52,11 @@ namespace NanoGames
             return f * c;
         }
 
+        public static Color operator +(Color a, Color b)
+        {
+            return new Color(a.R + b.R, a.G + b.G, a.B + b.B);
+        }
+
         public static bool operator ==(Color a, Color b)
         {
             return a.R == b.R && a.G == b.G && a.B == b.B;

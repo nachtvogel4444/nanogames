@@ -3,7 +3,7 @@
 
 namespace NanoGames.Games.Bomberguy
 {
-    internal class Explosion : AbstractBomberThing
+    internal class Explosion : AbstractRectbombularThing
     {
         private Type type;
 
@@ -15,7 +15,7 @@ namespace NanoGames.Games.Bomberguy
         {
             this.type = type;
 
-            match.TimeOnce(1500, () => Destroy());
+            match.TimeOnce(1000, () => Destroy());
         }
 
         public enum Type
@@ -29,7 +29,7 @@ namespace NanoGames.Games.Bomberguy
             LEFTEND
         }
 
-        public override void Draw(Graphics g)
+        public override void Draw(IGraphics g)
         {
             g.Circle(new Color(1, 0, 0), Center, Size.X / 10);
         }

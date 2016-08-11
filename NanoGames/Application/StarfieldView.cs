@@ -120,7 +120,7 @@ namespace NanoGames.Application
 
         private Vector GetScreenVector(double x, double y, double z)
         {
-            return new Vector((x / z) * 0.5 * Graphics.Width + 0.5 * Graphics.Width, (y / z) * 0.5 * Graphics.Width + 0.5 * Graphics.Height);
+            return new Vector((x / z) * 0.5 * GraphicsConstants.Width + 0.5 * GraphicsConstants.Width, (y / z) * 0.5 * GraphicsConstants.Width + 0.5 * GraphicsConstants.Height);
         }
 
         private sealed class Star

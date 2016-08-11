@@ -5,6 +5,8 @@
 
 #define PI 3.14159265359
 
+layout(location = 0) uniform float Fade;
+
 in vec2 FragmentTextureCoordinate;
 in float FragmentLineLength;
 in vec4 FragmentColor;
@@ -48,5 +50,5 @@ void main()
 
 	float i = beamIntegral(s, t);
 
-	OutputColor = FragmentColor * i;
+	OutputColor = FragmentColor * i * Fade;
 }

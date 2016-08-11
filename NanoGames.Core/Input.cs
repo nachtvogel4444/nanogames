@@ -1,109 +1,116 @@
 ﻿// Copyright (c) the authors of nanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
-using ProtoBuf;
-
 namespace NanoGames
 {
     /// <summary>
-    /// Represents the input state of a player.
+    /// A class used to access a player's input.
     /// </summary>
-    [ProtoContract]
-    public struct Input
+    public sealed class Input
     {
-        [ProtoMember(1)]
-        private int _value;
+        /// <summary>
+        /// The state of the Up button.
+        /// </summary>
+        public readonly ButtonState Up = new ButtonState();
 
         /// <summary>
-        /// Gets or sets a value indicating whether the up button is pressed.
+        /// The state of the Down button.
         /// </summary>
-        public bool Up
+        public readonly ButtonState Down = new ButtonState();
+
+        /// <summary>
+        /// The state of the Left button.
+        /// </summary>
+        public readonly ButtonState Left = new ButtonState();
+
+        /// <summary>
+        /// The state of the Right button.
+        /// </summary>
+        public readonly ButtonState Right = new ButtonState();
+
+        /// <summary>
+        /// The state of the Fire button.
+        /// </summary>
+        public readonly ButtonState Fire = new ButtonState();
+
+        /// <summary>
+        /// The state of the Alt Fire button.
+        /// </summary>
+        public readonly ButtonState AltFire = new ButtonState();
+
+        private const int _firstRepeatFrames = 20;
+
+        private const int _secondRepeatFrames = 6;
+
+        /// <summary>
+        /// Updates the input state.
+        /// </summary>
+        /// <param name="currentFrame">The index of the current frame.</param>
+        /// <param name="state">The input state.</param>
+        public void SetState(int currentFrame, InputState state)
         {
-            get { return GetBit(0); }
-            set { SetBit(0, value); }
+            Up.SetState(currentFrame, state.Up);
+            Down.SetState(currentFrame, state.Down);
+            Left.SetState(currentFrame, state.Left);
+            Right.SetState(currentFrame, state.Right);
+            Fire.SetState(currentFrame, state.Fire);
+            AltFire.SetState(currentFrame, state.AltFire);
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the down button is pressed.
+        /// Represents the state of a button.
         /// </summary>
-        public bool Down
+        public class ButtonState
         {
-            get { return GetBit(1); }
-            set { SetBit(1, value); }
-        }
+            private int _nextRepeatFrame;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the left button is pressed.
-        /// </summary>
-        public bool Left
-        {
-            get { return GetBit(2); }
-            set { SetBit(2, value); }
-        }
+            private bool _isPressed;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the right button is pressed.
-        /// </summary>
-        public bool Right
-        {
-            get { return GetBit(3); }
-            set { SetBit(3, value); }
-        }
+            private bool _wasActivated;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the fire button is pressed.
-        /// </summary>
-        public bool Fire
-        {
-            get { return GetBit(4); }
-            set { SetBit(4, value); }
-        }
+            /// <summary>
+            /// Gets a value indicating whether the button is currently pressed.
+            /// </summary>
+            public bool IsPressed => _isPressed;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the alt fire button is pressed.
-        /// </summary>
-        public bool AltFire
-        {
-            get { return GetBit(5); }
-            set { SetBit(5, value); }
-        }
+            /// <summary>
+            /// Gets a value indicating whether the button was activated (or repeated) in this frame.
+            /// </summary>
+            public bool WasActivated => _wasActivated;
 
-        public static bool operator ==(Input a, Input b)
-        {
-            return a._value == b._value;
-        }
-
-        public static bool operator !=(Input a, Input b)
-        {
-            return a._value != b._value;
-        }
-
-        /// <inheritdoc/>
-        public override bool Equals(object obj)
-        {
-            return obj is Input && this == (Input)obj;
-        }
-
-        /// <inheritdoc/>
-        public override int GetHashCode()
-        {
-            return _value.GetHashCode();
-        }
-
-        private bool GetBit(int n)
-        {
-            return (_value & (1 << n)) != 0;
-        }
-
-        private void SetBit(int n, bool value)
-        {
-            if (value)
+            /// <summary>
+            /// Sets the state of current button.
+            /// </summary>
+            /// <param name="currentFrame">The index of the current frame.</param>
+            /// <param name="isPressed">A value indicating whether the button is currently pressed.</param>
+            public void SetState(int currentFrame, bool isPressed)
             {
-                _value |= 1 << n;
-            }
-            else
-            {
-                _value &= ~(1 << n);
+                if (!isPressed)
+                {
+                    _isPressed = false;
+                    _wasActivated = false;
+                }
+                else
+                {
+                    if (!_isPressed)
+                    {
+                        _isPressed = true;
+                        _wasActivated = true;
+                        _nextRepeatFrame = currentFrame + _firstRepeatFrames;
+                    }
+                    else
+                    {
+                        if (currentFrame >= _nextRepeatFrame)
+                        {
+                            _wasActivated = true;
+                            _nextRepeatFrame += _secondRepeatFrames;
+                        }
+                        else
+                        {
+                            _wasActivated = false;
+                        }
+                    }
+                }
             }
         }
     }

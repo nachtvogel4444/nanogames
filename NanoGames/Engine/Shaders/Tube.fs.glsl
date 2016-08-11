@@ -3,11 +3,22 @@
 
 #version 430
 
-layout(location = 0) uniform sampler2D ScreenTexture;
+layout(location = 0) uniform sampler2D BlurTexture;
+layout(location = 1) uniform sampler2D ScreenTexture;
 
 in vec2 FragmentTextureCoordinate;
 
 out vec4 OutputColor;
+
+vec3 screenTexture(vec2 coord)
+{
+	return 1.5 * texture2D(ScreenTexture, coord).rgb + 2.0 * texture2D(BlurTexture, coord).rgb;
+}
+
+float matrixTexture(float y)
+{
+	return 0.9 + 0.1 * sin(200 * 2 * 3.14159265359 * y);
+}
 
 void main()
 {
@@ -21,10 +32,12 @@ void main()
 	float f = xt / xs * d * r;
 	vec2 textureCoordinate = FragmentTextureCoordinate * f * 0.5 + vec2(0.5, 0.5);
 
+	float cr = screenTexture(textureCoordinate + 0.0005 * vec2(0.866, 0.5)).r;
+	float cg = screenTexture(textureCoordinate + 0.0005 * vec2(0, -1)).g;
+	float cb = screenTexture(textureCoordinate + 0.0005 * vec2(-0.866, 0.5)).b;
+	
+	float m = matrixTexture(textureCoordinate.y);	
+
 	/* Sample the input at slight offsets to simulate a slight chromatic aberration. */
-	OutputColor = vec4(
-		texture2D(ScreenTexture, textureCoordinate + 0.001 * vec2(-0.988, 0.154)).r,
-		texture2D(ScreenTexture, textureCoordinate + 0.001 * vec2(0, -1)).g,
-		texture2D(ScreenTexture, textureCoordinate + 0.001 * vec2(0.988, 0.154)).b,
-		1);
+	OutputColor = vec4(m * vec3(cr, cg, cb), 1);
 }

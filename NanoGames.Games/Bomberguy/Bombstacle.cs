@@ -3,7 +3,7 @@
 
 namespace NanoGames.Games.Bomberguy
 {
-    internal class Bombstacle : AbstractBomberThing
+    internal class Bombstacle : AbstractRectbombularThing
     {
         public Bombstacle(BomberMatch match, Vector size) : this(match, new Vector(), size)
         {
@@ -13,7 +13,7 @@ namespace NanoGames.Games.Bomberguy
         {
         }
 
-        public override void Draw(Graphics g)
+        public override void Draw(IGraphics g)
         {
             g.Line(Colors.White, Position, Position + new Vector(Size.X, 0));
             g.Line(Colors.White, Position + new Vector(Size.X, 0), Position + new Vector(Size.X, Size.Y));

@@ -5,9 +5,21 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class BomberGuy : Player<BomberMatch>, BomberThing
     {
+        private Vector _position;
+
+        public bool Dying
+        {
+            get; private set;
+        }
+
         public bool Dead
         {
-            get; set;
+            get; private set;
+        }
+
+        public bool Alive
+        {
+            get { return !Dead && !Dying; }
         }
 
         public bool Destroyable
@@ -27,7 +39,13 @@ namespace NanoGames.Games.Bomberguy
 
         public Vector Position
         {
-            get; set;
+            get { return _position; }
+
+            set
+            {
+                if (!Alive) return;
+                _position = value;
+            }
         }
 
         public Vector Size
@@ -37,26 +55,29 @@ namespace NanoGames.Games.Bomberguy
 
         public Vector Center { get { return Position + new Vector(Size.X / 2d, Size.Y / 2d); } }
 
-        public void Draw(Graphics g)
-        {
-            Draw(g, this, this.Color);
-        }
-
         public void Destroy()
         {
-            if (Dead) return;
+            if (!Alive) return;
 
-            Dead = true;
+            Dying = true;
 
-            this.Score = Match.DeadPlayers++;
+            Match.TimeCyclic(200, (t) =>
+            {
+                if (Dead)
+                {
+                    t.Stop();
+                    t.Dispose();
+                    return;
+                }
+                this.LocalColor = GetComplementary(LocalColor);
+            });
+
+            Match.TimeOnce(1400, () => { Dead = true; });
         }
 
-        private void Draw(Graphics g, BomberGuy p, Color c)
+        private Color GetComplementary(Color color)
         {
-            g.Line(c, p.Position + new Vector(p.Size.X / 2d, 0), p.Position + new Vector(p.Size.X, p.Size.Y / 2d));
-            g.Line(c, p.Position + new Vector(p.Size.X, p.Size.Y / 2d), p.Position + new Vector(p.Size.X / 2d, p.Size.Y));
-            g.Line(c, p.Position + new Vector(p.Size.X / 2d, p.Size.Y), p.Position + new Vector(0, p.Size.Y / 2d));
-            g.Line(c, p.Position + new Vector(0, p.Size.Y / 2d), p.Position + new Vector(p.Size.X / 2d, 0));
+            return new Color(1 - color.R, 1 - color.G, 1 - color.B);
         }
     }
 }

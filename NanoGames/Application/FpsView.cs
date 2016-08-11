@@ -18,11 +18,15 @@ namespace NanoGames.Application
         public void Update(Terminal terminal)
         {
             var fontSize = 6;
-            var color = new Color(0.8, 0.6, 0.2);
+            var color = new Color(0.60, 0.35, 0.05);
 
             if (DebugMode.IsEnabled)
             {
                 terminal.Graphics.Print(color, fontSize, new Vector(0, 0), "DEBUG");
+                for (int i = 0; i <= System.GC.MaxGeneration; ++i)
+                {
+                    terminal.Graphics.Print(color, fontSize, new Vector(0, (i + 1) * fontSize), string.Format("GC{0}: {1}", i, System.GC.CollectionCount(i)));
+                }
             }
 
             var time = Stopwatch.GetTimestamp();
@@ -32,7 +36,7 @@ namespace NanoGames.Application
                 var fps = (double)Stopwatch.Frequency * _times.Count / (time - _times.Peek());
                 var fpsString = ((int)(fps + 0.5)).ToString("D2");
 
-                terminal.Graphics.Print(color, fontSize, new Vector(Graphics.Width - fpsString.Length * fontSize, 0), fpsString);
+                terminal.Graphics.Print(color, fontSize, new Vector(GraphicsConstants.Width - fpsString.Length * fontSize, 0), fpsString);
             }
 
             if (_times.Count > 128)

@@ -53,12 +53,20 @@
     <Compile Include="DebugMode.cs" />
     <Compile Include="Font.cs" />
     <Compile Include="Glyph.cs" />
+    <Compile Include="GraphicsConstants.cs" />
+    <Compile Include="GraphicsExtensions.cs" />
+    <Compile Include="IAudio.cs" />
+    <Compile Include="IGraphics.cs" />
+    <Compile Include="InputState.cs" />
     <Compile Include="Input.cs" />
-    <Compile Include="IRenderer.cs" />
+    <Compile Include="IOutput.cs" />
+    <Compile Include="IParticleSystem.cs" />
+    <Compile Include="Pitch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\SharedAssemblyInfo.cs" />
-    <Compile Include="Graphics.cs" />
     <Compile Include="RandomExtensions.cs" />
+    <Compile Include="Sound.cs" />
+    <Compile Include="Sounds.cs" />
     <Compile Include="Vector.cs" />
   </ItemGroup>
   <ItemGroup>
