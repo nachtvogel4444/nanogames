@@ -28,6 +28,7 @@ namespace NanoGames.Games.Snake
         {
             _movementSpeed = Constants.InitalSpeed;
 
+
             Width = 65;
             Height = 41;
 

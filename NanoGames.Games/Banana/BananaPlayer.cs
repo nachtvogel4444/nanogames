@@ -13,15 +13,13 @@ namespace NanoGames.Games.Banana
     {
         public Vector Position;
         public double Angle;
-        public double SpeedBullet;
-        public bool GunIsRight = true;
+        public double SpeedBullet = 2;
         private Polygon StartPolygonGun = new Polygon(new Vector[] {
             new Vector(-Constants.RadiusPlayer, -Constants.ThicknessGun),
             new Vector(1.2 * Constants.RadiusPlayer, -Constants.ThicknessGun),
             new Vector(1.2 * Constants.RadiusPlayer, Constants.ThicknessGun),
             new Vector(-Constants.RadiusPlayer, Constants.ThicknessGun),
-        }, false);
-        private int endIndex = 0;    
+        }, false);    
         public bool HasFinished = false;
 
         public void DrawScreen()
@@ -47,35 +45,39 @@ namespace NanoGames.Games.Banana
                 }
                 
                 /* Draw the body of the player. */
-                Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), Constants.RadiusPlayer);
+                Output.Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), Constants.RadiusPlayer);
+                if (player == Match.ActivePlayer)
+                {
+                    Output.Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), 0.7 * Constants.RadiusPlayer);
+                }
 
                 /* Draw the Gun of the player. */
-                Polygon newPolygonGun = StartPolygonGun.RotatePolygon(player.Angle);
-                if (StartPolygonGun.IsClosed)
-                {
-                    endIndex = StartPolygonGun.Count() - 1;
-                }
-                if (!StartPolygonGun.IsClosed)
-                {
-                    endIndex = StartPolygonGun.Count() - 2;
-                }
-                
-                for (int i = 0; i <= endIndex ; i++)
-                {
-                    Graphics.Line(color, player.Position + newPolygonGun[i], player.Position + newPolygonGun[i + 1]);
-                }
+                Output.Graphics.Line(color, player.Position, new Vector(player.Position.X + Constants.LengthGun * Math.Cos(player.Angle), player.Position.Y - Constants.LengthGun * Math.Sin(player.Angle)));
             }
 
             /* Draw all the bullets. */
             foreach (SimpleBullet bullet in Match.BulletList)
-            {
-                if (bullet.IsExploded)
-                {
-                    continue;
-                }
-                
-                Graphics.Line(new Color(1, 1, 1), bullet.Position, bullet.PostionTail);
+            {                
+                Output.Graphics.Line(new Color(1, 1, 1), bullet.Position, bullet.PositionTail);
             }
+
+            // Draw Landscape
+            /*
+            for (int i = 0; i < Match.Land.NPoints - 1; i++)
+            {
+                Output.Graphics.Point(new Color(1, 1, 1), new Vector(Match.Land.X[i], Match.Land.Y[i]));
+            }
+            */
+            for (int i = 0; i < Match.Land.NLines - 1; i++)
+            {
+                Output.Graphics.Line(new Color(1, 1, 1), new Vector(Match.LandX[i], Match.LandY[i]), new Vector(Match.LandX[i + 1], Match.LandY[i + 1]));
+            }
+
+            // Draw Information on Screen
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "ACTIVEPLAYER: " + Match.ActivePlayer.Name + Match.SecToGoInRound.ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "ANGLE: " + (Convert.ToInt32(Match.ActivePlayer.Angle * 180 / Math.PI)).ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 70), "SPEED: " + (Convert.ToInt32(Match.ActivePlayer.SpeedBullet * 10)).ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 80), "N: " + (Convert.ToInt32(Match.Land.NPoints)).ToString());
         }
     }
 }
