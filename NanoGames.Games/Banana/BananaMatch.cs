@@ -18,7 +18,7 @@ ToDo:
     verschiedene untergründe: reflecktierend, doppelte, halbe geschwindigkeit 
     verschiedene modi: suddenddeath
     töne: letzte 5sec, treffer, eingabe
-    bei gedrückter taste schneller werte ändern
+    /// bei gedrückter taste schneller werte ändern
     mappool oder random maps
     laufen
  
@@ -30,6 +30,7 @@ namespace NanoGames.Games.Banana
     {
         public int FrameCounter = 0;
         public int FrameCounterRound = 0;
+        public int CountInputLeftRight = 0;
         public int SecToGoInRound = 0;
         public int RoundCounter = 0;
         public string StateOfGame = "game";
@@ -175,12 +176,38 @@ namespace NanoGames.Games.Banana
         {
             if (player.Input.Left.WasActivated)
             {
-               player.Angle += Constants.StepAngle;
+               if (CountInputLeftRight < Constants.WaitTimeKey)
+                {
+                    player.Angle += Constants.StepAngle;
+                }
+
+               else
+                {
+                    player.Angle += Constants.StepAngle * Constants.MultiplierAngle;
+                }
             }
 
             if (player.Input.Right.WasActivated)
             {
-                player.Angle -= Constants.StepAngle;
+                if (CountInputLeftRight < Constants.WaitTimeKey)
+                {
+                    player.Angle -= Constants.StepAngle;
+                }
+
+                else
+                {
+                    player.Angle -= Constants.StepAngle * Constants.MultiplierAngle;
+                }
+            }
+
+            if (player.Input.Left.IsPressed || player.Input.Right.IsPressed)
+            {
+                CountInputLeftRight++;
+            }
+
+            if (!player.Input.Left.IsPressed && !player.Input.Right.IsPressed)
+            {
+                CountInputLeftRight = 0;
             }
 
             if (player.Angle < 0)
@@ -215,7 +242,6 @@ namespace NanoGames.Games.Banana
             {
                 player.SpeedBullet = 10;
             }
-
         }
 
         /*
