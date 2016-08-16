@@ -12,15 +12,19 @@ namespace NanoGames.Games.Banana
     class BananaPlayer : Player<BananaMatch>
     {
         public Vector Position;
+        public Vector PositionTail;
+        public Vector Velocity;
+        public Vector PositionStartJump;
+        public Vector VelocityStartJump;
+        public Vector Acceleration;
+        public int LifeTimeJump;
+        public int IdxPosition;
         public double Angle;
-        public double SpeedBullet = 2;
-        private Polygon StartPolygonGun = new Polygon(new Vector[] {
-            new Vector(-Constants.RadiusPlayer, -Constants.ThicknessGun),
-            new Vector(1.2 * Constants.RadiusPlayer, -Constants.ThicknessGun),
-            new Vector(1.2 * Constants.RadiusPlayer, Constants.ThicknessGun),
-            new Vector(-Constants.RadiusPlayer, Constants.ThicknessGun),
-        }, false);    
+        public double SpeedBullet = 2; 
         public bool HasFinished = false;
+        public int Direction = -1;
+        public int StepMove;
+        private Methods methods = new Methods();
 
         public void DrawScreen()
         {
@@ -60,24 +64,41 @@ namespace NanoGames.Games.Banana
             {                
                 Output.Graphics.Line(new Color(1, 1, 1), bullet.Position, bullet.PositionTail);
             }
-
-            // Draw Landscape
-            /*
-            for (int i = 0; i < Match.Land.NPoints - 1; i++)
+            
+            for (int i = 0; i < Match.Land.NPointsPolygon - 1; i++)
             {
-                Output.Graphics.Point(new Color(1, 1, 1), new Vector(Match.Land.X[i], Match.Land.Y[i]));
+                Output.Graphics.Line(new Color(1, 1, 1), new Vector(Match.Land.XPolygon[i], Match.Land.YPolygon[i]), new Vector(Match.Land.XPolygon[i + 1], Match.Land.YPolygon[i + 1]));
+            }
+            
+            /*
+            for (int i = 0; i < Match.Land.NPointsInterpolated - 1; i++)
+            {
+                Output.Graphics.Point(new Color(1, 1, 1), new Vector(Match.Land.XTracksUpper[i], Match.Land.YTracksUpper[i]));
             }
             */
-            for (int i = 0; i < Match.Land.NLines - 1; i++)
-            {
-                Output.Graphics.Line(new Color(1, 1, 1), new Vector(Match.LandX[i], Match.LandY[i]), new Vector(Match.LandX[i + 1], Match.LandY[i + 1]));
-            }
 
             // Draw Information on Screen
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "ACTIVEPLAYER: " + Match.ActivePlayer.Name + Match.SecToGoInRound.ToString());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "ANGLE: " + (Convert.ToInt32(Match.ActivePlayer.Angle * 180 / Math.PI)).ToString());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 70), "SPEED: " + (Convert.ToInt32(Match.ActivePlayer.SpeedBullet * 10)).ToString());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 80), "N: " + (Convert.ToInt32(Match.Land.NPoints)).ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 80), "N: " + (Convert.ToInt32(Match.Land.NPointsInterpolated)).ToString());
+        }
+
+        public void CheckCollisionLandscape()
+        {
+            for (int i = 0; i < Match.Land.NPointsInterpolated - 1; i++)
+            {
+                Vector obstacle = new Vector(Match.Land.XTracksUpper[i], Match.Land.YTracksUpper[i]);
+
+                if (methods.CheckCollision(Position, PositionTail, obstacle, 0.6 * Constants.Dx))
+                {
+                    Position = obstacle;
+                    IdxPosition = i;
+                    Match.StateOfGame = "Game";
+                    break;
+                }
+            }
+
         }
     }
 }
