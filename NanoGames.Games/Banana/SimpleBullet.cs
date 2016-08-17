@@ -18,7 +18,7 @@ namespace NanoGames.Games.Banana
         public Vector Velocity;
         private Vector Accelaration;
         public double LifeTime;
-        public string State = "normal";
+        public string State = "Normal";
 
         public SimpleBullet(Vector startPosition, double angle, double velocity)
         {

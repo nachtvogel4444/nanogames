@@ -33,7 +33,7 @@ namespace NanoGames.Games.Banana
 
         public double[] lineX = new double[2] { 0, 320 };
         public double[] lineY = new double[2] { 100, 100 };
-        public string[] lineType = new string[2] { "normal", "normal" };
+        public string[] lineType = new string[2] { "Normal", "Normal" };
 
         public void createLandscape(double[] inX, double[] inY, string[] inType)
         {

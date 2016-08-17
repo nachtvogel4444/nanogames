@@ -18,10 +18,10 @@ ToDo:
     verschiedene untergründe: reflecktierend, doppelte, halbe geschwindigkeit 
     verschiedene modi: suddenddeath
     töne: letzte 5sec, treffer, eingabe
-    /// bei gedrückter taste schneller werte ändern
     mappool oder random maps
-    laufen, jump fly in player klasse
     checkcollions aus simple bullet in methods
+    stop player when track ends or is too steep
+    fix jump
  
 */
 
@@ -34,7 +34,7 @@ namespace NanoGames.Games.Banana
         public int CountInputLeftRight = 0;
         public int SecToGoInRound = 0;
         public int RoundCounter = 0;
-        public string StateOfGame = "Game";
+        public string StateOfGame = "ActivePlayerMoving";
         public BananaPlayer ActivePlayer;
         public int ActivePlayerIdx = 0;
         public List<SimpleBullet> BulletList = new List<SimpleBullet>();
@@ -52,10 +52,9 @@ namespace NanoGames.Games.Banana
             for (int i = 0; i < Players.Count; ++i)
             {
                 double startAngle = 85 * Math.PI / 180;
-                Players[i].IdxPosition = 100;
+                Players[i].IdxPosition = 1000;
                 Players[i].Position = new Vector(Land.XTracksUpper[Players[i].IdxPosition], Land.YTracksUpper[Players[i].IdxPosition]);
                 Players[i].Angle = startAngle;
-                Players[i].StepMove = (int)Constants.VelocityPlayer;
                 Players[i].Acceleration = new Vector(0, Constants.Gravity);
             }
         }
@@ -74,64 +73,65 @@ namespace NanoGames.Games.Banana
 
             switch (StateOfGame)
             {
-                case "Game":
-                    // Active player can do stuff
-                    //SetSpeedBullet(ActivePlayer);
-                    MovePlayer(ActivePlayer);
-                    JumpPlayer(ActivePlayer);
-                    ShootGun(ActivePlayer);
-                break;
+                case "ActivePlayerMoving":
+
+                    ActivePlayer.Move();
+                    ActivePlayer.Jump();
+                    ActivePlayer.SelectAction();
+                    break;
 
                 case "AnimationJump":
-                    // player is jumping / flying
-                    FlyPlayer(ActivePlayer);
-                    ActivePlayer.CheckCollisionLandscape();
-                break;
 
+                    ActivePlayer.Fly();
+                    ActivePlayer.CheckCollisionLandscape();
+                    break;
+
+                case "ActivePlayerAiming":
+
+                    ActivePlayer.Rotate();
+                    ActivePlayer.SetSpeedBullet();
+                    ActivePlayer.ShootGun();
+                    ActivePlayer.SelectAction();
+                    break;
+                    
                 case "AnimationShoot":
-                    // shoot animation is over -> next player
+
                     if (BulletList.Count != 0)
                     {
                         List<SimpleBullet> BulletsToKeep = new List<SimpleBullet>();
                         foreach (SimpleBullet bullet in BulletList)
                         {
-                            // Move bullet
                             bullet.MoveSimpleBullet();
                             
-                            // Check for collsion with players
                             foreach (var player in Players)
                             {
                                 if (bullet.CheckCollision(player.Position, Constants.RadiusPlayer))
                                 {
-                                    bullet.State = "exploded";
+                                    bullet.State = "Exploded";
                                     player.HasFinished = true;
                                     finishedPlayers++;
                                 }
                             }   
-
-                            // Check for collisions with landscape
+                            
                             for(int i = 0; i < Land.NPointsInterpolated; i++)
                             {
                                 if (bullet.CheckCollision(new Vector(Land.XInterpolated[i], Land.YInterpolated[i]), 0.6 * Constants.Dx))
                                 {
                                     switch (Land.TypeInterpolated[i])
                                     {
-                                        case "normal":
-                                            bullet.State = "exploded";
-
-                                        break;
+                                        case "Normal":
+                                            bullet.State = "Exploded";
+                                            break;
                                     }
                                 }
                             }
-
-                            // Check if bullet is outside screen
+                            
                             if (bullet.Position.X < 0 || bullet.Position.X > 320 || bullet.Position.Y > 200)
                             {
-                                bullet.State = "exploded";
+                                bullet.State = "Exploded";
                             }
-
-                            // move bullet to new list if exploded
-                            if (!String.Equals(bullet.State, "exploded"))
+                            
+                            if (!String.Equals(bullet.State, "Exploded"))
                             {
                                 BulletsToKeep.Add(bullet);
                             }
@@ -142,7 +142,7 @@ namespace NanoGames.Games.Banana
 
                      else
                      {
-                         StateOfGame = "Game";
+                         StateOfGame = "ActivePlayerMoving";
                          ActivePlayerIdx++;
                          ActivePlayerIdx = ActivePlayerIdx % Players.Count;
                          ActivePlayer = Players[ActivePlayerIdx];
@@ -176,176 +176,6 @@ namespace NanoGames.Games.Banana
 
             FrameCounter++;
             FrameCounterRound++;
-        }
-
-        /*
-        private void RotatePlayer(BananaPlayer player)
-        {
-            if (player.Input.Left.WasActivated)
-            {
-               if (CountInputLeftRight < Constants.WaitTimeKey)
-                {
-                    player.Angle += Constants.StepAngle;
-                }
-
-               else
-                {
-                    player.Angle += Constants.StepAngle * Constants.MultiplierAngle;
-                }
-            }
-
-            if (player.Input.Right.WasActivated)
-            {
-                if (CountInputLeftRight < Constants.WaitTimeKey)
-                {
-                    player.Angle -= Constants.StepAngle;
-                }
-
-                else
-                {
-                    player.Angle -= Constants.StepAngle * Constants.MultiplierAngle;
-                }
-            }
-
-            if (player.Input.Left.IsPressed || player.Input.Right.IsPressed)
-            {
-                CountInputLeftRight++;
-            }
-
-            if (!player.Input.Left.IsPressed && !player.Input.Right.IsPressed)
-            {
-                CountInputLeftRight = 0;
-            }
-
-            if (player.Angle < 0)
-            {
-                player.Angle = 0;
-            }
-            
-            if (player.Angle > Math.PI)
-            {
-                player.Angle = Math.PI;
-            }
-        }
-        */
-
-        private void SetSpeedBullet(BananaPlayer player)
-        {
-            if (player.Input.Up.WasActivated)
-            {
-                player.SpeedBullet += Constants.StepSpeedBullet;
-            }
-
-            if (player.Input.Down.WasActivated)
-            {
-                player.SpeedBullet -= Constants.StepSpeedBullet;
-            }
-
-            if (player.SpeedBullet < 0)
-            {
-                player.SpeedBullet = 0;
-            }
-
-            if (player.SpeedBullet > 10)
-            {
-                player.SpeedBullet = 10;
-            }
-        }
-        
-        private void MovePlayer(BananaPlayer player)
-        {
-            if (player.Input.Left.WasActivated)
-            {
-                if (CountInputLeftRight < Constants.WaitTimeKey)
-                {
-                    player.IdxPosition -= player.StepMove;
-                    player.Position = new Vector(Land.XTracksUpper[player.IdxPosition], Land.YTracksUpper[player.IdxPosition]);
-                    player.Direction = -1;
-                }
-
-                else
-                {
-                    player.IdxPosition -= 2 * player.StepMove;
-                    player.Position = new Vector(Land.XTracksUpper[player.IdxPosition], Land.YTracksUpper[player.IdxPosition]);
-                    player.Direction = -1;
-                }
-            }
-
-            if (player.Input.Right.WasActivated)
-            {
-                if (CountInputLeftRight < Constants.WaitTimeKey)
-                {
-                    player.IdxPosition += player.StepMove;
-                    player.Position = new Vector(Land.XTracksUpper[player.IdxPosition], Land.YTracksUpper[player.IdxPosition]);
-                    player.Direction = 1;
-                }
-
-                else
-                {
-                    player.IdxPosition += 2 * player.StepMove;
-                    player.Position = new Vector(Land.XTracksUpper[player.IdxPosition], Land.YTracksUpper[player.IdxPosition]);
-                    player.Direction = 1;
-                }
-            }
-
-            if (player.Input.Left.IsPressed || player.Input.Right.IsPressed)
-            {
-                CountInputLeftRight++;
-            }
-
-            if (!player.Input.Left.IsPressed && !player.Input.Right.IsPressed)
-            {
-                CountInputLeftRight = 0;
-            }
-        }
-
-        private void JumpPlayer(BananaPlayer player)
-        {
-            if (player.Input.Up.WasActivated)
-            {
-                double angleLandscape = Land.Alpha[player.IdxPosition];
-                     
-                if (player.Input.Left.WasActivated || player.Input.Left.IsPressed)
-                {
-                    Vector n = new Vector(Math.Cos(angleLandscape + Math.PI / 4), -Math.Sin(angleLandscape + Math.PI / 4));
-                    player.VelocityStartJump = Constants.JumpVelocity *n;
-                    player.PositionStartJump = player.Position + 1.1 * Constants.Dx * n;
-                }
-
-                else if (player.Input.Right.WasActivated || player.Input.Right.IsPressed)
-                {
-                    Vector n = new Vector(Math.Cos(angleLandscape - Math.PI / 4), -Math.Sin(angleLandscape - Math.PI / 4));
-                    player.VelocityStartJump = Constants.JumpVelocity * n;
-                    player.PositionStartJump = player.Position + 1.1 * Constants.Dx * n;
-                }
-
-                else
-                {
-                    Vector n = new Vector(Math.Cos(angleLandscape), -Math.Sin(angleLandscape));
-                    player.VelocityStartJump = Constants.JumpVelocity *n;
-                    player.PositionStartJump = player.Position + 1.1 * Constants.Dx * n;
-                }
-
-                player.LifeTimeJump = 1;
-                StateOfGame = "AnimationJump";
-            }
-        }
-
-        private void FlyPlayer(BananaPlayer player)
-        {
-            player.Position = player.PositionStartJump + player.LifeTimeJump * player.VelocityStartJump + 0.5 * player.LifeTimeJump * player.LifeTimeJump * player.Acceleration;
-            player.Velocity = player.VelocityStartJump + player.LifeTimeJump * player.Acceleration;
-            player.PositionTail = player.Position - player.Velocity;
-            player.LifeTimeJump++;
-        }
-
-        private void ShootGun(BananaPlayer player)
-        {
-            if (player.Input.Fire.WasActivated || player.Input.Fire.IsPressed)
-            {
-                BulletList.Add(new SimpleBullet(new Vector(player.Position.X, player.Position.Y), player.Angle, player.SpeedBullet));
-                StateOfGame = "AnimationShoot";                                  
-            }
         }
     }
 }
