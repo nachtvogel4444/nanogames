@@ -75,14 +75,19 @@ namespace NanoGames.Games.Banana
             {
                 case "ActivePlayerMoving":
 
+                    ActivePlayer.Jump1();
                     ActivePlayer.Move();
-                    ActivePlayer.Jump();
                     ActivePlayer.SelectAction();
+                    break;
+
+                case "AnimationBeforeJump":
+
+                    ActivePlayer.Jump2();
                     break;
 
                 case "AnimationJump":
 
-                    ActivePlayer.Fly();
+                    ActivePlayer.Jump3();
                     ActivePlayer.CheckCollisionLandscape();
                     break;
 

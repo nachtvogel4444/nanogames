@@ -20,7 +20,7 @@ namespace NanoGames.Games.Banana
         public int LifeTimeJump;
         public int IdxPosition;
         public double Angle;
-        public double SpeedBullet = 2; 
+        public double SpeedBullet = 4; 
         public bool HasFinished = false;
         public int Direction = -1;
         private Methods methods = new Methods();
@@ -98,6 +98,7 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "ANGLE: " + (Convert.ToInt32(Match.ActivePlayer.Angle * 180 / Math.PI)).ToString());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 70), "SPEED: " + (Convert.ToInt32(Match.ActivePlayer.SpeedBullet * 10)).ToString());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 80), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 90), "COUNTUP: " + countUp.ToString().ToUpper());
         }
 
         public void Move()
@@ -156,44 +157,56 @@ namespace NanoGames.Games.Banana
             }
         }
 
-        public void Jump()
+        public void Jump1()
+        {
+            if (Input.Fire.WasActivated)
+            {
+                Match.StateOfGame = "AnimationBeforeJump";
+                countSpace = 0;
+            }
+        }
+
+        public void Jump2()
         {
             Vector nLeft = new Vector(Math.Cos(0.5 * Math.PI + Constants.AngleJump), -Math.Sin(0.5 * Math.PI + Constants.AngleJump));
             Vector nRight = new Vector(Math.Cos(0.5 * Math.PI - Constants.AngleJump), -Math.Sin(0.5 * Math.PI - Constants.AngleJump));
-            Vector nMiddle = new Vector(1, 0);
+            Vector nMiddle = new Vector(0, -1);
 
-            if (Input.Up.WasActivated)
+            if (Input.Fire.IsPressed)
             {
+                countSpace++;
+            }
+
+            if (!Input.Fire.IsPressed || (countSpace > Constants.JumpMultiplierTime))
+            {
+                double speed;
+
+                if (countSpace < Constants.JumpMultiplierTime)
+                {
+                    speed = Constants.SpeedJump;
+                }
+                    
+                else
+                {
+                    speed = Constants.JumpMultiplier * Constants.SpeedJump;
+                }
+
                 if (Input.Left.WasActivated || Input.Left.IsPressed)
                 {
-                    VelocityStartJump = countUp / 10 * Constants.SpeedJump * nLeft;
+                    VelocityStartJump = speed * nLeft;
                     PositionStartJump = Position + 1.1 * Constants.Dx * nLeft;
                 }
 
                 else if (Input.Right.WasActivated || Input.Right.IsPressed)
                 {
-                    VelocityStartJump = countUp / 10 * Constants.SpeedJump * nRight;
+                    VelocityStartJump = speed * nRight;
                     PositionStartJump = Position + 1.1 * Constants.Dx * nRight;
                 }
 
                 else
                 {
-                    VelocityStartJump = countUp * Constants.SpeedJump * nMiddle;
+                    VelocityStartJump = speed * nMiddle;
                     PositionStartJump = Position + 1.1 * Constants.Dx * nMiddle;
-                }
-
-                if (Input.Up.IsPressed)
-                {
-                    countUp++;
-                }
-                else
-                {
-                    countUp = 0;
-                }
-
-                if (countUp > Constants.SpeedJumpMaxMultiplier)
-                {
-                    countUp = Constants.SpeedJumpMaxMultiplier;
                 }
 
                 LifeTimeJump = 1;
@@ -201,7 +214,7 @@ namespace NanoGames.Games.Banana
             }
         }
 
-        public void Fly()
+        public void Jump3()
         {
             Position = PositionStartJump + LifeTimeJump * VelocityStartJump + 0.5 * LifeTimeJump * LifeTimeJump * Acceleration;
             Velocity = VelocityStartJump + LifeTimeJump * Acceleration;
