@@ -21,7 +21,9 @@ ToDo:
     mappool oder random maps
     checkcollions aus simple bullet in methods
     stop player when track ends or is too steep
-    fix jump
+    simple gun to bazooka
+    grenade
+    constants klasse ausdünnen
  
 */
 
@@ -74,10 +76,10 @@ namespace NanoGames.Games.Banana
             switch (StateOfGame)
             {
                 case "ActivePlayerMoving":
-
+                    
+                    ActivePlayer.SelectAction();
                     ActivePlayer.Jump1();
                     ActivePlayer.Move();
-                    ActivePlayer.SelectAction();
                     break;
 
                 case "AnimationBeforeJump":
@@ -93,7 +95,7 @@ namespace NanoGames.Games.Banana
 
                 case "ActivePlayerAiming":
 
-                    ActivePlayer.Rotate();
+                    ActivePlayer.SetAngle();
                     ActivePlayer.SetSpeedBullet();
                     ActivePlayer.ShootGun();
                     ActivePlayer.SelectAction();
@@ -151,12 +153,13 @@ namespace NanoGames.Games.Banana
                          ActivePlayerIdx++;
                          ActivePlayerIdx = ActivePlayerIdx % Players.Count;
                          ActivePlayer = Players[ActivePlayerIdx];
-                         FrameCounterRound = 0;
                      }
                     
                       break;
             }
-            
+
+            FrameCounterRound++;
+
             foreach (var player in Players)
             {
                 player.DrawScreen();
@@ -180,7 +183,6 @@ namespace NanoGames.Games.Banana
             }
 
             FrameCounter++;
-            FrameCounterRound++;
         }
     }
 }

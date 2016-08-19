@@ -20,11 +20,10 @@ namespace NanoGames.Games.Banana
         public double LifeTime;
         public string State = "Normal";
 
-        public SimpleBullet(Vector startPosition, double angle, double velocity)
+        public SimpleBullet(Vector startPosition, Vector startVelocity)
         {
-            StartPosition.X = startPosition.X + Math.Cos(angle) * 2*Constants.LengthGun;
-            StartPosition.Y = startPosition.Y - Math.Sin(angle) * 2*Constants.LengthGun;
-            StartVelocity = velocity * new Vector(Math.Cos(angle), -Math.Sin(angle));
+            StartPosition = startPosition;
+            StartVelocity = startVelocity;
             Accelaration = new Vector(0, Constants.Gravity);
             LifeTime = 0;
         }

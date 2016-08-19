@@ -31,6 +31,11 @@ namespace NanoGames.Games.Banana
         private int countSpace = 0;
         private int idxAction = 0;
         private string[] action = new string[] { "ActivePlayerMoving", "ActivePlayerAiming" };
+        private double lengthBazooka = 10;
+        private double heightBazooka = 3;
+        private double length2Bazooka = 6;
+        private double distanceBazooka = 3;
+        public Vector P1Bazooka;
 
         public void SelectAction()
         {
@@ -239,7 +244,7 @@ namespace NanoGames.Games.Banana
 
         }
 
-        public void Rotate()
+        public void SetAngle()
         {
             if (Input.Left.WasActivated)
             {
@@ -289,6 +294,13 @@ namespace NanoGames.Games.Banana
             {
                 Angle = Math.PI;
             }
+
+            if (Angle < 0)
+            {
+                Angle = 0;
+            }
+
+
         }
 
         public void SetSpeedBullet()
@@ -352,7 +364,8 @@ namespace NanoGames.Games.Banana
         {
             if (Input.Fire.WasActivated || Input.Fire.IsPressed)
             {
-                Match.BulletList.Add(new SimpleBullet(Position, Angle, SpeedBullet));
+                Vector speed = SpeedBullet * new Vector(Math.Cos(Angle), -Math.Sin(Angle));
+                Match.BulletList.Add(new SimpleBullet(Position + speed + Constants.LengthGun * new Vector(Math.Cos(Angle), -Math.Sin(Angle)), speed));
                 Match.StateOfGame = "AnimationShoot";
             }
         }
