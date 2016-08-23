@@ -31,14 +31,14 @@ namespace NanoGames.Games.Banana
 {
     class BananaMatch : Match<BananaPlayer>
     {
-        public int FrameCounter = 0;
-        public int FrameCounterRound = 0;
+        private int frameCountMove = 0;
+        private int frameCountMoveMax = 1800;
         public int CountInputLeftRight = 0;
         public int SecToGoInRound = 0;
         public int RoundCounter = 0;
         public string StateOfGame = "ActivePlayerMoving";
         public BananaPlayer ActivePlayer;
-        public int ActivePlayerIdx = 0;
+        private int activePlayerIdx = 0;
         public List<SimpleBullet> BulletList = new List<SimpleBullet>();
         public Landscape Land = new Landscape();
 
@@ -48,29 +48,29 @@ namespace NanoGames.Games.Banana
         {
             Land.createLandscape(Land.lineX, Land.lineY, Land.lineType);
 
-            ActivePlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));
-            ActivePlayer = Players[ActivePlayerIdx];
+            activePlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));
+            ActivePlayer = Players[activePlayerIdx];
 
             for (int i = 0; i < Players.Count; ++i)
             {
-                double startAngle = 85 * Math.PI / 180;
+                // initialize player here
+
                 Players[i].IdxPosition = 1000;
+                Players[i].Angle = 85 * Math.PI / 180;
                 Players[i].Position = new Vector(Land.XTracksUpper[Players[i].IdxPosition], Land.YTracksUpper[Players[i].IdxPosition]);
-                Players[i].Angle = startAngle;
-                Players[i].Acceleration = new Vector(0, Constants.Gravity);
             }
         }
 
         protected override void Update()
         {
-            SecToGoInRound = Convert.ToInt32((Constants.RoundTime - FrameCounterRound) / 60);
+            SecToGoInRound = Convert.ToInt32((frameCountMoveMax - frameCountMove) / 60);
 
-            if (FrameCounterRound == Constants.RoundTime)
+            if (frameCountMove >= frameCountMoveMax)
             {
-                ActivePlayerIdx++;
-                ActivePlayerIdx = ActivePlayerIdx % Players.Count;
-                ActivePlayer = Players[ActivePlayerIdx];
-                FrameCounterRound = 0;
+                activePlayerIdx++;
+                activePlayerIdx = activePlayerIdx % Players.Count;
+                ActivePlayer = Players[activePlayerIdx];
+                frameCountMove = 0;
             }
 
             switch (StateOfGame)
@@ -122,7 +122,7 @@ namespace NanoGames.Games.Banana
                             
                             for(int i = 0; i < Land.NPointsInterpolated; i++)
                             {
-                                if (bullet.CheckCollision(new Vector(Land.XInterpolated[i], Land.YInterpolated[i]), 0.6 * Constants.Dx))
+                                if (bullet.CheckCollision(new Vector(Land.XInterpolated[i], Land.YInterpolated[i]), 0.6 * Land.Tolerance))
                                 {
                                     switch (Land.TypeInterpolated[i])
                                     {
@@ -150,15 +150,15 @@ namespace NanoGames.Games.Banana
                      else
                      {
                          StateOfGame = "ActivePlayerMoving";
-                         ActivePlayerIdx++;
-                         ActivePlayerIdx = ActivePlayerIdx % Players.Count;
-                         ActivePlayer = Players[ActivePlayerIdx];
+                         activePlayerIdx++;
+                         activePlayerIdx = activePlayerIdx % Players.Count;
+                         ActivePlayer = Players[activePlayerIdx];
                      }
                     
                       break;
             }
 
-            FrameCounterRound++;
+            frameCountMove++;
 
             foreach (var player in Players)
             {
@@ -181,8 +181,6 @@ namespace NanoGames.Games.Banana
                     IsCompleted = true;
                 }
             }
-
-            FrameCounter++;
         }
     }
 }

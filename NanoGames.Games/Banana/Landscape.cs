@@ -35,6 +35,8 @@ namespace NanoGames.Games.Banana
         public double[] lineY = new double[2] { 100, 100 };
         public string[] lineType = new string[2] { "Normal", "Normal" };
 
+        public double Tolerance = 0.1;
+
         public void createLandscape(double[] inX, double[] inY, string[] inType)
         {
             // interpolate input polygon in Arrays, X: x-coordinates, Y: y coordinates, Type, type of wall
@@ -54,7 +56,7 @@ namespace NanoGames.Games.Banana
 
                 double a = Math.Atan(dx / dy);              
 
-                int n = (int)(dist / Constants.Dx) + 1;
+                int n = (int)(dist / Tolerance) + 1;
                 dx = dx / n;
                 dy = dy / n;
 

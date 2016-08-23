@@ -42,8 +42,6 @@ namespace NanoGames.Games.Banana
                 distsq = dx * dx + dy * dy;
             }
 
-
-
             if (distsq < (minDist * minDist))
             {
                 return true;

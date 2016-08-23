@@ -12,12 +12,9 @@ namespace NanoGames.Games.Banana
     class BananaPlayer : Player<BananaMatch>
     {
         public Vector Position;
-        public Vector PositionTail;
-        public Vector Velocity;
-        public Vector PositionStartJump;
-        public Vector VelocityStartJump;
+        private Vector velocity;
         public Vector Acceleration;
-        public int LifeTimeJump;
+        private int frameCountJump;
         public int IdxPosition;
         public double Angle;
         public double SpeedBullet = 4; 
@@ -28,25 +25,20 @@ namespace NanoGames.Games.Banana
         private int countRight = 0;
         private int countUp = 0;
         private int countDown = 0;
-        private int countSpace = 0;
         private int idxAction = 0;
         private string[] action = new string[] { "ActivePlayerMoving", "ActivePlayerAiming" };
-        private double lengthBazooka = 10;
-        private double heightBazooka = 3;
-        private double length2Bazooka = 6;
-        private double distanceBazooka = 3;
-        public Vector P1Bazooka;
+        private double angleJump = 30 * Math.PI / 180;
+        private Vector jumpLeft;
+        private Vector jumpRight;
+        private Vector jumpVertical;
 
-        public void SelectAction()
+        public BananaPlayer()
         {
-            if (Input.AltFire.WasActivated)
-            {
-                idxAction++;
-                idxAction = idxAction % action.Count(); 
-                Match.StateOfGame = action[idxAction];
-            }
+            jumpLeft = new Vector(Math.Cos(0.5 * Math.PI + angleJump), -Math.Sin(0.5 * Math.PI + angleJump));
+            jumpRight = new Vector(Math.Cos(0.5 * Math.PI - angleJump), -Math.Sin(0.5 * Math.PI - angleJump));
+            jumpVertical = new Vector(0, -1);
         }
-
+        
         public void DrawScreen()
         {
             /* Draw each player. */
@@ -58,7 +50,7 @@ namespace NanoGames.Games.Banana
                     continue;
                 }
 
-                Color color; 
+                Color color;
                 if (player == this)
                 {
                     /* Always show the current player in white. */
@@ -68,7 +60,7 @@ namespace NanoGames.Games.Banana
                 {
                     color = player.Color;
                 }
-                
+
                 /* Draw the body of the player. */
                 Output.Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), Constants.RadiusPlayer);
                 if (player == Match.ActivePlayer)
@@ -82,15 +74,15 @@ namespace NanoGames.Games.Banana
 
             /* Draw all the bullets. */
             foreach (SimpleBullet bullet in Match.BulletList)
-            {                
+            {
                 Output.Graphics.Line(new Color(1, 1, 1), bullet.Position, bullet.PositionTail);
             }
-            
+
             for (int i = 0; i < Match.Land.NPointsPolygon - 1; i++)
             {
                 Output.Graphics.Line(new Color(1, 1, 1), new Vector(Match.Land.XPolygon[i], Match.Land.YPolygon[i]), new Vector(Match.Land.XPolygon[i + 1], Match.Land.YPolygon[i + 1]));
             }
-            
+
             /*
             for (int i = 0; i < Match.Land.NPointsInterpolated - 1; i++)
             {
@@ -106,6 +98,16 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 90), "COUNTUP: " + countUp.ToString().ToUpper());
         }
 
+        public void SelectAction()
+        {
+            if (Input.AltFire.WasActivated)
+            {
+                idxAction++;
+                idxAction = idxAction % action.Count(); 
+                Match.StateOfGame = action[idxAction];
+            }
+        }
+
         public void Move()
         {
             if (Input.Left.WasActivated)
@@ -114,14 +116,12 @@ namespace NanoGames.Games.Banana
                 {
                     IdxPosition -= Constants.StepMove;
                     Position = new Vector(Match.Land.XTracksUpper[IdxPosition], Match.Land.YTracksUpper[IdxPosition]);
-                    Direction = -1;
                 }
 
                 else
                 {
                     IdxPosition -= Constants.StepMove * Constants.MultiplierStepMove;
                     Position = new Vector(Match.Land.XTracksUpper[IdxPosition], Match.Land.YTracksUpper[IdxPosition]);
-                    Direction = -1;
                 }
             }
 
@@ -164,76 +164,75 @@ namespace NanoGames.Games.Banana
 
         public void Jump1()
         {
-            if (Input.Fire.WasActivated)
+            if (Input.Up.WasActivated)
             {
                 Match.StateOfGame = "AnimationBeforeJump";
-                countSpace = 0;
+                countUp = 0;
             }
         }
 
         public void Jump2()
         {
-            Vector nLeft = new Vector(Math.Cos(0.5 * Math.PI + Constants.AngleJump), -Math.Sin(0.5 * Math.PI + Constants.AngleJump));
-            Vector nRight = new Vector(Math.Cos(0.5 * Math.PI - Constants.AngleJump), -Math.Sin(0.5 * Math.PI - Constants.AngleJump));
-            Vector nMiddle = new Vector(0, -1);
+            double speed = 0;
 
-            if (Input.Fire.IsPressed)
+            if(countUp > 15)
             {
-                countSpace++;
+                speed = 1.2;
             }
 
-            if (!Input.Fire.IsPressed || (countSpace > Constants.JumpMultiplierTime))
+            else
             {
-                double speed;
-
-                if (countSpace < Constants.JumpMultiplierTime)
+                if (Input.Up.IsPressed)
                 {
-                    speed = Constants.SpeedJump;
+                    countUp++;
                 }
-                    
+
                 else
                 {
-                    speed = Constants.JumpMultiplier * Constants.SpeedJump;
+                    speed = 0.7;
                 }
+            }
 
+            if (speed > 0)
+            {
                 if (Input.Left.WasActivated || Input.Left.IsPressed)
                 {
-                    VelocityStartJump = speed * nLeft;
-                    PositionStartJump = Position + 1.1 * Constants.Dx * nLeft;
+                    velocity = speed * jumpLeft;
+                    Position += (speed + 1.1 * Match.Land.Tolerance) * jumpLeft;
                 }
 
                 else if (Input.Right.WasActivated || Input.Right.IsPressed)
                 {
-                    VelocityStartJump = speed * nRight;
-                    PositionStartJump = Position + 1.1 * Constants.Dx * nRight;
+                    velocity = speed * jumpRight;
+                    Position += (speed + 1.1 * Match.Land.Tolerance) * jumpRight;
                 }
 
                 else
                 {
-                    VelocityStartJump = speed * nMiddle;
-                    PositionStartJump = Position + 1.1 * Constants.Dx * nMiddle;
+                    velocity = speed * jumpVertical;
+                    Position += (speed + 1.1 * Match.Land.Tolerance) * jumpVertical;
                 }
 
-                LifeTimeJump = 1;
+                frameCountJump = 0;
                 Match.StateOfGame = "AnimationJump";
             }
         }
 
         public void Jump3()
         {
-            Position = PositionStartJump + LifeTimeJump * VelocityStartJump + 0.5 * LifeTimeJump * LifeTimeJump * Acceleration;
-            Velocity = VelocityStartJump + LifeTimeJump * Acceleration;
-            PositionTail = Position - Velocity;
-            LifeTimeJump++;
+            Position += velocity + 0.5 * new Vector(0, Constants.Gravity) * (2 * frameCountJump + 1);
+            velocity += new Vector(0, Constants.Gravity);
         }
 
         public void CheckCollisionLandscape()
         {
+            Vector positionBefore = Position - velocity;
+
             for (int i = 0; i < Match.Land.NPointsInterpolated - 1; i++)
             {
                 Vector obstacle = new Vector(Match.Land.XTracksUpper[i], Match.Land.YTracksUpper[i]);
 
-                if (methods.CheckCollision(Position, PositionTail, obstacle, 0.6 * Constants.Dx))
+                if (methods.CheckCollision(Position, positionBefore, obstacle, 0.6 * Match.Land.Tolerance))
                 {
                     Position = obstacle;
                     IdxPosition = i;

@@ -23,11 +23,5 @@ namespace NanoGames.Games.Banana
         public const double LengthBullet = 1;
         public const double Gravity = 0.1;
         public const int offset = 20;
-        public const int RoundTime = 1200;
-        public const double Dx = 0.1;
-        public const double SpeedJump = 1.2;
-        public const double JumpMultiplier = 1.5;
-        public const int JumpMultiplierTime = 15;
-        public const double AngleJump = 50 * Math.PI / 180;
     }
 }
