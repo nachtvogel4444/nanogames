@@ -13,12 +13,12 @@ namespace NanoGames.Games.Bomberguy
         {
         }
 
-        public override void Draw(IGraphics g)
+        public override void Draw()
         {
-            g.Rectangle(Colors.White, Position, Position + Size);
+            Match.Output.Graphics.Rectangle(Colors.White, Position, Position + Size);
             for (double i = 1; i < Size.Y - 1; i++)
             {
-                g.Line(Colors.White, this.Position + new Vector(1, i), this.Position + new Vector(this.Size.X - 1, i));
+                Match.Output.Graphics.Line(Colors.White, this.Position + new Vector(1, i), this.Position + new Vector(this.Size.X - 1, i));
             }
         }
     }

@@ -13,14 +13,14 @@ namespace NanoGames.Games.Bomberguy
         {
         }
 
-        public override void Draw(IGraphics g)
+        public override void Draw()
         {
-            g.Line(Colors.White, Position, Position + new Vector(Size.X, 0));
-            g.Line(Colors.White, Position + new Vector(Size.X, 0), Position + new Vector(Size.X, Size.Y));
-            g.Line(Colors.White, Position + new Vector(Size.X, Size.Y), Position + new Vector(0, Size.Y));
-            g.Line(Colors.White, Position + new Vector(0, Size.Y), Position);
-            g.Line(Colors.White, Position, Position + new Vector(Size.X, Size.Y));
-            g.Line(Colors.White, Position + new Vector(Size.X, 0), Position + new Vector(0, Size.Y));
+            Match.Output.Graphics.Line(Colors.White, Position, Position + new Vector(Size.X, 0));
+            Match.Output.Graphics.Line(Colors.White, Position + new Vector(Size.X, 0), Position + new Vector(Size.X, Size.Y));
+            Match.Output.Graphics.Line(Colors.White, Position + new Vector(Size.X, Size.Y), Position + new Vector(0, Size.Y));
+            Match.Output.Graphics.Line(Colors.White, Position + new Vector(0, Size.Y), Position);
+            Match.Output.Graphics.Line(Colors.White, Position, Position + new Vector(Size.X, Size.Y));
+            Match.Output.Graphics.Line(Colors.White, Position + new Vector(Size.X, 0), Position + new Vector(0, Size.Y));
         }
     }
 }

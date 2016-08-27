@@ -89,7 +89,7 @@ namespace NanoGames.Games
             return matchTimer;
         }
 
-        public void TimeOnce(int interval, Action action)
+        public IMatchTimer TimeOnce(int interval, Action action)
         {
             var timer = GetTimer(interval);
             timer.Elapsed += () =>
@@ -99,9 +99,10 @@ namespace NanoGames.Games
                 timer.Dispose();
             };
             timer.Start();
+            return timer;
         }
 
-        public void TimeCyclic(int interval, Action<IMatchTimer> action)
+        public IMatchTimer TimeCyclic(int interval, Action<IMatchTimer> action)
         {
             var timer = GetTimer(interval);
             timer.Elapsed += () =>
@@ -109,6 +110,7 @@ namespace NanoGames.Games
                 action.Invoke(timer);
             };
             timer.Start();
+            return timer;
         }
 
         /// <summary>

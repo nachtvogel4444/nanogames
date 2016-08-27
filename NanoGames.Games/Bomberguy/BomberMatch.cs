@@ -59,6 +59,11 @@ namespace NanoGames.Games.Bomberguy
             return new Vector(Math.Floor(r), Math.Floor(c));
         }
 
+        internal double GetAbsSize(double relSize)
+        {
+            return relSize * _pixelsPerUnit;
+        }
+
         public Vector GetCell(Vector position)
         {
             var c = (position.X - _widthOffset) / _pixelsPerUnit;
@@ -221,7 +226,7 @@ namespace NanoGames.Games.Bomberguy
                     var thing = _field[r, c];
 
                     if (thing != null)
-                        thing.Draw(g);
+                        thing.Draw();
                 }
             }
         }
@@ -391,7 +396,7 @@ namespace NanoGames.Games.Bomberguy
 
             var cell = GetCell(p);
 
-            var bomb = new Bomb(BOMB_REACH, p, this, GetCoordinates(cell), new Vector(_pixelsPerUnit * BOMB_RATIO, _pixelsPerUnit * BOMB_RATIO));
+            var bomb = new Bomb(BOMB_REACH, p, this, GetCoordinates(cell));
 
             this[cell] = bomb;
         }
