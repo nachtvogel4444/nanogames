@@ -5,7 +5,7 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class Bombstacle : AbstractRectbombularThing
     {
-        private Color _color = new Color(0.9, 0.6, 0.3);
+        private Color _color = new Color(0.65, 0.4, 0.2);
 
         private Glyph _glyph = new Glyph(11, 11) {
             // outer shape
