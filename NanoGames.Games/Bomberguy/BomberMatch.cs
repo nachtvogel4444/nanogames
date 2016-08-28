@@ -7,12 +7,6 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class BomberMatch : Match<BomberGuy>
     {
-        public const int FIELD_MIN_SIZE = 9;
-        public const double PLAYER_RATIO = .9;
-        public const double BOMB_RATIO = 1;
-        public const int BOMB_REACH = 2;
-        public const double BOMBSTACLE_PROBABILITY = 0.5;
-
         private int _fieldSize;
         private double _pixelsPerUnit;
         private double _widthOffset;
@@ -24,19 +18,6 @@ namespace NanoGames.Games.Bomberguy
         }
 
         public double PlayerSpeed { get; private set; }
-
-        //public RectbombularThing this[Vector v]
-        //{
-        //    get
-        //    {
-        //        return this[(int)v.X, (int)v.Y];
-        //    }
-
-        //    set
-        //    {
-        //        this[(int)v.X, (int)v.Y] = value;
-        //    }
-        //}
 
         public RectbombularThing this[CellCoordinates c]
         {
@@ -92,11 +73,11 @@ namespace NanoGames.Games.Bomberguy
 
         protected override void Initialize()
         {
-            _fieldSize = FIELD_MIN_SIZE + ((int)(Players.Count / 4)) * 2;
+            _fieldSize = Constants.BomberMatch.FIELD_MIN_SIZE + ((int)(Players.Count / 4)) * 2;
 
             _field = new RectbombularThing[_fieldSize, _fieldSize];
 
-            PlayerSpeed = Constants.BomberGuy.REL_SPEED / _fieldSize;
+            PlayerSpeed = Constants.BomberGuy.SPEED / _fieldSize;
 
             _pixelsPerUnit = GraphicsConstants.Height / _fieldSize;
             _widthOffset = (GraphicsConstants.Width - GraphicsConstants.Height) / 2d;
@@ -142,7 +123,7 @@ namespace NanoGames.Games.Bomberguy
                     }
                     else
                     {
-                        if (this.Random.NextDouble() <= BOMBSTACLE_PROBABILITY)
+                        if (this.Random.NextDouble() <= Constants.BomberMatch.BOMBSTACLE_PROBABILITY)
                         {
                             this[r, c] = new Bombstacle(this, CellSize);
                         }
@@ -180,9 +161,7 @@ namespace NanoGames.Games.Bomberguy
                 {
                     var p = playerArray[i, j];
                     if (p == null) continue;
-                    p.Size = new Vector(_pixelsPerUnit * PLAYER_RATIO, _pixelsPerUnit * PLAYER_RATIO);
-
-                    //var cellCoordinates = new Vector(currPos.Y, currPos.X);
+                    p.Size = new Vector(_pixelsPerUnit * Constants.BomberGuy.REL_SIZE, _pixelsPerUnit * Constants.BomberGuy.REL_SIZE);
 
                     MakeSpaceAroundPlayer(currPos);
 
@@ -401,7 +380,7 @@ namespace NanoGames.Games.Bomberguy
 
             var cell = GetCell(p);
 
-            var bomb = new Bomb(BOMB_REACH, p, this, GetCoordinates(cell));
+            var bomb = new Bomb(p, this, GetCoordinates(cell));
 
             this[cell] = bomb;
         }

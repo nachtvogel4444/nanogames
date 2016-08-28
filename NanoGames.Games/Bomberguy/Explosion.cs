@@ -17,7 +17,6 @@ namespace NanoGames.Games.Bomberguy
         private Color _beamMiddleColor = new Color(0.8, 0.4, 0.1);
         private Color _beamOuterColor1 = new Color(1, 0.1, 0.1);
         private Color _beamOuterColor2 = new Color(0.5, 0, 0);
-        private double _drawWidth = 0.2;
 
         public Explosion(BomberMatch match, Type type, Vector direction, Vector size) : this(match, type, direction, new Vector(), size)
         {
@@ -43,8 +42,6 @@ namespace NanoGames.Games.Bomberguy
 
         public override void Draw()
         {
-            double absDrawWidth = Match.GetAbsSize(_drawWidth);
-
             // determine offset for beam opening by checking four reference directions; not the most elegant solution
             double beamOpeningOffset = 0;  // default case: direction left, opening right
             if (Vector.Dot(_direction, new Vector(0, -1)) > 0) beamOpeningOffset = DegToRad(90); // direction top, opening bottom
@@ -59,18 +56,18 @@ namespace NanoGames.Games.Bomberguy
             switch (_type)
             {
                 case Type.CENTER:
-                    Match.Output.Graphics.Circle(_centerInnerColor, Center, Match.GetAbsSize(Constants.Bomb.SIZE) * 0.3d / 2d);
-                    Match.Output.Graphics.Circle(_centerMiddleColor, Center, Match.GetAbsSize(Constants.Bomb.SIZE) * 0.6d / 2d);
-                    Match.Output.Graphics.Circle(_centerOuterColor, Center, Match.GetAbsSize(Constants.Bomb.SIZE) * 0.95 / 2d);
+                    Match.Output.Graphics.Circle(_centerInnerColor, Center, Match.GetAbsSize(Constants.Bomb.REL_SIZE) * 0.3d / 2d);
+                    Match.Output.Graphics.Circle(_centerMiddleColor, Center, Match.GetAbsSize(Constants.Bomb.REL_SIZE) * 0.6d / 2d);
+                    Match.Output.Graphics.Circle(_centerOuterColor, Center, Match.GetAbsSize(Constants.Bomb.REL_SIZE) * 0.95 / 2d);
 
                     if (!_particles) break;
                     Match.Output.Particles.Gravity = new Vector(0, 0);
                     Match.Output.Particles.Velocity = new Vector(0, 0);
                     Match.Output.Particles.Intensity = 0.4;
 
-                    Match.Output.Particles.Circle(_centerInnerColor, Center, Match.GetAbsSize(Constants.Bomb.SIZE) * 0.3d / 2d);
-                    Match.Output.Particles.Circle(_centerMiddleColor, Center, Match.GetAbsSize(Constants.Bomb.SIZE) * 0.6d / 2d);
-                    Match.Output.Particles.Circle(_centerOuterColor, Center, Match.GetAbsSize(Constants.Bomb.SIZE) * 0.95 / 2d);
+                    Match.Output.Particles.Circle(_centerInnerColor, Center, Match.GetAbsSize(Constants.Bomb.REL_SIZE) * 0.3d / 2d);
+                    Match.Output.Particles.Circle(_centerMiddleColor, Center, Match.GetAbsSize(Constants.Bomb.REL_SIZE) * 0.6d / 2d);
+                    Match.Output.Particles.Circle(_centerOuterColor, Center, Match.GetAbsSize(Constants.Bomb.REL_SIZE) * 0.95 / 2d);
                     break;
 
                 case Type.MIDDLE:

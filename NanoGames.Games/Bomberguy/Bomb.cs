@@ -6,17 +6,15 @@ namespace NanoGames.Games.Bomberguy
     internal class Bomb : AbstractRectbombularThing
     {
         private BomberGuy player;
-        private int reach;
         private IMatchTimer timer;
 
-        public Bomb(int reach, BomberGuy player, BomberMatch match) : this(reach, player, match, new Vector())
+        public Bomb(BomberGuy player, BomberMatch match) : this(player, match, new Vector())
         {
         }
 
-        public Bomb(int reach, BomberGuy player, BomberMatch match, Vector position) : base(match, true, false, false, position, match.CellSize * Constants.Bomb.SIZE)
+        public Bomb(BomberGuy player, BomberMatch match, Vector position) : base(match, true, false, false, position, match.CellSize * Constants.Bomb.REL_SIZE)
         {
             timer = match.TimeOnce(2000, () => Destroy());
-            this.reach = reach;
             this.player = player;
         }
 
@@ -46,7 +44,7 @@ namespace NanoGames.Games.Bomberguy
             {
                 direction = direction.RotatedRight;
 
-                for (int r = 1; r <= reach; r++)
+                for (int r = 1; r <= Constants.Bomb.REACH; r++)
                 {
                     var explosionCell = cell + direction * r;
                     var cellContent = Match[explosionCell];
@@ -60,7 +58,7 @@ namespace NanoGames.Games.Bomberguy
                         if (cellContent.Destroyable)
                         {
                             cellContent.Destroy();
-                            Match[explosionCell] = new Explosion(Match, getExplosionType(reach), new Vector(direction.Column, direction.Row), Match.GetCoordinates(explosionCell), Match.CellSize);
+                            Match[explosionCell] = new Explosion(Match, Explosion.Type.END, new Vector(direction.Column, direction.Row), Match.GetCoordinates(explosionCell), Match.CellSize);
                         }
                         break;
                     }
@@ -70,7 +68,7 @@ namespace NanoGames.Games.Bomberguy
 
         private Explosion.Type getExplosionType(int r)
         {
-            if (r == reach) return Explosion.Type.END;
+            if (r == Constants.Bomb.REACH) return Explosion.Type.END;
             else return Explosion.Type.MIDDLE;
         }
     }

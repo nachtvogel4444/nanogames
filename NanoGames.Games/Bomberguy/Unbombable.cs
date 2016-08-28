@@ -30,11 +30,6 @@ namespace NanoGames.Games.Bomberguy
         public override void Draw()
         {
             Match.Output.Graphics.Glyph(_color, _glyph, this.TopLeft, new Vector(this.Size.X * 0.98, 0), new Vector(0, this.Size.Y * 0.98));
-            //Match.Output.Graphics.Rectangle(Colors.White, Position, Position + Size);
-            //for (double i = 1; i < Size.Y - 1; i++)
-            //{
-            //    Match.Output.Graphics.Line(Colors.White, this.Position + new Vector(1, i), this.Position + new Vector(this.Size.X - 1, i));
-            //}
         }
     }
 }
