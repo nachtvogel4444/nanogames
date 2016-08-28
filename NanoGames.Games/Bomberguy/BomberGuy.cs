@@ -89,7 +89,7 @@ namespace NanoGames.Games.Bomberguy
             {
                 Match.Output.Particles.Gravity = new Vector(0, 0);
                 Match.Output.Particles.Velocity = Speed;
-                Match.Output.Particles.Intensity = 1;
+                Match.Output.Particles.Intensity = Speed.Length > 0 ? 1 : 2; 
             }
 
             g.Line(LocalColor, Position + new Vector(Size.X / 2d, 0), Position + new Vector(Size.X, Size.Y / 2d));
