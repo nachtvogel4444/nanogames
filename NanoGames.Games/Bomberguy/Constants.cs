@@ -12,5 +12,10 @@ namespace NanoGames.Games.Bomberguy
         {
             public static readonly double SIZE = 1;
         }
+
+        public static class BomberGuy
+        {
+            public static readonly double REL_SPEED = 9;
+        }
     }
 }

@@ -11,11 +11,9 @@ namespace NanoGames.Games.Bomberguy
         public const double PLAYER_RATIO = .9;
         public const double BOMB_RATIO = 1;
         public const int BOMB_REACH = 2;
-        public const double PLAYER_SPEED = 9;
         public const double BOMBSTACLE_PROBABILITY = 0.5;
 
         private int _fieldSize;
-        private double _playerSpeed;
         private double _pixelsPerUnit;
         private double _widthOffset;
         private RectbombularThing[,] _field;
@@ -24,6 +22,8 @@ namespace NanoGames.Games.Bomberguy
         {
             get { return new Vector(_pixelsPerUnit, _pixelsPerUnit); }
         }
+
+        public double PlayerSpeed { get; private set; }
 
         public RectbombularThing this[Vector v]
         {
@@ -90,7 +90,7 @@ namespace NanoGames.Games.Bomberguy
 
             _field = new RectbombularThing[_fieldSize, _fieldSize];
 
-            _playerSpeed = PLAYER_SPEED / _fieldSize;
+            PlayerSpeed = Constants.BomberGuy.REL_SPEED / _fieldSize;
 
             _pixelsPerUnit = GraphicsConstants.Height / _fieldSize;
             _widthOffset = (GraphicsConstants.Width - GraphicsConstants.Height) / 2d;
@@ -120,7 +120,7 @@ namespace NanoGames.Games.Bomberguy
                 CheckDeath(p);
             }
 
-            DrawField(Output.Graphics);
+            Draw();
         }
 
         private void InitializeField()
@@ -203,20 +203,16 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
-        private void DrawField(IGraphics g)
+        private void Draw()
         {
             /* Draw each player. */
             foreach (var player in Players)
             {
+
                 /* Skip players that have already finished. */
                 if (player.Dead) continue;
 
-                Color color = player.LocalColor;
-
-                g.Line(color, player.Position + new Vector(player.Size.X / 2d, 0), player.Position + new Vector(player.Size.X, player.Size.Y / 2d));
-                g.Line(color, player.Position + new Vector(player.Size.X, player.Size.Y / 2d), player.Position + new Vector(player.Size.X / 2d, player.Size.Y));
-                g.Line(color, player.Position + new Vector(player.Size.X / 2d, player.Size.Y), player.Position + new Vector(0, player.Size.Y / 2d));
-                g.Line(color, player.Position + new Vector(0, player.Size.Y / 2d), player.Position + new Vector(player.Size.X / 2d, 0));
+                player.Draw();
             }
 
             for (int r = 0; r < _fieldSize; r++)
@@ -233,6 +229,8 @@ namespace NanoGames.Games.Bomberguy
 
         private void MovePlayer(BomberGuy p)
         {
+            p.Speed = new Vector();
+
             double x = 0, y = 0;
 
             Vector inputVector = GetInputVector(p.Input);
@@ -240,7 +238,7 @@ namespace NanoGames.Games.Bomberguy
 
             if (p.Input.Up.IsPressed && !p.Input.Down.IsPressed)
             {
-                var neighborLeft = this[GetCell(p.Position + new Vector(0, _playerSpeed * inputVector.Y))];
+                var neighborLeft = this[GetCell(p.Position + new Vector(0, PlayerSpeed * inputVector.Y))];
                 bool neighborLeftPassable = neighborLeft == null;
                 bool slideToRightAllowed = false;
                 if (neighborLeft != null && !(neighborLeftPassable = neighborLeft.Passable))
@@ -251,7 +249,7 @@ namespace NanoGames.Games.Bomberguy
                     DetermineMovement(out neighborLeftPassable, out slideToRightAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
 
-                var neighborRight = this[GetCell(p.Position + new Vector(p.Size.X, _playerSpeed * inputVector.Y))];
+                var neighborRight = this[GetCell(p.Position + new Vector(p.Size.X, PlayerSpeed * inputVector.Y))];
                 bool neighborRightPassable = neighborRight == null;
                 bool slideToLeftAllowed = false;
                 if (neighborRight != null && !(neighborRightPassable = neighborRight.Passable))
@@ -270,7 +268,7 @@ namespace NanoGames.Games.Bomberguy
             }
             if (p.Input.Down.IsPressed && !p.Input.Up.IsPressed)
             {
-                var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, _playerSpeed * inputVector.Y))];
+                var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, PlayerSpeed * inputVector.Y))];
                 bool neighborLeftPassable = neighborLeft == null;
                 bool slideToRightAllowed = false;
                 if (neighborLeft != null && !(neighborLeftPassable = neighborLeft.Passable))
@@ -282,7 +280,7 @@ namespace NanoGames.Games.Bomberguy
                     DetermineMovement(out neighborLeftPassable, out slideToRightAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
 
-                var neighborRight = this[GetCell(p.Position + p.Size + new Vector(0, _playerSpeed * inputVector.Y))];
+                var neighborRight = this[GetCell(p.Position + p.Size + new Vector(0, PlayerSpeed * inputVector.Y))];
                 bool neighborRightPassable = neighborRight == null;
                 bool slideToLeftAllowed = false;
                 if (neighborRight != null && !(neighborRightPassable = neighborRight.Passable))
@@ -300,7 +298,7 @@ namespace NanoGames.Games.Bomberguy
             }
             if (p.Input.Left.IsPressed && !p.Input.Right.IsPressed)
             {
-                var neighborAbove = this[GetCell(p.Position + new Vector(_playerSpeed * inputVector.X, 0))];
+                var neighborAbove = this[GetCell(p.Position + new Vector(PlayerSpeed * inputVector.X, 0))];
                 bool neighborAbovePassable = neighborAbove == null;
                 bool slideToDownAllowed = false;
                 if (neighborAbove != null && !(neighborAbovePassable = neighborAbove.Passable))
@@ -311,7 +309,7 @@ namespace NanoGames.Games.Bomberguy
                     DetermineMovement(out neighborAbovePassable, out slideToDownAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
 
-                var neighborBelow = this[GetCell(p.Position + new Vector(_playerSpeed * inputVector.X, p.Size.Y))];
+                var neighborBelow = this[GetCell(p.Position + new Vector(PlayerSpeed * inputVector.X, p.Size.Y))];
                 bool neighborBelowPassable = neighborBelow == null;
                 bool slideToUpAllowed = false;
                 if (neighborBelow != null && !(neighborBelowPassable = neighborBelow.Passable))
@@ -330,7 +328,7 @@ namespace NanoGames.Games.Bomberguy
             }
             if (p.Input.Right.IsPressed && !p.Input.Left.IsPressed)
             {
-                var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed * inputVector.X, 0))];
+                var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + PlayerSpeed * inputVector.X, 0))];
                 bool neighborAbovePassable = neighborAbove == null;
                 bool slideToDownAllowed = false;
                 if (neighborAbove != null && !(neighborAbovePassable = neighborAbove.Passable))
@@ -341,7 +339,7 @@ namespace NanoGames.Games.Bomberguy
                     DetermineMovement(out neighborAbovePassable, out slideToDownAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
 
-                var neighborBelow = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed * inputVector.X, p.Size.Y))];
+                var neighborBelow = this[GetCell(p.Position + new Vector(p.Size.X + PlayerSpeed * inputVector.X, p.Size.Y))];
                 bool neighborBelowPassable = neighborBelow == null;
                 bool slideToUpAllowed = false;
                 if (neighborBelow != null && !(neighborBelowPassable = neighborBelow.Passable))
@@ -362,7 +360,8 @@ namespace NanoGames.Games.Bomberguy
 
             var direction = new Vector(x, y).Normalized;
 
-            p.Position += direction * _playerSpeed;
+            p.Speed = direction * PlayerSpeed;
+            p.Position += direction * PlayerSpeed;
         }
 
         private Vector GetInputVector(Input input)
