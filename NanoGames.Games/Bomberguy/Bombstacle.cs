@@ -5,6 +5,25 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class Bombstacle : AbstractRectbombularThing
     {
+        private Color _color = new Color(0.9, 0.6, 0.3);
+
+        private Glyph _glyph = new Glyph(11, 11) {
+            // outer shape
+            { 0, 0, 1, 0, 2, 1, 4, 1, 4, 0, 11, 0 },
+            { 11, 0, 11, 6, 10, 8, 10, 9, 11, 10, 11, 11 },
+            { 11, 11, 5, 11, 4, 10, 3, 10, 2, 11, 0, 11 },
+            { 0, 11, 0, 0 },
+            // inner crack
+            { 2, 3, 3, 4, 2, 5 },
+            { 3, 4, 4, 4, 6, 6 },
+            { 6, 6, 9, 3 },
+            { 8, 4, 7, 3 },
+            { 6, 6, 4, 7, 2, 9 },
+            { 3, 8, 4, 9 },
+            { 6, 6, 7, 9, 7, 10},
+            { 7, 9, 8, 9 }
+        };
+
         public Bombstacle(BomberMatch match, Vector size) : this(match, new Vector(), size)
         {
         }
@@ -15,12 +34,7 @@ namespace NanoGames.Games.Bomberguy
 
         public override void Draw()
         {
-            Match.Output.Graphics.Line(Colors.White, Position, Position + new Vector(Size.X, 0));
-            Match.Output.Graphics.Line(Colors.White, Position + new Vector(Size.X, 0), Position + new Vector(Size.X, Size.Y));
-            Match.Output.Graphics.Line(Colors.White, Position + new Vector(Size.X, Size.Y), Position + new Vector(0, Size.Y));
-            Match.Output.Graphics.Line(Colors.White, Position + new Vector(0, Size.Y), Position);
-            Match.Output.Graphics.Line(Colors.White, Position, Position + new Vector(Size.X, Size.Y));
-            Match.Output.Graphics.Line(Colors.White, Position + new Vector(Size.X, 0), Position + new Vector(0, Size.Y));
+            Match.Output.Graphics.Glyph(_color, _glyph, this.TopLeft, new Vector(this.Size.X * 0.98, 0), new Vector(0, this.Size.Y * 0.98));
         }
     }
 }
