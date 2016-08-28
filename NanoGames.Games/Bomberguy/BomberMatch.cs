@@ -25,55 +25,61 @@ namespace NanoGames.Games.Bomberguy
 
         public double PlayerSpeed { get; private set; }
 
-        public RectbombularThing this[Vector v]
+        //public RectbombularThing this[Vector v]
+        //{
+        //    get
+        //    {
+        //        return this[(int)v.X, (int)v.Y];
+        //    }
+
+        //    set
+        //    {
+        //        this[(int)v.X, (int)v.Y] = value;
+        //    }
+        //}
+
+        public RectbombularThing this[CellCoordinates c]
+        {
+            get { return this[c.Row, c.Column]; }
+            set { this[c.Row, c.Column] = value; }
+        }
+
+        public RectbombularThing this[int row, int column]
         {
             get
             {
-                return this[(int)v.X, (int)v.Y];
+                return _field[row, column];
             }
 
             set
             {
-                this[(int)v.X, (int)v.Y] = value;
+                _field[row, column] = value;
+                if (value != null) value.Position = GetCoordinates(new CellCoordinates(row, column));
             }
         }
 
-        public RectbombularThing this[int x, int y]
-        {
-            get
-            {
-                return _field[x, y];
-            }
-
-            set
-            {
-                _field[x, y] = value;
-                if (value != null) value.Position = GetCoordinates(new Vector(x, y));
-            }
-        }
-
-        public Vector GetCell(BomberThing thing)
-        {
-            var c = (thing.Center.X - _widthOffset) / _pixelsPerUnit;
-            var r = thing.Center.Y / _pixelsPerUnit;
-            return new Vector(Math.Floor(r), Math.Floor(c));
-        }
+        
 
         internal double GetAbsSize(double relSize)
         {
             return relSize * _pixelsPerUnit;
         }
 
-        public Vector GetCell(Vector position)
+        public CellCoordinates GetCell(BomberThing thing)
+        {
+            return GetCell(thing.Center);
+        }
+
+        public CellCoordinates GetCell(Vector position)
         {
             var c = (position.X - _widthOffset) / _pixelsPerUnit;
             var r = position.Y / _pixelsPerUnit;
-            return new Vector(Math.Floor(r), Math.Floor(c));
+            return new CellCoordinates((int)Math.Floor(r), (int)Math.Floor(c));
         }
 
-        public Vector GetCoordinates(Vector cellCoordinates)
+        public Vector GetCoordinates(CellCoordinates cellCoordinates)
         {
-            return new Vector(_widthOffset + cellCoordinates.Y * _pixelsPerUnit, cellCoordinates.X * _pixelsPerUnit);
+            return new Vector(_widthOffset + cellCoordinates.Column * _pixelsPerUnit, cellCoordinates.Row * _pixelsPerUnit);
         }
 
         public void CheckAllDeaths()
@@ -161,14 +167,14 @@ namespace NanoGames.Games.Bomberguy
                 }
             }
 
-            Vector direction = new Vector(1, 0);
+            CellCoordinates direction = new CellCoordinates(1, 0);
             int distance = (int)Math.Floor((double)(_fieldSize - 2) / playersPerSide);
-            Vector currPos = new Vector(1, 1);
+            CellCoordinates currPos = new CellCoordinates(1, 1);
             for (int i = 0; i < 4; i++)
             {
-                if (i == 1) currPos = new Vector(_fieldSize - 2, 1);
-                if (i == 2) currPos = new Vector(_fieldSize - 2, _fieldSize - 2);
-                if (i == 3) currPos = new Vector(1, _fieldSize - 2);
+                if (i == 1) currPos = new CellCoordinates(_fieldSize - 2, 1);
+                if (i == 2) currPos = new CellCoordinates(_fieldSize - 2, _fieldSize - 2);
+                if (i == 3) currPos = new CellCoordinates(1, _fieldSize - 2);
 
                 for (int j = 0; j < playersPerSide; j++)
                 {
@@ -176,11 +182,11 @@ namespace NanoGames.Games.Bomberguy
                     if (p == null) continue;
                     p.Size = new Vector(_pixelsPerUnit * PLAYER_RATIO, _pixelsPerUnit * PLAYER_RATIO);
 
-                    var cellCoordinates = new Vector(currPos.Y, currPos.X);
+                    //var cellCoordinates = new Vector(currPos.Y, currPos.X);
 
-                    MakeSpaceAroundPlayer(cellCoordinates);
+                    MakeSpaceAroundPlayer(currPos);
 
-                    p.Position = GetCoordinates(cellCoordinates);
+                    p.Position = GetCoordinates(currPos);
                     currPos += direction * distance;
                 }
 
@@ -188,12 +194,12 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
-        private void MakeSpaceAroundPlayer(Vector cellCoordinates)
+        private void MakeSpaceAroundPlayer(CellCoordinates cellCoordinates)
         {
             var cellContent = this[cellCoordinates];
             if (cellContent != null && cellContent.Destroyable) cellContent.Destroy();
 
-            var directionVector = new Vector(1, 0);
+            var directionVector = new CellCoordinates(1, 0);
 
             for (int i = 0; i < 4; i++)
             {

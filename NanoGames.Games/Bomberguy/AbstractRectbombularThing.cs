@@ -54,7 +54,7 @@ namespace NanoGames.Games.Bomberguy
             OnDestroy(cell);
         }
 
-        protected virtual void OnDestroy(Vector cell)
+        protected virtual void OnDestroy(CellCoordinates cell)
         {
         }
     }

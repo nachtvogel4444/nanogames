@@ -25,7 +25,7 @@ namespace NanoGames.Games.Bomberguy
             Match.Output.Graphics.Circle(player.Color, this.Center, this.Size.X / 2d * 0.8);
         }
 
-        protected override void OnDestroy(Vector cell)
+        protected override void OnDestroy(CellCoordinates cell)
         {
             timer.Stop();
             timer.Dispose();
@@ -37,11 +37,11 @@ namespace NanoGames.Games.Bomberguy
             Match.CheckAllDeaths();
         }
 
-        private void CreateExplosions(Vector cell)
+        private void CreateExplosions(CellCoordinates cell)
         {
             Match[cell] = new Explosion(Match, Explosion.Type.CENTER, new Vector(), Match.GetCoordinates(cell), Match.CellSize);
 
-            var direction = new Vector(-1, 0);
+            var direction = new CellCoordinates(-1, 0);
             for (int i = 0; i < 4; i++)
             {
                 direction = direction.RotatedRight;
@@ -53,14 +53,14 @@ namespace NanoGames.Games.Bomberguy
 
                     if (cellContent == null)
                     {
-                        Match[explosionCell] = new Explosion(Match, getExplosionType(r), new Vector(direction.Y, direction.X), Match.GetCoordinates(explosionCell), Match.CellSize);
+                        Match[explosionCell] = new Explosion(Match, getExplosionType(r), new Vector(direction.Column, direction.Row), Match.GetCoordinates(explosionCell), Match.CellSize);
                     }
                     else
                     {
                         if (cellContent.Destroyable)
                         {
                             cellContent.Destroy();
-                            Match[explosionCell] = new Explosion(Match, getExplosionType(reach), new Vector(direction.Y, direction.X), Match.GetCoordinates(explosionCell), Match.CellSize);
+                            Match[explosionCell] = new Explosion(Match, getExplosionType(reach), new Vector(direction.Column, direction.Row), Match.GetCoordinates(explosionCell), Match.CellSize);
                         }
                         break;
                     }
