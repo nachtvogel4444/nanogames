@@ -47,7 +47,7 @@ namespace NanoGames.Games.Bomberguy
         {
             if (!Destroyable) return;
 
-            var cell = Match.GetCell(this);
+            var cell = Match.GetCellCoordinates(this);
 
             Match[cell] = null;
 

@@ -35,7 +35,7 @@ namespace NanoGames.Games.Bomberguy
             set
             {
                 _field[row, column] = value;
-                if (value != null) value.Position = GetCoordinates(new CellCoordinates(row, column));
+                if (value != null) value.Position = GetScreenCoordinates(new CellCoordinates(row, column));
             }
         }
 
@@ -46,7 +46,7 @@ namespace NanoGames.Games.Bomberguy
             return relSize * _pixelsPerUnit;
         }
 
-        public CellCoordinates GetCell(BomberThing thing)
+        public CellCoordinates GetCellCoordinates(BomberThing thing)
         {
             return GetCell(thing.Center);
         }
@@ -58,7 +58,7 @@ namespace NanoGames.Games.Bomberguy
             return new CellCoordinates((int)Math.Floor(r), (int)Math.Floor(c));
         }
 
-        public Vector GetCoordinates(CellCoordinates cellCoordinates)
+        public Vector GetScreenCoordinates(CellCoordinates cellCoordinates)
         {
             return new Vector(_widthOffset + cellCoordinates.Column * _pixelsPerUnit, cellCoordinates.Row * _pixelsPerUnit);
         }
@@ -118,7 +118,6 @@ namespace NanoGames.Games.Bomberguy
                 {
                     if (r == 0 || r == _fieldSize - 1 || c == 0 || c == _fieldSize - 1 || r % 2 == 0 && c % 2 == 0)
                     {
-                        //_field[r, c] = new Unbombable(this, new Vector(_widthOffset + c * _pixelsPerUnit, r * _pixelsPerUnit), new Vector(_pixelsPerUnit, _pixelsPerUnit));
                         this[r, c] = new Unbombable(this, CellSize);
                     }
                     else
@@ -165,7 +164,7 @@ namespace NanoGames.Games.Bomberguy
 
                     MakeSpaceAroundPlayer(currPos);
 
-                    p.Position = GetCoordinates(currPos);
+                    p.Position = GetScreenCoordinates(currPos);
                     currPos += direction * distance;
                 }
 
@@ -378,16 +377,19 @@ namespace NanoGames.Games.Bomberguy
         {
             if (!p.Input.Fire.WasActivated) return;
 
-            var cell = GetCell(p);
+            var cell = GetCellCoordinates(p);
 
-            var bomb = new Bomb(p, this, GetCoordinates(cell));
+            // prevent multiple bombs in one cell
+            if (this[cell] != null) return;
+
+            var bomb = new Bomb(p, this, GetScreenCoordinates(cell));
 
             this[cell] = bomb;
         }
 
         private void CheckDeath(BomberGuy p)
         {
-            var cell = this[GetCell(p)];
+            var cell = this[GetCellCoordinates(p)];
 
             if (cell != null && cell.Deadly) p.Destroy();
         }

@@ -37,7 +37,7 @@ namespace NanoGames.Games.Bomberguy
 
         private void CreateExplosions(CellCoordinates cell)
         {
-            Match[cell] = new Explosion(Match, Explosion.Type.CENTER, new Vector(), Match.GetCoordinates(cell), Match.CellSize);
+            Match[cell] = new Explosion(Match, Explosion.Type.CENTER, new Vector(), Match.GetScreenCoordinates(cell), Match.CellSize);
 
             var direction = new CellCoordinates(-1, 0);
             for (int i = 0; i < 4; i++)
@@ -51,14 +51,14 @@ namespace NanoGames.Games.Bomberguy
 
                     if (cellContent == null)
                     {
-                        Match[explosionCell] = new Explosion(Match, getExplosionType(r), new Vector(direction.Column, direction.Row), Match.GetCoordinates(explosionCell), Match.CellSize);
+                        Match[explosionCell] = new Explosion(Match, getExplosionType(r), new Vector(direction.Column, direction.Row), Match.GetScreenCoordinates(explosionCell), Match.CellSize);
                     }
                     else
                     {
                         if (cellContent.Destroyable)
                         {
                             cellContent.Destroy();
-                            Match[explosionCell] = new Explosion(Match, Explosion.Type.END, new Vector(direction.Column, direction.Row), Match.GetCoordinates(explosionCell), Match.CellSize);
+                            Match[explosionCell] = new Explosion(Match, Explosion.Type.END, new Vector(direction.Column, direction.Row), Match.GetScreenCoordinates(explosionCell), Match.CellSize);
                         }
                         break;
                     }
