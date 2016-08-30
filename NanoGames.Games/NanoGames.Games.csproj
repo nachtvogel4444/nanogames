@@ -47,6 +47,11 @@
     <Compile Include="..\NanoGames.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AsteroidHunt\Asteroid.cs" />
+    <Compile Include="AsteroidHunt\Bullet.cs" />
+    <Compile Include="AsteroidHunt\Constants.cs" />
+    <Compile Include="AsteroidHunt\AsteroidHuntMatch.cs" />
+    <Compile Include="AsteroidHunt\AsteroidHuntPlayer.cs" />
     <Compile Include="Bomberguy\AbstractRectbombularThing.cs" />
     <Compile Include="Bomberguy\Bomb.cs" />
     <Compile Include="Bomberguy\BomberGuy.cs" />
