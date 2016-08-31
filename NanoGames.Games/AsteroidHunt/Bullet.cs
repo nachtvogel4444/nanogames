@@ -24,6 +24,13 @@ namespace NanoGames.Games.AsteroidHunt
         {
             Player.Score += points;
             _exploded = true;
+            Player.Match.Output.Particles.Gravity = new Vector(0, 0);
+            Player.Match.Output.Particles.Velocity = new Vector(Constants.Weapon.BulletVelocity / 8d, 0);
+            Player.Match.Output.Particles.Intensity = .7;
+
+            Player.Match.Output.Particles.Line(Player.LocalColor, Position, Position + new Vector(0, Constants.Weapon.BulletLength));
+            Player.Match.Output.Particles.Velocity = new Vector(-Constants.Weapon.BulletVelocity / 8d, 0);
+            Player.Match.Output.Particles.Line(Player.LocalColor, Position, Position + new Vector(0, Constants.Weapon.BulletLength));
         }
     }
 }

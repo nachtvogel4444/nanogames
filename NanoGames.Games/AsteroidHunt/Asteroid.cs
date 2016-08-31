@@ -23,7 +23,15 @@ namespace NanoGames.Games.AsteroidHunt
         internal void Hit(Bullet b)
         {
             _damage += b.Damage;
-            if (_damage >= Hitpoints) _exploded = true;
+            if (_damage >= Hitpoints)
+            {
+                _exploded = true;
+                Match.Output.Particles.Gravity = new Vector(0, 0);
+                Match.Output.Particles.Velocity = Velocity;
+                Match.Output.Particles.Intensity = 1;
+
+                Match.Output.Particles.Circle(new Color(1, 0, 0), Position, Size / 2d);
+            }
         }
 
         internal void Draw()
