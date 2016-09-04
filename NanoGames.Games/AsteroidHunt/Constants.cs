@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NanoGames.Games.AsteroidHunt
+﻿namespace NanoGames.Games.AsteroidHunt
 {
-    class Constants
+    internal class Constants
     {
         public static class Match
         {
@@ -17,6 +11,7 @@ namespace NanoGames.Games.AsteroidHunt
 
         public static class Simploid
         {
+            public static readonly Color Color = new Color(1, 0, 0);
             public static readonly double Probability = 0.7;
             public static readonly double MinVelocity = 0.2;
             public static readonly double MaxVelocity = 0.8;
@@ -25,7 +20,23 @@ namespace NanoGames.Games.AsteroidHunt
             public static readonly int BaseScore = 1;
             public static readonly int MinHitpoints = 1;
             public static readonly int MaxHitpoints = 2;
+            public static readonly bool HitpointsPlayerScaling = false;
         }
+
+        public static class Robustoid
+        {
+            public static readonly Color Color = new Color(0, 0, 1);
+            public static readonly double Probability = 0.2;
+            public static readonly double MinVelocity = 0.1;
+            public static readonly double MaxVelocity = 0.2;
+            public static readonly double MinSize = 10;
+            public static readonly double MaxSize = 20;
+            public static readonly int BaseScore = 1;
+            public static readonly int MinHitpoints = 5;
+            public static readonly int MaxHitpoints = 15;
+            public static readonly bool HitpointsPlayerScaling = true;
+        }
+
         public static class Player
         {
             public static readonly Vector Size = new Vector(6, 10);
