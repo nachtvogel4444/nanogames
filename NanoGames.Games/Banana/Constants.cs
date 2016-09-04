@@ -11,17 +11,6 @@ namespace NanoGames.Games.Banana
 {
     internal static class Constants
     {
-        public const double StepAngle = 1 * Math.PI / 180;
-        public const int MultiplierAngle = 5;
-        public const int StepMove = 2;
-        public const int MultiplierStepMove = 5;
-        public const int WaitTimeKey = 10;
-        public const int RadiusPlayer = 4;
-        public const int ThicknessGun = 1;
-        public const int LengthGun = 6;
-        public const double StepSpeedBullet = 0.1;
-        public const double LengthBullet = 1;
-        public const double Gravity = 0.1;
-        public const int offset = 20;
+        public const double Gravity = 0.05;
     }
 }

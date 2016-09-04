@@ -13,11 +13,12 @@ namespace NanoGames.Games.Banana
     {
         public int NPointsPolygon;
         public int NPointsInterpolated;
+        public int NPointsTracks;
         private List<double> alpha = new List<double>();
         private List<double> x = new List<double>();
         private List<double> y = new List<double>();
-        private List<double> xu = new List<double>();
-        private List<double> yu = new List<double>();
+        private List<double> xTracks = new List<double>();
+        private List<double> yTracks = new List<double>();
         private List<string> type = new List<string>();
         public double[] Alpha;
         public double[] XPolygon;
@@ -26,18 +27,20 @@ namespace NanoGames.Games.Banana
         public double[] XInterpolated;
         public double[] YInterpolated;
         public string[] TypeInterpolated;
-        public double[] XTracksUpper;
-        public double[] YTracksUpper;
-        public double[] XTracksLower;
-        public double[] YTracksLower;
+        public double[] XTracks;
+        public double[] YTracks;
 
-        public double[] lineX = new double[2] { 0, 320 };
-        public double[] lineY = new double[2] { 100, 100 };
-        public string[] lineType = new string[2] { "Normal", "Normal" };
+        // public double[] lineX = new double[2] { 0, 320 };
+        // public double[] lineY = new double[2] { 100, 100 };
+        // public string[] lineType = new string[2] { "Normal", "Normal" };
+
+        public double[] lineX = new double[7] { 0, 50, 120, 170, 200, 250, 320 };
+        public double[] lineY = new double[7] { 100, 120, 80, 90, 95, 140, 100 };
+        public string[] lineType = new string[7] { "Normal", "Normal", "Normal", "Normal", "Normal", "Normal", "Normal" };
 
         public double Tolerance = 0.1;
 
-        public void createLandscape(double[] inX, double[] inY, string[] inType)
+        public void createLandscape(double[] inX, double[] inY, string[] inType, double radiusPlayer)
         {
             // interpolate input polygon in Arrays, X: x-coordinates, Y: y coordinates, Type, type of wall
             // this is the line which is seen in the game as a landscape
@@ -69,8 +72,8 @@ namespace NanoGames.Games.Banana
                     y.Add(ytmp);
                     type.Add(inType[i]);
                     
-                    xu.Add(xtmp + Constants.RadiusPlayer * xo);
-                    yu.Add(ytmp + Constants.RadiusPlayer * yo);
+                    xTracks.Add(xtmp + radiusPlayer * xo);
+                    yTracks.Add(ytmp + radiusPlayer * yo);
 
                     alpha.Add(a);
                 }
@@ -88,8 +91,9 @@ namespace NanoGames.Games.Banana
             YPolygon = inY;
             TypePolygon = inType;
 
-            XTracksUpper = xu.ToArray();
-            YTracksUpper = yu.ToArray();
+            XTracks = xTracks.ToArray();
+            YTracks = yTracks.ToArray();
+            NPointsTracks = XTracks.GetLength(0);
 
             Alpha = alpha.ToArray();
 

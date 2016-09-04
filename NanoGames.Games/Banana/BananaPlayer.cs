@@ -12,31 +12,41 @@ namespace NanoGames.Games.Banana
     class BananaPlayer : Player<BananaMatch>
     {
         public Vector Position;
-        private Vector velocity;
-        public Vector Acceleration;
-        private int frameCountJump;
-        public int IdxPosition;
-        public double Angle;
-        public double SpeedBullet = 4; 
+        public int IdxPosition = 1000;
+        public Vector PositionBefore;
+
         public bool HasFinished = false;
-        public int Direction = -1;
-        private Methods methods = new Methods();
+        public double Radius = 2;
+
+        private Vector velocity;
+
+        private Vector jumpLeft;
+        private Vector jumpRight;
+        private Vector jumpVertical;
+        private int frameCountJump;
+
+        private double angle = 85 * Math.PI / 180;
+        private double speedBullet = 4;
+        private double lengthGun = 4;
+        
+        private double angleJump = 15 * Math.PI / 180;
+        private int wait = 20;
         private int countLeft = 0;
         private int countRight = 0;
         private int countUp = 0;
         private int countDown = 0;
         private int idxAction = 0;
         private string[] action = new string[] { "ActivePlayerMoving", "ActivePlayerAiming" };
-        private double angleJump = 30 * Math.PI / 180;
-        private Vector jumpLeft;
-        private Vector jumpRight;
-        private Vector jumpVertical;
+        
 
-        public BananaPlayer()
+        public void SetPlayer()
         {
             jumpLeft = new Vector(Math.Cos(0.5 * Math.PI + angleJump), -Math.Sin(0.5 * Math.PI + angleJump));
             jumpRight = new Vector(Math.Cos(0.5 * Math.PI - angleJump), -Math.Sin(0.5 * Math.PI - angleJump));
             jumpVertical = new Vector(0, -1);
+            
+            int idx = Convert.ToInt32(Math.Floor(Match.Random.NextDouble() * Match.Land.XTracks.GetLength(0)));
+            Position = new Vector(Match.Land.XTracks[idx], Match.Land.YTracks[idx]);
         }
         
         public void DrawScreen()
@@ -62,20 +72,21 @@ namespace NanoGames.Games.Banana
                 }
 
                 /* Draw the body of the player. */
-                Output.Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), Constants.RadiusPlayer);
+                Output.Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), Radius);
                 if (player == Match.ActivePlayer)
                 {
-                    Output.Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), 0.7 * Constants.RadiusPlayer);
+                    Output.Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), 0.9 * Radius);
+                    Output.Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), 0.8 * Radius);
                 }
 
                 /* Draw the Gun of the player. */
-                Output.Graphics.Line(color, player.Position, new Vector(player.Position.X + Constants.LengthGun * Math.Cos(player.Angle), player.Position.Y - Constants.LengthGun * Math.Sin(player.Angle)));
+                Output.Graphics.Line(color, player.Position, new Vector(player.Position.X + lengthGun * Math.Cos(player.angle), player.Position.Y - lengthGun * Math.Sin(player.angle)));
             }
 
             /* Draw all the bullets. */
-            foreach (SimpleBullet bullet in Match.BulletList)
+            foreach (SimpleBullet bullet in Match.ListBullets)
             {
-                Output.Graphics.Line(new Color(1, 1, 1), bullet.Position, bullet.PositionTail);
+                Output.Graphics.Line(new Color(1, 1, 1), bullet.Position, bullet.PositionBefore);
             }
 
             for (int i = 0; i < Match.Land.NPointsPolygon - 1; i++)
@@ -91,11 +102,11 @@ namespace NanoGames.Games.Banana
             */
 
             // Draw Information on Screen
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "ACTIVEPLAYER: " + Match.ActivePlayer.Name + Match.SecToGoInRound.ToString());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "ANGLE: " + (Convert.ToInt32(Match.ActivePlayer.Angle * 180 / Math.PI)).ToString());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 70), "SPEED: " + (Convert.ToInt32(Match.ActivePlayer.SpeedBullet * 10)).ToString());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 80), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 90), "COUNTUP: " + countUp.ToString().ToUpper());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 10), "ACTIVEPLAYER: " + Match.ActivePlayer.Name);
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 20), "ANGLE: " + (Convert.ToInt32(Match.ActivePlayer.angle * 180 / Math.PI)).ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 30), "SPEED: " + (Convert.ToInt32(Match.ActivePlayer.speedBullet * 10)).ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 40), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
+            Output.Graphics.Print(new Color(1, 1, 1), 10, new Vector(150, 20), Match.SecToGoInRound.ToString());
         }
 
         public void SelectAction()
@@ -112,37 +123,32 @@ namespace NanoGames.Games.Banana
         {
             if (Input.Left.WasActivated)
             {
-                if (countLeft < Constants.WaitTimeKey)
+                if (countLeft < wait)
                 {
-                    IdxPosition -= Constants.StepMove;
-                    Position = new Vector(Match.Land.XTracksUpper[IdxPosition], Match.Land.YTracksUpper[IdxPosition]);
+                    IdxPosition -= 1; 
                 }
 
                 else
                 {
-                    IdxPosition -= Constants.StepMove * Constants.MultiplierStepMove;
-                    Position = new Vector(Match.Land.XTracksUpper[IdxPosition], Match.Land.YTracksUpper[IdxPosition]);
+                    IdxPosition -= 2;
                 }
             }
 
             if (Input.Right.WasActivated)
             {
-                if (countRight< Constants.WaitTimeKey)
+                if (countRight < wait)
                 {
-                    IdxPosition += Constants.StepMove;
-                    Position = new Vector(Match.Land.XTracksUpper[IdxPosition], Match.Land.YTracksUpper[IdxPosition]);
-                    Direction = 1;
+                    IdxPosition += 1;
                 }
 
                 else
                 {
-                    IdxPosition += Constants.StepMove * Constants.MultiplierStepMove;
-                    Position = new Vector(Match.Land.XTracksUpper[IdxPosition], Match.Land.YTracksUpper[IdxPosition]);
-                    Direction = 1;
+                    IdxPosition += 2;
                 }
             }
 
-
+            Position = new Vector(Match.Land.XTracks[IdxPosition], Match.Land.YTracks[IdxPosition]); 
+            
             if (Input.Left.IsPressed)
             {
                 countLeft++;
@@ -175,9 +181,9 @@ namespace NanoGames.Games.Banana
         {
             double speed = 0;
 
-            if(countUp > 15)
+            if(countUp > wait)
             {
-                speed = 1.2;
+                speed = 1;
             }
 
             else
@@ -189,11 +195,11 @@ namespace NanoGames.Games.Banana
 
                 else
                 {
-                    speed = 0.7;
+                    speed = 0.5;
                 }
             }
 
-            if (speed > 0)
+            if (speed != 0)
             {
                 if (Input.Left.WasActivated || Input.Left.IsPressed)
                 {
@@ -213,120 +219,105 @@ namespace NanoGames.Games.Banana
                     Position += (speed + 1.1 * Match.Land.Tolerance) * jumpVertical;
                 }
 
-                frameCountJump = 0;
+                frameCountJump = 1;
                 Match.StateOfGame = "AnimationJump";
             }
         }
 
         public void Jump3()
         {
+            PositionBefore = Position;
             Position += velocity + 0.5 * new Vector(0, Constants.Gravity) * (2 * frameCountJump + 1);
             velocity += new Vector(0, Constants.Gravity);
+            frameCountJump++;
         }
 
-        public void CheckCollisionLandscape()
-        {
-            Vector positionBefore = Position - velocity;
-
-            for (int i = 0; i < Match.Land.NPointsInterpolated - 1; i++)
-            {
-                Vector obstacle = new Vector(Match.Land.XTracksUpper[i], Match.Land.YTracksUpper[i]);
-
-                if (methods.CheckCollision(Position, positionBefore, obstacle, 0.6 * Match.Land.Tolerance))
-                {
-                    Position = obstacle;
-                    IdxPosition = i;
-                    Match.StateOfGame = "ActivePlayerMoving";
-                    break;
-                }
-            }
-
-        }
 
         public void SetAngle()
         {
+            double deg = Math.PI / 180;
+
             if (Input.Left.WasActivated)
             {
-               if (countLeft < Constants.WaitTimeKey)
-               {
-                   Angle += Constants.StepAngle;
-               }
 
-               else
-               {
-                   Angle += Constants.StepAngle * Constants.MultiplierAngle;
-               }
-            }
+                if (countLeft < wait)
+                {
+                   angle += 1 * deg;
+                }
 
-            if (Input.Right.WasActivated)
-            {
-               if (countRight< Constants.WaitTimeKey)
-               {
-                   Angle -= Constants.StepAngle;
-               }
+                else
+                {
+                    angle += 5 * deg;
+                }
+             }
 
-               else
-               {
-                   Angle -= Constants.StepAngle * Constants.MultiplierAngle;
-               }
-            }
+             if (Input.Right.WasActivated)
+             {
+                if (countRight < wait)
+                {
+                    angle -= 1 * deg;
+                }
 
-            if (Input.Left.IsPressed)
-            {
-                countLeft++;
-            }
-            else
-            {
-                countLeft = 0;
-            }
+                else
+                {
+                    angle -= 5 * deg;
+                }
+             }
 
-            if (Input.Right.IsPressed)
-            {
-                countRight++;
-            }
-            else
-            {
-                countRight = 0;
-            }
-
-            if (Angle > Math.PI)
-            {
-                Angle = Math.PI;
-            }
-
-            if (Angle < 0)
-            {
-                Angle = 0;
-            }
-
-
+             if (Input.Left.IsPressed)
+             {
+                 countLeft++;
+             }
+             else
+             {
+                 countLeft = 0;
+             }
+              
+             if (Input.Right.IsPressed)
+             {
+                 countRight++;
+             }
+             else
+             {
+                 countRight = 0;
+             }
+              
+             if (angle > Math.PI)
+             {
+                 angle = Math.PI;
+             }
+              
+             if (angle < 0)
+             {
+                 angle = 0;
+             }
         }
 
         public void SetSpeedBullet()
         {
             if (Input.Up.WasActivated)
             {
-                if (countUp < Constants.WaitTimeKey)
+                if (countUp < wait)
                 {
-                    SpeedBullet += Constants.StepSpeedBullet;
+                    speedBullet += 0.1;
                 }
 
                 else
                 {
-                    SpeedBullet += 5 * Constants.StepSpeedBullet;
+                    speedBullet += 0.5;
                 }
             }
 
             if (Input.Down.WasActivated)
             {
-                if (countDown < Constants.WaitTimeKey)
+                if (countDown < wait)
                 {
-                    SpeedBullet -= Constants.StepSpeedBullet;
+                    speedBullet -= 0.1;
                 }
 
                 else
                 {
-                    SpeedBullet -= 5 * Constants.StepSpeedBullet;
+                    speedBullet -= 0.5;
                 }
             }
 
@@ -348,14 +339,14 @@ namespace NanoGames.Games.Banana
                 countDown = 0;
             }
 
-            if (SpeedBullet < 0)
+            if (speedBullet < 0)
             {
-                SpeedBullet = 0;
+                speedBullet = 0;
             }
 
-            if (SpeedBullet > 10)
+            if (speedBullet > 10)
             {
-                SpeedBullet = 10;
+                speedBullet = 10;
             }
         }
 
@@ -363,8 +354,10 @@ namespace NanoGames.Games.Banana
         {
             if (Input.Fire.WasActivated || Input.Fire.IsPressed)
             {
-                Vector speed = SpeedBullet * new Vector(Math.Cos(Angle), -Math.Sin(Angle));
-                Match.BulletList.Add(new SimpleBullet(Position + speed + Constants.LengthGun * new Vector(Math.Cos(Angle), -Math.Sin(Angle)), speed));
+                Vector velocity = speedBullet * new Vector(Math.Cos(angle), -Math.Sin(angle));
+                Vector position = Position + (Radius + speedBullet + 1.1 * Match.Land.Tolerance) * new Vector(Math.Cos(angle), -Math.Sin(angle));
+
+                Match.ListBullets.Add(new SimpleBullet(position, velocity));
                 Match.StateOfGame = "AnimationShoot";
             }
         }
