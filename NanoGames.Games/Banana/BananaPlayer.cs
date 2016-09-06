@@ -32,7 +32,7 @@ namespace NanoGames.Games.Banana
         
         private double angleJump = 15 * Math.PI / 180;
         private int wait = 20;
-        private int waitFire = 180;
+        private int waitFire = 72;
         private int countLeft = 0;
         private int countRight = 0;
         private int countUp = 0;
