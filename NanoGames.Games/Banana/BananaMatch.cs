@@ -75,9 +75,11 @@ namespace NanoGames.Games.Banana
             {
                 case "ActivePlayerMoving":
                     
-                    ActivePlayer.SelectAction();
-                    ActivePlayer.Jump1();
+                    ActivePlayer.SelectWeapon();
+                    //ActivePlayer.Jump1();
                     ActivePlayer.Move();
+                    ActivePlayer.SetAngle();
+                    ActivePlayer.ShootGun1();
                     CheckCollisionActivePlayerScreen();
                     break;
 
@@ -92,15 +94,15 @@ namespace NanoGames.Games.Banana
                     CheckCollisionActivePlayerLand();
                     break;
 
-                case "ActivePlayerAiming":
-
-                    ActivePlayer.SelectAction();
-                    ActivePlayer.SetAngle();
-                    ActivePlayer.SetSpeedBullet();
-                    ActivePlayer.ShootGun();
+                case "AnimationBeforeShoot":
+                    ActivePlayer.ShootGun2();
                     break;
-                    
+
                 case "AnimationShoot":
+                    ActivePlayer.ShootGun3();
+                    break;
+
+                case "AnimationBulletFly":
 
                     if (ListBullets.Count != 0)
                     {
@@ -216,6 +218,9 @@ namespace NanoGames.Games.Banana
                         bullet.State = "Exploded";
                         player.HasFinished = true;
                         finishedPlayers++;
+
+                        Output.Audio.Play(Sounds.Explosion);
+
                         break;
                     }
                 }
@@ -234,6 +239,9 @@ namespace NanoGames.Games.Banana
                         {
                             case "Normal":
                                 bullet.State = "Exploded";
+                                
+                                Output.Audio.Play(Sounds.Explosion);
+
                                 break;
                         }
 
@@ -267,6 +275,9 @@ namespace NanoGames.Games.Banana
                         case "Normal":
                             ActivePlayer.IdxPosition = i;
                             ActivePlayer.Position = land;
+
+                            Output.Audio.Play(Sounds.LowBeep);
+
                             StateOfGame = "ActivePlayerMoving";
                             break;
                     }
