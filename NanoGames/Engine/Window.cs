@@ -6,6 +6,7 @@ using OpenTK;
 using OpenTK.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace NanoGames.Engine
@@ -117,6 +118,8 @@ namespace NanoGames.Engine
 
                         using (var mainView = createMainView())
                         {
+                            long startTimestamp = Stopwatch.GetTimestamp();
+
                             while (true)
                             {
                                 _gameWindow.ProcessEvents();
@@ -129,10 +132,14 @@ namespace NanoGames.Engine
                                 var width = _gameWindow.Width;
                                 var height = _gameWindow.Height;
 
+                                double frame = (Stopwatch.GetTimestamp() - startTimestamp) / (double)Stopwatch.Frequency * 60.0;
+
                                 renderer.BeginFrame(width, height);
                                 UpdateKeyEvents(terminal.KeyEvents);
                                 terminal.Input = GetInput();
+                                terminal.Particles.SetFrame(frame);
                                 mainView.Update(terminal);
+                                terminal.Particles.Render(frame, renderer);
                                 renderer.EndFrame();
 
                                 _gameWindow.SwapBuffers();

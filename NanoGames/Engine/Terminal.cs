@@ -20,6 +20,7 @@ namespace NanoGames.Engine
         {
             Graphics = graphics;
             Audio = audio;
+            Particles = new ParticleSystem();
         }
 
         /// <summary>
@@ -36,6 +37,11 @@ namespace NanoGames.Engine
         /// Gets the player's graphics interface.
         /// </summary>
         public IGraphics Graphics { get; }
+
+        /// <summary>
+        /// Gets the particle system.
+        /// </summary>
+        public ParticleSystem Particles { get; }
 
         /// <summary>
         /// Gets the player's audio interface.

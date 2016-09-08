@@ -34,6 +34,14 @@ namespace NanoGames.Application.Ui
         {
             var color = isSelected ? Colors.FocusedControl : Colors.Control;
             terminal.Graphics.PrintCenter(color, Menu.FontSize, position, Text);
+
+            if (isSelected)
+            {
+                terminal.Particles.Frequency = 0.2;
+                terminal.Particles.Intensity = 0.5;
+                terminal.Particles.Lifetime = 20;
+                terminal.Particles.PrintCenter(new Color(0.05, 0.15, 0.25), Menu.FontSize, position, Text);
+            }
         }
 
         /// <inheritdoc/>

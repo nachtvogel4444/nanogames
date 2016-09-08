@@ -90,6 +90,9 @@ namespace NanoGames.Application
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to disable all complex shaders.
+        /// </summary>
         public bool ReducedDetails
         {
             get
