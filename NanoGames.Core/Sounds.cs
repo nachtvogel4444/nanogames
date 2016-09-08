@@ -37,9 +37,25 @@ namespace NanoGames
             Sound.Noise(0.1, new Pitch(200), new Pitch(500)));
 
         /// <summary>
+        /// A grenade fire sound.
+        /// </summary>
+        public static readonly Sound GrenadeFire = Sound.Sequence(
+            Sound.Noise(0.3, new Pitch(400), new Pitch(700)));
+
+        /// <summary>
         /// A walking sound.
         /// </summary>
         public static readonly Sound Walk = Sound.Sequence(
             Sound.Noise(0.1, new Pitch(400), new Pitch(500)));
+
+        /// <summary>
+        /// An toc sound.
+        /// </summary>
+        public static readonly Sound Toc = Sound.Sequence(
+            Sound.Noise(0.02, new Pitch(0), new Pitch(400)),
+            Sound.Noise(0.02, new Pitch(0), new Pitch(350)),
+            Sound.Noise(0.02, new Pitch(0), new Pitch(300)),
+            Sound.Noise(0.02, new Pitch(0), new Pitch(250)),
+            Sound.Noise(0.02, new Pitch(0), new Pitch(200)));
     }
 }

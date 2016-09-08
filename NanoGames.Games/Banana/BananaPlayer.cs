@@ -27,7 +27,7 @@ namespace NanoGames.Games.Banana
 
         private double angle;
         private double realAngle;
-        private double speedBullet = 0;
+        private double speedProjectile = 0;
         private double lengthGun = 4;
         
         private double angleJump = 15 * Math.PI / 180;
@@ -39,7 +39,7 @@ namespace NanoGames.Games.Banana
         private int countDown = 0;
         private int countFire = 0;
         private int idxWeapon = 0;
-        private string[] weapons = new string[] { "Gun" };
+        private string[] weapons = new string[] { "Gun", "Grenade" };
         private bool looksRight;
 
         public void SetPlayer()
@@ -105,6 +105,12 @@ namespace NanoGames.Games.Banana
                 Output.Graphics.Line(new Color(1, 1, 1), bullet.Position, bullet.PositionBefore);
             }
 
+            /* Draw all the grenades. */
+            foreach (Grenade grenade in Match.ListGrenades)
+            {
+                Output.Graphics.Circle(new Color(1, 1, 1), grenade.Position, grenade.Radius);
+            }
+
             for (int i = 0; i < Match.Land.NPointsPolygon - 1; i++)
             {
                 Output.Graphics.Line(new Color(1, 1, 1), new Vector(Match.Land.XPolygon[i], Match.Land.YPolygon[i]), new Vector(Match.Land.XPolygon[i + 1], Match.Land.YPolygon[i + 1]));
@@ -120,10 +126,19 @@ namespace NanoGames.Games.Banana
             // Draw Information on Screen
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 10), "ACTIVEPLAYER: " + Match.ActivePlayer.Name);
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 20), "REALANGLE: " + (Convert.ToInt32(Match.ActivePlayer.realAngle * 180 / Math.PI)).ToString());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "ANGLE: " + (Convert.ToInt32(Match.ActivePlayer.angle * 180 / Math.PI)).ToString());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 30), "SPEED: " + Convert.ToInt32((Match.ActivePlayer.speedBullet) * 10).ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 30), "SPEED: " + Convert.ToInt32((Match.ActivePlayer.speedProjectile) * 10).ToString());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 40), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "WEAPON: " + weapons[idxWeapon].ToUpper());
             Output.Graphics.Print(new Color(1, 1, 1), 10, new Vector(150, 20), Match.SecToGoInRound.ToString());
+
+            if (Match.Wind.Speed >= 0)
+            {
+                Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "Wind: P " + (Convert.ToInt32(Match.Wind.Speed * 10)).ToString());
+            }
+            else
+            {
+                Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "Wind: M " + (Convert.ToInt32(Match.Wind.Speed * 10)).ToString());
+            }
         }
 
         public void PlaySound()
@@ -173,7 +188,16 @@ namespace NanoGames.Games.Banana
             if (idx != 0)
             {
                 IdxPosition += idx;
-                Position = new Vector(Match.Land.XTracks[IdxPosition], Match.Land.YTracks[IdxPosition]);
+
+                if (IdxPosition >= 0 || IdxPosition < Match.Land.XTracks.GetLength(0))
+                {
+                    Position = new Vector(Match.Land.XTracks[IdxPosition], Match.Land.YTracks[IdxPosition]);
+                }
+
+                else
+                {
+                    HasFinished = true;
+                }
 
                 if (idx < 0)
                 {
@@ -204,73 +228,6 @@ namespace NanoGames.Games.Banana
             {
                 countRight = 0;
             }
-        }
-
-        public void Jump1()
-        {
-            if (Input.Up.WasActivated)
-            {
-                Match.StateOfGame = "AnimationBeforeJump";
-                countUp = 0;
-            }
-        }
-
-        public void Jump2()
-        {
-            double speed = 0;
-
-            if(countUp > wait)
-            {
-                speed = 1;
-            }
-
-            else
-            {
-                if (Input.Up.IsPressed)
-                {
-                    countUp++;
-                }
-
-                else
-                {
-                    speed = 0.5;
-                }
-            }
-
-            if (speed != 0)
-            {
-                if (Input.Left.WasActivated || Input.Left.IsPressed)
-                {
-                    velocity = speed * jumpLeft;
-                    Position += (speed + 1.1 * Match.Land.Tolerance) * jumpLeft;
-                }
-
-                else if (Input.Right.WasActivated || Input.Right.IsPressed)
-                {
-                    velocity = speed * jumpRight;
-                    Position += (speed + 1.1 * Match.Land.Tolerance) * jumpRight;
-                }
-
-                else
-                {
-                    velocity = speed * jumpVertical;
-                    Position += (speed + 1.1 * Match.Land.Tolerance) * jumpVertical;
-                }
-
-                frameCountJump = 1;
-                Match.StateOfGame = "AnimationJump";
-            }
-        }
-
-        public void Jump3()
-        {
-            PositionBefore = Position;
-            Position += velocity + 0.5 * new Vector(0, Constants.Gravity) * (2 * frameCountJump + 1);
-            velocity += new Vector(0, Constants.Gravity);
-            
-            Output.Audio.Play(Sounds.HighBeep);
-
-            frameCountJump++;
         }
 
         public void SetAngle()
@@ -340,7 +297,7 @@ namespace NanoGames.Games.Banana
             }
         }
 
-        public void ShootGun1()
+        public void Shoot1()
         {
             if (Input.Fire.WasActivated)
             {
@@ -349,10 +306,10 @@ namespace NanoGames.Games.Banana
             }
         }
 
-        public void ShootGun2()
+        public void Shoot2()
         {
-            speedBullet = countFire * 10.0 / waitFire;
-
+            speedProjectile = 2;// 1 + countFire * 9.0 / waitFire;
+            
             if (!Input.Fire.IsPressed || countFire > waitFire)
             {
                 Match.StateOfGame = "AnimationShoot";
@@ -361,15 +318,30 @@ namespace NanoGames.Games.Banana
                 countFire++;
         }
 
-        public void ShootGun3()
+        public void Shoot3()
         {
-            Vector velocity = speedBullet * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
-            Vector position = Position + (Radius + speedBullet + 1.1 * Match.Land.Tolerance) * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
-                
-            Output.Audio.Play(Sounds.GunFire);
+            if (weapons[idxWeapon] == "Gun")
+            {
+                Vector velocity = speedProjectile * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
+                Vector position = Position + (Radius + speedProjectile + 1.1 * Match.Land.Tolerance) * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
 
-            Match.ListBullets.Add(new SimpleBullet(position, velocity));
-            Match.StateOfGame = "AnimationBulletFly";
+                Output.Audio.Play(Sounds.GunFire);
+
+                Match.ListBullets.Add(new SimpleBullet(position, velocity));
+            }
+
+            if (weapons[idxWeapon] == "Grenade")
+            {
+                Vector velocity = speedProjectile * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
+                Vector position = Position + (Radius + speedProjectile + 1.1 * Match.Land.Tolerance+4) * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
+
+                Output.Audio.Play(Sounds.GrenadeFire);
+
+                Match.ListGrenades.Add(new Grenade(position, velocity));
+
+            }
+
+            Match.StateOfGame = "AnimationProjectileFly";
         }
 
     }

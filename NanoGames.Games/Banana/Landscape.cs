@@ -30,9 +30,11 @@ namespace NanoGames.Games.Banana
         public double[] XTracks;
         public double[] YTracks;
 
-        // public double[] lineX = new double[2] { 0, 320 };
-        // public double[] lineY = new double[2] { 100, 100 };
-        // public string[] lineType = new string[2] { "Normal", "Normal" };
+        /*
+        public double[] lineX = new double[2] { 0, 320 };
+        public double[] lineY = new double[2] { 100, 100 };
+        public string[] lineType = new string[2] { "Normal", "Normal" };
+        */
 
         public double[] lineX = new double[7] { 0, 50, 120, 170, 200, 250, 320 };
         public double[] lineY = new double[7] { 100, 120, 80, 90, 95, 140, 100 };
@@ -57,7 +59,7 @@ namespace NanoGames.Games.Banana
                 double xo = dy / dist;
                 double yo = -dx / dist;
 
-                double a = Math.Atan(dx / dy);              
+                double a = Math.Atan(-dy / dx);              
 
                 int n = (int)(dist / Tolerance) + 1;
                 dx = dx / n;

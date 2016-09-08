@@ -49,11 +49,13 @@
     </Compile>
     <Compile Include="Banana\BananaMatch.cs" />
     <Compile Include="Banana\BananaPlayer.cs" />
+    <Compile Include="Banana\Grenade.cs" />
     <Compile Include="Banana\Landscape.cs" />
     <Compile Include="Banana\SimpleBullet.cs" />
     <Compile Include="Banana\Polygon.cs" />
     <Compile Include="Banana\Constants.cs" />
     <Compile Include="Banana\Methods.cs" />
+    <Compile Include="Banana\Wind.cs" />
     <Compile Include="Bomberguy\AbstractRectbombularThing.cs" />
     <Compile Include="Bomberguy\Bomb.cs" />
     <Compile Include="Bomberguy\BomberGuy.cs" />

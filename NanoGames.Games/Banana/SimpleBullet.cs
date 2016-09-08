@@ -14,10 +14,8 @@ namespace NanoGames.Games.Banana
         public Vector Position;
         public Vector PositionBefore;
         private Vector velocity;
-
-        private Methods methods = new Methods();
-        private double frameCount = 0;
-        public string State = "Normal";
+        
+        public bool IsExploded = false;
 
         public SimpleBullet(Vector pos, Vector vel)
         {
@@ -26,18 +24,12 @@ namespace NanoGames.Games.Banana
             velocity = vel;
         }
 
-        public void MoveSimpleBullet()
+        public void MoveSimpleBullet(Wind w)
         {
             PositionBefore = Position; 
-            Position += velocity + 0.5 * new Vector(0, Constants.Gravity) * (2 * frameCount + 1);
-            velocity += new Vector(0, Constants.Gravity);
-            frameCount++;
-        }
-
-        public void ChangeState(string state)
-        {
-            State = state;
-        }
-        
+            Position += velocity + 0.5 * new Vector(0, Constants.Gravity);
+            // velocity += new Vector(0, Constants.Gravity) + 0.03 * new Vector(w.Speed - velocity.X, -velocity.Y);
+            velocity += new Vector(0, Constants.Gravity) + 0.03 * new Vector(w.Speed, 0);
+        }       
     }
 }

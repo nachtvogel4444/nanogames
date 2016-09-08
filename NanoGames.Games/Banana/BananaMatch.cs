@@ -41,6 +41,8 @@ namespace NanoGames.Games.Banana
         public Landscape Land = new Landscape();
         private List<BananaPlayer> listPlayers = new List<BananaPlayer>();
         public List<SimpleBullet> ListBullets = new List<SimpleBullet>();
+        public List<Grenade> ListGrenades = new List<Grenade>();
+        public Wind Wind = new Wind();
 
         private int finishedPlayers = 0;
 
@@ -56,6 +58,8 @@ namespace NanoGames.Games.Banana
 
             activePlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));
             ActivePlayer = Players[activePlayerIdx];
+
+            Wind.SetSpeed(Random);
         }
 
         protected override void Update()
@@ -68,6 +72,7 @@ namespace NanoGames.Games.Banana
                 activePlayerIdx = activePlayerIdx % Players.Count;
                 ActivePlayer = Players[activePlayerIdx];
                 frameCountMove = 0;
+                Wind.SetSpeed(Random);
                 StateOfGame = "ActivePlayerMoving";
             }
 
@@ -76,33 +81,44 @@ namespace NanoGames.Games.Banana
                 case "ActivePlayerMoving":
                     
                     ActivePlayer.SelectWeapon();
-                    //ActivePlayer.Jump1();
                     ActivePlayer.Move();
                     ActivePlayer.SetAngle();
-                    ActivePlayer.ShootGun1();
+                    ActivePlayer.Shoot1();
                     CheckCollisionActivePlayerScreen();
                     break;
 
-                case "AnimationBeforeJump":
-
-                    ActivePlayer.Jump2();
-                    break;
-
-                case "AnimationJump":
-
-                    ActivePlayer.Jump3();
-                    CheckCollisionActivePlayerLand();
-                    break;
-
                 case "AnimationBeforeShoot":
-                    ActivePlayer.ShootGun2();
+                    ActivePlayer.Shoot2();
                     break;
 
                 case "AnimationShoot":
-                    ActivePlayer.ShootGun3();
+                    ActivePlayer.Shoot3();
                     break;
 
-                case "AnimationBulletFly":
+                case "AnimationProjectileFly":
+
+                    if (ListGrenades.Count != 0)
+                    {
+                        List<Grenade> grenadesToKeep = new List<Grenade>();
+
+                        foreach (Grenade grenade in ListGrenades)
+                        {
+                            grenade.MoveGrenade();
+                        }
+
+                        CheckCollisionGrenadesLand();
+                        CheckCollisionGrenadesScreen();
+
+                        foreach (Grenade grenade in ListGrenades)
+                        {
+                            if (!grenade.IsExploded)
+                            {
+                                grenadesToKeep.Add(grenade);
+                            }
+                        }
+                        
+                        ListGrenades = grenadesToKeep;
+                    }
 
                     if (ListBullets.Count != 0)
                     {
@@ -110,16 +126,16 @@ namespace NanoGames.Games.Banana
 
                         foreach (SimpleBullet bullet in ListBullets)
                         {
-                            bullet.MoveSimpleBullet();
+                            bullet.MoveSimpleBullet(Wind);
                         }
 
                         CheckCollisionBulletsLand();
                         CheckCollisionBulletsPlayers();
                         CheckCollisionBulletsScreen();
-                        
+
                         foreach (SimpleBullet bullet in ListBullets)
                         {
-                            if (!String.Equals(bullet.State, "Exploded"))
+                            if (!bullet.IsExploded)
                             {
                                 bulletsToKeep.Add(bullet);
                             }
@@ -127,8 +143,8 @@ namespace NanoGames.Games.Banana
 
                         ListBullets = bulletsToKeep;
                     }
-                    
-                    else
+
+                    if (ListGrenades.Count == 0 && ListBullets.Count == 0)
                     {
                         frameCountMove = frameCountMoveMax;
                     }
@@ -215,7 +231,7 @@ namespace NanoGames.Games.Banana
                 {
                     if (CheckCollision(bullet.Position, bullet.PositionBefore, player.Position, player.Radius))
                     {
-                        bullet.State = "Exploded";
+                        bullet.IsExploded = true;
                         player.HasFinished = true;
                         finishedPlayers++;
 
@@ -238,9 +254,14 @@ namespace NanoGames.Games.Banana
                         switch (Land.TypeInterpolated[i])
                         {
                             case "Normal":
-                                bullet.State = "Exploded";
+                                bullet.IsExploded = true;
                                 
                                 Output.Audio.Play(Sounds.Explosion);
+
+                                for (int j = 0; j < 30; j++)
+                                {
+                                    Output.Particles.Point(new Color(1, 1, 1), bullet.Position);
+                                }
 
                                 break;
                         }
@@ -257,7 +278,64 @@ namespace NanoGames.Games.Banana
             {
                 if (bullet.Position.X < 0 || bullet.Position.X > 320 || bullet.Position.Y > 200)
                 {
-                    bullet.State = "Exploded";
+                    bullet.IsExploded = true;
+                }
+            }
+        }
+
+        private void CheckCollisionGrenadesPlayers()
+        {
+            foreach (Grenade grenade in ListGrenades)
+            {
+                foreach (var player in listPlayers)
+                {
+                    if (CheckCollision(grenade.Position, grenade.PositionBefore, player.Position, player.Radius + grenade.Radius))
+                    {
+                        
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void CheckCollisionGrenadesLand()
+        {
+            foreach (Grenade grenade in ListGrenades)
+            {
+                for (int i = 0; i < Land.NPointsInterpolated - 1; i++)
+                {
+                    if (CheckCollision(grenade.Position, grenade.PositionBefore, new Vector(Land.XInterpolated[i], Land.YInterpolated[i]), 0.6 * Land.Tolerance))
+                    {
+                        switch (Land.TypeInterpolated[i])
+                        {
+                            case "Normal":
+                                double phi = Land.Alpha[i];
+                                double x = +(Math.Cos(phi) * Math.Cos(phi) - Math.Sin(phi) * Math.Sin(phi)) * grenade.Velocity.X - 2 * Math.Sin(phi) * Math.Cos(phi) * grenade.Velocity.Y;
+                                double y = -(Math.Cos(phi) * Math.Cos(phi) - Math.Sin(phi) * Math.Sin(phi)) * grenade.Velocity.Y + 2 * Math.Sin(phi) * Math.Cos(phi) * grenade.Velocity.X;
+                                grenade.Velocity =  new Vector(y, x);
+                                grenade.PositionBefore = new Vector(Land.XInterpolated[i], Land.YInterpolated[i]) + (grenade.Radius + 5 * Land.Tolerance) * new Vector(Math.Cos(phi), -Math.Sin(phi));
+                                //grenade.PositionBefore = new Vector(Land.XInterpolated[i], Land.YInterpolated[i] -(5*grenade.Radius + 1.1 * Land.Tolerance));
+                                grenade.Position = grenade.PositionBefore + grenade.Velocity;
+
+                                Output.Audio.Play(Sounds.Toc);
+                                
+                                break;
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void CheckCollisionGrenadesScreen()
+        {
+            foreach (Grenade grenade in ListGrenades)
+            {
+                if (grenade.Position.X < 0 || grenade.Position.X > 320 || grenade.Position.Y > 200)
+                {
+                    grenade.IsExploded = true;
                 }
             }
         }
@@ -310,5 +388,6 @@ namespace NanoGames.Games.Banana
 
             listPlayers = playersToKeep;
         }
+        
     }
 }
