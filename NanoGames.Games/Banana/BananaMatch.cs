@@ -313,8 +313,8 @@ namespace NanoGames.Games.Banana
                                 double phi = Land.Alpha[i];
                                 double x = +(Math.Cos(phi) * Math.Cos(phi) - Math.Sin(phi) * Math.Sin(phi)) * grenade.Velocity.X - 2 * Math.Sin(phi) * Math.Cos(phi) * grenade.Velocity.Y;
                                 double y = -(Math.Cos(phi) * Math.Cos(phi) - Math.Sin(phi) * Math.Sin(phi)) * grenade.Velocity.Y + 2 * Math.Sin(phi) * Math.Cos(phi) * grenade.Velocity.X;
-                                grenade.Velocity =  new Vector(y, x);
-                                grenade.PositionBefore = new Vector(Land.XInterpolated[i], Land.YInterpolated[i]) + (grenade.Radius + 5 * Land.Tolerance) * new Vector(Math.Cos(phi), -Math.Sin(phi));
+                                grenade.Velocity =  new Vector(x, y);
+                                grenade.PositionBefore = new Vector(Land.XInterpolated[i], Land.YInterpolated[i]) + (1.1 * Land.Tolerance) * new Vector(Math.Cos(phi), -Math.Sin(phi));
                                 //grenade.PositionBefore = new Vector(Land.XInterpolated[i], Land.YInterpolated[i] -(5*grenade.Radius + 1.1 * Land.Tolerance));
                                 grenade.Position = grenade.PositionBefore + grenade.Velocity;
 
