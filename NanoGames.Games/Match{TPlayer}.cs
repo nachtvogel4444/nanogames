@@ -67,7 +67,11 @@ namespace NanoGames.Games
 
             for (int i = 0; i < Players.Count; ++i)
             {
-                Players[i].Output.SetFrame(Frame);
+                if (!ReferenceEquals(Output, Players[i].Output))
+                {
+                    Players[i].Output.SetFrame(Frame);
+                }
+
                 Players[i].Input.SetState(Frame, inputs[i]);
             }
 

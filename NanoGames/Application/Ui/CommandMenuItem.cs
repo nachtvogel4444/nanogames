@@ -37,9 +37,10 @@ namespace NanoGames.Application.Ui
 
             if (isSelected)
             {
-                terminal.Particles.Frequency = 0.2;
-                terminal.Particles.Intensity = 0.5;
-                terminal.Particles.Lifetime = 20;
+                terminal.Particles.Frequency = 2;
+                terminal.Particles.Intensity = 0.1;
+                terminal.Particles.Lifetime = 4;
+                terminal.Particles.Velocity = new Vector(0, -0.5);
                 terminal.Particles.PrintCenter(new Color(0.05, 0.15, 0.25), Menu.FontSize, position, Text);
             }
         }

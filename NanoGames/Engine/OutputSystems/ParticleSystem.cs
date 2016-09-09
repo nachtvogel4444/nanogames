@@ -13,13 +13,13 @@ namespace NanoGames.Engine.OutputSystems
     {
         private const int _maxParticles = 10000;
 
-        private const double _maxLifetime = 120;
-
         private const double _fadeOutFrames = 6;
 
         private readonly Random _random = new Random();
 
         private readonly List<Particle> _particles = new List<Particle>();
+
+        private double _lastFrame;
 
         private double _frame;
 
@@ -30,13 +30,13 @@ namespace NanoGames.Engine.OutputSystems
         public Vector Velocity { get; set; }
 
         /// <inheritdoc/>
-        public double Frequency { get; set; } = 0.5;
+        public double Frequency { get; set; } = 1;
 
         /// <inheritdoc/>
         public double Intensity { get; set; } = 2;
 
         /// <inheritdoc/>
-        public double Lifetime { get; set; } = 60;
+        public double Lifetime { get; set; } = 30;
 
         /// <summary>
         /// Sets the current frame index.
@@ -44,6 +44,7 @@ namespace NanoGames.Engine.OutputSystems
         /// <param name="frame">The frame index.</param>
         public void SetFrame(double frame)
         {
+            _lastFrame = _frame;
             _frame = frame;
         }
 
@@ -92,8 +93,8 @@ namespace NanoGames.Engine.OutputSystems
             double x = 0;
             while (true)
             {
-                x += -Math.Log(_random.NextDouble()) / Frequency / length;
-                if (x > 1)
+                x += -Math.Log(_random.NextDouble()) / (Frequency * (_frame - _lastFrame)) / length;
+                if (double.IsNaN(x) || double.IsInfinity(x) || x > 1)
                 {
                     break;
                 }
@@ -106,7 +107,7 @@ namespace NanoGames.Engine.OutputSystems
         /// <inheritdoc/>
         public void Point(Color color, Vector vector)
         {
-            if (_random.NextDouble() < Frequency)
+            if (_random.NextDouble() < Frequency * (_frame - _lastFrame))
             {
                 CreateParticle(color, vector);
             }
@@ -120,15 +121,29 @@ namespace NanoGames.Engine.OutputSystems
                 _particles.RemoveAt(0);
             }
 
+            var lifetime = -Math.Log(_random.NextDouble()) * Lifetime;
+
             _particles.Add(new Particle
             {
                 Position = position,
-                Velocity = Velocity + Intensity * Vector.FromAngle(_random.NextDouble() * 2 * Math.PI),
+                Velocity = Velocity + Intensity * RandomVector(),
                 Gravity = Gravity,
                 Color = color,
                 Frame = _frame,
-                Lifetime = Math.Min(Lifetime, _maxLifetime),
+                Lifetime = lifetime,
             });
+        }
+
+        private Vector RandomVector()
+        {
+            while (true)
+            {
+                var vector = new Vector(2 * _random.NextDouble() - 1, 2 * _random.NextDouble() - 1);
+                if (vector.SquaredLength <= 1)
+                {
+                    return vector;
+                }
+            }
         }
 
         private sealed class Particle
