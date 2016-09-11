@@ -77,6 +77,7 @@
     <Compile Include="..\NanoGames.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Application\MultiplayerDebugView.cs" />
     <Compile Include="Application\PlayerColors.cs" />
     <Compile Include="Application\TournamentView.cs" />
     <Compile Include="Application\Ui\ColorMenuItem.cs" />

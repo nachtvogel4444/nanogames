@@ -200,6 +200,30 @@ namespace NanoGames.Engine
                 case Key.Delete:
                     return KeyCode.Delete;
 
+                case Key.F1:
+                    return KeyCode.F1;
+
+                case Key.F2:
+                    return KeyCode.F2;
+
+                case Key.F3:
+                    return KeyCode.F3;
+
+                case Key.F4:
+                    return KeyCode.F4;
+
+                case Key.F5:
+                    return KeyCode.F5;
+
+                case Key.F6:
+                    return KeyCode.F6;
+
+                case Key.F7:
+                    return KeyCode.F7;
+
+                case Key.F8:
+                    return KeyCode.F8;
+
                 default:
                     return KeyCode.None;
             }
