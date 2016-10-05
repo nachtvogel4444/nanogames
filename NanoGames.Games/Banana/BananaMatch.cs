@@ -23,7 +23,6 @@ ToDo:
     stop player when track ends or is too steep
     simple gun to bazooka
     grenade
-    constants klasse ausdünnen
  
 */
 
@@ -247,11 +246,13 @@ namespace NanoGames.Games.Banana
         {
             foreach (SimpleBullet bullet in ListBullets)
             {
-                for (int i = 0; i < Land.NPointsInterpolated - 1; i++)
+                for (int i = 0; i < Land.N - 1; i++)
                 {
-                    if (CheckCollision(bullet.Position, bullet.PositionBefore, new Vector(Land.XInterpolated[i], Land.YInterpolated[i]), 0.6 * Land.Tolerance))
+                    Intersection intersection = new Intersection(bullet.Position, bullet.PositionBefore, Land.Points[i], Land.Points[i+1]);
+                    
+                    if (intersection.OfSegments)
                     {
-                        switch (Land.TypeInterpolated[i])
+                        switch (Land.Surface[i])
                         {
                             case "Normal":
                                 bullet.IsExploded = true;
@@ -303,11 +304,13 @@ namespace NanoGames.Games.Banana
         {
             foreach (Grenade grenade in ListGrenades)
             {
-                for (int i = 0; i < Land.NPointsInterpolated - 1; i++)
+                for (int i = 0; i < Land.N - 1; i++)
                 {
-                    if (CheckCollision(grenade.Position, grenade.PositionBefore, new Vector(Land.XInterpolated[i], Land.YInterpolated[i]), 0.6 * Land.Tolerance))
+                    Intersection intersection = new Intersection(grenade.Position, grenade.PositionBefore, Land.Points[i], Land.Points[i + 1]);
+
+                    if (intersection.OfSegments)
                     {
-                        switch (Land.TypeInterpolated[i])
+                        switch (Land.Surface[i])
                         {
                             case "Normal":
                                 double phi = Land.Alpha[i];
@@ -336,31 +339,6 @@ namespace NanoGames.Games.Banana
                 if (grenade.Position.X < 0 || grenade.Position.X > 320 || grenade.Position.Y > 200)
                 {
                     grenade.IsExploded = true;
-                }
-            }
-        }
-
-        private void CheckCollisionActivePlayerLand()
-        {
-            for (int i = 0; i < Land.NPointsTracks - 1; i++)
-            {
-                    Vector land = new Vector(Land.XTracks[i], Land.YTracks[i]);
-
-                if (CheckCollision(ActivePlayer.Position, ActivePlayer.PositionBefore, land, 0.6 * Land.Tolerance))
-                {
-                    switch (Land.TypeInterpolated[i])
-                    {
-                        case "Normal":
-                            ActivePlayer.IdxPosition = i;
-                            ActivePlayer.Position = land;
-
-                            Output.Audio.Play(Sounds.LowBeep);
-
-                            StateOfGame = "ActivePlayerMoving";
-                            break;
-                    }
-
-                    break;
                 }
             }
         }

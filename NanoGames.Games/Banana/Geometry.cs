@@ -12,30 +12,30 @@ namespace NanoGames.Games.Banana
 {
     public static class Geometry
     {
+        
 
-        public static Vector PointPoint(Vector point1, Vector point2)
+        public static Intersection Intersection(Vector p11, Vector p12, Vector p21, Vector p22)
         {
-            return point2 - point1;
-        }
+            double A1 = p11.Y - p12.Y;
+            double B1 = p11.X - p12.X;
+            double C1 = A1 * p11.X + B1 * p12.Y;
+            double A2 = p21.Y - p22.Y;
+            double B2 = p21.X - p22.X;
+            double C2 = A2 * p21.X + B2 * p22.Y;
 
-        public static Vector Intersection(Line line1, Line line2)
-        {
-            if (Vector.Dot(line1.M, line2.M) == 1)
+            double det = A1 * B2 - A2 * B1; 
+
+            if (det == 0)
             {
-                return new Vector(0, 0);
+                return 
             }
-
             else
             {
-
+                double x = (B2 * C1 - B1 * C2) / det;
+                double y = (A1 * C2 - A2 * C1) / det;
             }
+
         }
 
-        public static Vector PointLine(Vector point, Line line)
-        {
-
-
-            return ;
-        }
     }
 }

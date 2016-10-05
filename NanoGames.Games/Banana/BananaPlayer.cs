@@ -111,9 +111,9 @@ namespace NanoGames.Games.Banana
                 Output.Graphics.Circle(new Color(1, 1, 1), grenade.Position, grenade.Radius);
             }
 
-            for (int i = 0; i < Match.Land.NPointsPolygon - 1; i++)
+            for (int i = 0; i < Match.Land.N - 1; i++)
             {
-                Output.Graphics.Line(new Color(1, 1, 1), new Vector(Match.Land.XPolygon[i], Match.Land.YPolygon[i]), new Vector(Match.Land.XPolygon[i + 1], Match.Land.YPolygon[i + 1]));
+                Output.Graphics.Line(new Color(1, 1, 1), new Vector(Match.Land.X[i], Match.Land.Y[i]), new Vector(Match.Land.X[i + 1], Match.Land.Y[i + 1]));
             }
 
             /*

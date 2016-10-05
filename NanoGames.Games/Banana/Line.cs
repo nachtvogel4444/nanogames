@@ -33,5 +33,17 @@ namespace NanoGames.Games.Banana
             M = m;
         }
         
+        public bool IsInLine(Vector v)
+        {
+            if ((v.X - P.X) / M.X == (v.Y - P.Y) / M.Y)
+            {
+                return true;
+            }
+
+            else
+            {
+                return false;
+            }
+        }
     }
 }
