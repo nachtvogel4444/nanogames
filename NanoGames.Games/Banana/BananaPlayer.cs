@@ -157,18 +157,19 @@ namespace NanoGames.Games.Banana
 
         public void Move()
         {
-            int idx = 0;
+            int travel = 0;
+            int order = Math.Sign(Match.Land.Directions[IdxPosition].X);
 
             if (Input.Left.WasActivated)
             {
                 if (countLeft < wait)
                 {
-                    idx = -2; 
+                    travel = -2; 
                 }
 
                 else
                 {
-                    idx = -4;
+                    travel = -4;
                 }
             }
 
@@ -176,36 +177,79 @@ namespace NanoGames.Games.Banana
             {
                 if (countRight < wait)
                 {
-                    idx = 2;
+                    travel = 2;
                 }
 
                 else
                 {
-                    idx = 4;
+                    travel = 4;
                 }
             }
 
-            if (idx != 0)
+            if (travel != 0)
             {
-                IdxPosition += idx;
 
-                if (IdxPosition >= 0 || IdxPosition < Match.Land.XTracks.GetLength(0))
-                {
-                    Position = new Vector(Match.Land.XTracks[IdxPosition], Match.Land.YTracks[IdxPosition]);
-                }
-
-                else
-                {
-                    HasFinished = true;
-                }
-
-                if (idx < 0)
+                if (travel < 0)
                 {
                     looksRight = false;
                 }
                 else
                 {
                     looksRight = true;
+                }
+
+                int orientation = Math.Sign(order * travel);
+                int idx1 = IdxPosition;
+                int idx2 = IdxPosition + orientation;
+                int order1 = Math.Sign(Match.Land.Directions[idx1].X);
+                int order2 = Math.Sign(Match.Land.Directions[idx2].X);
+
+                double dist2pointRight = (Match.Land.Points[IdxPosition + 1] - Position).Length;
+                double dist2pointLeft = (Match.Land.Points[IdxPosition] - Position).Length;
+
+                if (orientation == 1)
+                {
+                    if (Math.Abs(travel) >= (Match.Land.Points[IdxPosition + 1] - Position).Length)
+                    {
+                        if (order1 == order2)
+                        {
+                            IdxPosition = idx2;
+                        }
+
+                        if ()
+                    }
+
+                    Position = Match.Land.Points[IdxPosition + 1];
+
+                    if (Match.Land.Directions[IdxPosition].X > 0 && Match.Land.Directions[IdxPosition + 1].X < 0)
+                    {
+                        
+                    }
+
+                    if (Match.Land.Directions[IdxPosition].X < 0 && Match.Land.Directions[IdxPosition + 1].X > 0)
+                    {
+                        Match.StateOfGame = "ActivePLayerFalling";
+                    }
+
+                    if (Match.Land.Directions[IdxPosition].X < 0 && Match.Land.Directions[IdxPosition + 1].X < 0)
+                    {
+                        IdxPosition -= 1;
+                    }
+                }
+
+                if (dist2travel >= dist2pointLeft && !looksRight)
+                {
+                    Position = Match.Land.Points[IdxPosition];
+
+                    if (Match.Land.Directions[IdxPosition].X * Match.Land.Directions[IdxPosition - 1].X < 0)
+                    {
+                        IdxPosition -= 1;
+                    }
+                }
+
+                else
+                {
+                    Position += travel * Match.Land.Directions[IdxPosition] * Math.Sign(Match.Land.Directions[IdxPosition].X);
                 }
 
                 Output.Audio.Play(Sounds.Walk);

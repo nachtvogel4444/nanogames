@@ -12,6 +12,7 @@ namespace NanoGames.Games.Banana
     class Landscape
     {
         public Vector[] Points;
+        public Vector[] Directions;
         public string[] Surface;
         public int N;
 
@@ -36,6 +37,15 @@ namespace NanoGames.Games.Banana
             {
                 Points[i] = new Vector(points[i, 0], points[i, 1]);
             }
+
+            Directions = new Vector[N-1];
+            for (int i = 0; i < N-1; i++)
+            {
+                Vector v = Points[i + 1] - Points[i];
+                Directions[i] = v.Normalized;
+            }
+
+
         }
     }
 }

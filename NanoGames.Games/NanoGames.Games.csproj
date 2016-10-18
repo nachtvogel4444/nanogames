@@ -49,7 +49,6 @@
     </Compile>
     <Compile Include="Banana\BananaMatch.cs" />
     <Compile Include="Banana\BananaPlayer.cs" />
-    <Compile Include="Banana\Geometry.cs" />
     <Compile Include="Banana\Grenade.cs" />
     <Compile Include="Banana\Intersection.cs" />
     <Compile Include="Banana\Landscape.cs" />
