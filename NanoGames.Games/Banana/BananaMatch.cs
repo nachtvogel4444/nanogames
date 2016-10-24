@@ -47,7 +47,9 @@ namespace NanoGames.Games.Banana
 
         protected override void Initialize()
         {
-            Land.createLandscape(Land.lineX, Land.lineY, Land.lineType, Players[0].Radius);
+            Land.CreateBlock(new Vector(100, 100), new Vector(110, 120));
+            Land.CreateBlock(new Vector(200, 50), new Vector(300, 70));
+            Land.Make();
 
             for (int i = 0; i < Players.Count; ++i)
             {
@@ -246,30 +248,8 @@ namespace NanoGames.Games.Banana
         {
             foreach (SimpleBullet bullet in ListBullets)
             {
-                for (int i = 0; i < Land.N - 1; i++)
-                {
-                    Intersection intersection = new Intersection(bullet.Position, bullet.PositionBefore, Land.Points[i], Land.Points[i+1]);
-                    
-                    if (intersection.OfSegments)
-                    {
-                        switch (Land.Surface[i])
-                        {
-                            case "Normal":
-                                bullet.IsExploded = true;
-                                
-                                Output.Audio.Play(Sounds.Explosion);
-
-                                for (int j = 0; j < 30; j++)
-                                {
-                                    Output.Particles.Point(new Color(1, 1, 1), bullet.Position);
-                                }
-
-                                break;
-                        }
-
-                        break;
-                    }
-                }
+                
+                
             }
         }
 
@@ -304,31 +284,7 @@ namespace NanoGames.Games.Banana
         {
             foreach (Grenade grenade in ListGrenades)
             {
-                for (int i = 0; i < Land.N - 1; i++)
-                {
-                    Intersection intersection = new Intersection(grenade.Position, grenade.PositionBefore, Land.Points[i], Land.Points[i + 1]);
 
-                    if (intersection.OfSegments)
-                    {
-                        switch (Land.Surface[i])
-                        {
-                            case "Normal":
-                                double phi = Land.Alpha[i];
-                                double x = +(Math.Cos(phi) * Math.Cos(phi) - Math.Sin(phi) * Math.Sin(phi)) * grenade.Velocity.X - 2 * Math.Sin(phi) * Math.Cos(phi) * grenade.Velocity.Y;
-                                double y = -(Math.Cos(phi) * Math.Cos(phi) - Math.Sin(phi) * Math.Sin(phi)) * grenade.Velocity.Y + 2 * Math.Sin(phi) * Math.Cos(phi) * grenade.Velocity.X;
-                                grenade.Velocity =  new Vector(x, y);
-                                grenade.PositionBefore = new Vector(Land.XInterpolated[i], Land.YInterpolated[i]) + (1.1 * Land.Tolerance) * new Vector(Math.Cos(phi), -Math.Sin(phi));
-                                //grenade.PositionBefore = new Vector(Land.XInterpolated[i], Land.YInterpolated[i] -(5*grenade.Radius + 1.1 * Land.Tolerance));
-                                grenade.Position = grenade.PositionBefore + grenade.Velocity;
-
-                                Output.Audio.Play(Sounds.Toc);
-                                
-                                break;
-                        }
-
-                        break;
-                    }
-                }
             }
         }
 

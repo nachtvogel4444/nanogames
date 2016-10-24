@@ -11,41 +11,73 @@ namespace NanoGames.Games.Banana
 {
     class Landscape
     {
-        public Vector[] Points;
-        public Vector[] Directions;
-        public string[] Surface;
-        public int N;
+        public int[,] Area = new int[320, 240];
+        public List<List<Vector>> Lines = new List<List<Vector>>();
 
-        private double[,] points;
-        private double[] y;
-
-        public Landscape()
+        public void CreateBlock(Vector p1, Vector p2)
         {
-            /*
-            X = new double[2] { 0, 320 };
-            Y = new double[2] { 100, 100 };
-            Surface = new string[2] { "Normal", "Normal" };
-            */
-            
-            points = new double[7, 2] { { 0, 100 }, { 50, 120 }, { 120, 80 }, { 170, 90 }, { 200, 95 }, { 250, 140 }, { 320, 100 } };
-            Surface = new string[7-1] { "Normal", "Normal", "Normal", "Normal", "Normal", "Normal" };
+            int x1 = (int)p1.X;
+            int x2 = (int)p2.X;
+            int y1 = (int)p1.Y;
+            int y2 = (int)p2.Y;
 
-            N = points.GetLength(0);
-
-            Points = new Vector[N];
-            for (int i = 0; i < N; i++)
+            for (int i = x1; i <= x2; i++)
             {
-                Points[i] = new Vector(points[i, 0], points[i, 1]);
+                for (int j = y1; j <= y2; j++)
+                {
+                    Area[i, j] = 1;
+                }
             }
-
-            Directions = new Vector[N-1];
-            for (int i = 0; i < N-1; i++)
-            {
-                Vector v = Points[i + 1] - Points[i];
-                Directions[i] = v.Normalized;
-            }
-
 
         }
+
+        public void Make()
+        {
+            for (int x = 0; x < 320; x++)
+            {
+                for (int y = 0; y < 240; y++)
+                {
+                    if (Area[x,y] == 1)
+                    {
+                        if (isBorder(x, y))
+                        {
+                            Area[x, y] = 2;
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool isBorder(int x, int y)
+        {
+            if ((Area[x - 1, y] == 0) ||
+                (Area[x + 1, y] == 0) ||
+                (Area[x, y - 1] == 0) || 
+                (Area[x, y + 1] == 0))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void Draw(IGraphics g)
+        {
+            for (int i = 0; i < 320; i++)
+            {
+                for (int j = 0; j < 240; j++)
+                {/*
+                    if (Area[i,j] == 1)
+                    {
+                        g.Point(new Color(1, 1, 1), new Vector(i, j));
+                    }
+                    */
+                    if (Area[i, j] == 2)
+                    {
+                        g.Point(new Color(1, 0, 0), new Vector(i, j));
+                    }
+                }
+            }
+        }
+
     }
 }

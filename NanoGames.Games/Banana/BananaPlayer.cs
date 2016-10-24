@@ -47,9 +47,7 @@ namespace NanoGames.Games.Banana
             jumpLeft = new Vector(Math.Cos(0.5 * Math.PI + angleJump), -Math.Sin(0.5 * Math.PI + angleJump));
             jumpRight = new Vector(Math.Cos(0.5 * Math.PI - angleJump), -Math.Sin(0.5 * Math.PI - angleJump));
             jumpVertical = new Vector(0, -1);
-            
-            IdxPosition = Convert.ToInt32(Math.Floor(Match.Random.NextDouble() * Match.Land.XTracks.GetLength(0)));
-            Position = new Vector(Match.Land.XTracks[IdxPosition], Match.Land.YTracks[IdxPosition]);
+           
 
             angle = Match.Random.NextDouble() * Math.PI - Math.PI / 2;
 
@@ -111,18 +109,9 @@ namespace NanoGames.Games.Banana
                 Output.Graphics.Circle(new Color(1, 1, 1), grenade.Position, grenade.Radius);
             }
 
-            for (int i = 0; i < Match.Land.N - 1; i++)
-            {
-                Output.Graphics.Line(new Color(1, 1, 1), new Vector(Match.Land.X[i], Match.Land.Y[i]), new Vector(Match.Land.X[i + 1], Match.Land.Y[i + 1]));
-            }
-
-            /*
-            for (int i = 0; i < Match.Land.NPointsInterpolated - 1; i++)
-            {
-                Output.Graphics.Point(new Color(1, 1, 1), new Vector(Match.Land.XTracksUpper[i], Match.Land.YTracksUpper[i]));
-            }
-            */
-
+            /* Draw landscape */
+            Match.Land.Draw(Output.Graphics);
+            
             // Draw Information on Screen
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 10), "ACTIVEPLAYER: " + Match.ActivePlayer.Name);
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 20), "REALANGLE: " + (Convert.ToInt32(Match.ActivePlayer.realAngle * 180 / Math.PI)).ToString());
@@ -156,7 +145,7 @@ namespace NanoGames.Games.Banana
         }
 
         public void Move()
-        {
+        {/*
             int travel = 0;
             int order = Math.Sign(Match.Land.Directions[IdxPosition].X);
 
@@ -271,7 +260,7 @@ namespace NanoGames.Games.Banana
             else
             {
                 countRight = 0;
-            }
+            }*/
         }
 
         public void SetAngle()
@@ -367,7 +356,7 @@ namespace NanoGames.Games.Banana
             if (weapons[idxWeapon] == "Gun")
             {
                 Vector velocity = speedProjectile * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
-                Vector position = Position + (Radius + speedProjectile + 1.1 * Match.Land.Tolerance) * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
+                Vector position = Position + (Radius + speedProjectile) * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
 
                 Output.Audio.Play(Sounds.GunFire);
 
@@ -377,7 +366,7 @@ namespace NanoGames.Games.Banana
             if (weapons[idxWeapon] == "Grenade")
             {
                 Vector velocity = speedProjectile * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
-                Vector position = Position + (Radius + speedProjectile + 1.1 * Match.Land.Tolerance+4) * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
+                Vector position = Position + (Radius + speedProjectile +4) * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
 
                 Output.Audio.Play(Sounds.GrenadeFire);
 
