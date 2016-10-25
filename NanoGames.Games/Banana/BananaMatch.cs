@@ -47,8 +47,9 @@ namespace NanoGames.Games.Banana
 
         protected override void Initialize()
         {
-            Land.CreateBlock(new Vector(100, 100), new Vector(110, 120));
-            Land.CreateBlock(new Vector(200, 50), new Vector(300, 70));
+            Land.CreateBlock(new Vector(100, 100), new Vector(103, 104));
+            //Land.CreateBlock(new Vector(160, 120), new Vector(190, 200));
+            //Land.CreateBlock(new Vector(200, 50), new Vector(300, 70));
             Land.Make();
 
             for (int i = 0; i < Players.Count; ++i)
