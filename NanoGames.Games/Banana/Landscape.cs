@@ -13,7 +13,7 @@ namespace NanoGames.Games.Banana
     {
         public bool[,] IsSolid = new bool[321, 201];
         public bool[,] IsBorder = new bool[321, 201];
-        public List<List<int[]>> Borders = new List<List<int[]>>();
+        public bool[,] IsWalk = new bool[321, 201];
 
         public void CreateBlock(Vector p1, Vector p2)
         {
@@ -35,9 +35,6 @@ namespace NanoGames.Games.Banana
 
         public void Make()
         {
-            List<int[]> tmp1 = new List<int[]>();
-            List<int[]> tmp2 = new List<int[]>();
-
             /* Fill IsBorder */
             for (int x = 0; x <= 320; x++)
             {
@@ -48,32 +45,54 @@ namespace NanoGames.Games.Banana
                         if (checkForBorder(x, y))
                         {
                             IsBorder[x, y] = true;
-                            tmp1.Add(new int[2] { x, y });
                         }
                     }
                 }
             }
 
-            /* Fill Lines */
-            Borders.Add(new List<int[]>());
-            foreach (int[] bp in tmp1)
-            {
-                if (!tmp2.Contains(bp))
-                {
-                    int[] p = bp;
-                    Borders.Last().Add(p);
+            /* Fill IsWalk */
+            bool[,] tmp1 = new bool[321, 201];
+            bool[,] tmp2 = new bool[321, 201];
+            IsSolid.CopyTo(tmp1, 0);
+            IsSolid.CopyTo(tmp2, 0);
 
-                    while (p != findNewNeighbour(p, tmp2))
+            for (int i = 1; i <= 4; i++)
+            {
+                for (int x = 0; x <= 320; x++)
+                {
+                    for (int y = 0; y <= 200; y++)
                     {
-                        p = findNewNeighbour(p, tmp2);
-                        Borders.Last().Add(p);
-                        tmp2.Add(p);
+                        if (tmp1[x, y])
+                        {
+                            tmp2[x, y - 1] = true;
+                            tmp2[x + 1, y - 1] = true;
+                            tmp2[x + 1, y] = true;
+                            tmp2[x + 1, y + 1] = true;
+                            tmp2[x, y + 1] = true;
+                            tmp2[x - 1, y + 1] = true;
+                            tmp2[x - 1, y] = true;
+                            tmp2[x - 1, y - 1] = true;
+                        }
                     }
                 }
-                
-               
+
+                tmp2.CopyTo(tmp1, 0);
             }
-            
+
+            for (int x = 0; x <= 320; x++)
+            {
+                for (int y = 0; y <= 200; y++)
+                {
+                    if (tmp2[x, y])
+                    {
+                        if (checkForBorder(x, y))
+                        {
+                            IsWalk[x, y] = true;
+                        }
+                    }
+                }
+            }
+
         }
 
         private bool checkForBorder(int x, int y)
@@ -88,23 +107,6 @@ namespace NanoGames.Games.Banana
                 (IsSolid[x + 1, y] == false) ||
                 (IsSolid[x, y - 1] == false) ||
                 (IsSolid[x, y + 1] == false));
-        }
-
-        private int[] findNewNeighbour(int[] p, List<int[]> l)
-        {
-            int x = p[0];
-            int y = p[1];
-
-            if (IsBorder[x + 1, y] && !l.Contains(new int[2] { x + 1, y })) { return new int[2] { x + 1, y }; }
-            if (IsBorder[x + 1, y + 1] && !l.Contains(new int[2] { x + 1, y + 1 })) { return new int[2] { x + 1, y + 1 }; }
-            if (IsBorder[x, y + 1] && !l.Contains(new int[2] { x, y + 1 })) { return new int[2] { x, y + 1 }; }
-            if (IsBorder[x - 1, y + 1] && !l.Contains(new int[2] { x - 1, y + 1 })) { return new int[2] { x - 1, y + 1 }; }
-            if (IsBorder[x - 1, y] && !l.Contains(new int[2] { x - 1, y })) { return new int[2] { x - 1, y }; }
-            if (IsBorder[x - 1, y - 1] && !l.Contains(new int[2] { x - 1, y - 1 })) { return new int[2] { x - 1, y - 1 }; }
-            if (IsBorder[x, y - 1] && !l.Contains(new int[2] { x, y - 1 })) { return new int[2] { x, y - 1 }; }
-            if (IsBorder[x + 1, y - 1] && !l.Contains(new int[2] { x + 1, y - 1 })) { return new int[2] { x + 1, y - 1 }; }
-
-            return p;
         }
 
         public void Draw(IGraphics g)
@@ -122,6 +124,11 @@ namespace NanoGames.Games.Banana
                     {
                         g.Point(new Color(1, 0, 0), new Vector(i, j));
                     }
+
+                    if (IsWalk[i, j])
+                    {
+                        g.Point(new Color(0, 1, 0), new Vector(i, j));
+                    }
                 }
             }
         }
@@ -136,5 +143,6 @@ namespace NanoGames.Games.Banana
             return value;
         }
 
+ 
     }
 }
