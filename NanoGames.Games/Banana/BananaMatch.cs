@@ -47,15 +47,15 @@ namespace NanoGames.Games.Banana
 
         protected override void Initialize()
         {
-            Land.CreateBlock(new Vector(100, 100), new Vector(103, 104));
-            //Land.CreateBlock(new Vector(160, 120), new Vector(190, 200));
-            //Land.CreateBlock(new Vector(200, 50), new Vector(300, 70));
+            Land.CreateBlock(new Vector(100, 100), new Vector(130, 110));
+            Land.CreateBlock(new Vector(120, 120), new Vector(190, 300));
+            Land.CreateBlock(new Vector(150, 100), new Vector(300, 130));
             Land.Make();
 
             for (int i = 0; i < Players.Count; ++i)
             {
                 listPlayers.Add(Players[i]);
-                Players[i].SetPlayer();
+                Players[i].GetBorn();
             }
 
             activePlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));

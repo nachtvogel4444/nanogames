@@ -11,28 +11,20 @@ namespace NanoGames.Games.Banana
 {
     class BananaPlayer : Player<BananaMatch>
     {
-        public Vector Position;
-        public int IdxPosition;
-        public Vector PositionBefore;
+        public Vector Position = new Vector(0, 0);
 
         public bool HasFinished = false;
-        public double Radius = 2;
 
-        private Vector velocity;
+        private Vector velocity = new Vector(0, 0);
 
-        private Vector jumpLeft;
-        private Vector jumpRight;
-        private Vector jumpVertical;
-        private int frameCountJump;
+        private int[,] circle;
 
-        private double angle;
-        private double realAngle;
-        private double speedProjectile = 0;
-        private double lengthGun = 4;
-        
-        private double angleJump = 15 * Math.PI / 180;
+        private double angle = 0;
+        private double realAngle = 0;
+        private double power = 0;
+        private double powerMax = 100;
+
         private int wait = 20;
-        private int waitFire = 72;
         private int countLeft = 0;
         private int countRight = 0;
         private int countUp = 0;
@@ -42,12 +34,13 @@ namespace NanoGames.Games.Banana
         private string[] weapons = new string[] { "Gun", "Grenade" };
         private bool looksRight;
 
-        public void SetPlayer()
+        public void GetBorn()
         {
-            jumpLeft = new Vector(Math.Cos(0.5 * Math.PI + angleJump), -Math.Sin(0.5 * Math.PI + angleJump));
-            jumpRight = new Vector(Math.Cos(0.5 * Math.PI - angleJump), -Math.Sin(0.5 * Math.PI - angleJump));
-            jumpVertical = new Vector(0, -1);
-           
+            Position.X = Match.Random.NextDouble() * 320;
+
+            circle = circleToPixel(Position);
+
+            power = 0;
 
             angle = Match.Random.NextDouble() * Math.PI - Math.PI / 2;
 
@@ -375,6 +368,17 @@ namespace NanoGames.Games.Banana
             }
 
             Match.StateOfGame = "AnimationProjectileFly";
+        }
+
+        private int[,] circleToPixel(Vector position)
+        {
+            int x = (int)Math.Round(position.X);
+            int y = (int)Math.Round(position.Y);
+
+            return new int[,] { { x - 3, y}, { x - 3, y + 1 }, { x - 2, y + 2}, { x - 1, y + 3 },
+                                { x, y + 3 }, { x + 1, y + 3 }, { x + 2, y + 2}, { x + 3, y + 1},
+                                { x + 3, y}, { x + 3, y - 1 }, { x + 2, y - 2}, { x + 1, y - 3 },
+                                { x, y - 3 }, { x - 1, y - 3 }, { x - 2, y - 2}, { x - 3, y - 1},};
         }
 
     }

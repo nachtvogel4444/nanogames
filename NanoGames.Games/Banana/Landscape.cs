@@ -12,8 +12,7 @@ namespace NanoGames.Games.Banana
     class Landscape
     {
         public bool[,] IsSolid = new bool[321, 201];
-        public bool[,] IsBorder = new bool[321, 201];
-        public bool[,] IsWalk = new bool[321, 201];
+        public bool[,] IsShell = new bool[321, 201];
 
         public void CreateBlock(Vector p1, Vector p2)
         {
@@ -35,78 +34,63 @@ namespace NanoGames.Games.Banana
 
         public void Make()
         {
-            /* Fill IsBorder */
-            for (int x = 0; x <= 320; x++)
-            {
-                for (int y = 0; y <= 200; y++)
-                {
-                    if (IsSolid[x,y])
-                    {
-                        if (checkForBorder(x, y))
-                        {
-                            IsBorder[x, y] = true;
-                        }
-                    }
-                }
-            }
-
-            /* Fill IsWalk */
-            bool[,] tmp1 = new bool[321, 201];
-            bool[,] tmp2 = new bool[321, 201];
-            IsSolid.CopyTo(tmp1, 0);
-            IsSolid.CopyTo(tmp2, 0);
-
-            for (int i = 1; i <= 4; i++)
-            {
-                for (int x = 0; x <= 320; x++)
-                {
-                    for (int y = 0; y <= 200; y++)
-                    {
-                        if (tmp1[x, y])
-                        {
-                            tmp2[x, y - 1] = true;
-                            tmp2[x + 1, y - 1] = true;
-                            tmp2[x + 1, y] = true;
-                            tmp2[x + 1, y + 1] = true;
-                            tmp2[x, y + 1] = true;
-                            tmp2[x - 1, y + 1] = true;
-                            tmp2[x - 1, y] = true;
-                            tmp2[x - 1, y - 1] = true;
-                        }
-                    }
-                }
-
-                tmp2.CopyTo(tmp1, 0);
-            }
-
-            for (int x = 0; x <= 320; x++)
-            {
-                for (int y = 0; y <= 200; y++)
-                {
-                    if (tmp2[x, y])
-                    {
-                        if (checkForBorder(x, y))
-                        {
-                            IsWalk[x, y] = true;
-                        }
-                    }
-                }
-            }
-
+            IsShell = addLayer(IsSolid, 3);
         }
 
-        private bool checkForBorder(int x, int y)
+        private bool[,] addLayer(bool[,] input, int count)
         {
-            if ((x < 1) || (x > 319) ||
-                (y < 1) || (y > 199))
+            if (count <= 0) { return input; }
+
+            bool[,] output = new bool[321, 201];
+
+            for (int x = 1; x < 320; x++)
             {
-                return true;
+                for (int y = 1; y < 200; y++)
+                {
+                    if (input[x, y])
+                    {
+                        output[x, y - 1] = true;
+                        output[x + 1, y - 1] = true;
+                        output[x + 1, y] = true;
+                        output[x + 1, y + 1] = true;
+                        output[x, y + 1] = true;
+                        output[x - 1, y + 1] = true;
+                        output[x - 1, y] = true;
+                        output[x - 1, y - 1] = true;
+                        output[x, y] = true;
+                    }
+                }
             }
 
-            return ((IsSolid[x - 1, y] == false) ||
-                (IsSolid[x + 1, y] == false) ||
-                (IsSolid[x, y - 1] == false) ||
-                (IsSolid[x, y + 1] == false));
+            return addLayer(output, count - 1);
+        }
+
+        private bool[,] getBorder(bool[,] input)
+        {
+            int n = input.GetLength(0);
+            int m = input.GetLength(1);
+
+            bool[,] output = new bool[n, m];
+
+            for (int x = 0; x < n; x++)
+            {
+                for (int y = 0; y < m; y++)
+                {
+                    if (input[x, y])
+                    {
+                        output[x, y] = ((x < 1) ||
+                                        (x > 319) ||
+                                        (y < 1) ||
+                                        (y > 199) ||
+                                        (input[x - 1, y] == false) ||
+                                        (input[x + 1, y] == false) ||
+                                        (input[x, y - 1] == false) ||
+                                        (input[x, y + 1] == false));
+                    }
+                }
+            }
+
+            return output;
         }
 
         public void Draw(IGraphics g)
@@ -117,7 +101,7 @@ namespace NanoGames.Games.Banana
                 {
                     if (IsSolid[i,j])
                     {
-                        // g.Point(new Color(1, 1, 1), new Vector(i, j));
+                        // g.Point(new Color(0.3, 0.3, 0.3), new Vector(i, j));
                     }
                     
                     if (IsBorder[i, j])
@@ -125,7 +109,7 @@ namespace NanoGames.Games.Banana
                         g.Point(new Color(1, 0, 0), new Vector(i, j));
                     }
 
-                    if (IsWalk[i, j])
+                    if (IsShell[i, j])
                     {
                         g.Point(new Color(0, 1, 0), new Vector(i, j));
                     }
