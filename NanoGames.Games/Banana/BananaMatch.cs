@@ -78,13 +78,18 @@ namespace NanoGames.Games.Banana
                 StateOfGame = "ActivePlayerMoving";
             }
 
+            /*
+             State of Game
+             - 
+             */
+
             switch (StateOfGame)
             {
                 case "ActivePlayerMoving":
                     
-                    ActivePlayer.SelectWeapon();
                     ActivePlayer.Move();
                     ActivePlayer.SetAngle();
+                    ActivePlayer.SetWeapon();
                     ActivePlayer.Shoot1();
                     CheckCollisionActivePlayerScreen();
                     break;

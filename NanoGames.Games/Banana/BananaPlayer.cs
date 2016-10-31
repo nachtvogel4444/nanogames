@@ -37,6 +37,7 @@ namespace NanoGames.Games.Banana
         public void GetBorn()
         {
             Position.X = Match.Random.NextDouble() * 320;
+            Position.Y = 10;
 
             circle = circleToPixel(Position);
 
@@ -123,12 +124,7 @@ namespace NanoGames.Games.Banana
             }
         }
 
-        public void PlaySound()
-        {
-            Output.Audio.Play(Sounds.Explosion);
-        }
-
-        public void SelectWeapon()
+        public void SetWeapon()
         {
             if (Input.AltFire.WasActivated)
             {
@@ -368,6 +364,11 @@ namespace NanoGames.Games.Banana
             }
 
             Match.StateOfGame = "AnimationProjectileFly";
+        }
+
+        public void Fall()
+        {
+
         }
 
         private int[,] circleToPixel(Vector position)
