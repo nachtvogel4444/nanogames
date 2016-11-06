@@ -83,7 +83,7 @@ namespace NanoGames.Games.Bomberguy
         {
             if (!Alive && !_particles) return;
 
-            IGraphics g = _particles ? Output.Particles : Output.Graphics;
+            IGraphics g = _particles ? Match.Output.Particles : Match.Output.Graphics;
 
             if(_particles)
             {
