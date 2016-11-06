@@ -54,7 +54,7 @@ namespace NanoGames.Games.AsteroidHunt
                 if (best == null || p.Score > best.Score) best = p;
                 if (secondBest == null || (p.Score < best.Score && p.Score > secondBest.Score)) secondBest = p;
 
-                if (p.Dead) return;
+                if (p.Dead) continue;
                 CheckDeath(p);
                 MovePlayer(p);
                 Fire(p);
