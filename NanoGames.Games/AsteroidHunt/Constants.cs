@@ -34,7 +34,7 @@
             public static readonly int BaseScore = 1;
             public static readonly int MinHitpoints = 5;
             public static readonly int MaxHitpoints = 15;
-            public static readonly bool HitpointsPlayerScaling = true;
+            public static readonly bool HitpointsPlayerScaling = false;
         }
 
         public static class Player
