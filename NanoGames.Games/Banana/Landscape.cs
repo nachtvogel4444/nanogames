@@ -12,7 +12,9 @@ namespace NanoGames.Games.Banana
     class Landscape
     {
         public bool[,] IsSolid = new bool[321, 201];
-        public bool[,] IsShell = new bool[321, 201];
+        public bool[,] IsBorder = new bool[321, 201];
+        public List<List<int>> BorderX;
+        public List<List<int>> BorderY;
 
         public void CreateBlock(Vector p1, Vector p2)
         {
@@ -34,7 +36,13 @@ namespace NanoGames.Games.Banana
 
         public void Make()
         {
-            IsShell = addLayer(IsSolid, 3);
+            IsBorder = getBorder(IsSolid);
+        }
+
+        public void Refresh()
+        {
+            IsBorder = getBorder(IsSolid);
+            refreshBorderList(IsBorder);
         }
 
         private bool[,] addLayer(bool[,] input, int count)
@@ -92,6 +100,50 @@ namespace NanoGames.Games.Banana
 
             return output;
         }
+
+        private void refreshBorderList(bool[,] input)
+        {
+            BorderX.Clear();
+            BorderY.Clear();
+
+            int n = input.GetLength(0);
+            int m = input.GetLength(1);
+            
+            bool[,] tmp = new bool[n, m];
+
+            for (int x = 0; x < n; x++)
+            {
+                for (int y = 0; y < m; y++)
+                {
+                    if (input[x, y] && !tmp[x, y])
+                    {
+                        int xx = x;
+                        int yy = y;
+                        BorderX.Add(new List<int>());
+                        BorderY.Add(new List<int>());
+
+                        while (!tmp[xx, yy])
+                        {
+                            BorderX[BorderX.Count - 1].Add(xx);
+                            BorderY[BorderX.Count - 1].Add(yy);
+                            tmp[xx, yy] = true;
+
+                            if (input[xx + 1, yy] && tmp[xx + 1, yy]) { xx++; continue; }
+                            if (input[xx + 1, yy + 1] && tmp[xx + 1, yy + 1]) { xx++; yy++; continue; }
+                            if (input[xx, yy + 1] && tmp[xx, yy + 1]) { yy++; continue; }
+                            if (input[xx - 1, yy + 1] && tmp[xx - 1, yy + 1]) { xx--; yy++; continue; }
+                            if (input[xx - 1, yy] && tmp[xx - 1, yy]) { xx--; continue; }
+                            if (input[xx - 1, yy - 1] && tmp[xx - 1, yy - 1]) { xx--; yy--; continue; }
+                            if (input[xx, yy - 1] && tmp[xx, yy - 1]) { yy--; continue; }
+                            if (input[xx + 1, yy - 1] && tmp[xx + 1, yy - 1]) { xx++; yy--; continue; }
+                        }
+
+                        
+                    }
+                }
+            }
+            
+        } 
 
         public void Draw(IGraphics g)
         {
