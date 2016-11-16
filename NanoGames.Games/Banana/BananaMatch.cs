@@ -50,7 +50,7 @@ namespace NanoGames.Games.Banana
             Land.CreateBlock(new Vector(100, 100), new Vector(130, 110));
             Land.CreateBlock(new Vector(120, 120), new Vector(190, 300));
             Land.CreateBlock(new Vector(150, 100), new Vector(300, 130));
-            Land.Make();
+            Land.Refresh();
 
             for (int i = 0; i < Players.Count; ++i)
             {
@@ -91,7 +91,6 @@ namespace NanoGames.Games.Banana
                     ActivePlayer.SetAngle();
                     ActivePlayer.SetWeapon();
                     ActivePlayer.Shoot1();
-                    CheckCollisionActivePlayerScreen();
                     break;
 
                 case "AnimationBeforeShoot":
@@ -155,8 +154,9 @@ namespace NanoGames.Games.Banana
                     {
                         frameCountMove = frameCountMoveMax;
                     }
-
+                    
                     break;
+                    
             }
 
             frameCountMove++;

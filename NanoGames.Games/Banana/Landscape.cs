@@ -13,16 +13,15 @@ namespace NanoGames.Games.Banana
     {
         public bool[,] IsSolid = new bool[321, 201];
         public bool[,] IsBorder = new bool[321, 201];
-        public List<List<int>> BorderX;
-        public List<List<int>> BorderY;
+        public List<List<Vector>> Border = new List<List<Vector>>();
 
         public void CreateBlock(Vector p1, Vector p2)
         {
             
-            int x1 = clamp((int)p1.X, 0, 320);
-            int x2 = clamp((int)p2.X, 0, 320);
-            int y1 = clamp((int)p1.Y, 0, 200);
-            int y2 = clamp((int)p2.Y, 0, 200);
+            int x1 = clamp((int)p1.X, 1, 319);
+            int x2 = clamp((int)p2.X, 1, 319);
+            int y1 = clamp((int)p1.Y, 1, 199);
+            int y2 = clamp((int)p2.Y, 1, 199);
 
             for (int i = x1; i <= x2; i++)
             {
@@ -32,11 +31,6 @@ namespace NanoGames.Games.Banana
                 }
             }
 
-        }
-
-        public void Make()
-        {
-            IsBorder = getBorder(IsSolid);
         }
 
         public void Refresh()
@@ -103,39 +97,37 @@ namespace NanoGames.Games.Banana
 
         private void refreshBorderList(bool[,] input)
         {
-            BorderX.Clear();
-            BorderY.Clear();
+            Border.Clear();
 
             int n = input.GetLength(0);
             int m = input.GetLength(1);
             
-            bool[,] tmp = new bool[n, m];
+            bool[,] wasTaken = new bool[n, m];
 
             for (int x = 0; x < n; x++)
             {
                 for (int y = 0; y < m; y++)
                 {
-                    if (input[x, y] && !tmp[x, y])
+                    if (input[x, y] && !wasTaken[x, y])
                     {
                         int xx = x;
                         int yy = y;
-                        BorderX.Add(new List<int>());
-                        BorderY.Add(new List<int>());
+                        Border.Add(new List<Vector>());
 
-                        while (!tmp[xx, yy])
+                        while (!wasTaken[xx, yy])
                         {
-                            BorderX[BorderX.Count - 1].Add(xx);
-                            BorderY[BorderX.Count - 1].Add(yy);
-                            tmp[xx, yy] = true;
+                            Border[Border.Count - 1].Add(new Vector(xx, yy));
 
-                            if (input[xx + 1, yy] && tmp[xx + 1, yy]) { xx++; continue; }
-                            if (input[xx + 1, yy + 1] && tmp[xx + 1, yy + 1]) { xx++; yy++; continue; }
-                            if (input[xx, yy + 1] && tmp[xx, yy + 1]) { yy++; continue; }
-                            if (input[xx - 1, yy + 1] && tmp[xx - 1, yy + 1]) { xx--; yy++; continue; }
-                            if (input[xx - 1, yy] && tmp[xx - 1, yy]) { xx--; continue; }
-                            if (input[xx - 1, yy - 1] && tmp[xx - 1, yy - 1]) { xx--; yy--; continue; }
-                            if (input[xx, yy - 1] && tmp[xx, yy - 1]) { yy--; continue; }
-                            if (input[xx + 1, yy - 1] && tmp[xx + 1, yy - 1]) { xx++; yy--; continue; }
+                            wasTaken[xx, yy] = true;
+
+                            if (input[xx + 1, yy] && !wasTaken[xx + 1, yy]) { xx++; continue; }
+                            if (input[xx + 1, yy + 1] && !wasTaken[xx + 1, yy + 1]) { xx++; yy++; continue; }
+                            if (input[xx, yy + 1] && !wasTaken[xx, yy + 1]) { yy++; continue; }
+                            if (input[xx - 1, yy + 1] && !wasTaken[xx - 1, yy + 1]) { xx--; yy++; continue; }
+                            if (input[xx - 1, yy] && !wasTaken[xx - 1, yy]) { xx--; continue; }
+                            if (input[xx - 1, yy - 1] && !wasTaken[xx - 1, yy - 1]) { xx--; yy--; continue; }
+                            if (input[xx, yy - 1] && !wasTaken[xx, yy - 1]) { yy--; continue; }
+                            if (input[xx + 1, yy - 1] && !wasTaken[xx + 1, yy - 1]) { xx++; yy--; continue; }
                         }
 
                         
@@ -158,14 +150,19 @@ namespace NanoGames.Games.Banana
                     
                     if (IsBorder[i, j])
                     {
-                        g.Point(new Color(1, 0, 0), new Vector(i, j));
-                    }
-
-                    if (IsShell[i, j])
-                    {
-                        g.Point(new Color(0, 1, 0), new Vector(i, j));
+                        // g.Point(new Color(1, 0, 0), new Vector(i, j));
                     }
                 }
+            }
+
+            foreach (List<Vector> piece in Border)
+            {
+                for (int i = 0; i < piece.Count - 1; i++)
+                {
+                    g.Line(new Color(1, 1, 1), piece[i], piece[i + 1]);
+                }
+                
+                g.Line(new Color(1, 1, 1), piece[piece.Count - 1], piece[0]);
             }
         }
 

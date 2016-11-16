@@ -15,9 +15,13 @@ namespace NanoGames.Games.Banana
 
         public bool HasFinished = false;
 
+        public double Radius = 5;
+        
         private Vector velocity = new Vector(0, 0);
 
-        private int[,] circle;
+        private double speedProjectile;
+
+        private double lengthGun = 2;
 
         private double angle = 0;
         private double realAngle = 0;
@@ -30,17 +34,18 @@ namespace NanoGames.Games.Banana
         private int countUp = 0;
         private int countDown = 0;
         private int countFire = 0;
+        private int waitFire = 0;
         private int idxWeapon = 0;
         private string[] weapons = new string[] { "Gun", "Grenade" };
         private bool looksRight;
 
         public void GetBorn()
         {
-            Position.X = Match.Random.NextDouble() * 320;
-            Position.Y = 10;
-
-            circle = circleToPixel(Position);
-
+            int tmp1 = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border.Count - 1));
+            int tmp2 = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border[tmp1].Count -1));
+            
+            Position = Match.Land.Border[tmp1][tmp2];
+            
             power = 0;
 
             angle = Match.Random.NextDouble() * Math.PI - Math.PI / 2;
@@ -88,7 +93,8 @@ namespace NanoGames.Games.Banana
                 }
 
                 /* Draw the Gun of the player. */
-                Output.Graphics.Line(color, player.Position, new Vector(player.Position.X + lengthGun * Math.Cos(player.realAngle), player.Position.Y - lengthGun * Math.Sin(player.realAngle)));
+                Output.Graphics.Line(color, new Vector(player.Position.X + Radius * Math.Cos(player.realAngle), player.Position.Y - Radius * Math.Sin(player.realAngle)),
+                    new Vector(player.Position.X + lengthGun * Math.Cos(player.realAngle), player.Position.Y - lengthGun * Math.Sin(player.realAngle)));
             }
 
             /* Draw all the bullets. */
@@ -109,7 +115,6 @@ namespace NanoGames.Games.Banana
             // Draw Information on Screen
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 10), "ACTIVEPLAYER: " + Match.ActivePlayer.Name);
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 20), "REALANGLE: " + (Convert.ToInt32(Match.ActivePlayer.realAngle * 180 / Math.PI)).ToString());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 30), "SPEED: " + Convert.ToInt32((Match.ActivePlayer.speedProjectile) * 10).ToString());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 40), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "WEAPON: " + weapons[idxWeapon].ToUpper());
             Output.Graphics.Print(new Color(1, 1, 1), 10, new Vector(150, 20), Match.SecToGoInRound.ToString());
@@ -134,7 +139,7 @@ namespace NanoGames.Games.Banana
         }
 
         public void Move()
-        {/*
+        {
             int travel = 0;
             int order = Math.Sign(Match.Land.Directions[IdxPosition].X);
 
@@ -249,7 +254,7 @@ namespace NanoGames.Games.Banana
             else
             {
                 countRight = 0;
-            }*/
+            }
         }
 
         public void SetAngle()
@@ -369,17 +374,6 @@ namespace NanoGames.Games.Banana
         public void Fall()
         {
 
-        }
-
-        private int[,] circleToPixel(Vector position)
-        {
-            int x = (int)Math.Round(position.X);
-            int y = (int)Math.Round(position.Y);
-
-            return new int[,] { { x - 3, y}, { x - 3, y + 1 }, { x - 2, y + 2}, { x - 1, y + 3 },
-                                { x, y + 3 }, { x + 1, y + 3 }, { x + 2, y + 2}, { x + 3, y + 1},
-                                { x + 3, y}, { x + 3, y - 1 }, { x + 2, y - 2}, { x + 1, y - 3 },
-                                { x, y - 3 }, { x - 1, y - 3 }, { x - 2, y - 2}, { x - 3, y - 1},};
         }
 
     }
