@@ -88,17 +88,17 @@ namespace NanoGames.Games.Banana
                 case "ActivePlayerMoving":
                     
                     ActivePlayer.Move();
-                    ActivePlayer.SetAngle();
-                    ActivePlayer.SetWeapon();
-                    ActivePlayer.Shoot1();
+                    // ActivePlayer.SetAngle();
+                    // ActivePlayer.SetWeapon();
+                    // ActivePlayer.Shoot1();
                     break;
 
                 case "AnimationBeforeShoot":
-                    ActivePlayer.Shoot2();
+                    // ActivePlayer.Shoot2();
                     break;
 
                 case "AnimationShoot":
-                    ActivePlayer.Shoot3();
+                    // ActivePlayer.Shoot3();
                     break;
 
                 case "AnimationProjectileFly":

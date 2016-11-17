@@ -12,10 +12,11 @@ namespace NanoGames.Games.Banana
     class BananaPlayer : Player<BananaMatch>
     {
         public Vector Position = new Vector(0, 0);
+        public int[] PositionIndex = new int[2] { 0, 0};
 
         public bool HasFinished = false;
 
-        public double Radius = 5;
+        public double Radius = 3;
         
         private Vector velocity = new Vector(0, 0);
 
@@ -41,14 +42,14 @@ namespace NanoGames.Games.Banana
 
         public void GetBorn()
         {
-            int tmp1 = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border.Count - 1));
-            int tmp2 = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border[tmp1].Count -1));
+            PositionIndex[0] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border.Count - 1));
+            PositionIndex[1] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border[PositionIndex[0]].Count -1));
             
-            Position = Match.Land.Border[tmp1][tmp2];
+            Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
             
             power = 0;
 
-            angle = Match.Random.NextDouble() * Math.PI - Math.PI / 2;
+            refreshAngle();
 
             if (Match.Random.Next(0, 1) == 0)
             {
@@ -85,16 +86,11 @@ namespace NanoGames.Games.Banana
                 }
 
                 /* Draw the body of the player. */
-                Output.Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), Radius);
+                player.Draw(Output.Graphics, color);
                 if (player == Match.ActivePlayer)
                 {
-                    Output.Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), 0.9 * Radius);
-                    Output.Graphics.Circle(color, new Vector(player.Position.X, player.Position.Y), 0.8 * Radius);
+                    
                 }
-
-                /* Draw the Gun of the player. */
-                Output.Graphics.Line(color, new Vector(player.Position.X + Radius * Math.Cos(player.realAngle), player.Position.Y - Radius * Math.Sin(player.realAngle)),
-                    new Vector(player.Position.X + lengthGun * Math.Cos(player.realAngle), player.Position.Y - lengthGun * Math.Sin(player.realAngle)));
             }
 
             /* Draw all the bullets. */
@@ -115,6 +111,7 @@ namespace NanoGames.Games.Banana
             // Draw Information on Screen
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 10), "ACTIVEPLAYER: " + Match.ActivePlayer.Name);
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 20), "REALANGLE: " + (Convert.ToInt32(Match.ActivePlayer.realAngle * 180 / Math.PI)).ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 30), "ANGLE: " + (Convert.ToInt32(Match.ActivePlayer.angle * 180 / Math.PI)).ToString());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 40), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "WEAPON: " + weapons[idxWeapon].ToUpper());
             Output.Graphics.Print(new Color(1, 1, 1), 10, new Vector(150, 20), Match.SecToGoInRound.ToString());
@@ -140,169 +137,57 @@ namespace NanoGames.Games.Banana
 
         public void Move()
         {
-            int travel = 0;
-            int order = Math.Sign(Match.Land.Directions[IdxPosition].X);
+            int step = 0;
 
             if (Input.Left.WasActivated)
             {
-                if (countLeft < wait)
-                {
-                    travel = -2; 
-                }
-
-                else
-                {
-                    travel = -4;
-                }
+                if (countLeft < wait) { step = -1; }
+                else { step = -3; }
             }
 
             if (Input.Right.WasActivated)
             {
-                if (countRight < wait)
-                {
-                    travel = 2;
-                }
-
-                else
-                {
-                    travel = 4;
-                }
+                if (countRight < wait) { step = 1; }
+                else { step = 3; }
             }
 
-            if (travel != 0)
+            if (Input.Left.IsPressed) { countLeft++; }
+            else { countLeft = 0; }
+
+            if (Input.Right.IsPressed) { countRight++; }
+            else { countRight = 0; }
+
+            if (step != 0)
             {
+                PositionIndex[1] += step;
+                PositionIndex[1] = mod(PositionIndex[1], Match.Land.Border[PositionIndex[0]].Count);
+                Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
 
-                if (travel < 0)
-                {
-                    looksRight = false;
-                }
-                else
-                {
-                    looksRight = true;
-                }
-
-                int orientation = Math.Sign(order * travel);
-                int idx1 = IdxPosition;
-                int idx2 = IdxPosition + orientation;
-                int order1 = Math.Sign(Match.Land.Directions[idx1].X);
-                int order2 = Math.Sign(Match.Land.Directions[idx2].X);
-
-                double dist2pointRight = (Match.Land.Points[IdxPosition + 1] - Position).Length;
-                double dist2pointLeft = (Match.Land.Points[IdxPosition] - Position).Length;
-
-                if (orientation == 1)
-                {
-                    if (Math.Abs(travel) >= (Match.Land.Points[IdxPosition + 1] - Position).Length)
-                    {
-                        if (order1 == order2)
-                        {
-                            IdxPosition = idx2;
-                        }
-
-                        if ()
-                    }
-
-                    Position = Match.Land.Points[IdxPosition + 1];
-
-                    if (Match.Land.Directions[IdxPosition].X > 0 && Match.Land.Directions[IdxPosition + 1].X < 0)
-                    {
-                        
-                    }
-
-                    if (Match.Land.Directions[IdxPosition].X < 0 && Match.Land.Directions[IdxPosition + 1].X > 0)
-                    {
-                        Match.StateOfGame = "ActivePLayerFalling";
-                    }
-
-                    if (Match.Land.Directions[IdxPosition].X < 0 && Match.Land.Directions[IdxPosition + 1].X < 0)
-                    {
-                        IdxPosition -= 1;
-                    }
-                }
-
-                if (dist2travel >= dist2pointLeft && !looksRight)
-                {
-                    Position = Match.Land.Points[IdxPosition];
-
-                    if (Match.Land.Directions[IdxPosition].X * Match.Land.Directions[IdxPosition - 1].X < 0)
-                    {
-                        IdxPosition -= 1;
-                    }
-                }
-
-                else
-                {
-                    Position += travel * Match.Land.Directions[IdxPosition] * Math.Sign(Match.Land.Directions[IdxPosition].X);
-                }
+                refreshAngle();
 
                 Output.Audio.Play(Sounds.Walk);
             }
-            
-            if (Input.Left.IsPressed)
-            {
-                countLeft++;
-            }
-            else
-            {
-                countLeft = 0;
-            }
-
-            if (Input.Right.IsPressed)
-            {
-                countRight++;
-            }
-            else
-            {
-                countRight = 0;
-            }
         }
-
+        /*
         public void SetAngle()
         {
             if (Input.Up.WasActivated)
             {
+                if (countUp < wait) { angle += 1 * Math.PI / 180; }
+                else { angle += 5 * Math.PI / 180; }
+            }
 
-                if (countUp < wait)
-                {
-                    angle += 1 * Math.PI / 180;
-                }
+            if (Input.Down.WasActivated)
+            {
+                if (countDown < wait) { angle -= 1 * Math.PI / 180; }
+                else { angle -= 5 * Math.PI / 180; }
+            }
 
-                else
-                {
-                    angle += 5 * Math.PI / 180;
-                }
-             }
+            if (Input.Up.IsPressed) { countUp++; }
+            else { countUp = 0; }
 
-             if (Input.Down.WasActivated)
-             {
-                if (countDown < wait)
-                {
-                    angle -= 1 * Math.PI / 180;
-                }
-
-                else
-                {
-                    angle -= 5 * Math.PI / 180;
-                }
-             }
-
-             if (Input.Up.IsPressed)
-             {
-                 countUp++;
-             }
-             else
-             {
-                 countUp = 0;
-             }
-              
-             if (Input.Down.IsPressed)
-             {
-                 countDown++;
-             }
-             else
-             {
-                 countDown = 0;
-             }
+            if (Input.Down.IsPressed) { countDown++; }
+            else { countDown = 0; }
 
             if (angle > Math.PI / 2)
             {
@@ -374,6 +259,30 @@ namespace NanoGames.Games.Banana
         public void Fall()
         {
 
+        }
+        */
+
+        private void refreshAngle()
+        {
+            double tmp = 0;
+            for (int i = 1; i <= 3; i++ )
+            {
+                tmp += (Match.Land.Border[PositionIndex[0]][PositionIndex[1]].Y - Match.Land.Border[PositionIndex[0]][mod(PositionIndex[1] + i, Match.Land.Border[PositionIndex[0]].Count)].Y) / i;
+                tmp -= (Match.Land.Border[PositionIndex[0]][PositionIndex[1]].Y - Match.Land.Border[PositionIndex[0]][mod(PositionIndex[1] - i, Match.Land.Border[PositionIndex[0]].Count)].Y) / i;
+            }
+
+            angle = Math.Tan(tmp / 7);            
+        }
+
+        public void Draw(IGraphics g, Color c)
+        {
+            g.Circle(c, Position, Radius);
+            g.Line(c, Position, Position + 7 * new Vector(Math.Sin(angle), Math.Cos(angle)));
+        }
+
+        private int mod(int x, int m)
+        {
+            return (x % m + m) % m;
         }
 
     }
