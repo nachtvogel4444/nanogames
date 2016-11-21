@@ -14,6 +14,7 @@ namespace NanoGames.Games.Banana
         public bool[,] IsSolid = new bool[321, 201];
         public bool[,] IsBorder = new bool[321, 201];
         public List<List<Vector>> Border = new List<List<Vector>>();
+        public List<List<Vector>> Normal = new List<List<Vector>>();
 
         public void CreateBlock(Vector p1, Vector p2)
         {
@@ -35,8 +36,8 @@ namespace NanoGames.Games.Banana
 
         public void Refresh()
         {
-            IsBorder = getBorder(IsSolid);
-            refreshBorderList(IsBorder);
+            IsBorder = getBorder();
+            refreshBorder();
         }
 
         private bool[,] addLayer(bool[,] input, int count)
@@ -67,10 +68,10 @@ namespace NanoGames.Games.Banana
             return addLayer(output, count - 1);
         }
 
-        private bool[,] getBorder(bool[,] input)
+        private bool[,] getBorder()
         {
-            int n = input.GetLength(0);
-            int m = input.GetLength(1);
+            int n = IsSolid.GetLength(0);
+            int m = IsSolid.GetLength(1);
 
             bool[,] output = new bool[n, m];
 
@@ -78,16 +79,16 @@ namespace NanoGames.Games.Banana
             {
                 for (int y = 0; y < m; y++)
                 {
-                    if (input[x, y])
+                    if (IsSolid[x, y])
                     {
                         output[x, y] = ((x < 1) ||
                                         (x > 319) ||
                                         (y < 1) ||
                                         (y > 199) ||
-                                        (input[x - 1, y] == false) ||
-                                        (input[x + 1, y] == false) ||
-                                        (input[x, y - 1] == false) ||
-                                        (input[x, y + 1] == false));
+                                        (IsSolid[x - 1, y] == false) ||
+                                        (IsSolid[x + 1, y] == false) ||
+                                        (IsSolid[x, y - 1] == false) ||
+                                        (IsSolid[x, y + 1] == false));
                     }
                 }
             }
@@ -95,12 +96,13 @@ namespace NanoGames.Games.Banana
             return output;
         }
 
-        private void refreshBorderList(bool[,] input)
+        private void refreshBorder()
         {
             Border.Clear();
+            Normal.Clear();
 
-            int n = input.GetLength(0);
-            int m = input.GetLength(1);
+            int n = IsBorder.GetLength(0);
+            int m = IsBorder.GetLength(1);
             
             bool[,] wasTaken = new bool[n, m];
 
@@ -108,26 +110,45 @@ namespace NanoGames.Games.Banana
             {
                 for (int y = 0; y < m; y++)
                 {
-                    if (input[x, y] && !wasTaken[x, y])
+                    if (IsBorder[x, y] && !wasTaken[x, y])
                     {
                         int xx = x;
                         int yy = y;
                         Border.Add(new List<Vector>());
+                        Normal.Add(new List<Vector>());
 
                         while (!wasTaken[xx, yy])
                         {
-                            Border[Border.Count - 1].Add(new Vector(xx, yy));
+                            Vector p = new Vector(xx, yy);
 
+                            Border[Border.Count - 1].Add(p);
                             wasTaken[xx, yy] = true;
 
-                            if (input[xx + 1, yy] && !wasTaken[xx + 1, yy]) { xx++; continue; }
-                            if (input[xx + 1, yy + 1] && !wasTaken[xx + 1, yy + 1]) { xx++; yy++; continue; }
-                            if (input[xx, yy + 1] && !wasTaken[xx, yy + 1]) { yy++; continue; }
-                            if (input[xx - 1, yy + 1] && !wasTaken[xx - 1, yy + 1]) { xx--; yy++; continue; }
-                            if (input[xx - 1, yy] && !wasTaken[xx - 1, yy]) { xx--; continue; }
-                            if (input[xx - 1, yy - 1] && !wasTaken[xx - 1, yy - 1]) { xx--; yy--; continue; }
-                            if (input[xx, yy - 1] && !wasTaken[xx, yy - 1]) { yy--; continue; }
-                            if (input[xx + 1, yy - 1] && !wasTaken[xx + 1, yy - 1]) { xx++; yy--; continue; }
+                            Vector s = new Vector(0, 0);
+                            for (int k = -2; k <= 2; k++)
+                            {
+                                for (int l = -2; l <= 2; l++)
+                                {
+                                    if (((xx + k) < 320) && ((xx + k) > 0) && ((yy + l) < 200) && ((yy + l) > 0))
+                                    {
+                                        if (IsSolid[xx + k, yy + l])
+                                                           {
+                                            s += new Vector(k, l);
+                                        }
+                                    }
+                                   
+                                }
+                            }
+                            Normal[Normal.Count - 1].Add(-s.Normalized);
+
+                            if (IsBorder[xx + 1, yy] && !wasTaken[xx + 1, yy]) { xx++; continue; }
+                            if (IsBorder[xx + 1, yy + 1] && !wasTaken[xx + 1, yy + 1]) { xx++; yy++; continue; }
+                            if (IsBorder[xx, yy + 1] && !wasTaken[xx, yy + 1]) { yy++; continue; }
+                            if (IsBorder[xx - 1, yy + 1] && !wasTaken[xx - 1, yy + 1]) { xx--; yy++; continue; }
+                            if (IsBorder[xx - 1, yy] && !wasTaken[xx - 1, yy]) { xx--; continue; }
+                            if (IsBorder[xx - 1, yy - 1] && !wasTaken[xx - 1, yy - 1]) { xx--; yy--; continue; }
+                            if (IsBorder[xx, yy - 1] && !wasTaken[xx, yy - 1]) { yy--; continue; }
+                            if (IsBorder[xx + 1, yy - 1] && !wasTaken[xx + 1, yy - 1]) { xx++; yy--; continue; }
                         }
 
                         

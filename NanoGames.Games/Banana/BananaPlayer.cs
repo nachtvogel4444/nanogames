@@ -12,11 +12,12 @@ namespace NanoGames.Games.Banana
     class BananaPlayer : Player<BananaMatch>
     {
         public Vector Position = new Vector(0, 0);
-        public int[] PositionIndex = new int[2] { 0, 0};
+        public int[] PositionIndex = new int[2] { 0, 0 };
+        public Vector Normal = new Vector(0, 0);
+        public double Alpha = 0;
 
         public bool HasFinished = false;
-
-        public double Radius = 3;
+        public double Radius = 4;
         
         private Vector velocity = new Vector(0, 0);
 
@@ -24,8 +25,8 @@ namespace NanoGames.Games.Banana
 
         private double lengthGun = 2;
 
-        private double angle = 0;
-        private double realAngle = 0;
+        private double localAiming = 0;
+        private double aiming = 0;
         private double power = 0;
         private double powerMax = 100;
 
@@ -46,20 +47,20 @@ namespace NanoGames.Games.Banana
             PositionIndex[1] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border[PositionIndex[0]].Count -1));
             
             Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
-            
+            Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
+            Alpha = Math.Atan2(Normal.Y, Normal.X);
+
             power = 0;
-
-            refreshAngle();
-
+            
             if (Match.Random.Next(0, 1) == 0)
             {
                 looksRight = false;
-                realAngle = -angle + Math.PI;
+                aiming = -localAiming + Math.PI;
             }
             else
             {
                 looksRight = true;
-                realAngle = angle;
+                aiming = localAiming;
             }
         }
         
@@ -110,10 +111,11 @@ namespace NanoGames.Games.Banana
             
             // Draw Information on Screen
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 10), "ACTIVEPLAYER: " + Match.ActivePlayer.Name);
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 20), "REALANGLE: " + (Convert.ToInt32(Match.ActivePlayer.realAngle * 180 / Math.PI)).ToString());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 30), "ANGLE: " + (Convert.ToInt32(Match.ActivePlayer.angle * 180 / Math.PI)).ToString());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 40), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "WEAPON: " + weapons[idxWeapon].ToUpper());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 20), "AIMING: " + (Convert.ToInt32(Match.ActivePlayer.aiming * 180 / Math.PI)).ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 30), "LOCALAIMING: " + (Convert.ToInt32(Match.ActivePlayer.localAiming * 180 / Math.PI)).ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 40), "ALPHA: " + (Convert.ToInt32(Alpha * 180 / Math.PI)).ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "WEAPON: " + weapons[idxWeapon].ToUpper());
             Output.Graphics.Print(new Color(1, 1, 1), 10, new Vector(150, 20), Match.SecToGoInRound.ToString());
 
             if (Match.Wind.Speed >= 0)
@@ -141,14 +143,30 @@ namespace NanoGames.Games.Banana
 
             if (Input.Left.WasActivated)
             {
-                if (countLeft < wait) { step = -1; }
-                else { step = -3; }
+                looksRight = false;
+
+                if (countLeft < wait)
+                {
+                    step = -1;
+                }
+                else
+                {
+                    step = -3;
+                }
             }
 
             if (Input.Right.WasActivated)
             {
-                if (countRight < wait) { step = 1; }
-                else { step = 3; }
+                looksRight = true;
+
+                if (countRight < wait)
+                {
+                    step = 1;
+                }
+                else
+                {
+                    step = 3;
+                }
             }
 
             if (Input.Left.IsPressed) { countLeft++; }
@@ -162,25 +180,38 @@ namespace NanoGames.Games.Banana
                 PositionIndex[1] += step;
                 PositionIndex[1] = mod(PositionIndex[1], Match.Land.Border[PositionIndex[0]].Count);
                 Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
-
-                refreshAngle();
-
+                Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
+                Alpha = Math.Atan2(Normal.Y, Normal.X);
+                aiming += Alpha; 
+               
                 Output.Audio.Play(Sounds.Walk);
             }
         }
-        /*
+        
         public void SetAngle()
         {
             if (Input.Up.WasActivated)
             {
-                if (countUp < wait) { angle += 1 * Math.PI / 180; }
-                else { angle += 5 * Math.PI / 180; }
+                if (countUp < wait)
+                {
+                    localAiming -= 1 * Math.PI / 180;
+                }
+                else
+                {
+                    localAiming -= 5 * Math.PI / 180;
+                }
             }
 
             if (Input.Down.WasActivated)
             {
-                if (countDown < wait) { angle -= 1 * Math.PI / 180; }
-                else { angle -= 5 * Math.PI / 180; }
+                if (countDown < wait)
+                {
+                    localAiming += 1 * Math.PI / 180;
+                }
+                else
+                {
+                    localAiming += 5 * Math.PI / 180;
+                }
             }
 
             if (Input.Up.IsPressed) { countUp++; }
@@ -189,26 +220,26 @@ namespace NanoGames.Games.Banana
             if (Input.Down.IsPressed) { countDown++; }
             else { countDown = 0; }
 
-            if (angle > Math.PI / 2)
+            if (localAiming < 0)
             {
-                angle = Math.PI / 2;
+                localAiming = 0;
             }
 
-            if (angle < - Math.PI / 2)
+            if (localAiming > (120.0 / 180 * Math.PI))
             {
-                angle = - Math.PI / 2;
+                localAiming = 120.0 / 180 * Math.PI;
             }
 
             if (looksRight)
             {
-                realAngle = angle;
+                aiming = Alpha + localAiming;
             }
             else
             {
-                realAngle = -angle + Math.PI;
+                aiming = Alpha - localAiming;
             }
         }
-
+        
         public void Shoot1()
         {
             if (Input.Fire.WasActivated)
@@ -234,8 +265,8 @@ namespace NanoGames.Games.Banana
         {
             if (weapons[idxWeapon] == "Gun")
             {
-                Vector velocity = speedProjectile * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
-                Vector position = Position + (Radius + speedProjectile) * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
+                Vector velocity = speedProjectile * new Vector(Math.Cos(aiming), -Math.Sin(aiming));
+                Vector position = Position + (Radius + speedProjectile) * new Vector(Math.Cos(aiming), -Math.Sin(aiming));
 
                 Output.Audio.Play(Sounds.GunFire);
 
@@ -244,8 +275,8 @@ namespace NanoGames.Games.Banana
 
             if (weapons[idxWeapon] == "Grenade")
             {
-                Vector velocity = speedProjectile * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
-                Vector position = Position + (Radius + speedProjectile +4) * new Vector(Math.Cos(realAngle), -Math.Sin(realAngle));
+                Vector velocity = speedProjectile * new Vector(Math.Cos(aiming), -Math.Sin(aiming));
+                Vector position = Position + (Radius + speedProjectile +4) * new Vector(Math.Cos(aiming), -Math.Sin(aiming));
 
                 Output.Audio.Play(Sounds.GrenadeFire);
 
@@ -260,30 +291,24 @@ namespace NanoGames.Games.Banana
         {
 
         }
-        */
-
-        private void refreshAngle()
-        {
-            double tmp = 0;
-            for (int i = 1; i <= 3; i++ )
-            {
-                tmp += (Match.Land.Border[PositionIndex[0]][PositionIndex[1]].Y - Match.Land.Border[PositionIndex[0]][mod(PositionIndex[1] + i, Match.Land.Border[PositionIndex[0]].Count)].Y) / i;
-                tmp -= (Match.Land.Border[PositionIndex[0]][PositionIndex[1]].Y - Match.Land.Border[PositionIndex[0]][mod(PositionIndex[1] - i, Match.Land.Border[PositionIndex[0]].Count)].Y) / i;
-            }
-
-            angle = Math.Tan(tmp / 7);            
-        }
-
+        
         public void Draw(IGraphics g, Color c)
         {
-            g.Circle(c, Position, Radius);
-            g.Line(c, Position, Position + 7 * new Vector(Math.Sin(angle), Math.Cos(angle)));
+            /* Body of the player */
+            g.CircleSegment(c, Position + 1 * Normal, 2, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
+            g.CircleSegment(c, Position + 1 * Normal, 3, Alpha - Math.PI / 2, Alpha + Math.PI / 2);
+            g.Line(c, Position + 1 * Normal + 3 * new Vector(-Normal.Y, Normal.X), Position + 1 * Normal + 3 * new Vector(Normal.Y, -Normal.X));
+
+            /* Gun */
+            g.Line(c, Position + 5 * Normal, Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming)));
+
         }
 
         private int mod(int x, int m)
         {
             return (x % m + m) % m;
         }
+
 
     }
 }
