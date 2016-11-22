@@ -25,7 +25,7 @@ namespace NanoGames.Games.Banana
 
         private double lengthGun = 2;
 
-        private double localAiming = 0;
+        private double localAiming = 0.25 * Math.PI;
         private double aiming = 0;
         private double power = 0;
         private double powerMax = 100;
@@ -36,7 +36,7 @@ namespace NanoGames.Games.Banana
         private int countUp = 0;
         private int countDown = 0;
         private int countFire = 0;
-        private int waitFire = 0;
+        private int waitFire = 120;
         private int idxWeapon = 0;
         private string[] weapons = new string[] { "Gun", "Grenade" };
         private bool looksRight;
@@ -50,17 +50,19 @@ namespace NanoGames.Games.Banana
             Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
             Alpha = Math.Atan2(Normal.Y, Normal.X);
 
-            power = 0;
+            power = 1;
+            idxWeapon = 0;
+            
             
             if (Match.Random.Next(0, 1) == 0)
             {
                 looksRight = false;
-                aiming = -localAiming + Math.PI;
+                aiming = Alpha - localAiming;
             }
             else
             {
                 looksRight = true;
-                aiming = localAiming;
+                aiming = Alpha + localAiming;
             }
         }
         
@@ -220,14 +222,14 @@ namespace NanoGames.Games.Banana
             if (Input.Down.IsPressed) { countDown++; }
             else { countDown = 0; }
 
-            if (localAiming < 0)
+            if (localAiming < 10.0 / 180 * Math.PI)
             {
-                localAiming = 0;
+                localAiming = 10.0 / 180 * Math.PI;
             }
 
-            if (localAiming > (120.0 / 180 * Math.PI))
+            if (localAiming > (115.0 / 180 * Math.PI))
             {
-                localAiming = 120.0 / 180 * Math.PI;
+                localAiming = 115.0 / 180 * Math.PI;
             }
 
             if (looksRight)
@@ -251,22 +253,22 @@ namespace NanoGames.Games.Banana
 
         public void Shoot2()
         {
-            speedProjectile = 2;// 1 + countFire * 9.0 / waitFire;
+            speedProjectile = 1 + 9.0 * countFire / waitFire;
             
             if (!Input.Fire.IsPressed || countFire > waitFire)
             {
                 Match.StateOfGame = "AnimationShoot";
             }
 
-                countFire++;
+            countFire++;
         }
 
         public void Shoot3()
         {
             if (weapons[idxWeapon] == "Gun")
             {
-                Vector velocity = speedProjectile * new Vector(Math.Cos(aiming), -Math.Sin(aiming));
-                Vector position = Position + (Radius + speedProjectile) * new Vector(Math.Cos(aiming), -Math.Sin(aiming));
+                Vector velocity = speedProjectile * new Vector(Math.Cos(aiming), Math.Sin(aiming));
+                Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
 
                 Output.Audio.Play(Sounds.GunFire);
 
@@ -276,7 +278,7 @@ namespace NanoGames.Games.Banana
             if (weapons[idxWeapon] == "Grenade")
             {
                 Vector velocity = speedProjectile * new Vector(Math.Cos(aiming), -Math.Sin(aiming));
-                Vector position = Position + (Radius + speedProjectile +4) * new Vector(Math.Cos(aiming), -Math.Sin(aiming));
+                Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
 
                 Output.Audio.Play(Sounds.GrenadeFire);
 

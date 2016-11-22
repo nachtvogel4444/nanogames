@@ -61,7 +61,7 @@ namespace NanoGames.Games.Banana
             activePlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));
             ActivePlayer = Players[activePlayerIdx];
 
-            Wind.SetSpeed(Random);
+            Wind.SetSpeed(0);
         }
 
         protected override void Update()
@@ -74,7 +74,7 @@ namespace NanoGames.Games.Banana
                 activePlayerIdx = activePlayerIdx % Players.Count;
                 ActivePlayer = Players[activePlayerIdx];
                 frameCountMove = 0;
-                Wind.SetSpeed(Random);
+                // Wind.SetSpeed(Random);
                 StateOfGame = "ActivePlayerMoving";
             }
 
@@ -254,7 +254,22 @@ namespace NanoGames.Games.Banana
         {
             foreach (SimpleBullet bullet in ListBullets)
             {
-                
+                foreach (List<Vector> block in Land.Border)
+                {
+                    for (int i = 0; i < block.Count - 1; i++)
+                    {
+                        Intersection intersection = new Intersection(bullet.Position, bullet.PositionBefore, block[i], block[i + 1]);
+
+                        if (intersection.IsTrue)
+                        {
+                            bullet.IsExploded = true;
+                            Land.makeCaldera(intersection.Point);
+                            Output.Audio.Play(Sounds.Explosion);
+
+                            return;
+                        }
+                    }
+                }
                 
             }
         }

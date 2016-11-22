@@ -30,7 +30,12 @@ namespace NanoGames.Games.Banana
             p = Math.Sqrt(-2 * Math.Log(q) / q);
 
             Speed = u1 * p * sigma + mean;
-            
         }
+
+        public void SetSpeed(double speed)
+        {
+            Speed = speed;
+        }
+           
     }
 }

@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace NanoGames.Games.Banana
 {
-    class Intersection
+    internal class Intersection
     {
         public bool Exists = false;
         public bool InSegment1 = false;
         public bool InSegment2 = false;
-        public bool OfSegments = false;
+        public bool IsTrue = false;
         public Vector Point;
 
         public Intersection(Vector p11, Vector p12, Vector p21, Vector p22)
@@ -37,24 +37,33 @@ namespace NanoGames.Games.Banana
                 Point.X = (B2 * C1 - B1 * C2) / det;
                 Point.Y = (A1 * C2 - A2 * C1) / det;
 
-                if ((Math.Min(p11.X, p12.X) <= Point.X) && (Math.Max(p11.X, p12.X) >= Point.X) &&
-                    (Math.Max(p11.Y, p12.Y) >= Point.Y) && (Math.Max(p11.Y, p12.Y) >= Point.Y))
+                if ((Math.Min(p11.X, p12.X) <= 1.01 * Point.X) && (Math.Max(p11.X, p12.X) >= 0.99 * Point.X) &&
+                    (Math.Min(p11.Y, p12.Y) <= 1.01 * Point.Y) && (Math.Max(p11.Y, p12.Y) >= 0.99 * Point.Y))
                 {
                     InSegment1 = true;
                 }
 
-                if ((Math.Min(p21.X, p22.X) <= Point.X) && (Math.Max(p21.X, p22.X) >= Point.X) &&
-                    (Math.Max(p21.Y, p22.Y) >= Point.Y) && (Math.Max(p21.Y, p22.Y) >= Point.Y))
+                if ((Math.Min(p21.X, p22.X) <= 1.01 * Point.X) && (Math.Max(p21.X, p22.X) >= 0.99 * Point.X) &&
+                    (Math.Min(p21.Y, p22.Y) <= 1.01 * Point.Y) && (Math.Max(p21.Y, p22.Y) >= 0.99 * Point.Y))
                 {
                     InSegment2 = true;
                 }
 
                 if (InSegment1 && InSegment2)
                 {
-                    OfSegments = true;
+                    IsTrue = true;
                 }
             }
 
+        }
+
+        public Intersection(Vector a, Vector b, Vector c)
+        {
+            Vector ab = b - a;
+            Vector ac = c - a;
+            double cross = ab.X * ac.Y - ab.Y * ab.X;
+
+            IsTrue = true;
         }
 
     }

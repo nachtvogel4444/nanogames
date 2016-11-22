@@ -116,39 +116,89 @@ namespace NanoGames.Games.Banana
                         int yy = y;
                         Border.Add(new List<Vector>());
                         Normal.Add(new List<Vector>());
+                        int now = 10;
+                        int last = 11;
 
                         while (!wasTaken[xx, yy])
                         {
-                            Vector p = new Vector(xx, yy);
-
-                            Border[Border.Count - 1].Add(p);
                             wasTaken[xx, yy] = true;
 
-                            Vector s = new Vector(0, 0);
-                            for (int k = -2; k <= 2; k++)
+                            if (true)
                             {
-                                for (int l = -2; l <= 2; l++)
+                                Vector s = new Vector(0, 0);
+                                for (int k = -2; k <= 2; k++)
                                 {
-                                    if (((xx + k) < 320) && ((xx + k) > 0) && ((yy + l) < 200) && ((yy + l) > 0))
+                                    for (int l = -2; l <= 2; l++)
                                     {
-                                        if (IsSolid[xx + k, yy + l])
-                                                           {
-                                            s += new Vector(k, l);
+                                        if (((xx + k) < 320) && ((xx + k) > 0) && ((yy + l) < 200) && ((yy + l) > 0))
+                                        {
+                                            if (IsSolid[xx + k, yy + l])
+                                            {
+                                                s += new Vector(k, l);
+                                            }
                                         }
-                                    }
-                                   
-                                }
-                            }
-                            Normal[Normal.Count - 1].Add(-s.Normalized);
 
-                            if (IsBorder[xx + 1, yy] && !wasTaken[xx + 1, yy]) { xx++; continue; }
-                            if (IsBorder[xx + 1, yy + 1] && !wasTaken[xx + 1, yy + 1]) { xx++; yy++; continue; }
-                            if (IsBorder[xx, yy + 1] && !wasTaken[xx, yy + 1]) { yy++; continue; }
-                            if (IsBorder[xx - 1, yy + 1] && !wasTaken[xx - 1, yy + 1]) { xx--; yy++; continue; }
-                            if (IsBorder[xx - 1, yy] && !wasTaken[xx - 1, yy]) { xx--; continue; }
-                            if (IsBorder[xx - 1, yy - 1] && !wasTaken[xx - 1, yy - 1]) { xx--; yy--; continue; }
-                            if (IsBorder[xx, yy - 1] && !wasTaken[xx, yy - 1]) { yy--; continue; }
-                            if (IsBorder[xx + 1, yy - 1] && !wasTaken[xx + 1, yy - 1]) { xx++; yy--; continue; }
+                                    }
+                                }
+
+                                Normal[Normal.Count - 1].Add(-s.Normalized);
+                                Border[Border.Count - 1].Add(new Vector(xx, yy));
+                            }
+
+                            last = now;
+
+                            if (IsBorder[xx + 1, yy] && !wasTaken[xx + 1, yy])
+                            {
+                                xx++;
+                                now = 1;
+                                continue;
+                            }
+                            if (IsBorder[xx + 1, yy + 1] && !wasTaken[xx + 1, yy + 1])
+                            {
+                                xx++;
+                                yy++;
+                                now = 2;
+                                continue;
+                            }
+                            if (IsBorder[xx, yy + 1] && !wasTaken[xx, yy + 1])
+                            {
+                                yy++;
+                                now = 3;
+                                continue;
+                            }
+                            if (IsBorder[xx - 1, yy + 1] && !wasTaken[xx - 1, yy + 1])
+                            {
+                                xx--;
+                                yy++;
+                                now = 4;
+                                continue;
+                            }
+                            if (IsBorder[xx - 1, yy] && !wasTaken[xx - 1, yy])
+                            {
+                                xx--;
+                                now = 5;
+                                continue;
+                            }
+                            if (IsBorder[xx - 1, yy - 1] && !wasTaken[xx - 1, yy - 1])
+                            {
+                                xx--;
+                                yy--;
+                                now = 6;
+                                continue;
+                            }
+                            if (IsBorder[xx, yy - 1] && !wasTaken[xx, yy - 1])
+                            {
+                                yy--;
+                                now = 7;
+                                continue;
+                            }
+                            if (IsBorder[xx + 1, yy - 1] && !wasTaken[xx + 1, yy - 1])
+                            {
+                                xx++;
+                                yy--;
+                                now = 8;
+                                continue;
+                            }
                         }
 
                         
@@ -157,6 +207,22 @@ namespace NanoGames.Games.Banana
             }
             
         } 
+
+        public void makeCaldera(Vector position)
+        {
+            for (int i = (int)position.X - 4; i <= (int)position.X + 4; i++)
+            {
+                for (int j = (int)position.Y - 4; j <= (int)position.Y + 4; j++)
+                {
+                    if ((position - new Vector(i, j)).Length <= 3)
+                    {
+                        IsSolid[i, j] = false;
+                    }
+                }
+            }
+
+            Refresh();
+        }
 
         public void Draw(IGraphics g)
         {
