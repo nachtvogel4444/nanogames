@@ -116,92 +116,47 @@ namespace NanoGames.Games.Banana
                         int yy = y;
                         Border.Add(new List<Vector>());
                         Normal.Add(new List<Vector>());
-                        int now = 10;
-                        int last = 11;
 
-                        while (!wasTaken[xx, yy])
+                        int last = 0;
+                        int[,] mylist = new int[8, 2] { { -1, -1 }, { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { -1, 1 }, { -1, 0 } };
+
+                        // while (!wasTaken[xx, yy])
+                        do
                         {
                             wasTaken[xx, yy] = true;
-
-                            if (true)
+                            
+                            Vector s = new Vector(0, 0);
+                            for (int k = -2; k <= 2; k++)
                             {
-                                Vector s = new Vector(0, 0);
-                                for (int k = -2; k <= 2; k++)
+                                for (int l = -2; l <= 2; l++)
                                 {
-                                    for (int l = -2; l <= 2; l++)
+                                    if (((xx + k) < 320) && ((xx + k) > 0) && ((yy + l) < 200) && ((yy + l) > 0))
                                     {
-                                        if (((xx + k) < 320) && ((xx + k) > 0) && ((yy + l) < 200) && ((yy + l) > 0))
+                                        if (IsSolid[xx + k, yy + l])
                                         {
-                                            if (IsSolid[xx + k, yy + l])
-                                            {
-                                                s += new Vector(k, l);
-                                            }
+                                            s += new Vector(k, l);
                                         }
-
                                     }
+
                                 }
+                            }
+                            
+                            Normal[Normal.Count - 1].Add(-s.Normalized);
+                            Border[Border.Count - 1].Add(new Vector(xx, yy));
+                           
+                            for (int k = 0; k < 8; k++)
+                            {
+                                int loc = mod(k + last, 7);
+                                if (IsBorder[xx + mylist[loc, 0], yy + mylist[loc, 1]])
+                                {
+                                    xx += mylist[loc, 0];
+                                    yy += mylist[loc, 1];
+                                    last = k;
+                                    break;
+                                }
+                            }
 
-                                Normal[Normal.Count - 1].Add(-s.Normalized);
-                                Border[Border.Count - 1].Add(new Vector(xx, yy));
-                            }
-
-                            last = now;
-
-                            if (IsBorder[xx + 1, yy] && !wasTaken[xx + 1, yy])
-                            {
-                                xx++;
-                                now = 1;
-                                continue;
-                            }
-                            if (IsBorder[xx + 1, yy + 1] && !wasTaken[xx + 1, yy + 1])
-                            {
-                                xx++;
-                                yy++;
-                                now = 2;
-                                continue;
-                            }
-                            if (IsBorder[xx, yy + 1] && !wasTaken[xx, yy + 1])
-                            {
-                                yy++;
-                                now = 3;
-                                continue;
-                            }
-                            if (IsBorder[xx - 1, yy + 1] && !wasTaken[xx - 1, yy + 1])
-                            {
-                                xx--;
-                                yy++;
-                                now = 4;
-                                continue;
-                            }
-                            if (IsBorder[xx - 1, yy] && !wasTaken[xx - 1, yy])
-                            {
-                                xx--;
-                                now = 5;
-                                continue;
-                            }
-                            if (IsBorder[xx - 1, yy - 1] && !wasTaken[xx - 1, yy - 1])
-                            {
-                                xx--;
-                                yy--;
-                                now = 6;
-                                continue;
-                            }
-                            if (IsBorder[xx, yy - 1] && !wasTaken[xx, yy - 1])
-                            {
-                                yy--;
-                                now = 7;
-                                continue;
-                            }
-                            if (IsBorder[xx + 1, yy - 1] && !wasTaken[xx + 1, yy - 1])
-                            {
-                                xx++;
-                                yy--;
-                                now = 8;
-                                continue;
-                            }
-                        }
-
-                        
+                        } while ((xx != x) || (yy != y));
                     }
                 }
             }
@@ -263,6 +218,11 @@ namespace NanoGames.Games.Banana
             return value;
         }
 
- 
+        private int mod(int x, int m)
+        {
+            return (x % m + m) % m;
+        }
+
+
     }
 }
