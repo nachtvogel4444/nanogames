@@ -47,6 +47,7 @@ namespace NanoGames.Games.Banana
 
         protected override void Initialize()
         {
+            // Land.CreateBlock(new Vector(100, 100), new Vector(104, 102));
             Land.CreateBlock(new Vector(100, 100), new Vector(130, 110));
             Land.CreateBlock(new Vector(120, 120), new Vector(190, 300));
             Land.CreateBlock(new Vector(150, 100), new Vector(300, 130));
@@ -101,6 +102,18 @@ namespace NanoGames.Games.Banana
                     ActivePlayer.Shoot3();
                     break;
 
+                case "PlayerFalling":
+                    foreach (var player in Players)
+                    {
+                        if (player.IsFalling)
+                        {
+                            player.Fall();
+                            CheckCollisionPlayerLand(player);
+                        }
+                    }
+
+                    break;
+
                 case "AnimationProjectileFly":
 
                     if (ListGrenades.Count != 0)
@@ -136,7 +149,7 @@ namespace NanoGames.Games.Banana
                         }
 
                         CheckCollisionBulletsLand();
-                        CheckCollisionBulletsPlayers();
+                        //CheckCollisionBulletsPlayers();
                         CheckCollisionBulletsScreen();
 
                         foreach (SimpleBullet bullet in ListBullets)
@@ -152,7 +165,8 @@ namespace NanoGames.Games.Banana
 
                     if (ListGrenades.Count == 0 && ListBullets.Count == 0)
                     {
-                        frameCountMove = frameCountMoveMax;
+                        frameCountMove = frameCountMoveMax - 30;
+                        StateOfGame = "ActivePlayerMoving";
                     }
                     
                     break;
@@ -264,6 +278,16 @@ namespace NanoGames.Games.Banana
                         {
                             bullet.IsExploded = true;
                             Land.makeCaldera(intersection.Point);
+
+                            foreach (var player in Players)
+                            {
+                                Land.checkPlayer(player);
+                                if (player.IsFalling)
+                                {
+                                    StateOfGame = "PlayerFalling";
+                                }
+                            }
+
                             Output.Audio.Play(Sounds.Explosion);
 
                             return;
@@ -316,6 +340,42 @@ namespace NanoGames.Games.Banana
                 if (grenade.Position.X < 0 || grenade.Position.X > 320 || grenade.Position.Y > 200)
                 {
                     grenade.IsExploded = true;
+                }
+            }
+        }
+
+        private void CheckCollisionPlayerLand(BananaPlayer player)
+        {
+            for (int i = 0; i < Land.Border.Count; i++)
+            {
+                var block = Land.Border[i];
+
+                for (int j = 0; j < block.Count - 1; j++)
+                {
+                    Intersection intersection = new Intersection(player.Position, player.PositionBefore, block[j], block[j + 1]);
+
+                    if (intersection.IsTrue)
+                    {
+                         if ((player.Position - block[j]).Length < (player.Position - block[j + 1]).Length)
+                        {
+                            player.Position = block[j];
+                            player.PositionIndex[0] = i;
+                            player.PositionIndex[1] = j;
+                        }
+
+                        else
+                        {
+                            player.Position = block[j + 1];
+                            player.PositionIndex[0] = i;
+                            player.PositionIndex[1] = j;
+                        }
+                        
+                        Output.Audio.Play(Sounds.Toc);
+
+                        StateOfGame = "ActivePlayerMoving";
+
+                        return;
+                    }
                 }
             }
         }

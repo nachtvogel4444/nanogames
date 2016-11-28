@@ -15,6 +15,7 @@ namespace NanoGames.Games.Banana
         public bool[,] IsBorder = new bool[321, 201];
         public List<List<Vector>> Border = new List<List<Vector>>();
         public List<List<Vector>> Normal = new List<List<Vector>>();
+        public bool IsHovering = false;
 
         public void CreateBlock(Vector p1, Vector p2)
         {
@@ -117,7 +118,7 @@ namespace NanoGames.Games.Banana
                         Border.Add(new List<Vector>());
                         Normal.Add(new List<Vector>());
 
-                        int last = 0;
+                        int last = 3;
                         int[,] mylist = new int[8, 2] { { -1, -1 }, { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { -1, 1 }, { -1, 0 } };
 
                         // while (!wasTaken[xx, yy])
@@ -146,12 +147,13 @@ namespace NanoGames.Games.Banana
                            
                             for (int k = 0; k < 8; k++)
                             {
-                                int loc = mod(k + last, 7);
+                                int loc = mod(last - 3 + k, 8);
+
                                 if (IsBorder[xx + mylist[loc, 0], yy + mylist[loc, 1]])
                                 {
                                     xx += mylist[loc, 0];
                                     yy += mylist[loc, 1];
-                                    last = k;
+                                    last = loc;
                                     break;
                                 }
                             }
@@ -177,6 +179,26 @@ namespace NanoGames.Games.Banana
             }
 
             Refresh();
+        }
+
+        public void checkPlayer(BananaPlayer player)
+        {
+            for (int i = 0; i < Border.Count; i++)
+            {
+                for (int j = 0; j < Border[i].Count; j++)
+                {
+                    if (player.Position == Border[i][j])
+                    {
+                        player.PositionIndex[0] = i;
+                        player.PositionIndex[1] = j;
+
+                        return;
+                    }
+                }
+            }
+
+            // player is hovering in air
+            player.IsFalling = true;
         }
 
         public void Draw(IGraphics g)

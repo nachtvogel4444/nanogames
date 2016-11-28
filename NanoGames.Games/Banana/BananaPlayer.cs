@@ -12,6 +12,7 @@ namespace NanoGames.Games.Banana
     class BananaPlayer : Player<BananaMatch>
     {
         public Vector Position = new Vector(0, 0);
+        public Vector PositionBefore = new Vector(0, 0);
         public int[] PositionIndex = new int[2] { 0, 0 };
         public Vector Normal = new Vector(0, 0);
         public double Alpha = 0;
@@ -22,6 +23,7 @@ namespace NanoGames.Games.Banana
         private Vector velocity = new Vector(0, 0);
 
         private double speedProjectile;
+        public bool IsFalling = false;
 
         private double lengthGun = 2;
 
@@ -179,12 +181,11 @@ namespace NanoGames.Games.Banana
 
             if (step != 0)
             {
-                PositionIndex[1] += step;
-                PositionIndex[1] = mod(PositionIndex[1], Match.Land.Border[PositionIndex[0]].Count);
+                PositionIndex[1] = mod(PositionIndex[1] + step, Match.Land.Border[PositionIndex[0]].Count);
                 Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
                 Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
                 Alpha = Math.Atan2(Normal.Y, Normal.X);
-                aiming += Alpha; 
+                aiming += Alpha;
                
                 Output.Audio.Play(Sounds.Walk);
             }
@@ -222,14 +223,14 @@ namespace NanoGames.Games.Banana
             if (Input.Down.IsPressed) { countDown++; }
             else { countDown = 0; }
 
-            if (localAiming < 10.0 / 180 * Math.PI)
+            if (localAiming < 0.0 / 180 * Math.PI)
             {
-                localAiming = 10.0 / 180 * Math.PI;
+                localAiming = 0.0 / 180 * Math.PI;
             }
 
-            if (localAiming > (115.0 / 180 * Math.PI))
+            if (localAiming > (180.0 / 180 * Math.PI))
             {
-                localAiming = 115.0 / 180 * Math.PI;
+                localAiming = 180.0 / 180 * Math.PI;
             }
 
             if (looksRight)
@@ -291,7 +292,9 @@ namespace NanoGames.Games.Banana
 
         public void Fall()
         {
-
+            PositionBefore = Position;
+            Position += velocity + 0.5 * new Vector(0, Constants.Gravity);
+            velocity += new Vector(0, Constants.Gravity);
         }
         
         public void Draw(IGraphics g, Color c)
