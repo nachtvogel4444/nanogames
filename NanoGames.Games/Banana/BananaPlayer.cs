@@ -20,17 +20,14 @@ namespace NanoGames.Games.Banana
         public bool HasFinished = false;
         public double Radius = 4;
         
-        private Vector velocity = new Vector(0, 0);
+        public Vector Velocity = new Vector(0, 0);
 
         private double speedProjectile;
         public bool IsFalling = false;
-
-        private double lengthGun = 2;
-
+        
         private double localAiming = 0.25 * Math.PI;
         private double aiming = 0;
-        private double power = 0;
-        private double powerMax = 100;
+        
 
         private int wait = 20;
         private int countLeft = 0;
@@ -40,7 +37,7 @@ namespace NanoGames.Games.Banana
         private int countFire = 0;
         private int waitFire = 120;
         private int idxWeapon = 0;
-        private string[] weapons = new string[] { "Gun", "Grenade" };
+        private string[] weapons = new string[] { "Gun" };
         private bool looksRight;
 
         public void GetBorn()
@@ -51,8 +48,7 @@ namespace NanoGames.Games.Banana
             Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
             Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
             Alpha = Math.Atan2(Normal.Y, Normal.X);
-
-            power = 1;
+            
             idxWeapon = 0;
             
             
@@ -98,16 +94,10 @@ namespace NanoGames.Games.Banana
                 }
             }
 
-            /* Draw all the bullets. */
-            foreach (SimpleBullet bullet in Match.ListBullets)
+            /* Draw bullet. */
+            if (!Match.Bullet.IsExploded)
             {
-                Output.Graphics.Line(new Color(1, 1, 1), bullet.Position, bullet.PositionBefore);
-            }
-
-            /* Draw all the grenades. */
-            foreach (Grenade grenade in Match.ListGrenades)
-            {
-                Output.Graphics.Circle(new Color(1, 1, 1), grenade.Position, grenade.Radius);
+                Output.Graphics.Line(new Color(1, 1, 1), Match.Bullet.Position, Match.Bullet.PositionBefore);
             }
 
             /* Draw landscape */
@@ -120,7 +110,7 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 40), "ALPHA: " + (Convert.ToInt32(Alpha * 180 / Math.PI)).ToString());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "WEAPON: " + weapons[idxWeapon].ToUpper());
-            Output.Graphics.Print(new Color(1, 1, 1), 10, new Vector(150, 20), Match.SecToGoInRound.ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 10, new Vector(150, 20), ((int)(Match.FramesLeft / 60.0)).ToString());
 
             if (Match.Wind.Speed >= 0)
             {
@@ -247,7 +237,7 @@ namespace NanoGames.Games.Banana
         {
             if (Input.Fire.WasActivated)
             {
-                Match.StateOfGame = "AnimationBeforeShoot";
+                Match.StateOfGame = "ActivePlayerShooting2";
                 countFire = 0;
             }
         }
@@ -258,7 +248,7 @@ namespace NanoGames.Games.Banana
             
             if (!Input.Fire.IsPressed || countFire > waitFire)
             {
-                Match.StateOfGame = "AnimationShoot";
+                Match.StateOfGame = "ActivePlayerShooting3";
             }
 
             countFire++;
@@ -273,28 +263,17 @@ namespace NanoGames.Games.Banana
 
                 Output.Audio.Play(Sounds.GunFire);
 
-                Match.ListBullets.Add(new SimpleBullet(position, velocity));
+                Match.Bullet.StartBullet(position, velocity);
+                Match.StateOfGame = "BulletFlying";
             }
 
-            if (weapons[idxWeapon] == "Grenade")
-            {
-                Vector velocity = speedProjectile * new Vector(Math.Cos(aiming), -Math.Sin(aiming));
-                Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
-
-                Output.Audio.Play(Sounds.GrenadeFire);
-
-                Match.ListGrenades.Add(new Grenade(position, velocity));
-
-            }
-
-            Match.StateOfGame = "AnimationProjectileFly";
         }
 
         public void Fall()
         {
             PositionBefore = Position;
-            Position += velocity + 0.5 * new Vector(0, Constants.Gravity);
-            velocity += new Vector(0, Constants.Gravity);
+            Position += Velocity + 0.5 * new Vector(0, Constants.Gravity);
+            Velocity += new Vector(0, Constants.Gravity);
         }
         
         public void Draw(IGraphics g, Color c)

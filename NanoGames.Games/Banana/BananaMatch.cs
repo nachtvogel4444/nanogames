@@ -30,17 +30,13 @@ namespace NanoGames.Games.Banana
 {
     class BananaMatch : Match<BananaPlayer>
     {
-        private int frameCountMove = 0;
-        private int frameCountMoveMax = 1800;
-        public int CountInputLeftRight = 0;
-        public int SecToGoInRound = 0;
-        public string StateOfGame = "ActivePlayerMoving";
+        public int FramesLeft = 0;
+        private int framesMax = 1800;
+        public string StateOfGame = "ActivePlayerActing";
         public BananaPlayer ActivePlayer;
         private int activePlayerIdx = 0;
         public Landscape Land = new Landscape();
-        private List<BananaPlayer> listPlayers = new List<BananaPlayer>();
-        public List<SimpleBullet> ListBullets = new List<SimpleBullet>();
-        public List<Grenade> ListGrenades = new List<Grenade>();
+        public Bullet Bullet = new Bullet();
         public Wind Wind = new Wind();
 
         private int finishedPlayers = 0;
@@ -53,129 +49,96 @@ namespace NanoGames.Games.Banana
             Land.CreateBlock(new Vector(150, 100), new Vector(300, 130));
             Land.Refresh();
 
-            for (int i = 0; i < Players.Count; ++i)
+            foreach (var player in Players)
             {
-                listPlayers.Add(Players[i]);
-                Players[i].GetBorn();
+                player.GetBorn();
             }
 
             activePlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));
             ActivePlayer = Players[activePlayerIdx];
 
             Wind.SetSpeed(0);
+
+            FramesLeft = framesMax;
         }
 
         protected override void Update()
         {
-            SecToGoInRound = Convert.ToInt32((frameCountMoveMax - frameCountMove) / 60);
-            
-            if (frameCountMove >= frameCountMoveMax)
+
+            if (FramesLeft < 0)
             {
                 activePlayerIdx++;
                 activePlayerIdx = activePlayerIdx % Players.Count;
                 ActivePlayer = Players[activePlayerIdx];
-                frameCountMove = 0;
+                FramesLeft = framesMax;
                 // Wind.SetSpeed(Random);
-                StateOfGame = "ActivePlayerMoving";
+                StateOfGame = "ActivePlayerActing";
             }
-
-            /*
-             State of Game
-             - 
-             */
 
             switch (StateOfGame)
             {
-                case "ActivePlayerMoving":
-                    
+                case "ActivePlayerActing":
+
                     ActivePlayer.Move();
                     ActivePlayer.SetAngle();
-                    // ActivePlayer.SetWeapon();
-                    ActivePlayer.Shoot1();
+                    ActivePlayer.SetWeapon();
+                    ActivePlayer.Shoot1();                  // StateOfGame -> Shooting2
+                    break;
+                    
+                case "ActivePlayerLastMove":
+
+                    ActivePlayer.Move();
+                    ActivePlayer.SetAngle();
+                    ActivePlayer.SetWeapon();
                     break;
 
-                case "AnimationBeforeShoot":
-                    ActivePlayer.Shoot2();
+                case "ActivePlayerShooting2":
+                    ActivePlayer.Shoot2();                  // StateOfGame -> Shooting3
                     break;
 
-                case "AnimationShoot":
-                    ActivePlayer.Shoot3();
+                case "ActivePlayerShooting3":
+                    ActivePlayer.Shoot3();                  // StateOfGame -> BulletFlying, ...
                     break;
 
                 case "PlayerFalling":
+
+                    bool someOneFalls = false;
+
                     foreach (var player in Players)
                     {
                         if (player.IsFalling)
                         {
                             player.Fall();
                             CheckCollisionPlayerLand(player);
+                            someOneFalls = true;
+                            FramesLeft = 10;
                         }
+                    }
+
+                    if (!someOneFalls)
+                    {
+                        StateOfGame = "ActivePlayerLastMove";
+                        FramesLeft = 60;
                     }
 
                     break;
 
-                case "AnimationProjectileFly":
+                case "BulletFlying":
 
-                    if (ListGrenades.Count != 0)
-                    {
-                        List<Grenade> grenadesToKeep = new List<Grenade>();
+                    Bullet.MoveBullet(Wind);
 
-                        foreach (Grenade grenade in ListGrenades)
-                        {
-                            grenade.MoveGrenade();
-                        }
+                    CheckCollisionBulletsLand();                  // StateOfGame -> ActivePlayerLastMove
+                    // CheckCollisionBulletsPlayers();               // StateOfGame -> ActivePlayerLastMove
+                    CheckCollisionBulletsScreen();                // StateOfGame -> ActivePlayerLastMove
 
-                        CheckCollisionGrenadesLand();
-                        CheckCollisionGrenadesScreen();
-
-                        foreach (Grenade grenade in ListGrenades)
-                        {
-                            if (!grenade.IsExploded)
-                            {
-                                grenadesToKeep.Add(grenade);
-                            }
-                        }
-                        
-                        ListGrenades = grenadesToKeep;
-                    }
-
-                    if (ListBullets.Count != 0)
-                    {
-                        List<SimpleBullet> bulletsToKeep = new List<SimpleBullet>();
-
-                        foreach (SimpleBullet bullet in ListBullets)
-                        {
-                            bullet.MoveSimpleBullet(Wind);
-                        }
-
-                        CheckCollisionBulletsLand();
-                        //CheckCollisionBulletsPlayers();
-                        CheckCollisionBulletsScreen();
-
-                        foreach (SimpleBullet bullet in ListBullets)
-                        {
-                            if (!bullet.IsExploded)
-                            {
-                                bulletsToKeep.Add(bullet);
-                            }
-                        }
-
-                        ListBullets = bulletsToKeep;
-                    }
-
-                    if (ListGrenades.Count == 0 && ListBullets.Count == 0)
-                    {
-                        frameCountMove = frameCountMoveMax - 30;
-                        StateOfGame = "ActivePlayerMoving";
-                    }
-                    
                     break;
-                    
+
+                case "AnimationNextPlayer":
+                    break;
+
             }
 
-            frameCountMove++;
-  
-            CheckPlayers();
+            FramesLeft--;
 
             foreach (var player in Players)
             {
@@ -199,149 +162,66 @@ namespace NanoGames.Games.Banana
                 }
             }
         }
-        
-        
-        private bool CheckCollision(Vector start, Vector stop, Vector obstacle, double minDist)
-        {
-            // bc: from postion to tail
-            // ba: from position to obstacle 
-            double bcx = stop.X - start.X;
-            double bcy = -stop.Y + start.Y;
-            double bax = obstacle.X - start.X;
-            double bay = -obstacle.Y + start.Y;
-            double cax = obstacle.X - stop.X;
-            double cay = -obstacle.Y + stop.Y;
-            double distsq;
-
-            double m = (bax * bcx + bay * bcy) / (bcx * bcx + bcy * bcy);
-
-            if (m < 0)
-            {
-                return false;
-            }
-
-            else if (m > 1)
-            {
-                distsq = cax * cax + cay * cay;
-            }
-
-            else
-            {
-                double dx = obstacle.X - (start.X + m * bcx);
-                double dy = -obstacle.Y - (-start.Y + m * bcy);
-                distsq = dx * dx + dy * dy;
-            }
-
-            if (distsq < (minDist * minDist))
-            {
-                return true;
-            }
-
-            else
-            {
-                return false;
-            }
-
-        }
-
+        /*
         private void CheckCollisionBulletsPlayers()
         {
-            foreach (SimpleBullet bullet in ListBullets)
+            foreach (var player in Players)
             {
-                foreach (var player in listPlayers)
+                if (CheckCollision(bullet.Position, bullet.PositionBefore, player.Position, player.Radius))
                 {
-                    if (CheckCollision(bullet.Position, bullet.PositionBefore, player.Position, player.Radius))
-                    {
-                        bullet.IsExploded = true;
-                        player.HasFinished = true;
-                        finishedPlayers++;
+                    bullet.IsExploded = true;
+                    player.HasFinished = true;
+                    finishedPlayers++;
 
-                        Output.Audio.Play(Sounds.Explosion);
+                    Output.Audio.Play(Sounds.Explosion);
 
-                        break;
-                    }
+                    break;
                 }
             }
-        }
+            
+        }*/
 
         private void CheckCollisionBulletsLand()
         {
-            foreach (SimpleBullet bullet in ListBullets)
+            foreach (List<Vector> block in Land.Border)
             {
-                foreach (List<Vector> block in Land.Border)
+                for (int i = 0; i < block.Count - 1; i++)
                 {
-                    for (int i = 0; i < block.Count - 1; i++)
+                    Intersection intersection = new Intersection(Bullet.Position, Bullet.PositionBefore, block[i], block[i + 1]);
+
+                    if (intersection.IsTrue)
                     {
-                        Intersection intersection = new Intersection(bullet.Position, bullet.PositionBefore, block[i], block[i + 1]);
+                        Output.Audio.Play(Sounds.Explosion);
+                        StateOfGame = "ActivePlayerLastMove";
+                        FramesLeft = 60;
 
-                        if (intersection.IsTrue)
+                        Bullet.IsExploded = true;
+
+                        Land.makeCaldera(intersection.Point);
+
+                        foreach (var player in Players)
                         {
-                            bullet.IsExploded = true;
-                            Land.makeCaldera(intersection.Point);
-
-                            foreach (var player in Players)
-                            {
-                                Land.checkPlayer(player);
-                                if (player.IsFalling)
-                                {
-                                    StateOfGame = "PlayerFalling";
-                                }
-                            }
-
-                            Output.Audio.Play(Sounds.Explosion);
-
-                            return;
+                            CheckPlayerPosition(player);
                         }
+                        
+                        return;
                     }
                 }
-                
             }
+
+
         }
 
         private void CheckCollisionBulletsScreen()
         {
-            foreach (SimpleBullet bullet in ListBullets)
+            if (Bullet.Position.X < 0 || Bullet.Position.X > 320 || Bullet.Position.Y > 200)
             {
-                if (bullet.Position.X < 0 || bullet.Position.X > 320 || bullet.Position.Y > 200)
-                {
-                    bullet.IsExploded = true;
-                }
+                Bullet.IsExploded = true;
+
+                StateOfGame = "ActivePlayerLastMove";
+                FramesLeft = 60 * 5;
             }
-        }
-
-        private void CheckCollisionGrenadesPlayers()
-        {
-            foreach (Grenade grenade in ListGrenades)
-            {
-                foreach (var player in listPlayers)
-                {
-                    if (CheckCollision(grenade.Position, grenade.PositionBefore, player.Position, player.Radius + grenade.Radius))
-                    {
-                        
-
-                        break;
-                    }
-                }
-            }
-        }
-
-        private void CheckCollisionGrenadesLand()
-        {
-            foreach (Grenade grenade in ListGrenades)
-            {
-
-            }
-        }
-
-        private void CheckCollisionGrenadesScreen()
-        {
-            foreach (Grenade grenade in ListGrenades)
-            {
-                if (grenade.Position.X < 0 || grenade.Position.X > 320 || grenade.Position.Y > 200)
-                {
-                    grenade.IsExploded = true;
-                }
-            }
+            
         }
 
         private void CheckCollisionPlayerLand(BananaPlayer player)
@@ -356,7 +236,7 @@ namespace NanoGames.Games.Banana
 
                     if (intersection.IsTrue)
                     {
-                         if ((player.Position - block[j]).Length < (player.Position - block[j + 1]).Length)
+                        if ((intersection.Point - block[j]).Length < (intersection.Point - block[j + 1]).Length)
                         {
                             player.Position = block[j];
                             player.PositionIndex[0] = i;
@@ -367,12 +247,12 @@ namespace NanoGames.Games.Banana
                         {
                             player.Position = block[j + 1];
                             player.PositionIndex[0] = i;
-                            player.PositionIndex[1] = j;
+                            player.PositionIndex[1] = j + 1;
                         }
-                        
-                        Output.Audio.Play(Sounds.Toc);
 
-                        StateOfGame = "ActivePlayerMoving";
+                        player.IsFalling = false;
+                        player.Velocity = new Vector(0, 0);
+                        Output.Audio.Play(Sounds.Toc);
 
                         return;
                     }
@@ -380,29 +260,36 @@ namespace NanoGames.Games.Banana
             }
         }
 
-        private void CheckCollisionActivePlayerScreen()
+        private void CheckCollisionPlayerScreen(BananaPlayer player)
         {
-            if (ActivePlayer.Position.X < 0 || ActivePlayer.Position.X > 320 || ActivePlayer.Position.Y > 200)
+            if (player.Position.X < 0 || player.Position.X > 320 || player.Position.Y > 200)
             {
-                ActivePlayer.HasFinished = true;
+                player.HasFinished = true;
+                player.IsFalling = false;
             }
-             
+
         }
 
-        private void CheckPlayers()
+        private void CheckPlayerPosition(BananaPlayer player)
         {
-            List<BananaPlayer> playersToKeep = new List<BananaPlayer>();
-
-            foreach (var player in listPlayers)
+            for (int i = 0; i < Land.Border.Count; i++)
             {
-                if (!player.HasFinished)
+                for (int j = 0; j < Land.Border[i].Count; j++)
                 {
-                    playersToKeep.Add(player);
-                }
-            }
+                    if (player.Position == Land.Border[i][j])
+                    {
+                        player.PositionIndex[0] = i;
+                        player.PositionIndex[1] = j;
 
-            listPlayers = playersToKeep;
+                        return;
+                    }
+                }
+                
+                // player is hovering in air
+                player.IsFalling = true;
+                StateOfGame = "PlayerFalling";
+                FramesLeft = 10;
+            }
         }
-        
     }
 }

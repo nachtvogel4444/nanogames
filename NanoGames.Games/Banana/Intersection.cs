@@ -37,14 +37,14 @@ namespace NanoGames.Games.Banana
                 Point.X = (B2 * C1 - B1 * C2) / det;
                 Point.Y = (A1 * C2 - A2 * C1) / det;
 
-                if ((Math.Min(p11.X, p12.X) <= 1.01 * Point.X) && (Math.Max(p11.X, p12.X) >= 0.99 * Point.X) &&
-                    (Math.Min(p11.Y, p12.Y) <= 1.01 * Point.Y) && (Math.Max(p11.Y, p12.Y) >= 0.99 * Point.Y))
+                if ((Math.Min(p11.X, p12.X) <= 1.0000001 * Point.X) && (Math.Max(p11.X, p12.X) >= 0.9999999 * Point.X) &&
+                    (Math.Min(p11.Y, p12.Y) <= 1.0000001 * Point.Y) && (Math.Max(p11.Y, p12.Y) >= 0.9999999 * Point.Y))
                 {
                     InSegment1 = true;
                 }
 
-                if ((Math.Min(p21.X, p22.X) <= 1.01 * Point.X) && (Math.Max(p21.X, p22.X) >= 0.99 * Point.X) &&
-                    (Math.Min(p21.Y, p22.Y) <= 1.01 * Point.Y) && (Math.Max(p21.Y, p22.Y) >= 0.99 * Point.Y))
+                if ((Math.Min(p21.X, p22.X) <= 1.0000001 * Point.X) && (Math.Max(p21.X, p22.X) >= 0.9999999 * Point.X) &&
+                    (Math.Min(p21.Y, p22.Y) <= 1.0000001 * Point.Y) && (Math.Max(p21.Y, p22.Y) >= 0.9999999 * Point.Y))
                 {
                     InSegment2 = true;
                 }

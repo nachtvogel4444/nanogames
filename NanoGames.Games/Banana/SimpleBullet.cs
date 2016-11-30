@@ -9,22 +9,23 @@ using System.Threading.Tasks;
 
 namespace NanoGames.Games.Banana
 {
-    internal class SimpleBullet
+    internal class Bullet
     {
         public Vector Position;
         public Vector PositionBefore;
         private Vector velocity;
         
-        public bool IsExploded = false;
+        public bool IsExploded = true;
 
-        public SimpleBullet(Vector pos, Vector vel)
+        public void StartBullet(Vector pos, Vector vel)
         {
             Position = pos;
             PositionBefore = pos - vel;
             velocity = vel;
+            IsExploded = false;
         }
 
-        public void MoveSimpleBullet(Wind w)
+        public void MoveBullet(Wind w)
         {
             PositionBefore = Position; 
             Position += velocity + 0.5 * new Vector(0, Constants.Gravity);

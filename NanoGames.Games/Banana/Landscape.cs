@@ -181,26 +181,6 @@ namespace NanoGames.Games.Banana
             Refresh();
         }
 
-        public void checkPlayer(BananaPlayer player)
-        {
-            for (int i = 0; i < Border.Count; i++)
-            {
-                for (int j = 0; j < Border[i].Count; j++)
-                {
-                    if (player.Position == Border[i][j])
-                    {
-                        player.PositionIndex[0] = i;
-                        player.PositionIndex[1] = j;
-
-                        return;
-                    }
-                }
-            }
-
-            // player is hovering in air
-            player.IsFalling = true;
-        }
-
         public void Draw(IGraphics g)
         {
             for (int i = 0; i <= 320; i++)
