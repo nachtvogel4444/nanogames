@@ -22,7 +22,8 @@ namespace NanoGames.Games.Banana
         
         public Vector Velocity = new Vector(0, 0);
 
-        private double speedProjectile;
+        private double speedProjectile = 0.5;
+        private double health = 100;
         public bool IsFalling = false;
         
         private double localAiming = 0.25 * Math.PI;
@@ -35,7 +36,6 @@ namespace NanoGames.Games.Banana
         private int countUp = 0;
         private int countDown = 0;
         private int countFire = 0;
-        private int waitFire = 120;
         private int idxWeapon = 0;
         private string[] weapons = new string[] { "Gun" };
         private bool looksRight;
@@ -67,8 +67,10 @@ namespace NanoGames.Games.Banana
         public void DrawScreen()
         {
             /* Draw each player. */
-            foreach (var player in Match.Players)
+            for (int i = 0; i < Match.Players.Count; i++)
             {
+                var player = Match.Players[i];
+
                 /* Skip players that have already finished. */
                 if (player.HasFinished)
                 {
@@ -87,11 +89,8 @@ namespace NanoGames.Games.Banana
                 }
 
                 /* Draw the body of the player. */
-                player.Draw(Output.Graphics, color);
-                if (player == Match.ActivePlayer)
-                {
-                    
-                }
+                player.Draw(Output.Graphics, color, i);
+                
             }
 
             /* Draw bullet. */
@@ -102,15 +101,31 @@ namespace NanoGames.Games.Banana
 
             /* Draw landscape */
             Match.Land.Draw(Output.Graphics);
+
+            // draw speedprojectile / power
+            int numberOfLines = (int)(speedProjectile * 100 / 5);
+            for (int i = 0; i < numberOfLines; i++)
+            {
+                Output.Graphics.Line(new Color(1,1,1), new Vector(110 + i, 20), new Vector(110 + i, 30));
+            }
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(110, 20), new Vector(110, 30));
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(110, 20), new Vector(210, 20));
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(110, 30), new Vector(210, 30));
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(210, 20), new Vector(210, 30));
             
+            // Draw Health
+            
+            /*
             // Draw Information on Screen
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 10), "ACTIVEPLAYER: " + Match.ActivePlayer.Name);
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 20), "AIMING: " + (Convert.ToInt32(Match.ActivePlayer.aiming * 180 / Math.PI)).ToString());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 30), "LOCALAIMING: " + (Convert.ToInt32(Match.ActivePlayer.localAiming * 180 / Math.PI)).ToString());
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 40), "ALPHA: " + (Convert.ToInt32(Alpha * 180 / Math.PI)).ToString());
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 40), "POWER: " + (Convert.ToInt32(speedProjectile)).ToString());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "WEAPON: " + weapons[idxWeapon].ToUpper());
             Output.Graphics.Print(new Color(1, 1, 1), 10, new Vector(150, 20), ((int)(Match.FramesLeft / 60.0)).ToString());
+            */
+            
 
             if (Match.Wind.Speed >= 0)
             {
@@ -244,9 +259,9 @@ namespace NanoGames.Games.Banana
 
         public void Shoot2()
         {
-            speedProjectile = 1 + 9.0 * countFire / waitFire;
+            speedProjectile = 0.5 + 4.5 * countFire / 60;
             
-            if (!Input.Fire.IsPressed || countFire > waitFire)
+            if (!Input.Fire.IsPressed || countFire > 60)
             {
                 Match.StateOfGame = "ActivePlayerShooting3";
             }
@@ -264,6 +279,9 @@ namespace NanoGames.Games.Banana
                 Output.Audio.Play(Sounds.GunFire);
 
                 Match.Bullet.StartBullet(position, velocity);
+
+                speedProjectile = 0.5;
+
                 Match.StateOfGame = "BulletFlying";
             }
 
@@ -276,7 +294,7 @@ namespace NanoGames.Games.Banana
             Velocity += new Vector(0, Constants.Gravity);
         }
         
-        public void Draw(IGraphics g, Color c)
+        public void Draw(IGraphics g, Color c, int i)
         {
             /* Body of the player */
             g.CircleSegment(c, Position + 1 * Normal, 2, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
@@ -286,6 +304,18 @@ namespace NanoGames.Games.Banana
             /* Gun */
             g.Line(c, Position + 5 * Normal, Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming)));
 
+            /* Health */
+            g.Print(c, 3, Position + new Vector(0, -15), health.ToString().ToUpper());
+
+            /*Player list*/
+            if (this == Match.ActivePlayer)
+            {
+                g.Print(c, 10, new Vector(10, 10 + 10 * i), Name);
+            }
+            else
+            {
+                g.Print(c, 6, new Vector(10, 10 + 10 * i), Name);
+            }
         }
 
         private int mod(int x, int m)

@@ -72,7 +72,7 @@ namespace NanoGames.Games.Banana
                 ActivePlayer = Players[activePlayerIdx];
                 FramesLeft = framesMax;
                 // Wind.SetSpeed(Random);
-                StateOfGame = "ActivePlayerActing";
+                StateOfGame = "AnimationNextPLayer";
             }
 
             switch (StateOfGame)
@@ -111,7 +111,7 @@ namespace NanoGames.Games.Banana
                             player.Fall();
                             CheckCollisionPlayerLand(player);
                             someOneFalls = true;
-                            FramesLeft = 10;
+                            FramesLeft++;
                         }
                     }
 
@@ -134,6 +134,7 @@ namespace NanoGames.Games.Banana
                     break;
 
                 case "AnimationNextPlayer":
+                    StateOfGame = "ActivePlayerMoving";
                     break;
 
             }
