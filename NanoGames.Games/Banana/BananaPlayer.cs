@@ -20,10 +20,12 @@ namespace NanoGames.Games.Banana
         public bool HasFinished = false;
         public double Radius = 4;
         
+        public List<Vector> Hitbox = new List<Vector>() { new Vector(0,0), new Vector(0, 0) , new Vector(0, 0) , new Vector(0, 0), new Vector(0, 0) };
+
         public Vector Velocity = new Vector(0, 0);
 
         private double speedProjectile = 0.5;
-        private double health = 100;
+        public double Health = 100;
         public bool IsFalling = false;
         
         private double localAiming = 0.25 * Math.PI;
@@ -40,10 +42,9 @@ namespace NanoGames.Games.Banana
         private string[] weapons = new string[] { "Gun" };
         private bool looksRight;
 
-        // some comment
-
         public void GetBorn()
         {
+            
             PositionIndex[0] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border.Count - 1));
             PositionIndex[1] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border[PositionIndex[0]].Count -1));
             
@@ -52,7 +53,6 @@ namespace NanoGames.Games.Banana
             Alpha = Math.Atan2(Normal.Y, Normal.X);
             
             idxWeapon = 0;
-            
             
             if (Match.Random.Next(0, 1) == 0)
             {
@@ -114,9 +114,9 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Line(new Color(1, 1, 1), new Vector(110, 20), new Vector(210, 20));
             Output.Graphics.Line(new Color(1, 1, 1), new Vector(110, 30), new Vector(210, 30));
             Output.Graphics.Line(new Color(1, 1, 1), new Vector(210, 20), new Vector(210, 30));
-            
+
             // Draw Health
-            
+
             /*
             // Draw Information on Screen
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 10), "ACTIVEPLAYER: " + Match.ActivePlayer.Name);
@@ -127,7 +127,7 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "WEAPON: " + weapons[idxWeapon].ToUpper());
             Output.Graphics.Print(new Color(1, 1, 1), 10, new Vector(150, 20), ((int)(Match.FramesLeft / 60.0)).ToString());
             */
-            
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
 
             if (Match.Wind.Speed >= 0)
             {
@@ -193,6 +193,7 @@ namespace NanoGames.Games.Banana
                 Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
                 Alpha = Math.Atan2(Normal.Y, Normal.X);
                 aiming += Alpha;
+                UpdateHitbox();
                
                 Output.Audio.Play(Sounds.Walk);
             }
@@ -254,7 +255,7 @@ namespace NanoGames.Games.Banana
         {
             if (Input.Fire.WasActivated)
             {
-                Match.StateOfGame = "ActivePlayerShooting2";
+                Match.StateOfGame = "ActivePlayerShoot2";
                 countFire = 0;
             }
         }
@@ -265,7 +266,7 @@ namespace NanoGames.Games.Banana
             
             if (!Input.Fire.IsPressed || countFire > 60)
             {
-                Match.StateOfGame = "ActivePlayerShooting3";
+                Match.StateOfGame = "ActivePlayerShoot3";
             }
 
             countFire++;
@@ -284,7 +285,7 @@ namespace NanoGames.Games.Banana
 
                 speedProjectile = 0.5;
 
-                Match.StateOfGame = "BulletFlying";
+                Match.StateOfGame = "SomethingFlying";
             }
 
         }
@@ -307,7 +308,7 @@ namespace NanoGames.Games.Banana
             g.Line(c, Position + 5 * Normal, Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming)));
 
             /* Health */
-            g.Print(c, 3, Position + new Vector(0, -15), health.ToString().ToUpper());
+            g.Print(c, 3, Position + new Vector(0, -15), Health.ToString().ToUpper());
 
             /*Player list*/
             if (this == Match.ActivePlayer)
@@ -318,6 +319,17 @@ namespace NanoGames.Games.Banana
             {
                 g.Print(c, 6, new Vector(10, 10 + 10 * i), Name);
             }
+        }
+
+        public void UpdateHitbox()
+        {
+            for (int i = 0; i <= 4; ++i)
+            {
+                var angleA = Alpha - Math.PI / 2 + i * Math.PI / 4;
+                Hitbox[i] = new Vector(3 * Math.Cos(angleA), 3 * Math.Sin(angleA));
+            }
+            
+            Hitbox[4] = new Vector(3 * Math.Cos(Alpha - Math.PI / 2), 3 * Math.Sin(Alpha - Math.PI / 2));
         }
 
         private int mod(int x, int m)

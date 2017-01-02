@@ -15,7 +15,6 @@ namespace NanoGames.Games.Banana
         public bool[,] IsBorder = new bool[321, 201];
         public List<List<Vector>> Border = new List<List<Vector>>();
         public List<List<Vector>> Normal = new List<List<Vector>>();
-        public bool IsHovering = false;
 
         public void CreateBlock(Vector p1, Vector p2)
         {

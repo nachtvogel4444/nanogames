@@ -18,6 +18,8 @@ namespace NanoGames.Games.Banana
         public bool IsTrue = false;
         public Vector Point;
 
+        private double epsilon = 0.000001;
+
         public Intersection(Vector p11, Vector p12, Vector p21, Vector p22)
         {
 
@@ -37,14 +39,14 @@ namespace NanoGames.Games.Banana
                 Point.X = (B2 * C1 - B1 * C2) / det;
                 Point.Y = (A1 * C2 - A2 * C1) / det;
 
-                if ((Math.Min(p11.X, p12.X) <= 1.0000001 * Point.X) && (Math.Max(p11.X, p12.X) >= 0.9999999 * Point.X) &&
-                    (Math.Min(p11.Y, p12.Y) <= 1.0000001 * Point.Y) && (Math.Max(p11.Y, p12.Y) >= 0.9999999 * Point.Y))
+                if ((Math.Min(p11.X, p12.X) <= Point.X + epsilon) && (Math.Max(p11.X, p12.X) >= Point.X - epsilon) &&
+                    (Math.Min(p11.Y, p12.Y) <= Point.Y + epsilon) && (Math.Max(p11.Y, p12.Y) >= Point.Y - epsilon))
                 {
                     InSegment1 = true;
                 }
 
-                if ((Math.Min(p21.X, p22.X) <= 1.0000001 * Point.X) && (Math.Max(p21.X, p22.X) >= 0.9999999 * Point.X) &&
-                    (Math.Min(p21.Y, p22.Y) <= 1.0000001 * Point.Y) && (Math.Max(p21.Y, p22.Y) >= 0.9999999 * Point.Y))
+                if ((Math.Min(p21.X, p22.X) <= Point.X + epsilon) && (Math.Max(p21.X, p22.X) >= Point.X - epsilon) &&
+                    (Math.Min(p21.Y, p22.Y) <= Point.Y + epsilon) && (Math.Max(p21.Y, p22.Y) >= Point.Y - epsilon))
                 {
                     InSegment2 = true;
                 }
