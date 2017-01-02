@@ -40,6 +40,8 @@ namespace NanoGames.Games.Banana
         private string[] weapons = new string[] { "Gun" };
         private bool looksRight;
 
+        // some comment
+
         public void GetBorn()
         {
             PositionIndex[0] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border.Count - 1));
