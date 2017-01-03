@@ -175,9 +175,9 @@ namespace NanoGames.Games.Banana
         {
             foreach (var player in Players)
             {
-                for (int i = 0; i < player.Hitbox.Count - 2; i++)
+                for (int i = 0; i < player.Hitbox.Length - 2; i++)
                 {
-                    Intersection intersection = new Intersection(Bullet.Position, Bullet.PositionBefore, player.Position + player.Hitbox[i], player.Position + player.Hitbox[i + 1]);
+                    Intersection intersection = new Intersection(Bullet.Position, Bullet.PositionBefore, player.Hitbox[i], player.Hitbox[i + 1]);
 
                     if (intersection.IsTrue)
                     {
@@ -259,6 +259,7 @@ namespace NanoGames.Games.Banana
                             player.PositionIndex[1] = j + 1;
                         }
 
+                        player.UpdateHitbox();
                         player.IsFalling = false;
                         player.Health -= player.Velocity.Length * 10;
                         player.Velocity = new Vector(0, 0);

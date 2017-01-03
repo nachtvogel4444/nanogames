@@ -20,7 +20,7 @@ namespace NanoGames.Games.Banana
         public bool HasFinished = false;
         public double Radius = 4;
         
-        public List<Vector> Hitbox = new List<Vector>() { new Vector(0,0), new Vector(0, 0) , new Vector(0, 0) , new Vector(0, 0), new Vector(0, 0) };
+        public Vector[] Hitbox = new Vector[10];
 
         public Vector Velocity = new Vector(0, 0);
 
@@ -51,6 +51,8 @@ namespace NanoGames.Games.Banana
             Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
             Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
             Alpha = Math.Atan2(Normal.Y, Normal.X);
+
+            UpdateHitbox();
             
             idxWeapon = 0;
             
@@ -306,6 +308,7 @@ namespace NanoGames.Games.Banana
             PositionBefore = Position;
             Position += Velocity + 0.5 * new Vector(0, Constants.Gravity);
             Velocity += new Vector(0, Constants.Gravity);
+            UpdateHitbox();
         }
         
         public void Draw(IGraphics g, Color c, int i)
@@ -314,9 +317,25 @@ namespace NanoGames.Games.Banana
             g.CircleSegment(c, Position + 1 * Normal, 2, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
             g.CircleSegment(c, Position + 1 * Normal, 3, Alpha - Math.PI / 2, Alpha + Math.PI / 2);
             g.Line(c, Position + 1 * Normal + 3 * new Vector(-Normal.Y, Normal.X), Position + 1 * Normal + 3 * new Vector(Normal.Y, -Normal.X));
+            
+            /* hitbox*//*
+            for (int j = 0; j < Hitbox.Length - 1; j++)
+            {
+                g.Line(c, Hitbox[j], Hitbox[j + 1]);
+            }*/
 
             /* Gun */
             g.Line(c, Position + 5 * Normal, Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming)));
+
+            /* crosshair*/
+            if (this == Match.ActivePlayer)
+            {
+                var p = Position + 5 * Normal + 15 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
+                var x = 3 * Math.Cos(aiming + Math.PI / 4);
+                var y = 3 * Math.Sin(aiming + Math.PI / 4);
+                g.Line(c, p + new Vector(-x, y), p + new Vector(x, -y));
+                g.Line(c, p + new Vector(-x, -y), p + new Vector(x, y));
+            }
 
             /* Health */
             g.Print(c, 3, Position + new Vector(0, -15), Health.ToString().ToUpper());
@@ -338,13 +357,13 @@ namespace NanoGames.Games.Banana
 
         public void UpdateHitbox()
         {
-            for (int i = 0; i <= 4; ++i)
+            for (int i = 0; i <= 8; i++)
             {
-                var angleA = Alpha - Math.PI / 2 + i * Math.PI / 4;
-                Hitbox[i] = new Vector(3 * Math.Cos(angleA), 3 * Math.Sin(angleA));
+                var angleA = Alpha - Math.PI / 2 + i * Math.PI / 8;
+                Hitbox[i] = Position + Normal + new Vector(3 * Math.Cos(angleA), 3 * Math.Sin(angleA));
             }
             
-            Hitbox[4] = new Vector(3 * Math.Cos(Alpha - Math.PI / 2), 3 * Math.Sin(Alpha - Math.PI / 2));
+            Hitbox[9] = Position + Normal + new Vector(3 * Math.Cos(Alpha - Math.PI / 2), 3 * Math.Sin(Alpha - Math.PI / 2));
         }
 
         private int mod(int x, int m)
