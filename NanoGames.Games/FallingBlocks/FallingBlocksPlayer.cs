@@ -32,6 +32,8 @@ namespace NanoGames.Games.FallingBlocks
 
         private bool _hasLost;
 
+        private int _nextPiece;
+
         public FallingBlocksPlayer LeftPlayer { get; set; }
 
         public FallingBlocksPlayer RightPlayer { get; set; }
@@ -48,6 +50,8 @@ namespace NanoGames.Games.FallingBlocks
         {
             Score = int.MaxValue;
 
+            SetNextPiece();
+
             for (int i = 0; i < Constants.InitialGarbageLines; ++i)
             {
                 _inbox.Add(new Color(0.33, 0.33, 0.33));
@@ -55,7 +59,7 @@ namespace NanoGames.Games.FallingBlocks
 
             Output.Particles.Gravity = new Vector(0, 0.2);
             Output.Particles.Velocity = new Vector(0, -2);
-            Output.Particles.Intensity = 4;
+            Output.Particles.Frequency = 2;
         }
 
         public void Update()
@@ -93,9 +97,11 @@ namespace NanoGames.Games.FallingBlocks
 
             if (_fallingPiece == null)
             {
-                _fallingPiece = Constants.RotatedPieces[Match.Random.Next(Constants.RotatedPieces.Length)];
+                _fallingPiece = Constants.RotatedPieces[_nextPiece];
                 _fallingPieceRotation = 1;
                 _fallingPieceX = (Constants.Width - _fallingPiece[_fallingPieceRotation].GetLength(0)) / 2;
+
+                SetNextPiece();
 
                 _fallingPieceY = -_fallingPiece[_fallingPieceRotation].GetLength(1);
 
@@ -203,6 +209,11 @@ namespace NanoGames.Games.FallingBlocks
             }
         }
 
+        private void SetNextPiece()
+        {
+            _nextPiece = Match.Random.Next(Constants.RotatedPieces.Length);
+        }
+
         private void SetHasMoved()
         {
             _lockInFrame = Match.Frame + Constants.LockInDelayFrames;
@@ -262,42 +273,41 @@ namespace NanoGames.Games.FallingBlocks
             int clearedLines = 0;
             for (int y = 0; y < piece.GetLength(1); ++y)
             {
-                int yw = y + _fallingPieceY;
-
-                bool isFull = true;
-                for (int x = 0; x < Constants.Width; ++x)
-                {
-                    if (!_isOccupied[x, yw])
-                    {
-                        isFull = false;
-                        break;
-                    }
-                }
-
-                if (isFull)
+                if (IsLineFull(y + _fallingPieceY))
                 {
                     ++clearedLines;
+                }
+            }
 
-                    for (int x = 0; x < Constants.Width; ++x)
-                    {
-                        if (_isOccupied[x, yw])
-                        {
-                            DrawBlock(Output.Particles, _blockColor[x, yw], default(Vector), x, yw);
-                        }
-                    }
-
-                    for (int y1 = yw; y1 > 0; --y1)
+            if (clearedLines > 0)
+            {
+                for (int y = 0; y < piece.GetLength(1); ++y)
+                {
+                    int yw = y + _fallingPieceY;
+                    if (IsLineFull(yw))
                     {
                         for (int x = 0; x < Constants.Width; ++x)
                         {
-                            _isOccupied[x, y1] = _isOccupied[x, y1 - 1];
-                            _blockColor[x, y1] = _blockColor[x, y1 - 1];
+                            if (_isOccupied[x, yw])
+                            {
+                                Output.Particles.Intensity = clearedLines;
+                                DrawBlock(Output.Particles, 0.5 * _blockColor[x, yw], default(Vector), x, yw);
+                            }
                         }
-                    }
 
-                    for (int x = 0; x < Constants.Width; ++x)
-                    {
-                        _isOccupied[x, 0] = false;
+                        for (int y1 = yw; y1 > 0; --y1)
+                        {
+                            for (int x = 0; x < Constants.Width; ++x)
+                            {
+                                _isOccupied[x, y1] = _isOccupied[x, y1 - 1];
+                                _blockColor[x, y1] = _blockColor[x, y1 - 1];
+                            }
+                        }
+
+                        for (int x = 0; x < Constants.Width; ++x)
+                        {
+                            _isOccupied[x, 0] = false;
+                        }
                     }
                 }
             }
@@ -311,6 +321,19 @@ namespace NanoGames.Games.FallingBlocks
             }
 
             _fallingPiece = null;
+        }
+
+        private bool IsLineFull(int yw)
+        {
+            for (int x = 0; x < Constants.Width; ++x)
+            {
+                if (!_isOccupied[x, yw])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private bool TryToMove(int x, int y, int rotation)

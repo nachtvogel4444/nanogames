@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NanoGames.Games</RootNamespace>
     <AssemblyName>NanoGames.Games</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -58,12 +58,19 @@
     <Compile Include="Banana\Constants.cs" />
     <Compile Include="Banana\Methods.cs" />
     <Compile Include="Banana\Wind.cs" />
+    <Compile Include="AsteroidHunt\Asteroid.cs" />
+    <Compile Include="AsteroidHunt\Bullet.cs" />
+    <Compile Include="AsteroidHunt\Constants.cs" />
+    <Compile Include="AsteroidHunt\AsteroidHuntMatch.cs" />
+    <Compile Include="AsteroidHunt\AsteroidHuntPlayer.cs" />
     <Compile Include="Bomberguy\AbstractRectbombularThing.cs" />
     <Compile Include="Bomberguy\Bomb.cs" />
     <Compile Include="Bomberguy\BomberGuy.cs" />
     <Compile Include="Bomberguy\BomberMatch.cs" />
     <Compile Include="Bomberguy\BomberThing.cs" />
     <Compile Include="Bomberguy\Bombstacle.cs" />
+    <Compile Include="Bomberguy\CellCoordinates.cs" />
+    <Compile Include="Bomberguy\Constants.cs" />
     <Compile Include="Bomberguy\Explosion.cs" />
     <Compile Include="Bomberguy\RectbombularThing.cs" />
     <Compile Include="Bomberguy\Unbombable.cs" />

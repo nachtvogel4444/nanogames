@@ -25,6 +25,7 @@ namespace NanoGames.Application
         private bool _showFps = false;
         private bool _isFullscreen = false;
         private bool _isVSynced = true;
+        private bool _reducedDetails = false;
         private string _playerName = "ANONYMOUS";
         private Color _playerColor = PlayerColors.Values[0];
         private string _lastServer = string.Empty;
@@ -85,6 +86,23 @@ namespace NanoGames.Application
             set
             {
                 _isVSynced = value;
+                Save();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to disable all complex shaders.
+        /// </summary>
+        public bool ReducedDetails
+        {
+            get
+            {
+                return _reducedDetails;
+            }
+
+            set
+            {
+                _reducedDetails = value;
                 Save();
             }
         }

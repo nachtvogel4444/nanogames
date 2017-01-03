@@ -6,26 +6,28 @@ namespace NanoGames.Games.Bomberguy
     internal class Bomb : AbstractRectbombularThing
     {
         private BomberGuy player;
-        private int reach;
+        private IMatchTimer timer;
 
-        public Bomb(int reach, BomberGuy player, BomberMatch match, Vector size) : this(reach, player, match, new Vector(), size)
+        public Bomb(BomberGuy player, BomberMatch match) : this(player, match, new Vector())
         {
         }
 
-        public Bomb(int reach, BomberGuy player, BomberMatch match, Vector position, Vector size) : base(match, true, false, false, position, size)
+        public Bomb(BomberGuy player, BomberMatch match, Vector position) : base(match, true, false, false, position, match.CellSize * Constants.Bomb.REL_SIZE)
         {
-            match.TimeOnce(2000, () => Destroy());
-            this.reach = reach;
+            timer = match.TimeOnce(2000, () => Destroy());
             this.player = player;
         }
 
-        public override void Draw(IGraphics g)
+        public override void Draw()
         {
-            g.Circle(player.Color, this.Center, this.Size.X / 2d * 0.8);
+            Match.Output.Graphics.Circle(player.Color, this.Center, this.Size.X / 2d * 0.8);
         }
 
-        protected override void OnDestroy(Vector cell)
+        protected override void OnDestroy(CellCoordinates cell)
         {
+            timer.Stop();
+            timer.Dispose();
+
             Match.Output.Audio.Play(Sounds.Explosion);
 
             CreateExplosions(cell);
@@ -33,30 +35,30 @@ namespace NanoGames.Games.Bomberguy
             Match.CheckAllDeaths();
         }
 
-        private void CreateExplosions(Vector cell)
+        private void CreateExplosions(CellCoordinates cell)
         {
-            Match[cell] = new Explosion(Explosion.Type.CENTER, Match, Match.GetCoordinates(cell), Match.CellSize);
+            Match[cell] = new Explosion(Match, Explosion.Type.CENTER, new Vector(), Match.GetScreenCoordinates(cell), Match.CellSize);
 
-            var direction = new Vector(-1, 0);
+            var direction = new CellCoordinates(-1, 0);
             for (int i = 0; i < 4; i++)
             {
                 direction = direction.RotatedRight;
 
-                for (int r = 1; r <= reach; r++)
+                for (int r = 1; r <= Constants.Bomb.REACH; r++)
                 {
                     var explosionCell = cell + direction * r;
                     var cellContent = Match[explosionCell];
 
                     if (cellContent == null)
                     {
-                        Match[explosionCell] = new Explosion(getExplosionType(r, direction), Match, Match.GetCoordinates(explosionCell), Match.CellSize);
+                        Match[explosionCell] = new Explosion(Match, getExplosionType(r), new Vector(direction.Column, direction.Row), Match.GetScreenCoordinates(explosionCell), Match.CellSize);
                     }
                     else
                     {
                         if (cellContent.Destroyable)
                         {
                             cellContent.Destroy();
-                            Match[explosionCell] = new Explosion(getExplosionType(reach, direction), Match, Match.GetCoordinates(explosionCell), Match.CellSize);
+                            Match[explosionCell] = new Explosion(Match, Explosion.Type.END, new Vector(direction.Column, direction.Row), Match.GetScreenCoordinates(explosionCell), Match.CellSize);
                         }
                         break;
                     }
@@ -64,28 +66,10 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
-        private Explosion.Type getExplosionType(int r, Vector direction)
+        private Explosion.Type getExplosionType(int r)
         {
-            if (direction.Y == -1)
-            {
-                if (r == reach) return Explosion.Type.TOPEND;
-                else return Explosion.Type.COLUMN;
-            }
-            else if (direction.X == 1)
-            {
-                if (r == reach) return Explosion.Type.RIGHTEND;
-                else return Explosion.Type.ROW;
-            }
-            else if (direction.Y == 1)
-            {
-                if (r == reach) return Explosion.Type.BOTTOMEND;
-                else return Explosion.Type.COLUMN;
-            }
-            else
-            {
-                if (r == reach) return Explosion.Type.LEFTEND;
-                else return Explosion.Type.ROW;
-            }
+            if (r == Constants.Bomb.REACH) return Explosion.Type.END;
+            else return Explosion.Type.MIDDLE;
         }
     }
 }

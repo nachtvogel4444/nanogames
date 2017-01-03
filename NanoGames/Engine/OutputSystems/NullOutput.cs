@@ -52,13 +52,15 @@ namespace NanoGames.Engine.OutputSystems
             {
             }
 
-            public double MeanDistance { get; set; }
+            public double Frequency { get; set; }
 
             public Vector Gravity { get; set; }
 
             public Vector Velocity { get; set; }
 
             public double Intensity { get; set; }
+
+            public double Lifetime { get; set; }
 
             public void Line(Color color, Vector start, Vector end)
             {

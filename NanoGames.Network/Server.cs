@@ -203,6 +203,8 @@ namespace NanoGames.Network
 
             public TcpConnection(Server server, TcpClient tcpClient)
             {
+                tcpClient.NoDelay = true;
+
                 _server = server;
                 _tcpClient = tcpClient;
                 _stream = tcpClient.GetStream();
@@ -220,7 +222,7 @@ namespace NanoGames.Network
                 _writer.Dispose();
                 _reader.Dispose();
                 _stream.Dispose();
-                _tcpClient.Dispose();
+                _tcpClient.Close();
             }
 
             private void OnPacket(byte[] packet)

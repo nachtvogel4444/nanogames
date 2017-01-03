@@ -45,6 +45,11 @@ namespace NanoGames.Application
                 },
             };
 
+            if (DebugMode.IsEnabled)
+            {
+                _mainMenu.Items.Insert(1, new CommandMenuItem("MULTIPLAYER DEBUG", () => _currentView = new MultiplayerDebugView(() => _currentView = _mainMenu)));
+            }
+
             _server = Settings.Instance.LastServer;
             _multiplayerMenu = new Menu("MULTIPLAYER")
             {

@@ -162,7 +162,7 @@ namespace NanoGames.Application
         {
             double fontSize = 8;
             double x = 160 - 0.5 * ((Settings.MaxPlayerNameLength + 6) * fontSize);
-            double y = 100 - 0.5 * _tournament.Players.Count * fontSize;
+            double y = 100 - 0.5 * _tournament.Players.Count() * fontSize;
 
             foreach (var playerInfo in _tournament.Players.OrderByDescending(p => p.TournamentScore).ThenBy(p => p.Name, StringComparer.InvariantCultureIgnoreCase).ThenBy(p => p.Id))
             {

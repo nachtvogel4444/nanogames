@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using System;
+using System.Globalization;
 
 namespace NanoGames
 {
@@ -181,7 +182,7 @@ namespace NanoGames
         /// <inheritdoc/>
         public override string ToString()
         {
-            return FormattableString.Invariant($"({X}, {Y})");
+            return string.Format(CultureInfo.InvariantCulture, "({0}, {1})", X, Y);
         }
     }
 }

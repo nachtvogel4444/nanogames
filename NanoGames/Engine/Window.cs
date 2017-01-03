@@ -6,6 +6,7 @@ using OpenTK;
 using OpenTK.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace NanoGames.Engine
@@ -117,6 +118,8 @@ namespace NanoGames.Engine
 
                         using (var mainView = createMainView())
                         {
+                            long startTimestamp = Stopwatch.GetTimestamp();
+
                             while (true)
                             {
                                 _gameWindow.ProcessEvents();
@@ -129,10 +132,14 @@ namespace NanoGames.Engine
                                 var width = _gameWindow.Width;
                                 var height = _gameWindow.Height;
 
+                                double frame = (Stopwatch.GetTimestamp() - startTimestamp) / (double)Stopwatch.Frequency * 60.0;
+
                                 renderer.BeginFrame(width, height);
                                 UpdateKeyEvents(terminal.KeyEvents);
                                 terminal.Input = GetInput();
+                                terminal.Particles.SetFrame(frame);
                                 mainView.Update(terminal);
+                                terminal.Particles.Render(frame, renderer);
                                 renderer.EndFrame();
 
                                 _gameWindow.SwapBuffers();
@@ -192,6 +199,30 @@ namespace NanoGames.Engine
 
                 case Key.Delete:
                     return KeyCode.Delete;
+
+                case Key.F1:
+                    return KeyCode.F1;
+
+                case Key.F2:
+                    return KeyCode.F2;
+
+                case Key.F3:
+                    return KeyCode.F3;
+
+                case Key.F4:
+                    return KeyCode.F4;
+
+                case Key.F5:
+                    return KeyCode.F5;
+
+                case Key.F6:
+                    return KeyCode.F6;
+
+                case Key.F7:
+                    return KeyCode.F7;
+
+                case Key.F8:
+                    return KeyCode.F8;
 
                 default:
                     return KeyCode.None;

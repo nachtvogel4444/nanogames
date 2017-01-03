@@ -27,6 +27,7 @@ namespace NanoGames.Engine
         };
 
         private readonly Shader _tubeShader = new Shader("NanoGames.Engine.Shaders.Tube");
+        private readonly Shader _reducedTubeShader = new Shader("NanoGames.Engine.Shaders.ReducedTube");
         private readonly Shader _blurShader = new Shader("NanoGames.Engine.Shaders.Blur");
 
         private readonly TriangleBuffer _triangleBuffer = new TriangleBuffer(_vertexSpecification);
@@ -61,6 +62,7 @@ namespace NanoGames.Engine
             _triangleBuffer.Dispose();
             _blurShader.Dispose();
             _tubeShader.Dispose();
+            _reducedTubeShader.Dispose();
         }
 
         /// <summary>
@@ -118,37 +120,48 @@ namespace NanoGames.Engine
         /// <param name="screenFramebuffer">The screen framebuffer.</param>
         internal void EndFrame(Framebuffer screenFramebuffer)
         {
-            GL.ActiveTexture(TextureUnit.Texture0);
-            screenFramebuffer.BindTexture();
-
-            for (int i = 0; i < _blurFramebuffers.Length; ++i)
+            if (Application.Settings.Instance.ReducedDetails)
             {
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBorderColor, new float[] { 0.02f, 0.02f, 0.02f, 1 });
+                GL.ActiveTexture(TextureUnit.Texture1);
+                screenFramebuffer.BindTexture();
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBorderColor, new float[] { 0, 0, 0, 1 });
+                GL.Hint(HintTarget.GenerateMipmapHint, HintMode.Nicest);
+                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+            }
+            else
+            {
+                GL.ActiveTexture(TextureUnit.Texture0);
+                screenFramebuffer.BindTexture();
+
+                for (int i = 0; i < _blurFramebuffers.Length; ++i)
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBorderColor, new float[] { 0.02f, 0.02f, 0.02f, 1 });
+
+                    GL.Hint(HintTarget.GenerateMipmapHint, HintMode.Nicest);
+                    GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+                    var framebuffer = _blurFramebuffers[i];
+                    GL.Viewport(0, 0, framebuffer.Width, framebuffer.Height);
+                    framebuffer.BindFramebuffer();
+                    _blurShader.Bind();
+                    GL.Uniform1(0, 0);
+                    GL.Uniform2(1, (float)(_blurRadius * _blurVectors[i].X / _width), (float)(_blurRadius * _blurVectors[i].Y / _height));
+                    _vertexArray.Draw();
+                    framebuffer.BindTexture();
+                }
+
+                Framebuffer.Unbind();
 
                 GL.Hint(HintTarget.GenerateMipmapHint, HintMode.Nicest);
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-                var framebuffer = _blurFramebuffers[i];
-                GL.Viewport(0, 0, framebuffer.Width, framebuffer.Height);
-                framebuffer.BindFramebuffer();
-                _blurShader.Bind();
-                GL.Uniform1(0, 0);
-                GL.Uniform2(1, (float)(_blurRadius * _blurVectors[i].X / _width), (float)(_blurRadius * _blurVectors[i].Y / _height));
-                _vertexArray.Draw();
-                framebuffer.BindTexture();
+                GL.ActiveTexture(TextureUnit.Texture1);
+                screenFramebuffer.BindTexture();
             }
-
-            Framebuffer.Unbind();
-
-            GL.Hint(HintTarget.GenerateMipmapHint, HintMode.Nicest);
-            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-
-            GL.ActiveTexture(TextureUnit.Texture1);
-            screenFramebuffer.BindTexture();
 
             GL.Viewport(0, 0, _width, _height);
 
-            _tubeShader.Bind();
+            (Application.Settings.Instance.ReducedDetails ? _reducedTubeShader : _tubeShader).Bind();
             GL.Uniform1(0, 0);
             GL.Uniform1(1, 1);
             _vertexArray.Draw();

@@ -22,6 +22,7 @@ namespace NanoGames.Network
         {
             _tcpClient = new TcpClient(AddressFamily.InterNetworkV6);
             _tcpClient.Client.DualMode = true;
+            _tcpClient.NoDelay = true;
         }
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace NanoGames.Network
                 _writer.Dispose();
                 _reader.Dispose();
                 _stream.Dispose();
-                _tcpClient.Dispose();
+                _tcpClient.Close();
             }
 
             base.Dispose(isDisposing);

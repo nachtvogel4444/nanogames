@@ -90,7 +90,7 @@ namespace NanoGames.Synchronization
         /// <summary>
         /// Gets a collection of all players in the tournament.
         /// </summary>
-        public IReadOnlyCollection<PlayerState> Players => _players.Values;
+        public IEnumerable<PlayerState> Players => _players.Values;
 
         /// <summary>
         /// Gets the state of the local player.

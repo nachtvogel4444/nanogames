@@ -41,20 +41,20 @@ namespace NanoGames.Games.Bomberguy
 
         internal BomberMatch Match { get; private set; }
 
-        public abstract void Draw(IGraphics g);
+        public abstract void Draw();
 
         public void Destroy()
         {
             if (!Destroyable) return;
 
-            var cell = Match.GetCell(this);
+            var cell = Match.GetCellCoordinates(this);
 
             Match[cell] = null;
 
             OnDestroy(cell);
         }
 
-        protected virtual void OnDestroy(Vector cell)
+        protected virtual void OnDestroy(CellCoordinates cell)
         {
         }
     }

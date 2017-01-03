@@ -26,8 +26,6 @@ namespace NanoGames.Games.Snake
                 return;
             }
 
-            Score = Match.Frame;
-
             var direction = GetInputDirection();
             if (direction != Direction.None && (int)direction != -(int)Direction)
             {
@@ -75,6 +73,7 @@ namespace NanoGames.Games.Snake
                     }
 
                     IsAlive = false;
+                    Score = Match.Frame;
                     return;
                 }
                 else

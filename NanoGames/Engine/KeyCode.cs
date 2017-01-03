@@ -62,5 +62,45 @@ namespace NanoGames.Engine
         /// Delete.
         /// </summary>
         Delete,
+
+        /// <summary>
+        /// F1.
+        /// </summary>
+        F1,
+
+        /// <summary>
+        /// F2.
+        /// </summary>
+        F2,
+
+        /// <summary>
+        /// F3.
+        /// </summary>
+        F3,
+
+        /// <summary>
+        /// F4.
+        /// </summary>
+        F4,
+
+        /// <summary>
+        /// F5.
+        /// </summary>
+        F5,
+
+        /// <summary>
+        /// F6.
+        /// </summary>
+        F6,
+
+        /// <summary>
+        /// F7.
+        /// </summary>
+        F7,
+
+        /// <summary>
+        /// F8.
+        /// </summary>
+        F8,
     }
 }

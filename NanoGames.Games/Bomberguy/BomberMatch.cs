@@ -7,15 +7,7 @@ namespace NanoGames.Games.Bomberguy
 {
     internal class BomberMatch : Match<BomberGuy>
     {
-        public const int FIELD_MIN_SIZE = 9;
-        public const double PLAYER_RATIO = .9;
-        public const double BOMB_RATIO = 1;
-        public const int BOMB_REACH = 2;
-        public const double PLAYER_SPEED = 9;
-        public const double BOMBSTACLE_PROBABILITY = 0.5;
-
         private int _fieldSize;
-        private double _playerSpeed;
         private double _pixelsPerUnit;
         private double _widthOffset;
         private RectbombularThing[,] _field;
@@ -25,50 +17,50 @@ namespace NanoGames.Games.Bomberguy
             get { return new Vector(_pixelsPerUnit, _pixelsPerUnit); }
         }
 
-        public RectbombularThing this[Vector v]
+        public double PlayerSpeed { get; private set; }
+
+        public RectbombularThing this[CellCoordinates c]
+        {
+            get { return this[c.Row, c.Column]; }
+            set { this[c.Row, c.Column] = value; }
+        }
+
+        public RectbombularThing this[int row, int column]
         {
             get
             {
-                return this[(int)v.X, (int)v.Y];
+                return _field[row, column];
             }
 
             set
             {
-                this[(int)v.X, (int)v.Y] = value;
+                _field[row, column] = value;
+                if (value != null) value.Position = GetScreenCoordinates(new CellCoordinates(row, column));
             }
         }
 
-        public RectbombularThing this[int x, int y]
+        
+
+        internal double GetAbsSize(double relSize)
         {
-            get
-            {
-                return _field[x, y];
-            }
-
-            set
-            {
-                _field[x, y] = value;
-                if (value != null) value.Position = GetCoordinates(new Vector(x, y));
-            }
+            return relSize * _pixelsPerUnit;
         }
 
-        public Vector GetCell(BomberThing thing)
+        public CellCoordinates GetCellCoordinates(BomberThing thing)
         {
-            var c = (thing.Center.X - _widthOffset) / _pixelsPerUnit;
-            var r = thing.Center.Y / _pixelsPerUnit;
-            return new Vector(Math.Floor(r), Math.Floor(c));
+            return GetCell(thing.Center);
         }
 
-        public Vector GetCell(Vector position)
+        public CellCoordinates GetCell(Vector position)
         {
             var c = (position.X - _widthOffset) / _pixelsPerUnit;
             var r = position.Y / _pixelsPerUnit;
-            return new Vector(Math.Floor(r), Math.Floor(c));
+            return new CellCoordinates((int)Math.Floor(r), (int)Math.Floor(c));
         }
 
-        public Vector GetCoordinates(Vector cellCoordinates)
+        public Vector GetScreenCoordinates(CellCoordinates cellCoordinates)
         {
-            return new Vector(_widthOffset + cellCoordinates.Y * _pixelsPerUnit, cellCoordinates.X * _pixelsPerUnit);
+            return new Vector(_widthOffset + cellCoordinates.Column * _pixelsPerUnit, cellCoordinates.Row * _pixelsPerUnit);
         }
 
         public void CheckAllDeaths()
@@ -81,11 +73,11 @@ namespace NanoGames.Games.Bomberguy
 
         protected override void Initialize()
         {
-            _fieldSize = FIELD_MIN_SIZE + ((int)(Players.Count / 4)) * 2;
+            _fieldSize = Constants.BomberMatch.FIELD_MIN_SIZE + ((int)(Players.Count / 4)) * 2;
 
             _field = new RectbombularThing[_fieldSize, _fieldSize];
 
-            _playerSpeed = PLAYER_SPEED / _fieldSize;
+            PlayerSpeed = Constants.BomberGuy.SPEED / _fieldSize;
 
             _pixelsPerUnit = GraphicsConstants.Height / _fieldSize;
             _widthOffset = (GraphicsConstants.Width - GraphicsConstants.Height) / 2d;
@@ -115,7 +107,7 @@ namespace NanoGames.Games.Bomberguy
                 CheckDeath(p);
             }
 
-            DrawField(Output.Graphics);
+            Draw();
         }
 
         private void InitializeField()
@@ -126,12 +118,11 @@ namespace NanoGames.Games.Bomberguy
                 {
                     if (r == 0 || r == _fieldSize - 1 || c == 0 || c == _fieldSize - 1 || r % 2 == 0 && c % 2 == 0)
                     {
-                        //_field[r, c] = new Unbombable(this, new Vector(_widthOffset + c * _pixelsPerUnit, r * _pixelsPerUnit), new Vector(_pixelsPerUnit, _pixelsPerUnit));
                         this[r, c] = new Unbombable(this, CellSize);
                     }
                     else
                     {
-                        if (this.Random.NextDouble() <= BOMBSTACLE_PROBABILITY)
+                        if (this.Random.NextDouble() <= Constants.BomberMatch.BOMBSTACLE_PROBABILITY)
                         {
                             this[r, c] = new Bombstacle(this, CellSize);
                         }
@@ -156,26 +147,24 @@ namespace NanoGames.Games.Bomberguy
                 }
             }
 
-            Vector direction = new Vector(1, 0);
+            CellCoordinates direction = new CellCoordinates(1, 0);
             int distance = (int)Math.Floor((double)(_fieldSize - 2) / playersPerSide);
-            Vector currPos = new Vector(1, 1);
+            CellCoordinates currPos = new CellCoordinates(1, 1);
             for (int i = 0; i < 4; i++)
             {
-                if (i == 1) currPos = new Vector(_fieldSize - 2, 1);
-                if (i == 2) currPos = new Vector(_fieldSize - 2, _fieldSize - 2);
-                if (i == 3) currPos = new Vector(1, _fieldSize - 2);
+                if (i == 1) currPos = new CellCoordinates(_fieldSize - 2, 1);
+                if (i == 2) currPos = new CellCoordinates(_fieldSize - 2, _fieldSize - 2);
+                if (i == 3) currPos = new CellCoordinates(1, _fieldSize - 2);
 
                 for (int j = 0; j < playersPerSide; j++)
                 {
                     var p = playerArray[i, j];
                     if (p == null) continue;
-                    p.Size = new Vector(_pixelsPerUnit * PLAYER_RATIO, _pixelsPerUnit * PLAYER_RATIO);
+                    p.Size = new Vector(_pixelsPerUnit * Constants.BomberGuy.REL_SIZE, _pixelsPerUnit * Constants.BomberGuy.REL_SIZE);
 
-                    var cellCoordinates = new Vector(currPos.Y, currPos.X);
+                    MakeSpaceAroundPlayer(currPos);
 
-                    MakeSpaceAroundPlayer(cellCoordinates);
-
-                    p.Position = GetCoordinates(cellCoordinates);
+                    p.Position = GetScreenCoordinates(currPos);
                     currPos += direction * distance;
                 }
 
@@ -183,12 +172,12 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
-        private void MakeSpaceAroundPlayer(Vector cellCoordinates)
+        private void MakeSpaceAroundPlayer(CellCoordinates cellCoordinates)
         {
             var cellContent = this[cellCoordinates];
             if (cellContent != null && cellContent.Destroyable) cellContent.Destroy();
 
-            var directionVector = new Vector(1, 0);
+            var directionVector = new CellCoordinates(1, 0);
 
             for (int i = 0; i < 4; i++)
             {
@@ -198,20 +187,16 @@ namespace NanoGames.Games.Bomberguy
             }
         }
 
-        private void DrawField(IGraphics g)
+        private void Draw()
         {
             /* Draw each player. */
             foreach (var player in Players)
             {
+
                 /* Skip players that have already finished. */
                 if (player.Dead) continue;
 
-                Color color = player.LocalColor;
-
-                g.Line(color, player.Position + new Vector(player.Size.X / 2d, 0), player.Position + new Vector(player.Size.X, player.Size.Y / 2d));
-                g.Line(color, player.Position + new Vector(player.Size.X, player.Size.Y / 2d), player.Position + new Vector(player.Size.X / 2d, player.Size.Y));
-                g.Line(color, player.Position + new Vector(player.Size.X / 2d, player.Size.Y), player.Position + new Vector(0, player.Size.Y / 2d));
-                g.Line(color, player.Position + new Vector(0, player.Size.Y / 2d), player.Position + new Vector(player.Size.X / 2d, 0));
+                player.Draw();
             }
 
             for (int r = 0; r < _fieldSize; r++)
@@ -221,13 +206,15 @@ namespace NanoGames.Games.Bomberguy
                     var thing = _field[r, c];
 
                     if (thing != null)
-                        thing.Draw(g);
+                        thing.Draw();
                 }
             }
         }
 
         private void MovePlayer(BomberGuy p)
         {
+            p.Speed = new Vector();
+
             double x = 0, y = 0;
 
             Vector inputVector = GetInputVector(p.Input);
@@ -235,7 +222,7 @@ namespace NanoGames.Games.Bomberguy
 
             if (p.Input.Up.IsPressed && !p.Input.Down.IsPressed)
             {
-                var neighborLeft = this[GetCell(p.Position + new Vector(0, _playerSpeed * inputVector.Y))];
+                var neighborLeft = this[GetCell(p.Position + new Vector(0, PlayerSpeed * inputVector.Y))];
                 bool neighborLeftPassable = neighborLeft == null;
                 bool slideToRightAllowed = false;
                 if (neighborLeft != null && !(neighborLeftPassable = neighborLeft.Passable))
@@ -246,7 +233,7 @@ namespace NanoGames.Games.Bomberguy
                     DetermineMovement(out neighborLeftPassable, out slideToRightAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
 
-                var neighborRight = this[GetCell(p.Position + new Vector(p.Size.X, _playerSpeed * inputVector.Y))];
+                var neighborRight = this[GetCell(p.Position + new Vector(p.Size.X, PlayerSpeed * inputVector.Y))];
                 bool neighborRightPassable = neighborRight == null;
                 bool slideToLeftAllowed = false;
                 if (neighborRight != null && !(neighborRightPassable = neighborRight.Passable))
@@ -265,7 +252,7 @@ namespace NanoGames.Games.Bomberguy
             }
             if (p.Input.Down.IsPressed && !p.Input.Up.IsPressed)
             {
-                var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, _playerSpeed * inputVector.Y))];
+                var neighborLeft = this[GetCell(p.Position + p.Size + new Vector(-p.Size.X, PlayerSpeed * inputVector.Y))];
                 bool neighborLeftPassable = neighborLeft == null;
                 bool slideToRightAllowed = false;
                 if (neighborLeft != null && !(neighborLeftPassable = neighborLeft.Passable))
@@ -277,7 +264,7 @@ namespace NanoGames.Games.Bomberguy
                     DetermineMovement(out neighborLeftPassable, out slideToRightAllowed, yDistance, xDistance, p.Size.Y, p.Size.X);
                 }
 
-                var neighborRight = this[GetCell(p.Position + p.Size + new Vector(0, _playerSpeed * inputVector.Y))];
+                var neighborRight = this[GetCell(p.Position + p.Size + new Vector(0, PlayerSpeed * inputVector.Y))];
                 bool neighborRightPassable = neighborRight == null;
                 bool slideToLeftAllowed = false;
                 if (neighborRight != null && !(neighborRightPassable = neighborRight.Passable))
@@ -295,7 +282,7 @@ namespace NanoGames.Games.Bomberguy
             }
             if (p.Input.Left.IsPressed && !p.Input.Right.IsPressed)
             {
-                var neighborAbove = this[GetCell(p.Position + new Vector(_playerSpeed * inputVector.X, 0))];
+                var neighborAbove = this[GetCell(p.Position + new Vector(PlayerSpeed * inputVector.X, 0))];
                 bool neighborAbovePassable = neighborAbove == null;
                 bool slideToDownAllowed = false;
                 if (neighborAbove != null && !(neighborAbovePassable = neighborAbove.Passable))
@@ -306,7 +293,7 @@ namespace NanoGames.Games.Bomberguy
                     DetermineMovement(out neighborAbovePassable, out slideToDownAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
 
-                var neighborBelow = this[GetCell(p.Position + new Vector(_playerSpeed * inputVector.X, p.Size.Y))];
+                var neighborBelow = this[GetCell(p.Position + new Vector(PlayerSpeed * inputVector.X, p.Size.Y))];
                 bool neighborBelowPassable = neighborBelow == null;
                 bool slideToUpAllowed = false;
                 if (neighborBelow != null && !(neighborBelowPassable = neighborBelow.Passable))
@@ -325,7 +312,7 @@ namespace NanoGames.Games.Bomberguy
             }
             if (p.Input.Right.IsPressed && !p.Input.Left.IsPressed)
             {
-                var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed * inputVector.X, 0))];
+                var neighborAbove = this[GetCell(p.Position + new Vector(p.Size.X + PlayerSpeed * inputVector.X, 0))];
                 bool neighborAbovePassable = neighborAbove == null;
                 bool slideToDownAllowed = false;
                 if (neighborAbove != null && !(neighborAbovePassable = neighborAbove.Passable))
@@ -336,7 +323,7 @@ namespace NanoGames.Games.Bomberguy
                     DetermineMovement(out neighborAbovePassable, out slideToDownAllowed, xDistance, yDistance, p.Size.X, p.Size.Y);
                 }
 
-                var neighborBelow = this[GetCell(p.Position + new Vector(p.Size.X + _playerSpeed * inputVector.X, p.Size.Y))];
+                var neighborBelow = this[GetCell(p.Position + new Vector(p.Size.X + PlayerSpeed * inputVector.X, p.Size.Y))];
                 bool neighborBelowPassable = neighborBelow == null;
                 bool slideToUpAllowed = false;
                 if (neighborBelow != null && !(neighborBelowPassable = neighborBelow.Passable))
@@ -357,7 +344,8 @@ namespace NanoGames.Games.Bomberguy
 
             var direction = new Vector(x, y).Normalized;
 
-            p.Position += direction * _playerSpeed;
+            p.Speed = direction * PlayerSpeed;
+            p.Position += direction * PlayerSpeed;
         }
 
         private Vector GetInputVector(Input input)
@@ -389,16 +377,19 @@ namespace NanoGames.Games.Bomberguy
         {
             if (!p.Input.Fire.WasActivated) return;
 
-            var cell = GetCell(p);
+            var cell = GetCellCoordinates(p);
 
-            var bomb = new Bomb(BOMB_REACH, p, this, GetCoordinates(cell), new Vector(_pixelsPerUnit * BOMB_RATIO, _pixelsPerUnit * BOMB_RATIO));
+            // prevent multiple bombs in one cell
+            if (this[cell] != null) return;
+
+            var bomb = new Bomb(p, this, GetScreenCoordinates(cell));
 
             this[cell] = bomb;
         }
 
         private void CheckDeath(BomberGuy p)
         {
-            var cell = this[GetCell(p)];
+            var cell = this[GetCellCoordinates(p)];
 
             if (cell != null && cell.Deadly) p.Destroy();
         }
