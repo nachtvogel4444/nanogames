@@ -69,12 +69,13 @@ namespace NanoGames.Games.Banana
             {
                 case "NextPlayer":
 
-                    while (ActivePlayer.HasFinished)
+                    do
                     {
                         activePlayerIdx++;
                         activePlayerIdx = activePlayerIdx % Players.Count;
                         ActivePlayer = Players[activePlayerIdx];
-                    }
+
+                    } while (ActivePlayer.HasFinished);
 
                     FramesLeft = framesMax;
                     Wind.SetSpeed(Random);

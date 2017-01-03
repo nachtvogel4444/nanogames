@@ -325,6 +325,10 @@ namespace NanoGames.Games.Banana
             if (this == Match.ActivePlayer)
             {
                 g.Print(c, 10, new Vector(10, 10 + 10 * i), Name);
+                g.CircleSegment(c, Position + 1 * Normal, 0.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
+                g.CircleSegment(c, Position + 1 * Normal, 1, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
+                g.CircleSegment(c, Position + 1 * Normal, 1.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
+                g.CircleSegment(c, Position + 1 * Normal, 2.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
             }
             else
             {
