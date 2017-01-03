@@ -24,7 +24,7 @@ namespace NanoGames.Games.Banana
 
         public Vector Velocity = new Vector(0, 0);
 
-        private double speedProjectile = 0.5;
+        private double speedProjectile = 0;
         public double Health = 100;
         public bool IsFalling = false;
         
@@ -114,8 +114,30 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Line(new Color(1, 1, 1), new Vector(110, 20), new Vector(210, 20));
             Output.Graphics.Line(new Color(1, 1, 1), new Vector(110, 30), new Vector(210, 30));
             Output.Graphics.Line(new Color(1, 1, 1), new Vector(210, 20), new Vector(210, 30));
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(140, 15), "POWER " + (Convert.ToInt32(speedProjectile * 20)).ToString());
+            
+            // draw wind
+            numberOfLines = (int)(Math.Abs(Match.Wind.Speed) * 40 / 5);
+            for (int i = 0; i < numberOfLines; i++)
+            {
+                if (Match.Wind.Speed < 0)
+                {
+                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(270 - i, 20), new Vector(268 - i, 25));
+                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(268 - i, 25), new Vector(270 - i, 30));
+                }
+                if (Match.Wind.Speed > 0)
+                {
+                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(270 + i, 20), new Vector(272 + i, 25));
+                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(272 + i, 25), new Vector(270 + i, 30));
+                }
+            }
 
-            // Draw Health
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(270, 20), new Vector(270, 30));
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(250, 20), new Vector(250, 30));
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(250, 20), new Vector(290, 20));
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(250, 30), new Vector(290, 30));
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(290, 20), new Vector(290, 30));
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(260, 15), "WIND " + (Convert.ToInt32(Math.Abs(Match.Wind.Speed) * 10)).ToString());
 
             /*
             // Draw Information on Screen
@@ -127,16 +149,6 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "WEAPON: " + weapons[idxWeapon].ToUpper());
             Output.Graphics.Print(new Color(1, 1, 1), 10, new Vector(150, 20), ((int)(Match.FramesLeft / 60.0)).ToString());
             */
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 50), "STATEOFGAME: " + Match.StateOfGame.ToUpper());
-
-            if (Match.Wind.Speed >= 0)
-            {
-                Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "Wind: P " + (Convert.ToInt32(Match.Wind.Speed * 10)).ToString());
-            }
-            else
-            {
-                Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(10, 60), "Wind: M " + (Convert.ToInt32(Match.Wind.Speed * 10)).ToString());
-            }
         }
 
         public void SetWeapon()
@@ -257,14 +269,15 @@ namespace NanoGames.Games.Banana
             {
                 Match.StateOfGame = "ActivePlayerShoot2";
                 countFire = 0;
+                speedProjectile = 0;
             }
         }
 
         public void Shoot2()
         {
-            speedProjectile = 0.5 + 4.5 * countFire / 60;
+            speedProjectile = 0.5 + 4.5 * countFire / 100;
             
-            if (!Input.Fire.IsPressed || countFire > 60)
+            if (!Input.Fire.IsPressed || countFire > 100)
             {
                 Match.StateOfGame = "ActivePlayerShoot3";
             }
@@ -282,8 +295,6 @@ namespace NanoGames.Games.Banana
                 Output.Audio.Play(Sounds.GunFire);
 
                 Match.Bullet.StartBullet(position, velocity);
-
-                speedProjectile = 0.5;
 
                 Match.StateOfGame = "SomethingFlying";
             }
