@@ -11,8 +11,8 @@ namespace NanoGames.Games.Banana
 {
     class Landscape
     {
-        public bool[,] IsSolid = new bool[321, 201];
-        public bool[,] IsBorder = new bool[321, 201];
+        private bool[,] IsSolid = new bool[321, 201];
+        private bool[,] IsBorder = new bool[321, 201];
         public List<List<Vector>> Border = new List<List<Vector>>();
         public List<List<Vector>> Normal = new List<List<Vector>>();
 
@@ -224,6 +224,26 @@ namespace NanoGames.Games.Banana
             return (x % m + m) % m;
         }
 
+        public void BuildLandscape(string name)
+        {
+            /* the first landscape */
+            if (name == "first")
+            {
+                CreateBlock(new Vector(100, 100), new Vector(130, 110));
+                CreateBlock(new Vector(120, 120), new Vector(190, 300));
+                CreateBlock(new Vector(150, 100), new Vector(300, 130));
+            }
+            
+            if (name == "blocks")
+            {
+                CreateBlock(new Vector(30, 60), new Vector(100, 90));
+                CreateBlock(new Vector(150, 100), new Vector(300, 120));
+                CreateBlock(new Vector(110, 160), new Vector(150, 190));
+                CreateBlock(new Vector(230, 160), new Vector(280, 190));
+            }
 
+            Refresh();
+        }
+        
     }
 }

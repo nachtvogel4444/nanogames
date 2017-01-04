@@ -22,6 +22,7 @@ namespace NanoGames.Games.Banana
         public bool NextPlayer = false;
         public bool PlayerHitGround = false;
         public bool BulletMoved = false;
-       
+        public bool TimerFiveSecondsToGo = false;
+        public bool TimerOneSecondToGo = false;
     }
 }

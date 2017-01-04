@@ -45,6 +45,75 @@ namespace NanoGames.Games.Banana
         
         public void DrawScreen()
         {
+            string tmp = "";
+            Color colorActivePlayer = Match.ActivePlayer.Color;
+
+            if (this == Match.ActivePlayer)
+            {
+                colorActivePlayer = new Color(1, 1, 1);
+            }
+
+            /* draw time left */
+            tmp = "TIME LEFT " + ((int)(Match.FramesLeft / 60.0)).ToString();
+            Output.Graphics.Print(new Color(1, 1, 1), 6, new Vector(160 - tmp.Length * 6 / 2, 2),  tmp);
+
+            /* draw active player name*/
+            Output.Graphics.Print(new Color(1, 1, 1), 6, new Vector(30, 2), "BRUNO");
+            
+            // draw speedprojectile / power
+            int numberOfLines = (int)(speedProjectile * 100 / 5);
+            for (int i = 0; i < numberOfLines; i++)
+            {
+                Output.Graphics.Line(colorActivePlayer, new Vector(110 + i, 20), new Vector(110 + i, 28));
+            }
+            Output.Graphics.Line(colorActivePlayer, new Vector(110, 20), new Vector(110, 28));
+            Output.Graphics.Line(colorActivePlayer, new Vector(110, 20), new Vector(210, 20));
+            Output.Graphics.Line(colorActivePlayer, new Vector(110, 28), new Vector(210, 28));
+            Output.Graphics.Line(colorActivePlayer, new Vector(210, 20), new Vector(210, 28));
+            tmp = "POWER " + (Convert.ToInt32(speedProjectile * 20)).ToString();
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(160 - tmp.Length * 4 / 2, 15), tmp);
+
+            // draw health
+            numberOfLines = (int)(Health * 40 / 100);
+            for (int i = 0; i < numberOfLines; i++)
+            {
+                Output.Graphics.Line(colorActivePlayer, new Vector(30 + i, 20), new Vector(30 + i, 28));
+            }
+            Output.Graphics.Line(colorActivePlayer, new Vector(30, 20), new Vector(30, 28));
+            Output.Graphics.Line(colorActivePlayer, new Vector(30, 20), new Vector(70, 20));
+            Output.Graphics.Line(colorActivePlayer, new Vector(30, 28), new Vector(70, 28));
+            Output.Graphics.Line(colorActivePlayer, new Vector(70, 20), new Vector(70, 28));
+            tmp = "HEALTH " + (Convert.ToInt32(Match.ActivePlayer.Health)).ToString().ToUpper();
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(50 - tmp.Length * 4 / 2, 15), tmp);
+
+
+            // draw wind
+            numberOfLines = (int)(Math.Abs(Match.Wind.Speed) * 40 / 5);
+            for (int i = 0; i < numberOfLines; i++)
+            {
+                if (Match.Wind.Speed < 0)
+                {
+                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(270 - i, 20), new Vector(268 - i, 24));
+                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(268 - i, 24), new Vector(270 - i, 28));
+                }
+                if (Match.Wind.Speed > 0)
+                {
+                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(270 + i, 20), new Vector(272 + i, 24));
+                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(272 + i, 24), new Vector(270 + i, 28));
+                }
+            }
+
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(270, 20), new Vector(270, 28));
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(250, 20), new Vector(250, 28));
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(250, 20), new Vector(290, 20));
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(250, 28), new Vector(290, 28));
+            Output.Graphics.Line(new Color(1, 1, 1), new Vector(290, 20), new Vector(290, 28));
+            tmp = "WIND " + (Convert.ToInt32(Math.Abs(Match.Wind.Speed) * 10)).ToString();
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(270 - tmp.Length / 2 * 4, 15), tmp);
+            
+            /* Draw landscape */
+            Match.Land.Draw(Output.Graphics);
+
             /* Draw each player. */
             for (int i = 0; i < Match.Players.Count; i++)
             {
@@ -69,7 +138,7 @@ namespace NanoGames.Games.Banana
 
                 /* Draw the body of the player. */
                 player.Draw(Output.Graphics, color, i);
-                
+
             }
 
             /* Draw bullet. */
@@ -77,47 +146,6 @@ namespace NanoGames.Games.Banana
             {
                 Output.Graphics.Line(new Color(1, 1, 1), Match.Bullet.Position, Match.Bullet.PositionBefore);
             }
-
-            /* Draw landscape */
-            Match.Land.Draw(Output.Graphics);
-
-            /* draw time left */
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(120, 10), "TIME LEFT " + ((int)(Match.FramesLeft / 60.0)).ToString());
-
-            // draw speedprojectile / power
-            int numberOfLines = (int)(speedProjectile * 100 / 5);
-            for (int i = 0; i < numberOfLines; i++)
-            {
-                Output.Graphics.Line(new Color(1,1,1), new Vector(110 + i, 20), new Vector(110 + i, 30));
-            }
-            Output.Graphics.Line(new Color(1, 1, 1), new Vector(110, 20), new Vector(110, 30));
-            Output.Graphics.Line(new Color(1, 1, 1), new Vector(110, 20), new Vector(210, 20));
-            Output.Graphics.Line(new Color(1, 1, 1), new Vector(110, 30), new Vector(210, 30));
-            Output.Graphics.Line(new Color(1, 1, 1), new Vector(210, 20), new Vector(210, 30));
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(140, 15), "POWER " + (Convert.ToInt32(speedProjectile * 20)).ToString());
-            
-            // draw wind
-            numberOfLines = (int)(Math.Abs(Match.Wind.Speed) * 40 / 5);
-            for (int i = 0; i < numberOfLines; i++)
-            {
-                if (Match.Wind.Speed < 0)
-                {
-                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(270 - i, 20), new Vector(268 - i, 25));
-                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(268 - i, 25), new Vector(270 - i, 30));
-                }
-                if (Match.Wind.Speed > 0)
-                {
-                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(270 + i, 20), new Vector(272 + i, 25));
-                    Output.Graphics.Line(new Color(1, 1, 1), new Vector(272 + i, 25), new Vector(270 + i, 30));
-                }
-            }
-
-            Output.Graphics.Line(new Color(1, 1, 1), new Vector(270, 20), new Vector(270, 30));
-            Output.Graphics.Line(new Color(1, 1, 1), new Vector(250, 20), new Vector(250, 30));
-            Output.Graphics.Line(new Color(1, 1, 1), new Vector(250, 20), new Vector(290, 20));
-            Output.Graphics.Line(new Color(1, 1, 1), new Vector(250, 30), new Vector(290, 30));
-            Output.Graphics.Line(new Color(1, 1, 1), new Vector(290, 20), new Vector(290, 30));
-            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(260, 15), "WIND " + (Convert.ToInt32(Math.Abs(Match.Wind.Speed) * 10)).ToString());
 
             /*
             // Draw Information on Screen
@@ -133,61 +161,58 @@ namespace NanoGames.Games.Banana
 
         public void PlayAudio()
         {
-            var a = Output.Audio;
-
-            if (Match.MatchAudioSettings.BulletExploded)
-            {
-                a.Play(Sounds.Explosion);
-                Match.MatchAudioSettings.BulletExploded = false;
-            }
-
-            if (Match.MatchAudioSettings.GrenadeExploded)
-            {
-                a.Play(Sounds.Explosion);
-                Match.MatchAudioSettings.GrenadeExploded = false;
-            }
-
             if (Match.MatchAudioSettings.AngleSet)
             {
-                a.Play(Sounds.Toc);
+                Output.Audio.Play(Sounds.Toc);
                 Match.MatchAudioSettings.AngleSet = false;
             }
 
             if (Match.MatchAudioSettings.LoadingPower)
             {
-                a.Play(Sounds.LoadingPower);
+                Output.Audio.Play(Sound.Chirp(1.7, new Pitch(100), new Pitch(300)));
                 Match.MatchAudioSettings.LoadingPower = false;
             }
 
             if (Match.MatchAudioSettings.PlayerShot)
             {
-                a.Play(Sounds.GunFire);
+                Output.Audio.Play(Sound.Noise(0.3, new Pitch(400), new Pitch(700)));
                 Match.MatchAudioSettings.PlayerShot = false;
             }
 
             if (Match.MatchAudioSettings.PlayerWalked)
             {
-                //a.Play(Sounds.Explosion);
-                Match.Output.Audio.Play(Sounds.Explosion);
+                Output.Audio.Play(Sound.Noise(0.1, new Pitch(400), new Pitch(500)));
                 Match.MatchAudioSettings.PlayerWalked = false;
             }
-
-            if (Match.MatchAudioSettings.NextPlayer)
+            
+            if (Match.MatchAudioSettings.TimerFiveSecondsToGo)
             {
-                a.Play(Sounds.HighBeep);
-                Match.MatchAudioSettings.NextPlayer = false;
+                Output.Audio.Play(Sound.Chirp(0.1, Pitch.C(5), Pitch.C(6)));
+                Match.MatchAudioSettings.TimerFiveSecondsToGo = false;
+            }
+
+            if (Match.MatchAudioSettings.TimerOneSecondToGo)
+            {
+                Output.Audio.Play(Sound.Tone(1, Pitch.C(6)));
+                Match.MatchAudioSettings.TimerOneSecondToGo = false;
             }
 
             if (Match.MatchAudioSettings.PlayerHitGround)
             {
-                a.Play(Sounds.Toc);
+                Output.Audio.Play(Sounds.Toc);
                 Match.MatchAudioSettings.PlayerHitGround = false;
             }
 
-            if (Match.MatchAudioSettings.BulletMoved)
+            if (Match.MatchAudioSettings.BulletExploded)
             {
-                a.Play(Sounds.FlyingBullet(Match.Bullet.Velocity.Length / 5));
-                Match.MatchAudioSettings.BulletMoved = false;
+                Output.Audio.Play(Sounds.Explosion);
+                Match.MatchAudioSettings.BulletExploded = false;
+            }
+
+            if (Match.MatchAudioSettings.GrenadeExploded)
+            {
+                Output.Audio.Play(Sounds.Explosion);
+                Match.MatchAudioSettings.GrenadeExploded = false;
             }
         }
 
@@ -317,14 +342,14 @@ namespace NanoGames.Games.Banana
             if (Input.Down.IsPressed) { countDown++; }
             else { countDown = 0; }
 
-            if (localAiming < 0.0 / 180 * Math.PI)
+            if (localAiming < 5.0 / 180 * Math.PI)
             {
-                localAiming = 0.0 / 180 * Math.PI;
+                localAiming = 5.0 / 180 * Math.PI;
             }
 
-            if (localAiming > (180.0 / 180 * Math.PI))
+            if (localAiming > (130.0 / 180 * Math.PI))
             {
-                localAiming = 180.0 / 180 * Math.PI;
+                localAiming = 130.0 / 180 * Math.PI;
             }
 
             if (looksRight)
@@ -350,9 +375,9 @@ namespace NanoGames.Games.Banana
 
         public void Shoot2()
         {
-            speedProjectile = 0.5 + 4.5 * countFire / 100;
+            speedProjectile = 0.5 + 4.5 * countFire / 98;
             
-            if (!Input.Fire.IsPressed || countFire > 100)
+            if (!Input.Fire.IsPressed || countFire > 98)
             {
                 Match.StateOfGame = "ActivePlayerShoot3";
             }
@@ -387,11 +412,22 @@ namespace NanoGames.Games.Banana
         
         public void Draw(IGraphics g, Color c, int i)
         {
+            string tmp = "";
+
             /* Body of the player */
             g.CircleSegment(c, Position + 1 * Normal, 2, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
             g.CircleSegment(c, Position + 1 * Normal, 3, Alpha - Math.PI / 2, Alpha + Math.PI / 2);
             g.Line(c, Position + 1 * Normal + 3 * new Vector(-Normal.Y, Normal.X), Position + 1 * Normal + 3 * new Vector(Normal.Y, -Normal.X));
-            
+
+            /* Acitve Player is filled */
+            if (this == Match.ActivePlayer)
+            {
+                g.CircleSegment(c, Position + 1 * Normal, 0.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
+                g.CircleSegment(c, Position + 1 * Normal, 1, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
+                g.CircleSegment(c, Position + 1 * Normal, 1.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
+                g.CircleSegment(c, Position + 1 * Normal, 2.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
+            }
+
             /* hitbox*//*
             for (int j = 0; j < Hitbox.Length - 1; j++)
             {
@@ -405,28 +441,19 @@ namespace NanoGames.Games.Banana
             if (this == Match.ActivePlayer)
             {
                 var p = Position + 5 * Normal + 15 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
-                var x = 3 * Math.Cos(aiming + Math.PI / 4);
-                var y = 3 * Math.Sin(aiming + Math.PI / 4);
-                g.Line(c, p + new Vector(-x, y), p + new Vector(x, -y));
-                g.Line(c, p + new Vector(-x, -y), p + new Vector(x, y));
+                g.Line(c, p - 1 * new Vector(Math.Cos(aiming + Math.PI / 4), Math.Sin(aiming + Math.PI / 4)), p + 1 * new Vector(Math.Cos(aiming + Math.PI / 4), Math.Sin(aiming + Math.PI / 4)));
+                g.Line(c, p - 1 * new Vector(Math.Cos(aiming - Math.PI / 4), Math.Sin(aiming - Math.PI / 4)), p + 1 * new Vector(Math.Cos(aiming - Math.PI / 4), Math.Sin(aiming - Math.PI / 4)));
             }
+
+            /* Name */
+            tmp = ((i + Match.StartPlayerIdx) % Match.Players.Count + 1).ToString().ToUpper() + ". BRUNO";
+            g.Print(c, 3, Position + new Vector(-tmp.Length / 2 * 3, -18), tmp);
 
             /* Health */
-            g.Print(c, 3, Position + new Vector(0, -15), Health.ToString().ToUpper());
+            tmp = Health.ToString().ToUpper();
+            g.Print(c, 3, Position + new Vector(-tmp.Length / 2 * 3, -15), tmp);
 
-            /*Player list*/
-            if (this == Match.ActivePlayer)
-            {
-                g.Print(c, 10, new Vector(10, 10 + 10 * i), Name);
-                g.CircleSegment(c, Position + 1 * Normal, 0.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
-                g.CircleSegment(c, Position + 1 * Normal, 1, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
-                g.CircleSegment(c, Position + 1 * Normal, 1.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
-                g.CircleSegment(c, Position + 1 * Normal, 2.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
-            }
-            else
-            {
-                g.Print(c, 6, new Vector(10, 10 + 10 * i), Name);
-            }
+
         }
 
         public void UpdateHitbox()

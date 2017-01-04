@@ -34,6 +34,7 @@ namespace NanoGames.Games.Banana
         private int framesMax = 1800;
         public string StateOfGame = "ActivePlayerActing";
         public BananaPlayer ActivePlayer;
+        public int StartPlayerIdx = 0;
         private int activePlayerIdx = 0;
         public Landscape Land = new Landscape();
         public Bullet Bullet = new Bullet();
@@ -44,18 +45,15 @@ namespace NanoGames.Games.Banana
 
         protected override void Initialize()
         {
-            // Land.CreateBlock(new Vector(100, 100), new Vector(104, 102));
-            Land.CreateBlock(new Vector(100, 100), new Vector(130, 110));
-            Land.CreateBlock(new Vector(120, 120), new Vector(190, 300));
-            Land.CreateBlock(new Vector(150, 100), new Vector(300, 130));
-            Land.Refresh();
+            Land.BuildLandscape("blocks");
 
             foreach (var player in Players)
             {
                 player.GetBorn();
             }
 
-            activePlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));
+            StartPlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));
+            activePlayerIdx = StartPlayerIdx;
             ActivePlayer = Players[activePlayerIdx];
 
             Wind.SetSpeed(Random);
@@ -133,6 +131,19 @@ namespace NanoGames.Games.Banana
 
                     break;
 
+            }
+
+            if ((FramesLeft == 300) ||
+                (FramesLeft == 240) ||
+                (FramesLeft == 180) ||
+                (FramesLeft == 120))
+            {
+                MatchAudioSettings.TimerFiveSecondsToGo = true;
+            }
+
+            if (FramesLeft == 60)
+            {
+                MatchAudioSettings.TimerOneSecondToGo = true;
             }
 
             FramesLeft--;
