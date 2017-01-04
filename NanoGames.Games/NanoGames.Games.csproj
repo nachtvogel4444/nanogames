@@ -47,6 +47,7 @@
     <Compile Include="..\NanoGames.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Banana\AudioSettings.cs" />
     <Compile Include="Banana\BananaMatch.cs" />
     <Compile Include="Banana\BananaPlayer.cs" />
     <Compile Include="Banana\Grenade.cs" />

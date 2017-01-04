@@ -13,7 +13,7 @@ namespace NanoGames.Games.Banana
     {
         public Vector Position;
         public Vector PositionBefore;
-        private Vector velocity;
+        public Vector Velocity;
         
         public bool IsExploded = true;
 
@@ -21,16 +21,17 @@ namespace NanoGames.Games.Banana
         {
             Position = pos;
             PositionBefore = pos - vel;
-            velocity = vel;
+            Velocity = vel;
             IsExploded = false;
         }
 
         public void MoveBullet(Wind w)
         {
             PositionBefore = Position; 
-            Position += velocity + 0.5 * new Vector(0, Constants.Gravity);
+            Position += Velocity + 0.5 * new Vector(0, Constants.Gravity);
             // velocity += new Vector(0, Constants.Gravity) + 0.03 * new Vector(w.Speed - velocity.X, -velocity.Y);
-            velocity += new Vector(0, Constants.Gravity) + 0.03 * new Vector(w.Speed, 0);
+            Velocity += new Vector(0, Constants.Gravity) + 0.03 * new Vector(w.Speed, 0);
+            
         }       
     }
 }

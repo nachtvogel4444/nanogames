@@ -38,6 +38,7 @@ namespace NanoGames.Games.Banana
         public Landscape Land = new Landscape();
         public Bullet Bullet = new Bullet();
         public Wind Wind = new Wind();
+        public AudioSettings MatchAudioSettings = new AudioSettings();
 
         private int finishedPlayers = 0;
 
@@ -79,7 +80,8 @@ namespace NanoGames.Games.Banana
 
                     FramesLeft = framesMax;
                     Wind.SetSpeed(Random);
-                    StateOfGame = "ActivePlayerActing";
+                    StateOfGame = "ActivePlayerActing";     // StateOfGame -> ActivePlayerActing
+                    MatchAudioSettings.NextPlayer = true;
                     break;
                     
                 case "ActivePlayerActing":
@@ -117,6 +119,7 @@ namespace NanoGames.Games.Banana
                     if (!Bullet.IsExploded)
                     {
                         Bullet.MoveBullet(Wind);
+                        MatchAudioSettings.BulletMoved = true;
                         CheckCollisionBulletsLand();                  
                         CheckCollisionBulletsPlayers();              
                         CheckCollisionBulletsScreen();                
@@ -125,7 +128,7 @@ namespace NanoGames.Games.Banana
 
                     if (!somethingFlying)
                     {
-                        StateOfGame = "NextPlayer";
+                        StateOfGame = "NextPlayer";            // StateOfGame -> NextPlayer
                     }
 
                     break;
@@ -151,6 +154,7 @@ namespace NanoGames.Games.Banana
             foreach (var player in Players)
             {
                 player.DrawScreen();
+                player.PlayAudio();
             }
 
             if (Players.Count == 1)
@@ -181,7 +185,7 @@ namespace NanoGames.Games.Banana
 
                     if (intersection.IsTrue)
                     {
-                        Output.Audio.Play(Sounds.Explosion);
+                        MatchAudioSettings.BulletExploded = true;
                         Bullet.IsExploded = true;
                         Land.makeCaldera(intersection.Point);
                         player.Health -= 50;
@@ -207,7 +211,7 @@ namespace NanoGames.Games.Banana
 
                     if (intersection.IsTrue)
                     {
-                        Output.Audio.Play(Sounds.Explosion);
+                        MatchAudioSettings.BulletExploded = true;
                         Bullet.IsExploded = true;
                         Land.makeCaldera(intersection.Point);
 
@@ -263,7 +267,7 @@ namespace NanoGames.Games.Banana
                         player.IsFalling = false;
                         player.Health -= player.Velocity.Length * 10;
                         player.Velocity = new Vector(0, 0);
-                        Output.Audio.Play(Sounds.Toc);
+                        MatchAudioSettings.PlayerHitGround = true;
 
                         return;
                     }
@@ -297,5 +301,6 @@ namespace NanoGames.Games.Banana
             // player is hovering in air
             player.IsFalling = true;
         }
+
     }
 }

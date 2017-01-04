@@ -21,6 +21,7 @@ namespace NanoGames.Games.Banana
         public double Radius = 4;
         
         public Vector[] Hitbox = new Vector[10];
+        // public AudioSettings PlayerAudioSettings = new AudioSettings();
 
         public Vector Velocity = new Vector(0, 0);
 
@@ -41,32 +42,6 @@ namespace NanoGames.Games.Banana
         private int idxWeapon = 0;
         private string[] weapons = new string[] { "Gun" };
         private bool looksRight;
-
-        public void GetBorn()
-        {
-            
-            PositionIndex[0] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border.Count - 1));
-            PositionIndex[1] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border[PositionIndex[0]].Count -1));
-            
-            Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
-            Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
-            Alpha = Math.Atan2(Normal.Y, Normal.X);
-
-            UpdateHitbox();
-            
-            idxWeapon = 0;
-            
-            if (Match.Random.Next(0, 1) == 0)
-            {
-                looksRight = false;
-                aiming = Alpha - localAiming;
-            }
-            else
-            {
-                looksRight = true;
-                aiming = Alpha + localAiming;
-            }
-        }
         
         public void DrawScreen()
         {
@@ -105,6 +80,9 @@ namespace NanoGames.Games.Banana
 
             /* Draw landscape */
             Match.Land.Draw(Output.Graphics);
+
+            /* draw time left */
+            Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(120, 10), "TIME LEFT " + ((int)(Match.FramesLeft / 60.0)).ToString());
 
             // draw speedprojectile / power
             int numberOfLines = (int)(speedProjectile * 100 / 5);
@@ -153,12 +131,99 @@ namespace NanoGames.Games.Banana
             */
         }
 
+        public void PlayAudio()
+        {
+            var a = Output.Audio;
+
+            if (Match.MatchAudioSettings.BulletExploded)
+            {
+                a.Play(Sounds.Explosion);
+                Match.MatchAudioSettings.BulletExploded = false;
+            }
+
+            if (Match.MatchAudioSettings.GrenadeExploded)
+            {
+                a.Play(Sounds.Explosion);
+                Match.MatchAudioSettings.GrenadeExploded = false;
+            }
+
+            if (Match.MatchAudioSettings.AngleSet)
+            {
+                a.Play(Sounds.Toc);
+                Match.MatchAudioSettings.AngleSet = false;
+            }
+
+            if (Match.MatchAudioSettings.LoadingPower)
+            {
+                a.Play(Sounds.LoadingPower);
+                Match.MatchAudioSettings.LoadingPower = false;
+            }
+
+            if (Match.MatchAudioSettings.PlayerShot)
+            {
+                a.Play(Sounds.GunFire);
+                Match.MatchAudioSettings.PlayerShot = false;
+            }
+
+            if (Match.MatchAudioSettings.PlayerWalked)
+            {
+                //a.Play(Sounds.Explosion);
+                Match.Output.Audio.Play(Sounds.Explosion);
+                Match.MatchAudioSettings.PlayerWalked = false;
+            }
+
+            if (Match.MatchAudioSettings.NextPlayer)
+            {
+                a.Play(Sounds.HighBeep);
+                Match.MatchAudioSettings.NextPlayer = false;
+            }
+
+            if (Match.MatchAudioSettings.PlayerHitGround)
+            {
+                a.Play(Sounds.Toc);
+                Match.MatchAudioSettings.PlayerHitGround = false;
+            }
+
+            if (Match.MatchAudioSettings.BulletMoved)
+            {
+                a.Play(Sounds.FlyingBullet(Match.Bullet.Velocity.Length / 5));
+                Match.MatchAudioSettings.BulletMoved = false;
+            }
+        }
+
+        public void GetBorn()
+        {
+
+            PositionIndex[0] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border.Count - 1));
+            PositionIndex[1] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border[PositionIndex[0]].Count - 1));
+
+            Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
+            Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
+            Alpha = Math.Atan2(Normal.Y, Normal.X);
+
+            UpdateHitbox();
+
+            idxWeapon = 0;
+
+            if (Match.Random.Next(0, 1) == 0)
+            {
+                looksRight = false;
+                aiming = Alpha - localAiming;
+            }
+            else
+            {
+                looksRight = true;
+                aiming = Alpha + localAiming;
+            }
+        }
+
         public void SetWeapon()
         {
             if (Input.AltFire.WasActivated)
             {
                 idxWeapon++;
                 idxWeapon = idxWeapon % weapons.Count();
+                Match.MatchAudioSettings.WeaponSelected = true;
             }
         }
 
@@ -208,22 +273,23 @@ namespace NanoGames.Games.Banana
                 Alpha = Math.Atan2(Normal.Y, Normal.X);
                 aiming += Alpha;
                 UpdateHitbox();
-               
-                Output.Audio.Play(Sounds.Walk);
+                Match.MatchAudioSettings.PlayerWalked = true;
             }
         }
         
         public void SetAngle()
         {
+            double angle = 0;
+
             if (Input.Up.WasActivated)
             {
                 if (countUp < wait)
                 {
-                    localAiming -= 1 * Math.PI / 180;
+                    angle = -1 * Math.PI / 180;
                 }
                 else
                 {
-                    localAiming -= 5 * Math.PI / 180;
+                    angle = -5 * Math.PI / 180;
                 }
             }
 
@@ -231,12 +297,18 @@ namespace NanoGames.Games.Banana
             {
                 if (countDown < wait)
                 {
-                    localAiming += 1 * Math.PI / 180;
+                    angle = 1 * Math.PI / 180;
                 }
                 else
                 {
-                    localAiming += 5 * Math.PI / 180;
+                    angle = 5 * Math.PI / 180;
                 }
+            }
+
+            if (angle != 0)
+            {
+                localAiming += angle;
+                Match.MatchAudioSettings.AngleSet = true;
             }
 
             if (Input.Up.IsPressed) { countUp++; }
@@ -272,6 +344,7 @@ namespace NanoGames.Games.Banana
                 Match.StateOfGame = "ActivePlayerShoot2";
                 countFire = 0;
                 speedProjectile = 0;
+                Match.MatchAudioSettings.LoadingPower = true;
             }
         }
 
@@ -294,7 +367,7 @@ namespace NanoGames.Games.Banana
                 Vector velocity = speedProjectile * new Vector(Math.Cos(aiming), Math.Sin(aiming));
                 Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
 
-                Output.Audio.Play(Sounds.GunFire);
+                Match.MatchAudioSettings.PlayerShot = true;
 
                 Match.Bullet.StartBullet(position, velocity);
 
@@ -309,6 +382,7 @@ namespace NanoGames.Games.Banana
             Position += Velocity + 0.5 * new Vector(0, Constants.Gravity);
             Velocity += new Vector(0, Constants.Gravity);
             UpdateHitbox();
+            // audio tbd
         }
         
         public void Draw(IGraphics g, Color c, int i)
@@ -371,6 +445,6 @@ namespace NanoGames.Games.Banana
             return (x % m + m) % m;
         }
 
-
+        
     }
 }

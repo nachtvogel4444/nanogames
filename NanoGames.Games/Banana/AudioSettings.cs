@@ -1,0 +1,27 @@
+﻿// Copyright (c) the authors of nanoGames. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt in the project root.
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace NanoGames.Games.Banana
+{
+    internal class AudioSettings
+    {
+        public bool BulletExploded = false;
+        public bool GrenadeExploded = false;
+        public bool PlayerWalked = false;
+        public bool WeaponSelected = false;
+        public bool AngleSet = false;
+        public bool LoadingPower = false;
+        public bool PlayerShot = false;
+        public bool NextPlayer = false;
+        public bool PlayerHitGround = false;
+        public bool BulletMoved = false;
+       
+    }
+}
