@@ -175,7 +175,10 @@ namespace NanoGames.Games.Banana
 
             if (Match.MatchAudioSettings.PlayerShot)
             {
-                Output.Audio.Play(Sound.Noise(0.3, new Pitch(400), new Pitch(700)));
+                Output.Audio.Play(Sound.Sequence(
+                            Sound.Noise(0.1, new Pitch(800), new Pitch(1000)),
+                            Sound.Noise(0.1, new Pitch(500), new Pitch(700)),
+                            Sound.Noise(0.1, new Pitch(200), new Pitch(500))));
                 Match.MatchAudioSettings.PlayerShot = false;
             }
 
