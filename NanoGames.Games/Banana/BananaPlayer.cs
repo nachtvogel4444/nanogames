@@ -40,7 +40,7 @@ namespace NanoGames.Games.Banana
         private int countDown = 0;
         private int countFire = 0;
         private int idxWeapon = 0;
-        private string[] weapons = new string[] { "Gun" };
+        private string[] weapons = new string[] { "Gun", "Grenade 1sec", "Grenade 2sec", "Grenade 3sec" };
         private bool looksRight;
         
         public void DrawScreen()
@@ -58,8 +58,13 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Print(new Color(1, 1, 1), 6, new Vector(160 - tmp.Length * 6 / 2, 2),  tmp);
 
             /* draw active player name*/
-            Output.Graphics.Print(new Color(1, 1, 1), 6, new Vector(30, 2), "BRUNO");
-            
+            tmp = Match.ActivePlayer.Name;
+            Output.Graphics.Print(new Color(1, 1, 1), 6, new Vector(50 - tmp.Length / 2 * 6, 2), tmp);
+
+            /* draw active weapon*/
+            tmp = Match.ActivePlayer.weapons[idxWeapon].ToUpper();
+            Output.Graphics.Print(new Color(1, 1, 1), 6, new Vector(270 - tmp.Length / 2 * 6, 2), tmp);
+
             // draw speedprojectile / power
             int numberOfLines = (int)(speedProjectile * 100 / 5);
             for (int i = 0; i < numberOfLines; i++)
@@ -73,7 +78,7 @@ namespace NanoGames.Games.Banana
             tmp = "POWER " + (Convert.ToInt32(speedProjectile * 20)).ToString();
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(160 - tmp.Length * 4 / 2, 15), tmp);
 
-            // draw health
+            // Draw Health
             numberOfLines = (int)(Health * 40 / 100);
             for (int i = 0; i < numberOfLines; i++)
             {
@@ -145,6 +150,12 @@ namespace NanoGames.Games.Banana
             if (!Match.Bullet.IsExploded)
             {
                 Output.Graphics.Line(new Color(1, 1, 1), Match.Bullet.Position, Match.Bullet.PositionBefore);
+            }
+
+            /* Draw grenade. */
+            if (!Match.Grenade.IsExploded && !Match.Grenade.IsDead)
+            {
+                Output.Graphics.Circle(new Color(1, 1, 1), Match.Grenade.Position, 1);
             }
 
             /*
@@ -390,17 +401,33 @@ namespace NanoGames.Games.Banana
 
         public void Shoot3()
         {
+            Vector velocity = speedProjectile * new Vector(Math.Cos(aiming), Math.Sin(aiming));
+            Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
+
+            Match.MatchAudioSettings.PlayerShot = true;
+
             if (weapons[idxWeapon] == "Gun")
             {
-                Vector velocity = speedProjectile * new Vector(Math.Cos(aiming), Math.Sin(aiming));
-                Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
-
-                Match.MatchAudioSettings.PlayerShot = true;
-
                 Match.Bullet.StartBullet(position, velocity);
-
-                Match.StateOfGame = "SomethingFlying";
             }
+            
+            if (weapons[idxWeapon] == "Grenade 1sec")
+            {
+                Match.Grenade.StartGrenade(position, velocity, 60);
+            }
+
+            if (weapons[idxWeapon] == "Grenade 2sec")
+            {
+                Match.Grenade.StartGrenade(position, velocity, 120);
+            }
+
+            if (weapons[idxWeapon] == "Grenade 3sec")
+            {
+                Match.Grenade.StartGrenade(position, velocity, 180);
+            }
+
+            Match.StateOfGame = "SomethingFlying";
+
 
         }
 
@@ -449,11 +476,11 @@ namespace NanoGames.Games.Banana
             }
 
             /* Name */
-            tmp = ((i + Match.StartPlayerIdx) % Match.Players.Count + 1).ToString().ToUpper() + ". BRUNO";
+            tmp = ((i + Match.StartPlayerIdx) % Match.Players.Count + 1).ToString().ToUpper() + "." + Name;
             g.Print(c, 3, Position + new Vector(-tmp.Length / 2 * 3, -18), tmp);
 
             /* Health */
-            tmp = Health.ToString().ToUpper();
+            tmp = ((int)Health).ToString().ToUpper();
             g.Print(c, 3, Position + new Vector(-tmp.Length / 2 * 3, -15), tmp);
 
 

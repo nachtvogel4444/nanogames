@@ -38,6 +38,7 @@ namespace NanoGames.Games.Banana
         private int activePlayerIdx = 0;
         public Landscape Land = new Landscape();
         public Bullet Bullet = new Bullet();
+        public Grenade Grenade = new Grenade();
         public Wind Wind = new Wind();
         public AudioSettings MatchAudioSettings = new AudioSettings();
 
@@ -50,6 +51,7 @@ namespace NanoGames.Games.Banana
             foreach (var player in Players)
             {
                 player.GetBorn();
+                player.Name = "TEST";
             }
 
             StartPlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));
@@ -79,7 +81,6 @@ namespace NanoGames.Games.Banana
                     FramesLeft = framesMax;
                     Wind.SetSpeed(Random);
                     StateOfGame = "ActivePlayerActing";     // StateOfGame -> ActivePlayerActing
-                    MatchAudioSettings.NextPlayer = true;
                     break;
                     
                 case "ActivePlayerActing":
@@ -109,6 +110,7 @@ namespace NanoGames.Games.Banana
                         {
                             player.Fall();
                             CheckCollisionPlayerLand(player);
+                            CheckCollisionPlayerScreen(player);
                             somethingFlying = true;
                         }
                     }
@@ -117,10 +119,19 @@ namespace NanoGames.Games.Banana
                     if (!Bullet.IsExploded)
                     {
                         Bullet.MoveBullet(Wind);
-                        MatchAudioSettings.BulletMoved = true;
-                        CheckCollisionBulletsLand();                  
-                        CheckCollisionBulletsPlayers();              
-                        CheckCollisionBulletsScreen();                
+                        CheckCollisionBulletLand();                  
+                        CheckCollisionBulletPlayers();              
+                        CheckCollisionBulletScreen();                
+                        somethingFlying = true;
+                    }
+
+                    // grenade flying
+                    if (!Grenade.IsExploded && !Grenade.IsDead)
+                    {
+                        Grenade.MoveGrenade();
+                        CheckCollisionGrenadeLand();
+                        CheckCollisionGrenadeScreen();
+                        CheckGrenadeExplosion();
                         somethingFlying = true;
                     }
 
@@ -186,7 +197,7 @@ namespace NanoGames.Games.Banana
             }
         }
         
-        private void CheckCollisionBulletsPlayers()
+        private void CheckCollisionBulletPlayers()
         {
             foreach (var player in Players)
             {
@@ -198,7 +209,7 @@ namespace NanoGames.Games.Banana
                     {
                         MatchAudioSettings.BulletExploded = true;
                         Bullet.IsExploded = true;
-                        Land.makeCaldera(intersection.Point);
+                        Land.makeCaldera(intersection.Point, 3);
                         player.Health -= 50;
 
                         foreach (var playerB in Players)
@@ -212,7 +223,7 @@ namespace NanoGames.Games.Banana
             }              
         }
 
-        private void CheckCollisionBulletsLand()
+        private void CheckCollisionBulletLand()
         {
             foreach (List<Vector> block in Land.Border)
             {
@@ -224,7 +235,7 @@ namespace NanoGames.Games.Banana
                     {
                         MatchAudioSettings.BulletExploded = true;
                         Bullet.IsExploded = true;
-                        Land.makeCaldera(intersection.Point);
+                        Land.makeCaldera(intersection.Point, 3);
 
                         foreach (var player in Players)
                         {
@@ -238,14 +249,87 @@ namespace NanoGames.Games.Banana
 
 
         }
+        
+        private void CheckCollisionGrenadeLand()
+        {
+            for (int i = 0; i < Land.Border.Count - 1; i++)
+            {
+                var block = Land.Border[i];
+                 
+                for (int j = 0; j < block.Count - 1; j++)
+                {
+                    Vector p1 = block[j];
+                    Vector p2 = block[j + 1];
 
-        private void CheckCollisionBulletsScreen()
+                    Intersection intersection = new Intersection(Grenade.Position, Grenade.PositionBefore, p1, p2);
+
+                    if (intersection.IsTrue)
+                    {
+                        var n = new Vector();
+                        if ((p1 - intersection.Point).Length < (p2 - intersection.Point).Length)
+                        {
+                            n = Land.Normal[i][j];
+                        }
+                        else
+                        {
+                            n = Land.Normal[i][j + 1];
+                        }
+
+                        Grenade.Bounce(intersection.Point, n);
+
+                        return;
+                    }
+                }
+            }
+
+
+        }
+
+        private void CheckCollisionBulletScreen()
         {
             if (Bullet.Position.X < 0 || Bullet.Position.X > 320 || Bullet.Position.Y > 200)
             {
                 Bullet.IsExploded = true;
             }
             
+        }
+
+        private void CheckCollisionGrenadeScreen()
+        {
+            if (Grenade.Position.X < 0 || Grenade.Position.X > 320 || Grenade.Position.Y > 200)
+            {
+                Grenade.IsDead = true;
+            }
+
+        }
+
+        private void CheckGrenadeExplosion()
+        {
+            if (Grenade.IsExploded)
+            {
+                Land.makeCaldera(Grenade.Position, 6);
+                MatchAudioSettings.GrenadeExploded = true;
+
+                foreach (var player in Players)
+                {
+                    double damage = 0;
+                    double dist = (player.Position - Grenade.Position).Length;
+
+                    if (dist < 5)
+                    {
+                        damage = 50;
+                    } 
+                    if ((dist >= 5) && (dist < 15))
+                    {
+                        damage = -5 * dist + 75;
+                    }
+
+                    player.Health -= damage;
+
+                    CheckIfPlayerIsFalling(player);
+                    
+                }
+            }
         }
 
         private void CheckCollisionPlayerLand(BananaPlayer player)

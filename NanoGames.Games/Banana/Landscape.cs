@@ -164,14 +164,15 @@ namespace NanoGames.Games.Banana
             
         } 
 
-        public void makeCaldera(Vector position)
+        public void makeCaldera(Vector position, int size)
         {
-            for (int i = (int)position.X - 4; i <= (int)position.X + 4; i++)
+            for (int i = (int)position.X - size + 1; i <= (int)position.X + size + 1; i++)
             {
-                for (int j = (int)position.Y - 4; j <= (int)position.Y + 4; j++)
+                for (int j = (int)position.Y - size + 1; j <= (int)position.Y + size + 1; j++)
                 {
-                    if ((position - new Vector(i, j)).Length <= 3)
+                    if ((position - new Vector(i, j)).Length <= size)
                     {
+
                         IsSolid[i, j] = false;
                     }
                 }

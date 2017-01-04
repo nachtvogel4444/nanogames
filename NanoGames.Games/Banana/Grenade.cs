@@ -15,30 +15,84 @@ namespace NanoGames.Games.Banana
         public Vector Position;
         public Vector PositionBefore;
         public Vector Velocity;
-        public bool IsExploded = false;
-        
+        public bool IsExploded = true;
+        public bool IsDead = true;
+
         private int frameCount = 0;
         public double Radius = 1;
-        private int lifeTime = 3 * 60;
+        private int lifeTime = 0;
 
-        public Grenade(Vector pos, Vector vel)
+        public void StartGrenade(Vector pos, Vector vel, int time)
         {
             Position = pos;
             PositionBefore = pos - vel;
             Velocity = vel;
+            IsExploded = false;
+            IsDead = false;
+            lifeTime = time;
+            frameCount = 0;
         }
 
         public void MoveGrenade()
         {
-            PositionBefore = Position;
-            Position += Velocity + 0.5 * new Vector(0, Constants.Gravity);
-            Velocity += new Vector(0, Constants.Gravity);
+            if (Velocity.Length > 0.001)
+            {
+                PositionBefore = Position;
+                Position += Velocity + 0.5 * new Vector(0, Constants.Gravity);
+                Velocity += new Vector(0, Constants.Gravity);
+            }
             frameCount++;
 
             if (frameCount > lifeTime)
             {
                 IsExploded = true;
             }
+        }
+
+        public void Bounce(Vector intersection, Vector norm)
+        {
+            Vector incomming = Velocity.Normalized;
+            Vector outgoing;
+            Vector p1 = intersection - incomming;
+            Vector mid;
+            Vector p2;
+            double l;
+
+            double A1 = intersection.Y - (intersection.Y + norm.Y);
+            double B1 = intersection.X - (intersection.X + norm.X);
+            double C1 = A1 * intersection.X + B1 * (intersection.Y + norm.Y);
+
+            double A2 = -B1;
+            double B2 = A1;
+            double C2 = A2 * p1.X + B2 * p1.Y;
+
+            double det = A1 * B2 - A2 * B1;
+
+            if (det != 0)
+            {
+                mid.X = (B2 * C1 - B1 * C2) / det;
+                mid.Y = (A1 * C2 - A2 * C1) / det;
+
+                p2 = mid - (p1 - mid);
+            }
+            else
+            {
+                p2 = p1;
+            }
+
+            outgoing = (p2 - intersection).Normalized;
+
+            l = Velocity.Length - (PositionBefore - intersection).Length;
+
+            if (l < 1)
+            {
+                l = 1;
+            }
+
+            Position = intersection + l * outgoing;
+
+            Velocity = 0.6 * Velocity.Length * outgoing;
+
         }
     }
 }
