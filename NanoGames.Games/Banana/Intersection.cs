@@ -18,7 +18,7 @@ namespace NanoGames.Games.Banana
         public bool IsTrue = false;
         public Vector Point;
 
-        private double epsilon = 0.000001;
+        private double epsilon = 0.001;
 
         public Intersection(Vector p11, Vector p12, Vector p21, Vector p22)
         {
