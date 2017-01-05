@@ -11,18 +11,10 @@ using System.Threading.Tasks;
 /*
 ToDo:
 
-    Anzeige: near miss, wer dran ist plus reihenfolge
-    healthpoints
-    verschiedene bullets, flächenschaden, granaten mehrere projektile
-    player platzierung
-    verschiedene untergründe: reflecktierend, doppelte, halbe geschwindigkeit 
+    Anzeige: near miss
     verschiedene modi: suddenddeath
-    töne: letzte 5sec, treffer, eingabe
+    töne
     mappool oder random maps
-    checkcollions aus simple bullet in methods
-    stop player when track ends or is too steep
-    simple gun to bazooka
-    grenade
  
 */
 

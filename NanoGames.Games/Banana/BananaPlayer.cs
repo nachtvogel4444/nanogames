@@ -39,7 +39,7 @@ namespace NanoGames.Games.Banana
         private int countUp = 0;
         private int countDown = 0;
         private int countFire = 0;
-        private int idxWeapon = 0;
+        public int IdxWeapon = 0;
         private string[] weapons = new string[] { "Gun", "Grenade 1sec", "Grenade 2sec", "Grenade 3sec" };
         private bool looksRight;
         
@@ -62,7 +62,7 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Print(new Color(1, 1, 1), 6, new Vector(50 - tmp.Length / 2 * 6, 2), tmp);
 
             /* draw active weapon*/
-            tmp = Match.ActivePlayer.weapons[idxWeapon].ToUpper();
+            tmp = Match.ActivePlayer.weapons[Match.ActivePlayer.IdxWeapon].ToUpper();
             Output.Graphics.Print(new Color(1, 1, 1), 6, new Vector(270 - tmp.Length / 2 * 6, 2), tmp);
 
             // draw speedprojectile / power
@@ -241,7 +241,7 @@ namespace NanoGames.Games.Banana
 
             UpdateHitbox();
 
-            idxWeapon = 0;
+            IdxWeapon = 0;
 
             if (Match.Random.Next(0, 1) == 0)
             {
@@ -259,8 +259,8 @@ namespace NanoGames.Games.Banana
         {
             if (Input.AltFire.WasActivated)
             {
-                idxWeapon++;
-                idxWeapon = idxWeapon % weapons.Count();
+                IdxWeapon++;
+                IdxWeapon = IdxWeapon % weapons.Count();
                 Match.MatchAudioSettings.WeaponSelected = true;
             }
         }
@@ -406,22 +406,22 @@ namespace NanoGames.Games.Banana
 
             Match.MatchAudioSettings.PlayerShot = true;
 
-            if (weapons[idxWeapon] == "Gun")
+            if (weapons[IdxWeapon] == "Gun")
             {
                 Match.Bullet.StartBullet(position, velocity);
             }
             
-            if (weapons[idxWeapon] == "Grenade 1sec")
+            if (weapons[IdxWeapon] == "Grenade 1sec")
             {
                 Match.Grenade.StartGrenade(position, velocity, 60);
             }
 
-            if (weapons[idxWeapon] == "Grenade 2sec")
+            if (weapons[IdxWeapon] == "Grenade 2sec")
             {
                 Match.Grenade.StartGrenade(position, velocity, 120);
             }
 
-            if (weapons[idxWeapon] == "Grenade 3sec")
+            if (weapons[IdxWeapon] == "Grenade 3sec")
             {
                 Match.Grenade.StartGrenade(position, velocity, 180);
             }
