@@ -58,13 +58,13 @@ namespace NanoGames.Games.Banana
             Vector p2;
             double l;
 
-            double A1 = intersection.Y - (intersection.Y + norm.Y);
-            double B1 = intersection.X - (intersection.X + norm.X);
-            double C1 = A1 * intersection.X + B1 * (intersection.Y + norm.Y);
+            double A1 = -intersection.Y + (intersection.Y + norm.Y);
+            double B1 = intersection.X + norm.X - intersection.X;
+            double C1 = A1 * intersection.X - B1 * intersection.Y;
 
             double A2 = -B1;
             double B2 = A1;
-            double C2 = A2 * p1.X + B2 * p1.Y;
+            double C2 = A2 * p1.X - B2 * p1.Y;
 
             double det = A1 * B2 - A2 * B1;
 
@@ -73,22 +73,19 @@ namespace NanoGames.Games.Banana
                 mid.X = (B2 * C1 - B1 * C2) / det;
                 mid.Y = (A1 * C2 - A2 * C1) / det;
 
+                mid.Y = -mid.Y;
                 p2 = mid - (p1 - mid);
             }
             else
             {
                 p2 = p1;
             }
+            
 
             outgoing = (p2 - intersection).Normalized;
 
             l = Velocity.Length - (PositionBefore - intersection).Length;
-
-            if (l < 1)
-            {
-                l = 1;
-            }
-
+            
             Position = intersection + l * outgoing;
 
             Velocity = 0.6 * Velocity.Length * outgoing;

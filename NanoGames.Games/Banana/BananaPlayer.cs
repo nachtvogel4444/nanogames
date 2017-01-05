@@ -25,7 +25,7 @@ namespace NanoGames.Games.Banana
 
         public Vector Velocity = new Vector(0, 0);
 
-        private double speedProjectile = 0;
+        public double SpeedProjectile = 0;
         public double Health = 100;
         public bool IsFalling = false;
         
@@ -45,7 +45,7 @@ namespace NanoGames.Games.Banana
         
         public void DrawScreen()
         {
-            string tmp = "";
+            string tmp;
             Color colorActivePlayer = Match.ActivePlayer.Color;
 
             if (this == Match.ActivePlayer)
@@ -66,7 +66,7 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Print(new Color(1, 1, 1), 6, new Vector(270 - tmp.Length / 2 * 6, 2), tmp);
 
             // draw speedprojectile / power
-            int numberOfLines = (int)(speedProjectile * 100 / 5);
+            int numberOfLines = (int)(Match.ActivePlayer.SpeedProjectile * 100 / 5);
             for (int i = 0; i < numberOfLines; i++)
             {
                 Output.Graphics.Line(colorActivePlayer, new Vector(110 + i, 20), new Vector(110 + i, 28));
@@ -75,11 +75,11 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Line(colorActivePlayer, new Vector(110, 20), new Vector(210, 20));
             Output.Graphics.Line(colorActivePlayer, new Vector(110, 28), new Vector(210, 28));
             Output.Graphics.Line(colorActivePlayer, new Vector(210, 20), new Vector(210, 28));
-            tmp = "POWER " + (Convert.ToInt32(speedProjectile * 20)).ToString();
+            tmp = "POWER " + (Convert.ToInt32(SpeedProjectile * 20)).ToString();
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(160 - tmp.Length * 4 / 2, 15), tmp);
 
             // Draw Health
-            numberOfLines = (int)(Health * 40 / 100);
+            numberOfLines = (int)(Match.ActivePlayer.Health * 40 / 100);
             for (int i = 0; i < numberOfLines; i++)
             {
                 Output.Graphics.Line(colorActivePlayer, new Vector(30 + i, 20), new Vector(30 + i, 28));
@@ -90,8 +90,7 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Line(colorActivePlayer, new Vector(70, 20), new Vector(70, 28));
             tmp = "HEALTH " + (Convert.ToInt32(Match.ActivePlayer.Health)).ToString().ToUpper();
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(50 - tmp.Length * 4 / 2, 15), tmp);
-
-
+            
             // draw wind
             numberOfLines = (int)(Math.Abs(Match.Wind.Speed) * 40 / 5);
             for (int i = 0; i < numberOfLines; i++)
@@ -382,14 +381,14 @@ namespace NanoGames.Games.Banana
             {
                 Match.StateOfGame = "ActivePlayerShoot2";
                 countFire = 0;
-                speedProjectile = 0;
+                SpeedProjectile = 0;
                 Match.MatchAudioSettings.LoadingPower = true;
             }
         }
 
         public void Shoot2()
         {
-            speedProjectile = 0.5 + 4.5 * countFire / 98;
+            SpeedProjectile = 0.5 + 4.5 * countFire / 98;
             
             if (!Input.Fire.IsPressed || countFire > 98)
             {
@@ -401,7 +400,8 @@ namespace NanoGames.Games.Banana
 
         public void Shoot3()
         {
-            Vector velocity = speedProjectile * new Vector(Math.Cos(aiming), Math.Sin(aiming));
+            Vector velocity = SpeedProjectile * new Vector(Math.Cos(aiming), Math.Sin(aiming));
+            //Vector velocity = 1 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
             Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
 
             Match.MatchAudioSettings.PlayerShot = true;

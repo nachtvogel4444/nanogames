@@ -29,9 +29,7 @@ namespace NanoGames.Games.Banana
         {
             PositionBefore = Position; 
             Position += Velocity + 0.5 * new Vector(0, Constants.Gravity);
-            // velocity += new Vector(0, Constants.Gravity) + 0.03 * new Vector(w.Speed - velocity.X, -velocity.Y);
-            Velocity += new Vector(0, Constants.Gravity) + 0.01 * new Vector(w.Speed, 0);
-            
+            Velocity += new Vector(0, Constants.Gravity) + 0.008 * new Vector(w.Speed, 0);
         }       
     }
 }

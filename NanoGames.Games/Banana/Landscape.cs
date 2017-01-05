@@ -116,6 +116,7 @@ namespace NanoGames.Games.Banana
                         int yy = y;
                         Border.Add(new List<Vector>());
                         Normal.Add(new List<Vector>());
+                        Vector s;
 
                         int last = 3;
                         int[,] mylist = new int[8, 2] { { -1, -1 }, { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { -1, 1 }, { -1, 0 } };
@@ -125,7 +126,7 @@ namespace NanoGames.Games.Banana
                         {
                             wasTaken[xx, yy] = true;
                             
-                            Vector s = new Vector(0, 0);
+                            s = new Vector(0, 0);
                             for (int k = -2; k <= 2; k++)
                             {
                                 for (int l = -2; l <= 2; l++)
@@ -158,6 +159,7 @@ namespace NanoGames.Games.Banana
                             }
 
                         } while ((xx != x) || (yy != y));
+                        
                     }
                 }
             }
@@ -228,20 +230,26 @@ namespace NanoGames.Games.Banana
         public void BuildLandscape(string name)
         {
             /* the first landscape */
-            if (name == "first")
+            if (name == "First")
             {
                 CreateBlock(new Vector(100, 100), new Vector(130, 110));
                 CreateBlock(new Vector(120, 120), new Vector(190, 300));
                 CreateBlock(new Vector(150, 100), new Vector(300, 130));
             }
             
-            if (name == "blocks")
+            if (name == "Blocks")
             {
                 CreateBlock(new Vector(30, 60), new Vector(100, 90));
                 CreateBlock(new Vector(150, 100), new Vector(300, 120));
                 CreateBlock(new Vector(110, 160), new Vector(150, 190));
                 CreateBlock(new Vector(230, 160), new Vector(280, 190));
             }
+
+            if (name == "SimpleBlock")
+            {
+                CreateBlock(new Vector(100, 100), new Vector(150, 110));
+            }
+
 
             Refresh();
         }

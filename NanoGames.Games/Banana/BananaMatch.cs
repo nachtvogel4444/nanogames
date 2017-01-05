@@ -46,7 +46,7 @@ namespace NanoGames.Games.Banana
 
         protected override void Initialize()
         {
-            Land.BuildLandscape("blocks");
+            Land.BuildLandscape("Blocks");
 
             foreach (var player in Players)
             {
@@ -168,8 +168,11 @@ namespace NanoGames.Games.Banana
             {
                 if (player.Health <= 0)
                 {
+                    if (!player.HasFinished)
+                    {
+                        finishedPlayers++;
+                    }
                     player.HasFinished = true;
-                    finishedPlayers++;
                 }
             }
 
@@ -210,7 +213,7 @@ namespace NanoGames.Games.Banana
                         MatchAudioSettings.BulletExploded = true;
                         Bullet.IsExploded = true;
                         Land.makeCaldera(intersection.Point, 3);
-                        player.Health -= 50;
+                        player.Health -= 40;
 
                         foreach (var playerB in Players)
                         {
@@ -227,9 +230,9 @@ namespace NanoGames.Games.Banana
         {
             foreach (List<Vector> block in Land.Border)
             {
-                for (int i = 0; i < block.Count - 1; i++)
+                for (int j = 0; j < block.Count; j++)
                 {
-                    Intersection intersection = new Intersection(Bullet.Position, Bullet.PositionBefore, block[i], block[i + 1]);
+                    Intersection intersection = new Intersection(Bullet.Position, Bullet.PositionBefore, block[j], block[mod(j + 1, block.Count)]);
 
                     if (intersection.IsTrue)
                     {
@@ -252,27 +255,36 @@ namespace NanoGames.Games.Banana
         
         private void CheckCollisionGrenadeLand()
         {
-            for (int i = 0; i < Land.Border.Count - 1; i++)
-            {
-                var block = Land.Border[i];
-                 
-                for (int j = 0; j < block.Count - 1; j++)
+            for (int i = 0; i < Land.Border.Count; i++)
+            {                 
+                for (int j = 0; j < Land.Border[i].Count; j++)
                 {
-                    Vector p1 = block[j];
-                    Vector p2 = block[j + 1];
+                    Vector p0 = Land.Border[i][mod(j - 1, Land.Border[i].Count)];
+                    Vector p1 = Land.Border[i][j];
+                    Vector p2 = Land.Border[i][mod(j + 1, Land.Border[i].Count)];
+                    Vector p3 = Land.Border[i][mod(j + 2, Land.Border[i].Count)];
 
                     Intersection intersection = new Intersection(Grenade.Position, Grenade.PositionBefore, p1, p2);
 
                     if (intersection.IsTrue)
                     {
                         var n = new Vector();
+                        var n0 = new Vector();
+                        var n1 = new Vector();
+                        var n2 = new Vector();
                         if ((p1 - intersection.Point).Length < (p2 - intersection.Point).Length)
                         {
-                            n = Land.Normal[i][j];
+                            n0 = new Vector((p1 - p0).Y, -(p1 - p0).X).Normalized;
+                            n1 = new Vector((p2 - p1).Y, -(p2 - p1).X).Normalized;
+                            
+                            n = (n0 + n1).Normalized;
                         }
                         else
                         {
-                            n = Land.Normal[i][j + 1];
+                            n1 = new Vector((p2 - p1).Y, -(p2 - p1).X).Normalized;
+                            n2 = new Vector((p3 - p2).Y, -(p3 - p2).X).Normalized;
+
+                            n = (n1 + n2).Normalized;
                         }
 
                         Grenade.Bounce(intersection.Point, n);
@@ -307,7 +319,7 @@ namespace NanoGames.Games.Banana
         {
             if (Grenade.IsExploded)
             {
-                Land.makeCaldera(Grenade.Position, 6);
+                Land.makeCaldera(Grenade.Position, 5);
                 MatchAudioSettings.GrenadeExploded = true;
 
                 foreach (var player in Players)
@@ -317,11 +329,11 @@ namespace NanoGames.Games.Banana
 
                     if (dist < 5)
                     {
-                        damage = 50;
+                        damage = 60;
                     } 
                     if ((dist >= 5) && (dist < 15))
                     {
-                        damage = -5 * dist + 75;
+                        damage = -6 * dist + 90;
                     }
 
                     player.Health -= damage;
@@ -336,24 +348,22 @@ namespace NanoGames.Games.Banana
         {
             for (int i = 0; i < Land.Border.Count; i++)
             {
-                var block = Land.Border[i];
-
-                for (int j = 0; j < block.Count - 1; j++)
+                for (int j = 0; j < Land.Border[i].Count; j++)
                 {
-                    Intersection intersection = new Intersection(player.Position, player.PositionBefore, block[j], block[j + 1]);
+                    Intersection intersection = new Intersection(player.Position, player.PositionBefore, Land.Border[i][j], Land.Border[i][mod(j + 1, Land.Border[i].Count)]);
 
                     if (intersection.IsTrue)
                     {
-                        if ((intersection.Point - block[j]).Length < (intersection.Point - block[j + 1]).Length)
+                        if ((intersection.Point - Land.Border[i][j]).Length < (intersection.Point - Land.Border[i][mod(j + 1, Land.Border[i].Count)]).Length)
                         {
-                            player.Position = block[j];
+                            player.Position = Land.Border[i][j];
                             player.PositionIndex[0] = i;
                             player.PositionIndex[1] = j;
                         }
 
                         else
                         {
-                            player.Position = block[j + 1];
+                            player.Position = Land.Border[i][mod(j + 1, Land.Border[i].Count)];
                             player.PositionIndex[0] = i;
                             player.PositionIndex[1] = j + 1;
                         }
@@ -395,6 +405,11 @@ namespace NanoGames.Games.Banana
 
             // player is hovering in air
             player.IsFalling = true;
+        }
+        
+        private int mod(int x, int m)
+        {
+            return (x % m + m) % m;
         }
 
     }
