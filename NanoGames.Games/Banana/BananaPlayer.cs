@@ -40,7 +40,7 @@ namespace NanoGames.Games.Banana
         private int countDown = 0;
         private int countFire = 0;
         public int IdxWeapon = 0;
-        private string[] weapons = new string[] { "Gun", "Grenade 1sec", "Grenade 2sec", "Grenade 3sec" };
+        private string[] weapons = new string[] { "Bazooka", "Grenade 1sec", "Grenade 2sec", "Grenade 3sec" };
         private bool looksRight;
         
         public void DrawScreen()
@@ -155,6 +155,10 @@ namespace NanoGames.Games.Banana
             if (!Match.Grenade.IsExploded && !Match.Grenade.IsDead)
             {
                 Output.Graphics.Circle(new Color(1, 1, 1), Match.Grenade.Position, 1);
+                double t = Match.Grenade.TimeLeft / 60.0;
+                int s = (int)(t);
+                int d = (int)((t - s) * 10.0);
+                Output.Graphics.Print(new Color(1, 1, 1), 3, Match.Grenade.Position + new Vector(0, -7), s.ToString() + "." + d.ToString());
             }
 
             /*
@@ -171,6 +175,12 @@ namespace NanoGames.Games.Banana
 
         public void PlayAudio()
         {
+            if (Match.MatchAudioSettings.NextPlayer)
+            {
+                Output.Audio.Play(Sound.Tone(1, Pitch.C(6)));
+                Match.MatchAudioSettings.NextPlayer = false;
+            }
+
             if (Match.MatchAudioSettings.AngleSet)
             {
                 Output.Audio.Play(Sounds.Toc);
@@ -279,7 +289,7 @@ namespace NanoGames.Games.Banana
                 }
                 else
                 {
-                    step = -3;
+                    step = -2;
                 }
             }
 
@@ -293,7 +303,7 @@ namespace NanoGames.Games.Banana
                 }
                 else
                 {
-                    step = 3;
+                    step = 2;
                 }
             }
 
@@ -406,7 +416,7 @@ namespace NanoGames.Games.Banana
 
             Match.MatchAudioSettings.PlayerShot = true;
 
-            if (weapons[IdxWeapon] == "Gun")
+            if (weapons[IdxWeapon] == "Bazooka")
             {
                 Match.Bullet.StartBullet(position, velocity);
             }

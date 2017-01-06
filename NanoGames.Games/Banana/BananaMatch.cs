@@ -73,6 +73,7 @@ namespace NanoGames.Games.Banana
                     FramesLeft = framesMax;
                     Wind.SetSpeed(Random);
                     StateOfGame = "ActivePlayerActing";     // StateOfGame -> ActivePlayerActing
+                    MatchAudioSettings.NextPlayer = true;
                     break;
                     
                 case "ActivePlayerActing":

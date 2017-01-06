@@ -53,11 +53,8 @@
     <Compile Include="Banana\Grenade.cs" />
     <Compile Include="Banana\Intersection.cs" />
     <Compile Include="Banana\Landscape.cs" />
-    <Compile Include="Banana\Line.cs" />
     <Compile Include="Banana\SimpleBullet.cs" />
-    <Compile Include="Banana\Polygon.cs" />
     <Compile Include="Banana\Constants.cs" />
-    <Compile Include="Banana\Methods.cs" />
     <Compile Include="Banana\Wind.cs" />
     <Compile Include="AsteroidHunt\Asteroid.cs" />
     <Compile Include="AsteroidHunt\Bullet.cs" />

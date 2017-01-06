@@ -17,6 +17,7 @@ namespace NanoGames.Games.Banana
         public Vector Velocity;
         public bool IsExploded = true;
         public bool IsDead = true;
+        public double TimeLeft;
 
         private int frameCount = 0;
         public double Radius = 1;
@@ -31,6 +32,7 @@ namespace NanoGames.Games.Banana
             IsDead = false;
             lifeTime = time;
             frameCount = 0;
+            TimeLeft = time;
         }
 
         public void MoveGrenade()
@@ -42,6 +44,7 @@ namespace NanoGames.Games.Banana
                 Velocity += new Vector(0, Constants.Gravity);
             }
             frameCount++;
+            TimeLeft--;
 
             if (frameCount > lifeTime)
             {
