@@ -142,6 +142,31 @@ namespace NanoGames
             return new Vector(ca * X - sa * Y, sa * X + ca * Y);
         }
 
+        /// <summary>
+        /// Gets the vector rotated "angle" degrees counterclockwise
+        /// </summary>
+        /// <param name="angle">angle of rotation counterclockwise</param>
+        /// <returns>The rotated angle.</returns>
+        public Vector RotateAngle(double angle)
+        {
+            var x = X * Math.Cos(angle) + Y * Math.Sin(angle);
+            var y = -X * Math.Sin(angle) + Y * Math.Cos(angle);
+            return new Vector(x, y);
+        }
+
+        /// <summary>
+        /// Gets the vector rotated "angle" degrees counterclockwise around origin
+        /// </summary>
+        /// <param name="angle">angle of rotaion counterclockwise</param>
+        /// <param name="origin">origin of rotation</param>
+        /// <returns>The rotated vector.</returns>
+        public Vector RotateAngle(double angle, Vector origin)
+        {
+            var x = (X - origin.X) * Math.Cos(angle) + (Y - origin.Y) * Math.Sin(angle) + origin.X;
+            var y = -(X - origin.X) * Math.Sin(angle) + (Y - origin.Y) * Math.Cos(angle) + origin.Y;
+            return new Vector(x, y);
+        }
+
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {

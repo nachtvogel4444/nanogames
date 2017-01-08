@@ -27,5 +27,15 @@ namespace NanoGames
             Sound.Noise(0.1, new Pitch(0), new Pitch(300)),
             Sound.Noise(0.1, new Pitch(0), new Pitch(250)),
             Sound.Noise(0.1, new Pitch(0), new Pitch(200)));
+
+        /// <summary>
+        /// An toc sound.
+        /// </summary>
+        public static readonly Sound Toc = Sound.Sequence(
+            Sound.Noise(0.02, new Pitch(0), new Pitch(400)),
+            Sound.Noise(0.02, new Pitch(0), new Pitch(350)),
+            Sound.Noise(0.02, new Pitch(0), new Pitch(300)),
+            Sound.Noise(0.02, new Pitch(0), new Pitch(250)),
+            Sound.Noise(0.02, new Pitch(0), new Pitch(200)));
     }
 }
