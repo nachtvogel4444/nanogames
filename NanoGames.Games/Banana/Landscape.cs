@@ -174,8 +174,10 @@ namespace NanoGames.Games.Banana
                 {
                     if ((position - new Vector(i, j)).Length <= size)
                     {
-
-                        IsSolid[i, j] = false;
+                        if ((i >= 0) && (i <= 320) && (j >= 0) || (j <= 200))
+                        {
+                            IsSolid[i, j] = false;
+                        }
                     }
                 }
             }

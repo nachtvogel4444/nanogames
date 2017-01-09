@@ -23,5 +23,21 @@ namespace NanoGames.Games.Banana
         public bool TimerFiveSecondsToGo = false;
         public bool TimerOneSecondToGo = false;
         public bool NextPlayer = false;
+
+        public void Reset()
+        {
+            BulletExploded = false;
+            GrenadeExploded = false;
+            PlayerWalked = false;
+            WeaponSelected = false;
+            AngleSet = false;
+            LoadingPower = false;
+            PlayerShot = false;
+            PlayerHitGround = false;
+            TimerFiveSecondsToGo = false;
+            TimerOneSecondToGo = false;
+            NextPlayer = false;
+        }
+    
     }
 }

@@ -43,7 +43,6 @@ namespace NanoGames.Games.Banana
             foreach (var player in Players)
             {
                 player.GetBorn();
-                player.Name = "TEST";
             }
 
             StartPlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));
@@ -70,10 +69,19 @@ namespace NanoGames.Games.Banana
 
                     } while (ActivePlayer.HasFinished);
 
-                    FramesLeft = framesMax;
+                    FramesLeft = framesMax + 60;
                     Wind.SetSpeed(Random);
-                    StateOfGame = "ActivePlayerActing";     // StateOfGame -> ActivePlayerActing
-                    MatchAudioSettings.NextPlayer = true;
+                    StateOfGame = "Wait";     // StateOfGame -> Wait 1 s
+                    break;
+
+                case "Wait":
+
+                    if (FramesLeft <= framesMax)
+                    {
+                        StateOfGame = "ActivePlayerActing";     // StateOfGame -> ActivePlayerActing
+                        MatchAudioSettings.NextPlayer = true;
+                    }
+
                     break;
                     
                 case "ActivePlayerActing":
@@ -174,6 +182,7 @@ namespace NanoGames.Games.Banana
                 player.DrawScreen();
                 player.PlayAudio();
             }
+            MatchAudioSettings.Reset();
 
             if (Players.Count == 1)
             {
@@ -211,6 +220,7 @@ namespace NanoGames.Games.Banana
                         foreach (var playerB in Players)
                         {
                             CheckIfPlayerIsFalling(playerB);
+                            RecalculatePlayerPositionIndex(playerB);
                         }
 
                         return;
@@ -236,6 +246,7 @@ namespace NanoGames.Games.Banana
                         foreach (var player in Players)
                         {
                             CheckIfPlayerIsFalling(player);
+                            RecalculatePlayerPositionIndex(player);
                         }
                         
                         return;
@@ -332,7 +343,8 @@ namespace NanoGames.Games.Banana
                     player.Health -= damage;
 
                     CheckIfPlayerIsFalling(player);
-                    
+                    RecalculatePlayerPositionIndex(player);
+
                 }
             }
         }
@@ -399,7 +411,29 @@ namespace NanoGames.Games.Banana
             // player is hovering in air
             player.IsFalling = true;
         }
-        
+
+        public void RecalculatePlayerPositionIndex(BananaPlayer player)
+        {
+            for (int i = 0; i < Land.Border.Count; i++)
+            {
+                for (int j = 0; j < Land.Border[i].Count; j++)
+                {
+                    Vector p = Land.Border[i][j];
+
+                    double epsilon = 0.000001;
+                    if ((p-player.Position).Length < epsilon)
+                    {
+                        player.PositionIndex[0] = i;
+                        player.PositionIndex[1] = j;
+                        player.Position = p;
+
+                        return;
+                    }
+                }
+            }
+
+        }
+
         private int mod(int x, int m)
         {
             return (x % m + m) % m;

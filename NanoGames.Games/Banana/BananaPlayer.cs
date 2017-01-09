@@ -79,10 +79,10 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(160 - tmp.Length * 4 / 2, 15), tmp);
 
             // Draw Health
-            numberOfLines = (int)(Match.ActivePlayer.Health * 40 / 100);
+            numberOfLines = (int)(Match.ActivePlayer.Health * 60 / 100);
             for (int i = 0; i < numberOfLines; i++)
             {
-                Output.Graphics.Line(colorActivePlayer, new Vector(30 + i, 20), new Vector(30 + i, 28));
+                Output.Graphics.Line(colorActivePlayer, new Vector(30.0 + 2.0 / 3 * i, 20), new Vector(30.0 + 2.0 / 3 * i, 28));
             }
             Output.Graphics.Line(colorActivePlayer, new Vector(30, 20), new Vector(30, 28));
             Output.Graphics.Line(colorActivePlayer, new Vector(30, 20), new Vector(70, 20));
@@ -178,19 +178,16 @@ namespace NanoGames.Games.Banana
             if (Match.MatchAudioSettings.NextPlayer)
             {
                 Output.Audio.Play(Sound.Tone(1, Pitch.C(6)));
-                Match.MatchAudioSettings.NextPlayer = false;
             }
 
             if (Match.MatchAudioSettings.AngleSet)
             {
                 Output.Audio.Play(Sounds.Toc);
-                Match.MatchAudioSettings.AngleSet = false;
             }
 
             if (Match.MatchAudioSettings.LoadingPower)
             {
                 Output.Audio.Play(Sound.Chirp(1.7, new Pitch(100), new Pitch(300)));
-                Match.MatchAudioSettings.LoadingPower = false;
             }
 
             if (Match.MatchAudioSettings.PlayerShot)
@@ -199,43 +196,36 @@ namespace NanoGames.Games.Banana
                             Sound.Noise(0.1, new Pitch(800), new Pitch(1000)),
                             Sound.Noise(0.1, new Pitch(500), new Pitch(700)),
                             Sound.Noise(0.1, new Pitch(200), new Pitch(500))));
-                Match.MatchAudioSettings.PlayerShot = false;
             }
 
             if (Match.MatchAudioSettings.PlayerWalked)
             {
                 Output.Audio.Play(Sound.Noise(0.1, new Pitch(400), new Pitch(500)));
-                Match.MatchAudioSettings.PlayerWalked = false;
             }
             
             if (Match.MatchAudioSettings.TimerFiveSecondsToGo)
             {
                 Output.Audio.Play(Sound.Chirp(0.1, Pitch.C(5), Pitch.C(6)));
-                Match.MatchAudioSettings.TimerFiveSecondsToGo = false;
             }
 
             if (Match.MatchAudioSettings.TimerOneSecondToGo)
             {
                 Output.Audio.Play(Sound.Tone(1, Pitch.C(6)));
-                Match.MatchAudioSettings.TimerOneSecondToGo = false;
             }
 
             if (Match.MatchAudioSettings.PlayerHitGround)
             {
                 Output.Audio.Play(Sounds.Toc);
-                Match.MatchAudioSettings.PlayerHitGround = false;
             }
 
             if (Match.MatchAudioSettings.BulletExploded)
             {
                 Output.Audio.Play(Sounds.Explosion);
-                Match.MatchAudioSettings.BulletExploded = false;
             }
 
             if (Match.MatchAudioSettings.GrenadeExploded)
             {
                 Output.Audio.Play(Sounds.Explosion);
-                Match.MatchAudioSettings.GrenadeExploded = false;
             }
         }
 
