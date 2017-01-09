@@ -147,6 +147,7 @@ namespace NanoGames.Application
                     {
                         Color = PlayerColors.Values[(i * 5) % PlayerColors.Values.Count],
                         Output = new Output(),
+                        Name = "PLAYER" + (i + 1),
                     }).ToList(),
 
                 Random = new Random(),

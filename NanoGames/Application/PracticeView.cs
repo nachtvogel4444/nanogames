@@ -114,6 +114,7 @@ namespace NanoGames.Application
                     {
                         Color = Settings.Instance.PlayerColor,
                         Output = _output,
+                        Name = Settings.Instance.PlayerName,
                     },
                 },
 
