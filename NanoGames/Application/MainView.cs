@@ -15,8 +15,8 @@ namespace NanoGames.Application
     /// </summary>
     internal sealed class MainView : IView, IDisposable
     {
-        private IView _fpsView = new FpsView();
-        private IView _background = new StarfieldView();
+        private FpsView _fpsView = new FpsView();
+        private StarfieldView _background = new StarfieldView();
 
         private IView _currentView;
 
@@ -84,6 +84,9 @@ namespace NanoGames.Application
         }
 
         /// <inheritdoc/>
+        public bool ShowBackground => true;
+
+        /// <inheritdoc/>
         public void Dispose()
         {
         }
@@ -93,7 +96,15 @@ namespace NanoGames.Application
         {
             _fpsView.Update(terminal);
             _currentView?.Update(terminal);
-            _background.Update(terminal);
+
+            if (_currentView == null || _currentView.ShowBackground)
+            {
+                _background.Update(terminal);
+            }
+            else
+            {
+                _background.Pause();
+            }
         }
 
         private void OnQuit()

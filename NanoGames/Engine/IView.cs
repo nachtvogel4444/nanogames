@@ -9,6 +9,10 @@ namespace NanoGames.Engine
     internal interface IView
     {
         /// <summary>
+        /// Gets a value indicating whether to show the background.</summary>
+        bool ShowBackground { get; }
+
+        /// <summary>
         /// Updates and renders the view.
         /// </summary>
         /// <param name="terminal">The terminal this view should render to.</param>

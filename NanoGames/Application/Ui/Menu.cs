@@ -31,6 +31,9 @@ namespace NanoGames.Application.Ui
             Title = title;
         }
 
+        /// <inheritdoc/>
+        public bool ShowBackground => true;
+
         /// <summary>
         /// Gets or sets the menu title.
         /// </summary>

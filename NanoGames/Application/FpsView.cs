@@ -2,31 +2,32 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using NanoGames.Engine;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace NanoGames.Application
 {
     /// <summary>
     /// A view that measures and draws the current frames per second.
     /// </summary>
-    internal sealed class FpsView : IView
+    internal sealed class FpsView
     {
         private readonly Queue<long> _times = new Queue<long>();
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Updates and renders the view.
+        /// </summary>
+        /// <param name="terminal">The terminal this view should render to.</param>
         public void Update(Terminal terminal)
         {
-            var fontSize = 6;
+            var fontSize = 4;
             var color = new Color(0.60, 0.35, 0.05);
 
             if (DebugMode.IsEnabled)
             {
-                terminal.Graphics.Print(color, fontSize, new Vector(0, 0), "DEBUG");
-                for (int i = 0; i <= System.GC.MaxGeneration; ++i)
-                {
-                    terminal.Graphics.Print(color, fontSize, new Vector(0, (i + 1) * fontSize), string.Format("GC{0}: {1}", i, System.GC.CollectionCount(i)));
-                }
+                terminal.Graphics.Print(color, fontSize, new Vector(0, 0), "GC " + string.Join("/", Enumerable.Range(0, GC.MaxGeneration + 1).Select(g => GC.CollectionCount(g))));
             }
 
             var time = Stopwatch.GetTimestamp();
@@ -34,7 +35,7 @@ namespace NanoGames.Application
             if (Settings.Instance.ShowFps && _times.Count > 0)
             {
                 var fps = (double)Stopwatch.Frequency * _times.Count / (time - _times.Peek());
-                var fpsString = ((int)(fps + 0.5)).ToString("D2");
+                var fpsString = ((int)(fps + 0.5)).ToString("D2") + " FPS";
 
                 terminal.Graphics.Print(color, fontSize, new Vector(GraphicsConstants.Width - fpsString.Length * fontSize, 0), fpsString);
             }

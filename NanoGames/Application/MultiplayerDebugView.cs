@@ -50,6 +50,9 @@ namespace NanoGames.Application
         }
 
         /// <inheritdoc/>
+        public bool ShowBackground => _match == null;
+
+        /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
             if (_match != null)

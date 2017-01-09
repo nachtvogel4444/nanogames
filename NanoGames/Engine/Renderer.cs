@@ -13,7 +13,7 @@ namespace NanoGames.Engine
     [Synchronization.NonClonable]
     internal sealed class Renderer : IGraphics, IDisposable
     {
-        private const float _lineRadius = 0.5f;
+        private const float _lineRadius = 1f / 3f;
 
         private static readonly VertexSpecification _lineVertexSpecification = new VertexSpecification()
         {

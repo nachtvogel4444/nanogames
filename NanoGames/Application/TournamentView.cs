@@ -57,6 +57,9 @@ namespace NanoGames.Application
         }
 
         /// <inheritdoc/>
+        public bool ShowBackground => _currentView != null || (_tournament.TournamentPhase != TournamentPhase.Match && _tournament.TournamentPhase != TournamentPhase.MatchCountdown);
+
+        /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
             bool escape = false;

@@ -22,7 +22,7 @@ float matrixTexture(float y)
 
 void main()
 {
-	float r = 5.0; // The tube radius, measured in diagonals. A smaller radius means a more curved tube.
+	float r = 8.0; // The tube radius, measured in diagonals. A smaller radius means a more curved tube.
 
 	/* Project the view ray onto the spherical tube and compute the screen coordinates that we hit. */
 	float d = (r + 1) / r;

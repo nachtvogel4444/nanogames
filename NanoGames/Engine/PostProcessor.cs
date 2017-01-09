@@ -157,6 +157,7 @@ namespace NanoGames.Engine
 
                 GL.ActiveTexture(TextureUnit.Texture1);
                 screenFramebuffer.BindTexture();
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBorderColor, new float[] { 0, 0, 0, 1 });
             }
 
             GL.Viewport(0, 0, _width, _height);

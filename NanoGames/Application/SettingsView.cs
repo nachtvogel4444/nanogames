@@ -98,6 +98,9 @@ namespace NanoGames.Application
         }
 
         /// <inheritdoc/>
+        public bool ShowBackground => true;
+
+        /// <inheritdoc/>
         public void Update(Terminal terminal)
         {
             _menu.Update(terminal);

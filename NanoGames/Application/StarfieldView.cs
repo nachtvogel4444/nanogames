@@ -11,7 +11,7 @@ namespace NanoGames.Application
     /// <summary>
     /// A view showing a moving starfield.
     /// </summary>
-    internal sealed class StarfieldView : IView
+    internal sealed class StarfieldView
     {
         private const double _starsPerInterval = 4096;
         private readonly Random _random = new Random();
@@ -31,7 +31,20 @@ namespace NanoGames.Application
         /// </summary>
         public double Warp { get; set; } = 1.0;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Doesn't pause the view, but still keeps the time current.
+        /// </summary>
+        public void Pause()
+        {
+            var currentTimestamp = Stopwatch.GetTimestamp();
+            _lastStarTimestamp += currentTimestamp - _lastTimestamp;
+            _lastTimestamp = currentTimestamp;
+        }
+
+        /// <summary>
+        /// Updates and renders the view.
+        /// </summary>
+        /// <param name="terminal">The terminal this view should render to.</param>
         public void Update(Terminal terminal)
         {
             if (_stars.Count == 0)
