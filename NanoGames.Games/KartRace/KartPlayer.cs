@@ -15,7 +15,7 @@ namespace NanoGames.Games.KartRace
         public void Render()
         {
             var graphics = Output.Graphics;
-            graphics.Line(new Color(1, 1, 1), new Vector(0, 100), new Vector(320, 100));
+            graphics.Line(Constants.HorizonColor, new Vector(0, 100), new Vector(320, 100));
 
             foreach (var line in Match.TrackLines)
             {
@@ -40,7 +40,7 @@ namespace NanoGames.Games.KartRace
                 p = Project(p);
                 q = Project(q);
 
-                graphics.Line(new Color(0.5, 0.5, 0.5), p, q);
+                graphics.Line(line.Color, p, q);
             }
 
             foreach (var player in Match.Players)

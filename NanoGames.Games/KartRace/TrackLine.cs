@@ -8,11 +8,13 @@ namespace NanoGames.Games.KartRace
 {
     class TrackLine
     {
+        public readonly Color Color;
         public readonly Vector P;
         public readonly Vector Q;
 
-        public TrackLine(Vector p, Vector q)
+        public TrackLine(Color color, Vector p, Vector q)
         {
+            Color = color;
             P = p;
             Q = q;
         }
