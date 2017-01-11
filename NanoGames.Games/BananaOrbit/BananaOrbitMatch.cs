@@ -19,7 +19,17 @@ namespace NanoGames.Games.BananaOrbit
 
         private void DrawScreen()
         {
+
+            
             Output.Graphics.Circle(new Color(1, 1, 1), new Vector(160, 100), 20);
+
+            ConvexPolygon poly = new ConvexPolygon();
+            poly.Add(new Vector(20, 20));
+            poly.Add(new Vector(40, 20));
+            poly.Add(new Vector(40, 40));
+            poly.Add(new Vector(20, 40));
+
+            poly.DrawAll(Output.Graphics, new Color(1, 1, 1));
         }
 
         private void PlayAudio()

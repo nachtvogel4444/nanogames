@@ -46,14 +46,25 @@ namespace NanoGames.Games.BananaOrbit
         /// <summary>
         /// Gets the directional vector of the segment, pointing from start to stop.
         /// </summary>
-        public Vector DirectionalVector => Stop - Start;
+        public Vector DirectionalVector => Start - Stop;
 
+        /// <summary>
+        /// Gets the midpoint of the segment.
+        /// </summary>
+        public Vector MidPoint => Stop + 0.5 * DirectionalVector;
+        
         /// <summary>
         /// Gets the normal unit vector to the segment, counterclockwise.
         /// </summary>
         public Vector Normal => new Vector(DirectionalVector.Y, -DirectionalVector.X).Normalized;
 
-        
+        /// <summary>
+        /// Draws the segment.
+        /// </summary>
+        public void Draw(IGraphics g, Color c)
+        {
+            g.Line(c, Start, Stop);
+        }
 
     }
 }

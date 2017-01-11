@@ -49,6 +49,8 @@
     </Compile>
     <Compile Include="BananaOrbit\BananaOrbitMatch.cs" />
     <Compile Include="BananaOrbit\BananaOrbitPlayer.cs" />
+    <Compile Include="BananaOrbit\Constants.cs" />
+    <Compile Include="BananaOrbit\ConvexPolygon.cs" />
     <Compile Include="BananaOrbit\Polygon.cs" />
     <Compile Include="BananaOrbit\Segment.cs" />
     <Compile Include="Banana\AudioSettings.cs" />
