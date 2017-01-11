@@ -145,15 +145,9 @@ namespace NanoGames.Games.BananaOrbit
             int i = 0;
             foreach (Vector point in Points)
             {
-                g.Circle(c, point, 1.5);
+                g.Circle(c, point, 0.5);
                 g.Print(c, 2, point - new Vector(0, -2), i.ToString());
                 i++;
-            }
-
-            /* Draw all mid points*/
-            foreach (Segment edge in Edges)
-            {
-                g.Circle(c, edge.MidPoint, 1.5);
             }
 
             /* Draw all edges*/
