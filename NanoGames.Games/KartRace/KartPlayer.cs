@@ -14,6 +14,9 @@ namespace NanoGames.Games.KartRace
 
         public bool HasFinished;
 
+        public int Round;
+        public double MaxAngle;
+
         public void Render()
         {
             var graphics = Output.Graphics;

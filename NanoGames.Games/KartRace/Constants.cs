@@ -8,6 +8,8 @@ namespace NanoGames.Games.KartRace
 {
     class Constants
     {
+        public const int Rounds = 3;
+
         public const double Acceleration = 0.002;
         
         public const double Brake = 0.01;
@@ -30,7 +32,7 @@ namespace NanoGames.Games.KartRace
 
         public const double PlayerAxisOffset = 0.12;
         
-        public static readonly Color[] TrackSegmentColors = new[] { new Color(0.8, 0, 0), new Color(0.7, 0.7, 0.7) };
+        public static readonly Color[] TrackSegmentColors = new[] { new Color(0.7, 0.7, 0.7), new Color(0.8, 0, 0) };
 
         public static readonly double[] TrackAmplitudes = new double[] { 3, 2, 2, 2, 2, 1, 4 };
 

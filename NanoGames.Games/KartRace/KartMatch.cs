@@ -56,6 +56,15 @@ namespace NanoGames.Games.KartRace
                 }
             }
 
+            {
+                double r = GetTrackRadius(0);
+                TrackLines.Add(
+                        new TrackLine(
+                            Constants.TrackSegmentColors[0],
+                            new Vector(r, 0),
+                            new Vector(r + Constants.TrackWidth, 0)));
+            }
+
             var startPos = new Vector(Constants.TrackWidth * 0.5 + GetTrackRadius(0), 0);
 
             for (int i = 0; i < Players.Count; ++i)
@@ -69,6 +78,8 @@ namespace NanoGames.Games.KartRace
         {
             foreach (var player in Players)
             {
+                if (player.HasFinished) continue;
+
                 if (player.Input.Left.IsPressed)
                 {
                     player.Direction *= Constants.TurnSpeed;
@@ -94,6 +105,20 @@ namespace NanoGames.Games.KartRace
                 player.Position += player.Velocity;
 
                 var playerA = Math.Atan2(player.Position.Y, player.Position.X);
+                if (playerA < 0) playerA += 2 * Math.PI;
+
+                player.MaxAngle = Math.Max(player.MaxAngle, playerA);
+                if (playerA < 0.1 && player.MaxAngle > 6.1)
+                {
+                    player.MaxAngle = playerA;
+                    ++player.Round;
+                    if (player.Round == Constants.Rounds)
+                    {
+                        player.HasFinished = true;
+                        player.Score = -Frame;
+                    }
+                }
+
                 var playerR = player.Position.Length;
                 var trackR = GetTrackRadius(playerA);
                 var trackD = GetTrackDerivative(playerA);
@@ -110,6 +135,8 @@ namespace NanoGames.Games.KartRace
 
             foreach (var player in Players)
             {
+                if (player.HasFinished) continue;
+
                 /* Check for collisions. */
                 foreach (var otherPlayer in Players)
                 {
@@ -144,7 +171,13 @@ namespace NanoGames.Games.KartRace
 
             foreach (var player in Players)
             {
+                if (player.HasFinished) continue;
                 player.Render();
+            }
+
+            if (Players.Count(p => !p.HasFinished) < 2)
+            {
+                IsCompleted = true;
             }
         }
 
