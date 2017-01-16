@@ -82,6 +82,10 @@
     <Compile Include="Discipline.cs" />
     <Compile Include="DisciplineDirectory.cs" />
     <Compile Include="Discipline{TMatch,TPlayer}.cs" />
+    <Compile Include="KartRace\Constants.cs" />
+    <Compile Include="KartRace\KartPlayer.cs" />
+    <Compile Include="KartRace\KartMatch.cs" />
+    <Compile Include="KartRace\TrackLine.cs" />
     <Compile Include="NanoSoccer\Ball.cs" />
     <Compile Include="NanoSoccer\Circle.cs" />
     <Compile Include="NanoSoccer\Field.cs" />
