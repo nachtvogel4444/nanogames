@@ -29,7 +29,6 @@ namespace NanoGames.Games.BananaOrbit
         /// </summary>
         public Vector FirstPoint => Points[0];
         
-
         /// <summary>
         /// Gets the last point in the polygon.
         /// </summary>

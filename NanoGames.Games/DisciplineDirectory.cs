@@ -16,13 +16,13 @@ namespace NanoGames.Games
         {
             /* Note: names must be in ALL-CAPS to render correctly. */
 
-            /*Add<AsteroidHunt.AsteroidHuntMatch, AsteroidHunt.AsteroidHuntPlayer>("ASTEROID HUNT");
+            Add<AsteroidHunt.AsteroidHuntMatch, AsteroidHunt.AsteroidHuntPlayer>("ASTEROID HUNT");
             Add<Bomberguy.BomberMatch, Bomberguy.BomberGuy>("BOMBERGUY");
             Add<Example.ExampleMatch, Example.ExamplePlayer>("INTO THE SQUARE");
             Add<FallingBlocks.FallingBlocksMatch, FallingBlocks.FallingBlocksPlayer>("FALLING BLOCKS");
             Add<KartRace.KartMatch, KartRace.KartPlayer>("KART RACE");
             Add<NanoSoccer.NanoSoccerMatch, NanoSoccer.NanoSoccerPlayer>("NANO SOCCER");
-            Add<Snake.SnakeMatch, Snake.SnakePlayer>("SNAKE");*/
+            Add<Snake.SnakeMatch, Snake.SnakePlayer>("SNAKE");
             Add<Banana.BananaMatch, Banana.BananaPlayer>("BANANA");
             Add<BananaOrbit.BananaOrbitMatch, BananaOrbit.BananaOrbitPlayer>("BANANAORBIT");
         }
