@@ -60,6 +60,8 @@ namespace NanoGames.Games.KartRace
 
             foreach (var player in Match.Players)
             {
+                if (player.HasFinished) continue;
+
                 var p = Translate(player.Position);
                 if (p.X < 0) continue;
 
