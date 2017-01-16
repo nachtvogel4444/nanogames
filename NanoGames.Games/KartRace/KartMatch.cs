@@ -69,8 +69,13 @@ namespace NanoGames.Games.KartRace
 
             for (int i = 0; i < Players.Count; ++i)
             {
-                Players[i].Position = startPos + i * new Vector(0, 1);
-                Players[i].Direction = Rotation.Quarter;
+                var startAngle = -Constants.StartAngle;
+                var startRadius = GetTrackRadius(startAngle) + (i + 1) * Constants.TrackWidth / (Players.Count + 1);
+
+                Players[i].Position = Vector.FromAngle(startAngle) * startRadius;
+
+                var direction = Rotation.FromRadians(startAngle) * new Vector(GetTrackDerivative(startAngle), 1).Normalized;
+                Players[i].Direction = Rotation.FromVector(direction);
             }
         }
 

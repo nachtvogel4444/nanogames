@@ -14,7 +14,7 @@ namespace NanoGames.Games.KartRace
 
         public bool HasFinished;
 
-        public int Round;
+        public int Round = -1;
         public double MaxAngle;
 
         public void Render()

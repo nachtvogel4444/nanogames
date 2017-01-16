@@ -10,6 +10,8 @@ namespace NanoGames.Games.KartRace
     {
         public const int Rounds = 3;
 
+        public const double StartAngle = 0.05;
+
         public const double Acceleration = 0.002;
         
         public const double Brake = 0.01;
