@@ -30,7 +30,7 @@ namespace NanoGames.Games.KartRace
 
         public const double TrackWidth = 6;
 
-        public const double PlayerRadius = 0.125;
+        public const double PlayerRadius = 0.2;
 
         public const double PlayerAxisOffset = 0.12;
         
