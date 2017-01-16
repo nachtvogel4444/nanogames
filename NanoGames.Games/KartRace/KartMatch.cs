@@ -190,7 +190,8 @@ namespace NanoGames.Games.KartRace
                 player.Render();
             }
 
-            if (Players.Count(p => !p.HasFinished) < 2)
+            var activePlayers = Players.Count(p => !p.HasFinished);
+            if (Players.Count <= 1 ? activePlayers == 0 : activePlayers <= 1)
             {
                 IsCompleted = true;
             }

@@ -17,6 +17,11 @@ namespace NanoGames.Games.KartRace
         public int Round = -1;
         public double MaxAngle;
 
+        public KartPlayer()
+        {
+            Score = -9e9;
+        }
+
         public void Render()
         {
             var graphics = Output.Graphics;
