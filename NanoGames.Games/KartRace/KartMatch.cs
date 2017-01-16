@@ -77,6 +77,7 @@ namespace NanoGames.Games.KartRace
                 var startAngle = -Constants.StartAngle;
                 var startRadius = GetTrackRadius(startAngle) + (i + 1) * Constants.TrackWidth / (Players.Count + 1);
 
+                Players[i].MaxAngle = startAngle + 2 * Math.PI;
                 Players[i].Position = Vector.FromAngle(startAngle) * startRadius;
 
                 var direction = GetTrackTangent(startAngle);
@@ -117,7 +118,11 @@ namespace NanoGames.Games.KartRace
                 var playerA = Math.Atan2(player.Position.Y, player.Position.X);
                 if (playerA < 0) playerA += 2 * Math.PI;
 
-                player.MaxAngle = Math.Max(player.MaxAngle, playerA);
+                if (player.MaxAngle < playerA && playerA < player.MaxAngle + 0.2)
+                {
+                    player.MaxAngle = playerA;
+                }
+
                 if (playerA < 0.1 && player.MaxAngle > 6.1)
                 {
                     player.MaxAngle = playerA;
