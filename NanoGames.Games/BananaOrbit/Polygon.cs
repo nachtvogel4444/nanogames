@@ -67,7 +67,7 @@ namespace NanoGames.Games.BananaOrbit
             for (int i = 0; i < N; i++)
             {
                 k = (i + 1) % N;
-                edges.Add(new Segment(Points[k], Points[i]));
+                edges.Add(new Segment(Points[i], Points[k]));
             }
 
             return edges;
@@ -98,10 +98,10 @@ namespace NanoGames.Games.BananaOrbit
             int k;
             double area = 0;
 
-            for (int i = 0; i < N - 1; i++)
+            for (int i = 0; i < N; i++)
             {
                 k = (i + 1) % Points.Count;
-                area += (Points[k].X - Points[i].X) * (Points[k].Y - Points[i].Y) / 2;
+                area += (Points[i].X * (-Points[k].Y) - Points[k].X * -(Points[i].Y)) / 2;
             }
 
             return Math.Abs(area);
@@ -125,6 +125,20 @@ namespace NanoGames.Games.BananaOrbit
         }
 
         /// <summary>
+        /// Rotates the polygon counterclockwise around a given point.
+        /// </summary>
+        /// <param name="origin">The origin of the rotation.</param>
+        /// <param name="angle">The angle of the rotation.</param>
+        public void Rotate(double angle, Vector origin)
+        {
+            for (int i = 0; i < N; i++)
+            {
+                Points[i] = Points[i].RotateAngle(angle, origin);
+            }
+
+        }
+
+        /// <summary>
         /// Draws the polygon.
         /// </summary>
         public void Draw(IGraphics g, Color c)
@@ -139,32 +153,26 @@ namespace NanoGames.Games.BananaOrbit
         /// <summary>
         /// Draws all the things from the polygon.
         /// </summary>
-        public void DrawAll(IGraphics g, Color c)
+        public void DrawDebug(IGraphics g, Color c)
         {
             /* Draw all points*/
             int i = 0;
             foreach (Vector point in Points)
             {
                 g.Circle(c, point, 0.5);
-                g.Print(c, 2, point - new Vector(0, -2), i.ToString());
+                g.Print(c, 3, point - new Vector(0, -2), i.ToString());
                 i++;
             }
 
             /* Draw all edges*/
             foreach (Segment edge in Edges)
             {
-                edge.Draw(g, c);
-            }
-
-            /* Draw all normals*/
-            foreach (Segment edge in Edges)
-            {
-                g.Line(c, edge.MidPoint, edge.MidPoint + edge.Normal);
+                edge.DrawDebug(g, c);
             }
 
             /*print area, number of points*/
-            g.Print(c, 2, Points[0] + new Vector(0, -10), "Area: " + Area.ToString());
-            g.Print(c, 2, Points[0] + new Vector(0, -7), "N: " + N.ToString());
+            g.Print(c, 3, Points[0] + new Vector(0, -10), "AREA: " + Area.ToString());
+            g.Print(c, 3, Points[0] + new Vector(0, -7), "N: " + N.ToString());
         }
 
     }
