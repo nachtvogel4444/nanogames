@@ -82,5 +82,25 @@ namespace NanoGames
         {
             return new Rotation(Math.Cos(angle) - 1, Math.Sin(angle));
         }
+
+        /// <summary>
+        /// Rotate so that the vector (1, 0) is rotated onto the specified vector.
+        /// </summary>
+        /// <param name="v">The vector.</param>
+        /// <returns>The rotation.</returns>
+        public static Rotation FromVector(Vector v)
+        {
+            var vn = v.Normalized;
+            return new Rotation(vn.X - 1, vn.Y);
+        }
+
+        /// <summary>
+        /// Returns the vector (1, 0) rotated by this rotation. This is the inverse of Rotation.FromVector.
+        /// </summary>
+        /// <returns>The rotated vector.</returns>
+        public Vector ToVector()
+        {
+            return new Vector(_rMinusOne + 1, _i);
+        }
     }
 }

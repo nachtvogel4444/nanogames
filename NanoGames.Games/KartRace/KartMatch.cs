@@ -81,23 +81,35 @@ namespace NanoGames.Games.KartRace
 
                 if (player.Input.Up.IsPressed)
                 {
-                    player.Speed += Constants.Acceleration;
-                    if (player.Speed > Constants.MaxSpeed)
-                    {
-                        player.Speed = Constants.MaxSpeed;
-                    }
+                    player.Velocity += Constants.Acceleration * player.Direction.ToVector();
                 }
 
                 if (player.Input.Down.IsPressed)
                 {
-                    player.Speed -= Constants.Brake;
-                    if (player.Speed < 0)
-                    {
-                        player.Speed = 0;
-                    }
+                    player.Velocity -= Constants.Acceleration * player.Direction.ToVector();
                 }
 
-                player.Position += player.Speed * (player.Direction * new Vector(1, 0));
+                var velocity = player.Velocity.Length;
+                if (velocity > Constants.MaxSpeed)
+                {
+                    player.Velocity *= Constants.MaxSpeed / velocity;
+                }
+
+                player.Position += player.Velocity;
+
+                var playerA = Math.Atan2(player.Position.Y, player.Position.X);
+                var playerR = player.Position.Length;
+                var trackR = GetTrackRadius(playerA);
+                var trackD = GetTrackDerivative(playerA);
+                var trackNormal = Rotation.FromRadians(playerA) * new Vector(-1, trackD).Normalized;
+
+                var dot = Vector.Dot(player.Velocity, trackNormal);
+
+                if ((playerR < trackR && dot > 0) || (playerR > trackR + Constants.TrackWidth && dot < 0))
+                {
+                    player.Velocity -= 2 * dot * trackNormal;
+                    player.Velocity *= Constants.TrackBumpElasticity;
+                }
             }
 
             foreach (var player in Players)
@@ -109,12 +121,24 @@ namespace NanoGames.Games.KartRace
         private double GetTrackRadius(double angle)
         {
             double r = Constants.TrackRadius;
+
             for (int i = 0; i < Constants.TrackAmplitudes.Length; ++i)
             {
                 r += Math.Sin(angle * (i + 1) + _offsets[i]) * Constants.TrackAmplitudes[i];
             }
 
             return Math.Max(Constants.MinTrackRadius, r);
+        }
+
+        private double GetTrackDerivative(double angle)
+        {
+            double d = 0;
+            for (int i = 0; i < Constants.TrackAmplitudes.Length; ++i)
+            {
+                d += Math.Cos(angle * (i + 1) + _offsets[i]) * (i + 1) * Constants.TrackAmplitudes[i];
+            }
+
+            return d / Constants.TrackRadius;
         }
     }
 }

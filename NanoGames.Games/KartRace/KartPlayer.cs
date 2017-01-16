@@ -9,7 +9,7 @@ namespace NanoGames.Games.KartRace
     class KartPlayer : Player<KartMatch>
     {
         public Vector Position;
-        public double Speed;
+        public Vector Velocity;
         public Rotation Direction;
 
         public void Render()
@@ -48,7 +48,7 @@ namespace NanoGames.Games.KartRace
                 var p = Translate(player.Position);
                 if (p.X < 0) continue;
 
-                var r = 20 / (p.X + Constants.NearOffset);
+                var r = Constants.PlayerRadius * 160 / (p.X + Constants.NearOffset);
                 p = Project(p);
 
                 graphics.Circle(player.LocalColor, p, r);

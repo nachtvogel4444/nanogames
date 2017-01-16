@@ -14,6 +14,8 @@ namespace NanoGames.Games.KartRace
 
         public const double MaxSpeed = 0.5;
 
+        public const double TrackBumpElasticity = 0.5;
+
         public const double TrackRadius =  64;
 
         public const double MinTrackRadius = 32;
@@ -24,11 +26,17 @@ namespace NanoGames.Games.KartRace
 
         public const double TrackWidth = 6;
 
+        public const double PlayerRadius = 0.125;
+
+        public const double PlayerAxisOffset = 0.12;
+        
         public static readonly Color[] TrackSegmentColors = new[] { new Color(0.8, 0, 0), new Color(0.7, 0.7, 0.7) };
 
         public static readonly double[] TrackAmplitudes = new double[] { 3, 2, 2, 2, 2, 1, 4 };
 
         public static readonly Rotation TurnSpeed = Rotation.FromDegrees(1);
+
+        public static double CameraTurnSpeed = 1.0 / 180.0 * Math.PI;
 
         public static readonly double CameraOffset = 2.5;
 
