@@ -89,11 +89,7 @@ namespace NanoGames.Games.KartRace
                     player.Velocity -= Constants.Acceleration * player.Direction.ToVector();
                 }
 
-                var velocity = player.Velocity.Length;
-                if (velocity > Constants.MaxSpeed)
-                {
-                    player.Velocity *= Constants.MaxSpeed / velocity;
-                }
+                player.Velocity = LimitSpeed(player.Velocity);
 
                 player.Position += player.Velocity;
 
@@ -114,7 +110,54 @@ namespace NanoGames.Games.KartRace
 
             foreach (var player in Players)
             {
+                /* Check for collisions. */
+                foreach (var otherPlayer in Players)
+                {
+                    var relativePosition = otherPlayer.Position - player.Position;
+
+                    if (otherPlayer != player
+                        && !otherPlayer.HasFinished
+                        && relativePosition.Length < 2 * Constants.PlayerRadius)
+                    {
+                        /*
+                         * We overlap with the other player.
+                         * This is only a collision if the players are moving towards each other, otherwise, let them move apart naturally.
+                         */
+
+                        var relativeVelocity = otherPlayer.Velocity - player.Velocity;
+
+                        /* The dot product tells us if the vectors are oriented towards each other. */
+                        if (Vector.Dot(relativePosition, relativeVelocity) < 0)
+                        {
+                            /*
+                             * The other player is moving towards us, relatively.
+                             * Compute the result of a perfectly elastic condition.
+                             */
+
+                            var velocityExchange = Vector.Dot(relativeVelocity, relativePosition.Normalized) * relativePosition.Normalized;
+                            player.Velocity = LimitSpeed(player.Velocity + velocityExchange);
+                            otherPlayer.Velocity = LimitSpeed(otherPlayer.Velocity - velocityExchange);
+                        }
+                    }
+                }
+            }
+
+            foreach (var player in Players)
+            {
                 player.Render();
+            }
+        }
+
+        private static Vector LimitSpeed(Vector velocity)
+        {
+            var speed = velocity.Length;
+            if (speed > Constants.MaxSpeed)
+            {
+                return velocity * (Constants.MaxSpeed / speed);
+            }
+            else
+            {
+                return velocity;
             }
         }
 

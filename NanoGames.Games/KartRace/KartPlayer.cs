@@ -12,6 +12,8 @@ namespace NanoGames.Games.KartRace
         public Vector Velocity;
         public Rotation Direction;
 
+        public bool HasFinished;
+
         public void Render()
         {
             var graphics = Output.Graphics;
