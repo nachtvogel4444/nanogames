@@ -12,6 +12,11 @@ namespace NanoGames.Games.KartRace
 
         private readonly double[] _offsets = new double[Constants.TrackAmplitudes.Length];
 
+        public Vector GetTrackTangent(double angle)
+        {
+            return Rotation.FromRadians(angle) * new Vector(GetTrackDerivative(angle), 1).Normalized;
+        }
+
         protected override void Initialize()
         {
             for (int i = 0; i < Constants.TrackAmplitudes.Length; ++i)
@@ -74,7 +79,7 @@ namespace NanoGames.Games.KartRace
 
                 Players[i].Position = Vector.FromAngle(startAngle) * startRadius;
 
-                var direction = Rotation.FromRadians(startAngle) * new Vector(GetTrackDerivative(startAngle), 1).Normalized;
+                var direction = GetTrackTangent(startAngle);
                 Players[i].Direction = Rotation.FromVector(direction);
             }
         }

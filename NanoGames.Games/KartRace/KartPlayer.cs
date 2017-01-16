@@ -20,6 +20,16 @@ namespace NanoGames.Games.KartRace
         public void Render()
         {
             var graphics = Output.Graphics;
+
+            var roundString = $"ROUND {Math.Max(1, Round + 1)}";
+            graphics.Print(new Color(1, 1, 1), 8, new Vector(316 - roundString.Length * 8, 16), roundString);
+
+            var trackAngle = Math.Atan2(Position.Y, Position.X);
+            if (Vector.Dot(Match.GetTrackTangent(trackAngle), Direction.ToVector()) < 0)
+            {
+                graphics.PrintCenter(Colors.Error, 8, new Vector(160, 24), "WRONG WAY");
+            }
+
             graphics.Line(Constants.HorizonColor, new Vector(0, 100), new Vector(320, 100));
 
             foreach (var line in Match.TrackLines)
