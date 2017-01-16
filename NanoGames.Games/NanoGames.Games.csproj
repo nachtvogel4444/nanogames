@@ -53,6 +53,7 @@
     <Compile Include="BananaOrbit\ConvexPolygon.cs" />
     <Compile Include="BananaOrbit\Polygon.cs" />
     <Compile Include="BananaOrbit\Segment.cs" />
+    <Compile Include="BananaOrbit\Voronoi.cs" />
     <Compile Include="Banana\AudioSettings.cs" />
     <Compile Include="Banana\BananaMatch.cs" />
     <Compile Include="Banana\BananaPlayer.cs" />
@@ -81,10 +82,6 @@
     <Compile Include="Discipline.cs" />
     <Compile Include="DisciplineDirectory.cs" />
     <Compile Include="Discipline{TMatch,TPlayer}.cs" />
-    <Compile Include="KartRace\Constants.cs" />
-    <Compile Include="KartRace\KartPlayer.cs" />
-    <Compile Include="KartRace\KartMatch.cs" />
-    <Compile Include="KartRace\TrackLine.cs" />
     <Compile Include="NanoSoccer\Ball.cs" />
     <Compile Include="NanoSoccer\Circle.cs" />
     <Compile Include="NanoSoccer\Field.cs" />
@@ -123,7 +120,6 @@
   <ItemGroup>
     <Content Include="Banana\tmpcode.txt" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
