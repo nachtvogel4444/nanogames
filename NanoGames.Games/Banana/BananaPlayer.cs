@@ -459,7 +459,7 @@ namespace NanoGames.Games.Banana
             Position += Velocity + 0.5 * new Vector(0, Constants.Gravity);
             Velocity += new Vector(0, Constants.Gravity);
             UpdateHitbox();
-            // audio tbd
+            Match.MatchAudioSettings.PlayerHitGround = true;
         }
         
         public void Draw(IGraphics g, Color c, int i)
