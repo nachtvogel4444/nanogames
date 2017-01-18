@@ -121,8 +121,10 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Line(new Color(1, 1, 1), new Vector(290, 20), new Vector(290, 28));
             tmp = "WIND " + (Convert.ToInt32(Math.Abs(Match.Wind.Speed) * 10)).ToString();
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(270 - tmp.Length / 2 * 4, 15), tmp);
- 
 
+            /* Draw landscape */
+            Match.Land.Draw(Output.Graphics);
+            
             /* Draw each player. */
             for (int i = 0; i < Match.Players.Count; i++)
             {
@@ -150,8 +152,6 @@ namespace NanoGames.Games.Banana
 
             }
 
-            /* Draw landscape */
-            Match.Land.Draw(Output.Graphics);
             /* Draw bullet. */
             if (!Match.Bullet.IsExploded)
             {
@@ -243,6 +243,7 @@ namespace NanoGames.Games.Banana
 
         public void GetBorn()
         {
+            Score = int.MaxValue;
 
             PositionIndex[0] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border.Count - 1));
             PositionIndex[1] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border[PositionIndex[0]].Count - 1));

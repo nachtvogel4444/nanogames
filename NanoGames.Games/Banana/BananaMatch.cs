@@ -171,6 +171,9 @@ namespace NanoGames.Games.Banana
                         finishedPlayers++;
                     }
                     player.HasFinished = true;
+
+                    /* Finishing lateer is better. */
+                    player.Score = finishedPlayers;
                 }
             }
 
@@ -211,7 +214,7 @@ namespace NanoGames.Games.Banana
                     {
                         MatchAudioSettings.BulletExploded = true;
                         Bullet.IsExploded = true;
-                        Land.makeCaldera(intersection.Point, 5);
+                        // Land.makeCaldera(intersection.Point, 5);
                         player.Health -= 50;
 
                         foreach (var playerB in Players)
@@ -223,12 +226,12 @@ namespace NanoGames.Games.Banana
 
                                 if (dist <= 3)
                                 {
-                                    damage = 50;
+                                    damage = 30;
                                 }
 
                                 if ((dist > 3) && (dist <= 10))
                                 {
-                                    damage = -6 * dist + 68;
+                                    damage = -6.0 * dist + 38.0;
                                 }
 
                                 playerB.Health -= damage;
@@ -352,7 +355,7 @@ namespace NanoGames.Games.Banana
         {
             if (Grenade.IsExploded)
             {
-                Land.makeCaldera(Grenade.Position, 12);
+                Land.makeCaldera(Grenade.Position, 10);
                 MatchAudioSettings.GrenadeExploded = true;
 
                 foreach (var player in Players)
