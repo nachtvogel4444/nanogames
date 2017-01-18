@@ -211,7 +211,7 @@ namespace NanoGames.Games.Banana
                     {
                         MatchAudioSettings.BulletExploded = true;
                         Bullet.IsExploded = true;
-                        Land.makeCaldera(intersection.Point, 7);
+                        Land.makeCaldera(intersection.Point, 5);
                         player.Health -= 50;
 
                         foreach (var playerB in Players)
@@ -219,7 +219,7 @@ namespace NanoGames.Games.Banana
                             if (player != playerB)
                             {
                                 double damage = 0;
-                                double dist = (player.Position + player.Normal - Bullet.Position).Length;
+                                double dist = (playerB.Position + playerB.Normal - Bullet.Position).Length;
 
                                 if (dist <= 3)
                                 {
@@ -256,7 +256,7 @@ namespace NanoGames.Games.Banana
                     {
                         MatchAudioSettings.BulletExploded = true;
                         Bullet.IsExploded = true;
-                        Land.makeCaldera(intersection.Point, 7);
+                        Land.makeCaldera(intersection.Point, 5);
 
                         foreach (var player in Players)
                         {
@@ -392,6 +392,8 @@ namespace NanoGames.Games.Banana
                         {
                             player.Position = Land.Border[i][j];
                             player.Normal = Land.Normal[i][j];
+                            player.Alpha = Math.Atan2(player.Normal.Y, player.Normal.X);
+                            player.Aiming += player.Alpha;
                             player.PositionIndex[0] = i;
                             player.PositionIndex[1] = j;
                         }
@@ -400,6 +402,8 @@ namespace NanoGames.Games.Banana
                         {
                             player.Position = Land.Border[i][mod(j + 1, Land.Border[i].Count)];
                             player.Normal = Land.Normal[i][mod(j + 1, Land.Border[i].Count)];
+                            player.Alpha = Math.Atan2(player.Normal.Y, player.Normal.X);
+                            player.Aiming += player.Alpha;
                             player.PositionIndex[0] = i;
                             player.PositionIndex[1] = j + 1;
                         }

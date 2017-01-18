@@ -30,7 +30,7 @@ namespace NanoGames.Games.Banana
         public bool IsFalling = false;
         
         private double localAiming = 0.25 * Math.PI;
-        private double aiming = 0;
+        public double Aiming = 0;
         
 
         private int wait = 20;
@@ -258,12 +258,12 @@ namespace NanoGames.Games.Banana
             if (Match.Random.Next(0, 1) == 0)
             {
                 looksRight = false;
-                aiming = Alpha - localAiming;
+                Aiming = Alpha - localAiming;
             }
             else
             {
                 looksRight = true;
-                aiming = Alpha + localAiming;
+                Aiming = Alpha + localAiming;
             }
         }
 
@@ -321,7 +321,7 @@ namespace NanoGames.Games.Banana
                 Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
                 Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
                 Alpha = Math.Atan2(Normal.Y, Normal.X);
-                aiming += Alpha;
+                Aiming += Alpha;
                 UpdateHitbox();
                 Match.MatchAudioSettings.PlayerWalked = true;
             }
@@ -379,11 +379,11 @@ namespace NanoGames.Games.Banana
 
             if (looksRight)
             {
-                aiming = Alpha + localAiming;
+                Aiming = Alpha + localAiming;
             }
             else
             {
-                aiming = Alpha - localAiming;
+                Aiming = Alpha - localAiming;
             }
         }
         
@@ -391,7 +391,7 @@ namespace NanoGames.Games.Banana
         {
             if (Input.Fire.WasActivated)
             {
-                Vector guntip = Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
+                Vector guntip = Position + 5 * Normal + 5 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
                 
                 if (Match.Land.CheckIsSolid(guntip))
                 {
@@ -422,9 +422,9 @@ namespace NanoGames.Games.Banana
 
         public void Shoot3()
         {
-            Vector velocity = SpeedProjectile * new Vector(Math.Cos(aiming), Math.Sin(aiming));
+            Vector velocity = SpeedProjectile * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
             //Vector velocity = 1 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
-            Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
+            Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
 
             Match.MatchAudioSettings.PlayerShot = true;
 
@@ -487,14 +487,14 @@ namespace NanoGames.Games.Banana
             }*/
 
             /* Gun */
-            g.Line(c, Position + 5 * Normal, Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming)));
+            g.Line(c, Position + 5 * Normal, Position + 5 * Normal + 5 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming)));
 
             /* crosshair*/
             if (this == Match.ActivePlayer)
             {
-                var p = Position + 5 * Normal + 15 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
-                g.Line(c, p - 1 * new Vector(Math.Cos(aiming + Math.PI / 4), Math.Sin(aiming + Math.PI / 4)), p + 1 * new Vector(Math.Cos(aiming + Math.PI / 4), Math.Sin(aiming + Math.PI / 4)));
-                g.Line(c, p - 1 * new Vector(Math.Cos(aiming - Math.PI / 4), Math.Sin(aiming - Math.PI / 4)), p + 1 * new Vector(Math.Cos(aiming - Math.PI / 4), Math.Sin(aiming - Math.PI / 4)));
+                var p = Position + 5 * Normal + 15 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
+                g.Line(c, p - 1 * new Vector(Math.Cos(Aiming + Math.PI / 4), Math.Sin(Aiming + Math.PI / 4)), p + 1 * new Vector(Math.Cos(Aiming + Math.PI / 4), Math.Sin(Aiming + Math.PI / 4)));
+                g.Line(c, p - 1 * new Vector(Math.Cos(Aiming - Math.PI / 4), Math.Sin(Aiming - Math.PI / 4)), p + 1 * new Vector(Math.Cos(Aiming - Math.PI / 4), Math.Sin(Aiming - Math.PI / 4)));
             }
 
             /* Name */
