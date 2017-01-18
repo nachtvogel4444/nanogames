@@ -3,37 +3,42 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+
 
 namespace NanoGames.Games.Banana
 {
     class Landscape
     {
-        private bool[,] IsSolid = new bool[321, 201];
-        private bool[,] IsBorder = new bool[321, 201];
+        private bool[,] isSolid = new bool[321, 201];
+        private bool[,] isBorder = new bool[321, 201];
+        private bool[,] isPoint = new bool[321, 201];
         public List<List<Vector>> Border = new List<List<Vector>>();
         public List<List<Vector>> Normal = new List<List<Vector>>();
 
-        public void CreateBlock(Vector p1, Vector p2)
+        public void InitializePoints(Random r)
         {
-            
-            int x1 = clamp((int)p1.X, 1, 319);
-            int x2 = clamp((int)p2.X, 1, 319);
-            int y1 = clamp((int)p1.Y, 1, 199);
-            int y2 = clamp((int)p2.Y, 1, 199);
-
-            for (int i = x1; i <= x2; i++)
+            for (int i = 0; i <= 320; i++)
             {
-                for (int j = y1; j <= y2; j++)
+                for (int j = 0; j <= 200; j++)
                 {
-                    IsSolid[i, j] = true;
+                    if (isSolid[i, j])
+                    {
+                        var t = r.NextDouble();
+
+                        if (t < 0.2)
+                        {
+                            isPoint[i, j] = true;
+                        }
+                    }
+
                 }
             }
-
         }
 
         public void Refresh()
         {
-            IsBorder = getBorder();
+            isBorder = getBorder();
             refreshBorder();
         }
 
@@ -67,8 +72,8 @@ namespace NanoGames.Games.Banana
 
         private bool[,] getBorder()
         {
-            int n = IsSolid.GetLength(0);
-            int m = IsSolid.GetLength(1);
+            int n = isSolid.GetLength(0);
+            int m = isSolid.GetLength(1);
 
             bool[,] output = new bool[n, m];
 
@@ -76,16 +81,16 @@ namespace NanoGames.Games.Banana
             {
                 for (int y = 0; y < m; y++)
                 {
-                    if (IsSolid[x, y])
+                    if (isSolid[x, y])
                     {
                         output[x, y] = ((x < 1) ||
                                         (x > 319) ||
                                         (y < 1) ||
                                         (y > 199) ||
-                                        (IsSolid[x - 1, y] == false) ||
-                                        (IsSolid[x + 1, y] == false) ||
-                                        (IsSolid[x, y - 1] == false) ||
-                                        (IsSolid[x, y + 1] == false));
+                                        (isSolid[x - 1, y] == false) ||
+                                        (isSolid[x + 1, y] == false) ||
+                                        (isSolid[x, y - 1] == false) ||
+                                        (isSolid[x, y + 1] == false));
                     }
                 }
             }
@@ -98,8 +103,8 @@ namespace NanoGames.Games.Banana
             Border.Clear();
             Normal.Clear();
 
-            int n = IsBorder.GetLength(0);
-            int m = IsBorder.GetLength(1);
+            int n = isBorder.GetLength(0);
+            int m = isBorder.GetLength(1);
             
             bool[,] wasTaken = new bool[n, m];
 
@@ -107,7 +112,7 @@ namespace NanoGames.Games.Banana
             {
                 for (int y = 0; y < m; y++)
                 {
-                    if (IsBorder[x, y] && !wasTaken[x, y])
+                    if (isBorder[x, y] && !wasTaken[x, y])
                     {
                         int xx = x;
                         int yy = y;
@@ -130,7 +135,7 @@ namespace NanoGames.Games.Banana
                                 {
                                     if (((xx + k) < 320) && ((xx + k) > 0) && ((yy + l) < 200) && ((yy + l) > 0))
                                     {
-                                        if (IsSolid[xx + k, yy + l])
+                                        if (isSolid[xx + k, yy + l])
                                         {
                                             s += new Vector(k, l);
                                         }
@@ -146,7 +151,7 @@ namespace NanoGames.Games.Banana
                             {
                                 int loc = mod(last - 3 + k, 8);
 
-                                if (IsBorder[xx + mylist[loc, 0], yy + mylist[loc, 1]])
+                                if (isBorder[xx + mylist[loc, 0], yy + mylist[loc, 1]])
                                 {
                                     xx += mylist[loc, 0];
                                     yy += mylist[loc, 1];
@@ -161,7 +166,7 @@ namespace NanoGames.Games.Banana
                 }
             }
             
-        } 
+        }
 
         public void makeCaldera(Vector position, int size)
         {
@@ -173,7 +178,7 @@ namespace NanoGames.Games.Banana
                     {
                         if ((i >= 0) && (i <= 320) && (j >= 0) && (j <= 200))
                         {
-                            IsSolid[i, j] = false;
+                            isSolid[i, j] = false;
                         }
                     }
                 }
@@ -182,20 +187,34 @@ namespace NanoGames.Games.Banana
             Refresh();
         }
 
+        public bool CheckIsSolid(Vector p)
+        {
+            int x = (int)p.X;
+            int y = (int)p.Y;
+
+            if (isSolid[x, y] ||
+                isSolid[x + 1, y] ||
+                isSolid[x + 1, y + 1] ||
+                isSolid[x, y + 1])
+            {
+                return true;
+            }
+
+            else
+            {
+                return false;
+            }
+        }
+
         public void Draw(IGraphics g)
         {
             for (int i = 0; i <= 320; i++)
             {
                 for (int j = 0; j <= 200; j++)
                 {
-                    if (IsSolid[i,j])
+                    if (isSolid[i, j] && isPoint[i, j])
                     {
-                        // g.Point(new Color(0.3, 0.3, 0.3), new Vector(i, j));
-                    }
-                    
-                    if (IsBorder[i, j])
-                    {
-                        // g.Point(new Color(1, 0, 0), new Vector(i, j));
+                        g.Point(new Color(1, 1, 1), new Vector(i, j));
                     }
                 }
             }
@@ -229,29 +248,94 @@ namespace NanoGames.Games.Banana
         public void BuildLandscape(string name)
         {
             /* the first landscape */
-            if (name == "First")
+            if (name == "first")
             {
-                CreateBlock(new Vector(100, 100), new Vector(130, 110));
-                CreateBlock(new Vector(120, 120), new Vector(190, 300));
-                CreateBlock(new Vector(150, 100), new Vector(300, 130));
+                createBlock(new Vector(100, 100), new Vector(130, 110));
+                createBlock(new Vector(120, 120), new Vector(190, 300));
+                createBlock(new Vector(150, 100), new Vector(300, 130));
             }
             
-            if (name == "Blocks")
+            if (name == "blocks")
             {
-                CreateBlock(new Vector(30, 60), new Vector(100, 90));
-                CreateBlock(new Vector(150, 100), new Vector(300, 120));
-                CreateBlock(new Vector(110, 160), new Vector(150, 190));
-                CreateBlock(new Vector(230, 160), new Vector(280, 190));
+                createBlock(new Vector(30, 60), new Vector(100, 90));
+                createBlock(new Vector(150, 100), new Vector(300, 120));
+                createBlock(new Vector(110, 160), new Vector(150, 190));
+                createBlock(new Vector(230, 160), new Vector(280, 190));
             }
 
             if (name == "SimpleBlock")
             {
-                CreateBlock(new Vector(100, 100), new Vector(150, 110));
+                createBlock(new Vector(100, 100), new Vector(150, 110));
             }
 
+            if (name == "lady")
+            {
+                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\lady.bmp");
+            }
+
+            if (name == "boarder")
+            {
+                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\boarder.bmp");
+            }
+
+            if (name == "skier")
+            {
+                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\skier.bmp");
+            }
+
+            if (name == "airplane")
+            {
+                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\airplane.bmp");
+            }
+            if (name == "owls")
+            {
+                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\owls.bmp");
+            }
 
             Refresh();
         }
-        
+
+        public void BuildLandscapeRandom(Random random)
+        {
+            List<string> names = new List<string> { "blocks", "lady", "boarder", "skier", "airplane", "owls" };
+            int i = Convert.ToInt32(Math.Floor(random.NextDouble() * names.Count));
+            BuildLandscape(names[i]);
+        }
+
+        private void createBlock(Vector p1, Vector p2)
+        {
+
+            int x1 = clamp((int)p1.X, 1, 319);
+            int x2 = clamp((int)p2.X, 1, 319);
+            int y1 = clamp((int)p1.Y, 1, 199);
+            int y2 = clamp((int)p2.Y, 1, 199);
+
+            for (int i = x1; i <= x2; i++)
+            {
+                for (int j = y1; j <= y2; j++)
+                {
+                    isSolid[i, j] = true;
+                }
+            }
+
+        }
+
+        private void readImageToIsSolid(string filename)
+        {
+            Bitmap bmp = new Bitmap(Image.FromFile(filename));
+
+            for (int i = 0; i < bmp.Width; i++)
+            {
+                for (int j = 0; j < bmp.Height; j++)
+                {
+                    var b = bmp.GetPixel(i, j).GetBrightness();
+
+                    if (b < 0.5)
+                    {
+                        isSolid[i + 10, j + 40] = true;
+                    }
+                }
+            }
+        }
     }
 }

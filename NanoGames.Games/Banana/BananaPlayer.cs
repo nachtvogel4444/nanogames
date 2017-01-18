@@ -54,7 +54,14 @@ namespace NanoGames.Games.Banana
             }
 
             /* draw time left */
-            tmp = "TIME LEFT " + ((int)(Match.FramesLeft / 60.0)).ToString();
+            if (Match.FramesLeft < 0)
+            {
+                tmp = "TIME LEFT 0";
+            }
+            else
+            {
+                tmp = "TIME LEFT " + ((int)(Match.FramesLeft / 60.0)).ToString();
+            }
             Output.Graphics.Print(new Color(1, 1, 1), 6, new Vector(160 - tmp.Length * 6 / 2, 2),  tmp);
 
             /* draw active player name*/
@@ -114,9 +121,7 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Line(new Color(1, 1, 1), new Vector(290, 20), new Vector(290, 28));
             tmp = "WIND " + (Convert.ToInt32(Math.Abs(Match.Wind.Speed) * 10)).ToString();
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(270 - tmp.Length / 2 * 4, 15), tmp);
-            
-            /* Draw landscape */
-            Match.Land.Draw(Output.Graphics);
+ 
 
             /* Draw each player. */
             for (int i = 0; i < Match.Players.Count; i++)
@@ -145,6 +150,8 @@ namespace NanoGames.Games.Banana
 
             }
 
+            /* Draw landscape */
+            Match.Land.Draw(Output.Graphics);
             /* Draw bullet. */
             if (!Match.Bullet.IsExploded)
             {
@@ -202,7 +209,12 @@ namespace NanoGames.Games.Banana
             {
                 Output.Audio.Play(Sound.Noise(0.1, new Pitch(400), new Pitch(500)));
             }
-            
+
+            if (Match.MatchAudioSettings.CannotShot)
+            {
+                Output.Audio.Play(Sounds.Toc);
+            }
+
             if (Match.MatchAudioSettings.TimerFiveSecondsToGo)
             {
                 Output.Audio.Play(Sound.Chirp(0.1, Pitch.C(5), Pitch.C(6)));
@@ -379,10 +391,20 @@ namespace NanoGames.Games.Banana
         {
             if (Input.Fire.WasActivated)
             {
-                Match.StateOfGame = "ActivePlayerShoot2";
-                countFire = 0;
-                SpeedProjectile = 0;
-                Match.MatchAudioSettings.LoadingPower = true;
+                Vector guntip = Position + 5 * Normal + 5 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
+                
+                if (Match.Land.CheckIsSolid(guntip))
+                {
+                    Match.MatchAudioSettings.CannotShot = true;
+                }
+
+                else
+                {
+                    Match.StateOfGame = "ActivePlayerShoot2";
+                    countFire = 0;
+                    SpeedProjectile = 0;
+                    Match.MatchAudioSettings.LoadingPower = true;
+                }
             }
         }
 

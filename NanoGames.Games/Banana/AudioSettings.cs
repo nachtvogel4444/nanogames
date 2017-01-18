@@ -23,6 +23,7 @@ namespace NanoGames.Games.Banana
         public bool TimerFiveSecondsToGo = false;
         public bool TimerOneSecondToGo = false;
         public bool NextPlayer = false;
+        public bool CannotShot = false;
 
         public void Reset()
         {
@@ -37,6 +38,7 @@ namespace NanoGames.Games.Banana
             TimerFiveSecondsToGo = false;
             TimerOneSecondToGo = false;
             NextPlayer = false;
+            CannotShot = false;
         }
     
     }

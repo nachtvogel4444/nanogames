@@ -3,9 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 /*
@@ -21,7 +18,7 @@ namespace NanoGames.Games.Banana
     class BananaMatch : Match<BananaPlayer>
     {
         public int FramesLeft = 0;
-        private int framesMax = 1800;
+        private int framesMax = 3000;
         public string StateOfGame = "ActivePlayerActing";
         public BananaPlayer ActivePlayer;
         public int StartPlayerIdx = 0;
@@ -37,7 +34,10 @@ namespace NanoGames.Games.Banana
 
         protected override void Initialize()
         {
-            Land.BuildLandscape("Blocks");
+            //Land.BuildLandscape("Blocks");
+            //Land.BuildLandscape("owls");
+            Land.BuildLandscapeRandom(Random);
+            Land.InitializePoints(Random);
 
             foreach (var player in Players)
             {
@@ -211,11 +211,29 @@ namespace NanoGames.Games.Banana
                     {
                         MatchAudioSettings.BulletExploded = true;
                         Bullet.IsExploded = true;
-                        Land.makeCaldera(intersection.Point, 8);
+                        Land.makeCaldera(intersection.Point, 7);
                         player.Health -= 50;
 
                         foreach (var playerB in Players)
-                        {
+                        { 
+                            if (player != playerB)
+                            {
+                                double damage = 0;
+                                double dist = (player.Position + player.Normal - Bullet.Position).Length;
+
+                                if (dist <= 3)
+                                {
+                                    damage = 50;
+                                }
+
+                                if ((dist > 3) && (dist <= 10))
+                                {
+                                    damage = -6 * dist + 68;
+                                }
+
+                                playerB.Health -= damage;
+                            }
+
                             CheckIfPlayerIsFalling(playerB);
                             RecalculatePlayerPositionIndex(playerB);
                         }
@@ -238,10 +256,24 @@ namespace NanoGames.Games.Banana
                     {
                         MatchAudioSettings.BulletExploded = true;
                         Bullet.IsExploded = true;
-                        Land.makeCaldera(intersection.Point, 8);
+                        Land.makeCaldera(intersection.Point, 7);
 
                         foreach (var player in Players)
                         {
+                            double damage = 0;
+                            double dist = (player.Position + player.Normal - Bullet.Position).Length;
+
+                            if (dist <= 3)
+                            {
+                                damage = 50;
+                            }
+
+                            if ((dist > 3) && (dist <= 10))
+                            {
+                                damage = -6 * dist + 68;
+                            }
+
+                            player.Health -= damage;
                             CheckIfPlayerIsFalling(player);
                             RecalculatePlayerPositionIndex(player);
                         }
@@ -320,7 +352,7 @@ namespace NanoGames.Games.Banana
         {
             if (Grenade.IsExploded)
             {
-                Land.makeCaldera(Grenade.Position, 15);
+                Land.makeCaldera(Grenade.Position, 12);
                 MatchAudioSettings.GrenadeExploded = true;
 
                 foreach (var player in Players)
@@ -359,6 +391,7 @@ namespace NanoGames.Games.Banana
                         if ((intersection.Point - Land.Border[i][j]).Length < (intersection.Point - Land.Border[i][mod(j + 1, Land.Border[i].Count)]).Length)
                         {
                             player.Position = Land.Border[i][j];
+                            player.Normal = Land.Normal[i][j];
                             player.PositionIndex[0] = i;
                             player.PositionIndex[1] = j;
                         }
@@ -366,6 +399,7 @@ namespace NanoGames.Games.Banana
                         else
                         {
                             player.Position = Land.Border[i][mod(j + 1, Land.Border[i].Count)];
+                            player.Normal = Land.Normal[i][mod(j + 1, Land.Border[i].Count)];
                             player.PositionIndex[0] = i;
                             player.PositionIndex[1] = j + 1;
                         }
