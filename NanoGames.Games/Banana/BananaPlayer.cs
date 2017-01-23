@@ -248,11 +248,7 @@ namespace NanoGames.Games.Banana
             PositionIndex[0] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border.Count - 1));
             PositionIndex[1] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border[PositionIndex[0]].Count - 1));
 
-            Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
-            Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
-            Alpha = Math.Atan2(Normal.Y, Normal.X);
-
-            UpdateHitbox();
+            RecalcFromIndex();
 
             IdxWeapon = 0;
 
@@ -319,15 +315,25 @@ namespace NanoGames.Games.Banana
             if (step != 0)
             {
                 PositionIndex[1] = mod(PositionIndex[1] + step, Match.Land.Border[PositionIndex[0]].Count);
-                Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
-                Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
-                Alpha = Math.Atan2(Normal.Y, Normal.X);
-                Aiming += Alpha;
-                UpdateHitbox();
+                RecalcFromIndex();
                 Match.MatchAudioSettings.PlayerWalked = true;
             }
         }
-        
+
+        public void RecalcFromIndex()
+        {
+            Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
+            Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
+            Alpha = Math.Atan2(Normal.Y, Normal.X);
+            Aiming += Alpha;
+
+            for (int i = 0; i <= 8; i++)
+            {
+                var angleA = Alpha - Math.PI / 2 + i * Math.PI / 8;
+                Hitbox[i] = Position + Normal + new Vector(3 * Math.Cos(angleA), 3 * Math.Sin(angleA));
+            }
+        }
+
         public void SetAngle()
         {
             double angle = 0;
@@ -459,7 +465,6 @@ namespace NanoGames.Games.Banana
             PositionBefore = Position;
             Position += Velocity + 0.5 * new Vector(0, Constants.Gravity);
             Velocity += new Vector(0, Constants.Gravity);
-            UpdateHitbox();
             Match.MatchAudioSettings.PlayerHitGround = true;
         }
         
@@ -507,17 +512,6 @@ namespace NanoGames.Games.Banana
             g.Print(c, 3, Position + new Vector(-tmp.Length / 2 * 3, -15), tmp);
 
 
-        }
-
-        public void UpdateHitbox()
-        {
-            for (int i = 0; i <= 8; i++)
-            {
-                var angleA = Alpha - Math.PI / 2 + i * Math.PI / 8;
-                Hitbox[i] = Position + Normal + new Vector(3 * Math.Cos(angleA), 3 * Math.Sin(angleA));
-            }
-            
-            Hitbox[9] = Position + Normal + new Vector(3 * Math.Cos(Alpha - Math.PI / 2), 3 * Math.Sin(Alpha - Math.PI / 2));
         }
 
         private int mod(int x, int m)

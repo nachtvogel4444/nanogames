@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 
 namespace NanoGames.Games.Banana
@@ -102,7 +103,7 @@ namespace NanoGames.Games.Banana
         {
             Border.Clear();
             Normal.Clear();
-
+            
             int n = isBorder.GetLength(0);
             int m = isBorder.GetLength(1);
             
@@ -116,18 +117,43 @@ namespace NanoGames.Games.Banana
                     {
                         int xx = x;
                         int yy = y;
-                        Border.Add(new List<Vector>());
-                        Normal.Add(new List<Vector>());
-                        Vector s;
-
+                        List<Vector> tmpB = new List<Vector>();
+                        
                         int last = 3;
                         int[,] mylist = new int[8, 2] { { -1, -1 }, { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { -1, 1 }, { -1, 0 } };
-
-                        // while (!wasTaken[xx, yy])
+                        
                         do
                         {
                             wasTaken[xx, yy] = true;
-                            
+   
+                            tmpB.Add(new Vector(xx, yy));
+
+                            for (int k = 0; k < 8; k++)
+                            {
+                                int loc = mod(last - 3 + k, 8);
+
+                                if (isBorder[xx + mylist[loc, 0], yy + mylist[loc, 1]])
+                                {
+                                    xx += mylist[loc, 0];
+                                    yy += mylist[loc, 1];
+                                    last = loc;
+                                    break;
+                                }
+                            }
+
+                        } while ((xx != x) || (yy != y));
+
+                        // remove duplicates
+                        var B = tmpB.Distinct().ToList();
+
+                        // make normals
+                        List<Vector> N = new List<Vector>();
+                        Vector s;
+                        foreach (Vector b in B)
+                        {
+                            xx = (int)b.X;
+                            yy = (int)b.Y;
+
                             s = new Vector(0, 0);
                             for (int k = -2; k <= 2; k++)
                             {
@@ -143,25 +169,22 @@ namespace NanoGames.Games.Banana
 
                                 }
                             }
-                            
-                            Normal[Normal.Count - 1].Add(-s.Normalized);
-                            Border[Border.Count - 1].Add(new Vector(xx, yy));
-                           
-                            for (int k = 0; k < 8; k++)
-                            {
-                                int loc = mod(last - 3 + k, 8);
 
-                                if (isBorder[xx + mylist[loc, 0], yy + mylist[loc, 1]])
-                                {
-                                    xx += mylist[loc, 0];
-                                    yy += mylist[loc, 1];
-                                    last = loc;
-                                    break;
-                                }
-                            }
+                            N.Add(-s.Normalized);
 
-                        } while ((xx != x) || (yy != y));
-                        
+                        }
+
+                        Normal.Add(N);
+                        Border.Add(B);
+                                        
+
+                        // add tmpBorder and tmpNormal to Border and Nnormal if they are long enough
+                        //if (tmpBorder.Count > 7)
+                        //{
+                        //    Normal.Add(tmpNormal);
+                        //    Border.Add(tmpBorder);
+                        //}
+
                     }
                 }
             }
@@ -208,6 +231,9 @@ namespace NanoGames.Games.Banana
 
         public void Draw(IGraphics g)
         {
+
+            //List<Color> colorList = new List<Color> { new Color(0, 0, 1), new Color(0, 1, 1), new Color(1, 1, 1), new Color(1, 0, 1), new Color(1, 1, 0) };
+
             for (int i = 0; i <= 320; i++)
             {
                 for (int j = 0; j <= 200; j++)
@@ -219,14 +245,13 @@ namespace NanoGames.Games.Banana
                 }
             }
 
-            foreach (List<Vector> piece in Border)
+            for (int i = 0; i < Border.Count; i++)
             {
-                for (int i = 0; i < piece.Count - 1; i++)
+                for (int j = 0; j < Border[i].Count; j++)
                 {
-                    g.Line(new Color(1, 1, 1), piece[i], piece[i + 1]);
+                    g.Line(new Color(1, 1, 1), Border[i][j], Border[i][mod(j + 1, Border[i].Count)]);
                 }
                 
-                g.Line(new Color(1, 1, 1), piece[piece.Count - 1], piece[0]);
             }
         }
 

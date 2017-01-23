@@ -118,9 +118,12 @@ namespace NanoGames.Games.Banana
                     if (!Bullet.IsExploded)
                     {
                         Bullet.MoveBullet(Wind);
-                        CheckCollisionBulletLand();                  
-                        CheckCollisionBulletPlayers();              
-                        CheckCollisionBulletScreen();                
+                        CheckCollisionBulletScreen();
+                        CheckCollisionBulletLand(); 
+                        if (!Bullet.IsExploded)
+                        {
+                            CheckCollisionBulletPlayers();
+                        }
                         somethingFlying = true;
                     }
 
@@ -214,7 +217,45 @@ namespace NanoGames.Games.Banana
                     {
                         MatchAudioSettings.BulletExploded = true;
                         Bullet.IsExploded = true;
-                        // Land.makeCaldera(intersection.Point, 5);
+                        Land.makeCaldera(intersection.Point, 5);
+
+                        // push player into caldera
+                        bool foundSomething = false;
+                        Vector p1 = player.Position;
+                        Vector p2 = player.Position + Bullet.Velocity.Normalized;
+                        while ((p1 - player.Position).Length <= 6 && !foundSomething)
+                        {
+                            for (int ii = 0; ii < Land.Border.Count; ii++)
+                            {
+                                for (int jj = 0; jj < Land.Border[ii].Count; jj++)
+                                {
+                                    Intersection intersection2 = new Intersection(p1, p2, Land.Border[ii][jj], Land.Border[ii][mod(jj + 1, Land.Border[ii].Count)]);
+
+                                    if (intersection2.IsTrue)
+                                    {
+                                        foundSomething = true;
+
+                                        if ((intersection.Point - Land.Border[ii][jj]).Length < (intersection.Point - Land.Border[ii][mod(jj + 1, Land.Border[ii].Count)]).Length)
+                                        {
+                                            player.PositionIndex[0] = ii;
+                                            player.PositionIndex[1] = jj;
+                                            player.RecalcFromIndex();
+                                        }
+
+                                        else
+                                        {
+                                            player.PositionIndex[0] = ii;
+                                            player.PositionIndex[1] = mod(jj + 1, Land.Border[ii].Count);
+                                            player.RecalcFromIndex();
+                                        }
+                                    }
+                                }
+                            }
+
+                            p1 += Bullet.Velocity.Normalized;
+                            p2 += Bullet.Velocity.Normalized;
+                        }
+
                         player.Health -= 50;
 
                         foreach (var playerB in Players)
@@ -236,9 +277,9 @@ namespace NanoGames.Games.Banana
 
                                 playerB.Health -= damage;
                             }
-
+                            
                             CheckIfPlayerIsFalling(playerB);
-                            RecalculatePlayerPositionIndex(playerB);
+                            RecalcPlayerPositionIndex(playerB);
                         }
 
                         return;
@@ -266,19 +307,19 @@ namespace NanoGames.Games.Banana
                             double damage = 0;
                             double dist = (player.Position + player.Normal - Bullet.Position).Length;
 
-                            if (dist <= 3)
+                            if (dist <= 4)
                             {
                                 damage = 50;
                             }
 
-                            if ((dist > 3) && (dist <= 10))
+                            if ((dist > 4) && (dist <= 6))
                             {
-                                damage = -6 * dist + 68;
+                                damage = -22.5 * dist + 140;
                             }
 
                             player.Health -= damage;
                             CheckIfPlayerIsFalling(player);
-                            RecalculatePlayerPositionIndex(player);
+                            RecalcPlayerPositionIndex(player);
                         }
                         
                         return;
@@ -376,7 +417,7 @@ namespace NanoGames.Games.Banana
                     player.Health -= damage;
 
                     CheckIfPlayerIsFalling(player);
-                    RecalculatePlayerPositionIndex(player);
+                    RecalcPlayerPositionIndex(player);
                 }
             }
         }
@@ -393,25 +434,18 @@ namespace NanoGames.Games.Banana
                     {
                         if ((intersection.Point - Land.Border[i][j]).Length < (intersection.Point - Land.Border[i][mod(j + 1, Land.Border[i].Count)]).Length)
                         {
-                            player.Position = Land.Border[i][j];
-                            player.Normal = Land.Normal[i][j];
-                            player.Alpha = Math.Atan2(player.Normal.Y, player.Normal.X);
-                            player.Aiming += player.Alpha;
                             player.PositionIndex[0] = i;
                             player.PositionIndex[1] = j;
+                            player.RecalcFromIndex();
                         }
 
                         else
                         {
-                            player.Position = Land.Border[i][mod(j + 1, Land.Border[i].Count)];
-                            player.Normal = Land.Normal[i][mod(j + 1, Land.Border[i].Count)];
-                            player.Alpha = Math.Atan2(player.Normal.Y, player.Normal.X);
-                            player.Aiming += player.Alpha;
                             player.PositionIndex[0] = i;
-                            player.PositionIndex[1] = j + 1;
+                            player.PositionIndex[1] = mod(j + 1, Land.Border[i].Count);
+                            player.RecalcFromIndex();
                         }
-
-                        player.UpdateHitbox();
+                        
                         player.IsFalling = false;
                         player.Health -= player.Velocity.Length * 10;
                         player.Velocity = new Vector(0, 0);
@@ -450,7 +484,7 @@ namespace NanoGames.Games.Banana
             player.IsFalling = true;
         }
 
-        public void RecalculatePlayerPositionIndex(BananaPlayer player)
+        public void RecalcPlayerPositionIndex(BananaPlayer player)
         {
             for (int i = 0; i < Land.Border.Count; i++)
             {
