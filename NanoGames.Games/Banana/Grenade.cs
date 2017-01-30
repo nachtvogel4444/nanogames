@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace NanoGames.Games.Banana
 {
-    class Grenade
+    internal class Grenade
     {
         public Vector Position;
         public Vector PositionBefore;
