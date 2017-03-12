@@ -7,6 +7,8 @@ namespace NanoGames.Games.BananaOrbit
 {
     class BananaOrbitMatch : Match<BananaOrbitPlayer>
     {
+        private Body body = new Body(new Vector(160, 100));
+
         protected override void Initialize()
         {
 
@@ -20,6 +22,12 @@ namespace NanoGames.Games.BananaOrbit
         private void DrawScreen()
         {
             DrawTestScreen();
+
+            // play animation
+            var g = Output.Graphics;
+            body.Draw(g);
+            body.Cycle();
+
         }
 
         private void PlayAudio()

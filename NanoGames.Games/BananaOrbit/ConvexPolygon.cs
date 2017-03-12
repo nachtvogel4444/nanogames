@@ -26,7 +26,7 @@ namespace NanoGames.Games.BananaOrbit
 
             foreach (Segment edge in Edges)
             {
-                if (!clockwise(edge.Start, edge.Stop, point))
+                if (!clockwise(edge.Start, edge.End, point))
                 {
                     // throw new InvalidOperationException("Point cannot be added, point not clockwise orientated");
                 }

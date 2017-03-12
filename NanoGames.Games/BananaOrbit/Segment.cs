@@ -18,7 +18,7 @@ namespace NanoGames.Games.BananaOrbit
         /// <summary>
         /// The postion vector to the endpoint.
         /// </summary>
-        public Vector Stop;
+        public Vector End;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Segment"/> class.
@@ -30,23 +30,23 @@ namespace NanoGames.Games.BananaOrbit
 
             // check for start = stop
             Start = start;
-            Stop = stop;
+            End = stop;
         }
 
         /// <summary>
         /// Gets the squared length of the segment.
         /// </summary>
-        public double SquaredLength => (Start - Stop).SquaredLength;
+        public double SquaredLength => (Start - End).SquaredLength;
 
         /// <summary>
         /// Gets the length of the segement.
         /// </summary>
-        public double Length => (Stop - Start).Length;
+        public double Length => (End - Start).Length;
 
         /// <summary>
         /// Gets the directional vector of the segment, pointing from start to stop.
         /// </summary>
-        public Vector DirectionalVector => Stop - Start;
+        public Vector DirectionalVector => End - Start;
 
         /// <summary>
         /// Gets the midpoint of the segment.
@@ -66,7 +66,7 @@ namespace NanoGames.Games.BananaOrbit
         public void Rotate(double angle, Vector origin)
         {
             Start = Start.RotateAngle(angle, origin);
-            Stop = Stop.RotateAngle(angle, origin);
+            End = End.RotateAngle(angle, origin);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace NanoGames.Games.BananaOrbit
         /// <param name="c">Color.</param>
         public void Draw(IGraphics g, Color c)
         {
-            g.Line(c, Start, Stop);
+            g.Line(c, Start, End);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace NanoGames.Games.BananaOrbit
         /// <param name="c">Color.</param>
         public void DrawDebug(IGraphics g, Color c)
         {
-            g.Line(c, Start, Stop);
+            g.Line(c, Start, End);
             g.Circle(c, Start, 1);
             g.Line(c, MidPoint, MidPoint + Normal);
         }
