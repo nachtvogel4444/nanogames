@@ -12,5 +12,11 @@ namespace NanoGames.Games.Banana
         public List<Segment> Lines;
 
         public bool IsSolid;
+
+        public VectorInt Position;
+        public VectorInt Left;
+        public VectorInt Right;
+        public int Neighbors;
+
     }
 }

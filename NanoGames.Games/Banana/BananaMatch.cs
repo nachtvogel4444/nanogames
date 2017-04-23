@@ -23,6 +23,7 @@ namespace NanoGames.Games.Banana
         public BananaPlayer ActivePlayer;
         public int StartPlayerIdx = 0;
         private int activePlayerIdx = 0;
+        public PixelMap Map = new PixelMap();
         public Landscape Land = new Landscape();
         public Bullet Bullet = new Bullet();
         public Grenade Grenade = new Grenade();
@@ -38,6 +39,9 @@ namespace NanoGames.Games.Banana
             //Land.BuildLandscape("owls");
             Land.BuildLandscapeRandom(Random);
             Land.InitializePoints(Random);
+
+            // initialize map
+            Map.Initialize();
 
             foreach (var player in Players)
             {

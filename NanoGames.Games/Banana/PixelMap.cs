@@ -15,18 +15,104 @@ namespace NanoGames.Games.Banana
         private int yMin = 40;
         private int yMax = 190;
 
+        // do a function setSolid -> sets Issolid + updates neighbors, removes single pixels, updates left right
     
-        public void InitializePixels()
+        public void Initialize()
         {
             // fill Pixels with true
             createBlock(new Vector(50, 80), new Vector(200, 150));
             UpdatePixelLines();            
         }
 
+
+        public void UpdateNeighbours()
+        {
+            for (int i = xMin; i < xMax; i++)
+            {
+                for (int j = yMin; j < yMax; j++)
+                {
+                    var pixel = Pixels[i, j];
+                    pixel.Neighbors = 0;
+
+                    if (Pixels[i - 1, j - 1].IsSolid) { pixel.Neighbors++; }
+                    if (Pixels[i, j - 1].IsSolid) { pixel.Neighbors++; }
+                    if (Pixels[i + 1, j - 1].IsSolid) { pixel.Neighbors++; }
+                    if (Pixels[i + 1, j].IsSolid) { pixel.Neighbors++; }
+                    if (Pixels[i + 1, j + 1].IsSolid) { pixel.Neighbors++; }
+                    if (Pixels[i, j + 1].IsSolid) { pixel.Neighbors++; }
+                    if (Pixels[i - 1, j + 1].IsSolid) { pixel.Neighbors++; }
+                    if (Pixels[i - 1, j].IsSolid) { pixel.Neighbors++; }
+
+                }
+            }
+        }
+        
+        public void RemoveSinglePixels()
+        {
+            bool test = true;
+
+            while (test)
+            {
+                test = false;
+
+                for (int i = xMin; i < xMax; i++)
+                {
+                    for (int j = yMin; j < yMax; j++)
+                    {
+                        var pixel = Pixels[i, j];
+
+                        if (pixel.Neighbors <= 1 && pixel.IsSolid)
+                        {
+                            pixel.IsSolid = false;
+                            test = true;
+                        }
+                    }
+                }
+            }
+        }
+        
+        public void UpdateLeftRight()
+        {
+            int[] xlist = new int[8] { -1, 0, 1, 1, 1, 0, -1, -1 };
+            int[] ylist = new int[8] { -1, -1, -1, 0, 1, 1, 1, 0 };
+
+            for (int i = xMin; i < xMax; i++)
+            {
+                for (int j = yMin; j < yMax; j++)
+                {
+                    var pixel = Pixels[i, j];
+
+                    int in2out = 0;
+                    int out2in = 0;
+
+                    for (int k = 0; k < 8; k++)
+                    {
+                        int loc = mod(k, 8);
+
+                        if (Pixels[i + xlist[loc], j + ylist[loc]].IsSolid != Pixels[i + xlist[loc + 1], j + ylist[loc + 1]].IsSolid)
+                        {
+                            if (Pixels[i + xlist[loc], j + ylist[loc]].IsSolid)
+                            {
+                                in2out = loc;
+                            }
+                            else
+                            {
+                                out2in = loc;
+                            }
+                        }
+                    }
+
+                    pixel.Right = new VectorInt(xlist[out2in + 1], ylist[out2in + 1]);
+                    pixel.Left = new VectorInt(xlist[in2out], ylist[in2out]);
+
+                }
+            }
+        }
+
         public void UpdatePixelLines()
         {
             // updates all lines from each pixel by looking at the 8 neighbouring pixels
-
+            
             for (int i = xMin; i < xMax; i++)
             {
                 for (int j = yMin; j < yMax; j++)
@@ -213,13 +299,16 @@ namespace NanoGames.Games.Banana
 
         public void MakeCaldera(Vector position, int size)
         {
-            for (int i = (int)position.X - size + 1; i <= (int)position.X + size + 1; i++)
+            int x = (int)Math.Round(position.X);
+            int y = (int)Math.Round(position.Y);
+
+            for (int i = x - size; i <= x + size; i++)
             {
-                for (int j = (int)position.Y - size + 1; j <= (int)position.Y + size + 1; j++)
+                for (int j = y - size; j <= y + size; j++)
                 {
                     if ((position - new Vector(i, j)).Length <= size)
                     {
-                        if ((i >= 0) && (i <= 320) && (j >= 0) && (j <= 200))
+                        if ((i >= xMin) && (i <= xMax) && (j >= yMin) && (j <= yMax))
                         {
                             Pixels[i, j].IsSolid = false;
                         }
@@ -272,6 +361,11 @@ namespace NanoGames.Games.Banana
                 return max;
 
             return value;
+        }
+
+        private int mod(int x, int m)
+        {
+            return (x % m + m) % m;
         }
 
     }

@@ -67,6 +67,7 @@
     <Compile Include="Banana\Pixel.cs" />
     <Compile Include="Banana\PixelMap.cs" />
     <Compile Include="Banana\Segment.cs" />
+    <Compile Include="Banana\VectorInt.cs" />
     <Compile Include="Banana\Wind.cs" />
     <Compile Include="AsteroidHunt\Asteroid.cs" />
     <Compile Include="AsteroidHunt\Bullet.cs" />
