@@ -9,8 +9,8 @@ namespace NanoGames.Games.Banana
 {
     internal class Pixel
     {
-        public Vector Position;
-        public List<Vector> Neighbors = new List<Vector> { };
+        public List<Segment> Lines;
 
+        public bool IsSolid;
     }
 }

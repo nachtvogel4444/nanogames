@@ -10,8 +10,8 @@ namespace NanoGames.Games.Banana
     internal class Map
     {
         public bool[,] IsPixel = new bool[320, 200];
-        public List<Pixel> ListPixel = new List<Pixel> { };
-        public List<Pixel> ListOutlinePixel = new List<Pixel> { };
+        public List<PixelMap> ListPixel = new List<PixelMap> { };
+        public List<PixelMap> ListOutlinePixel = new List<PixelMap> { };
 
         private List<Vector> cw = new List<Vector> { new Vector(-1, 1), new Vector(0, 1), new Vector(1, 1), new Vector(1, 0), new Vector(1, -1), new Vector(0, -1), new Vector(-1, -1), new Vector(-1, 0), };
 
@@ -40,7 +40,7 @@ namespace NanoGames.Games.Banana
 
         private void refreshNeighbors()
         {
-            foreach (Pixel pixel in ListPixel)
+            foreach (PixelMap pixel in ListPixel)
             {
                 pixel.Neighbors.Clear();
 
