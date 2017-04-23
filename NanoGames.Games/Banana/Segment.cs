@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
 using System;
+using System.Collections.Generic;
 
 namespace NanoGames.Games.Banana
 {
@@ -27,10 +28,16 @@ namespace NanoGames.Games.Banana
         /// <param name="stop">The postion vector to the endpoint.</param>
         public Segment(Vector start, Vector stop)
         {
+            if (start == stop)
+            {
+                throw new System.ArgumentException("Segment has no length!");
+            }
 
-            // check for start = stop
-            Start = start;
-            End = stop;
+            else
+            {
+                Start = start;
+                End = stop;
+            }
         }
 
         /// <summary>
@@ -57,6 +64,56 @@ namespace NanoGames.Games.Banana
         /// Gets the normal unit vector to the segment, counterclockwise.
         /// </summary>
         public Vector Normal => new Vector(DirectionalVector.Y, -DirectionalVector.X).Normalized;
+
+        /// <summary>
+        /// States if segment is orientated like a slash without regarding its orientation.
+        /// </summary>
+        public bool IsSlash => (
+            ((Start.X < End.X) && (Start.Y < End.Y)) ||
+            ((Start.X > End.X) && (Start.Y > End.Y))
+            );
+
+        /// <summary>
+        /// Gives list of the first (top left) and second (bottom rigth) vector describing a bounding box of the segment.
+        /// </summary>
+        public List<Vector> BBox => GetBBox();
+
+        /// <summary>
+        /// Gives list of integers of the bounding box of the segment [x1, x2, y1, y2].
+        /// </summary>
+        public List<int> BBoxInt => GetBBoxInt();
+
+        /// <summary>
+        /// Gets boundig box.
+        /// </summary>
+        public List<Vector> GetBBox()
+        {
+            if (IsSlash)
+            {
+                return new List<Vector> {new Vector(Start.X, End.Y), new Vector(End.X, Start.Y) };
+            }
+
+            else
+            {
+                return new List<Vector> { Start, End };
+            }
+        }
+
+        /// <summary>
+        /// Gets boundig box with int values, so that the resulting bbox is always bigger.
+        /// </summary>
+        public List<int> GetBBoxInt()
+        {
+            if (IsSlash)
+            {
+                return new List<int> { (int)Start.X, (int)End.Y, (int)End.X + 1, (int)Start.Y + 1 };
+            }
+
+            else
+            {
+                return new List<int> { (int)Start.X, (int)Start.Y + 1, (int)End.X + 1, (int)End.Y};
+            }
+        }
 
         /// <summary>
         /// Rotates the segment counterclockwise around a given point.

@@ -9,21 +9,18 @@ namespace NanoGames.Games.Banana
 {
     internal class PixelMap
     {
-        private Pixel[,] Pixels;
+        private Pixel[,] Pixels = new Pixel[320, 200];
         private int xMin = 10;
         private int xMax = 310;
         private int yMin = 40;
         private int yMax = 190;
 
-        public PixelMap()
-        {
-            Pixels = new Pixel[320, 200];
-        }
     
         public void InitializePixels()
         {
             // fill Pixels with true
-            // keep sicherheitsrand from border
+            createBlock(new Vector(50, 80), new Vector(200, 150));
+            UpdatePixelLines();            
         }
 
         public void UpdatePixelLines()
@@ -161,12 +158,94 @@ namespace NanoGames.Games.Banana
 
         public Intersection CheckCollision(Segment segmentIn)
         {
-            // bounding box, ... etprehcnede pixel testen, intersections in liste speichern. näheste zu segment.End ausgeben
-            Intersection intersection = new Intersection(segmentIn, segmentPixel);
+            // bounding box
+            List<int> bb = segmentIn.BBoxInt;
+
+            // search for intersections
+            List<Intersection> intersections = new List<Intersection> { };
+
+            // go through all pixels in bbox
+            for (int i = bb[0]; i <= bb[1]; i++)
+            {
+                for (int j = bb[2]; j <= bb[3]; j++)
+                {
+                    // go through all lines in pixel
+                    foreach (Segment line in Pixels[i, j].Lines)
+                    {
+                        Intersection intersection = new Intersection(segmentIn, line);
+
+                        if (intersection.IsTrue)
+                        {
+                            intersections.Add(intersection);
+                        }
+                    }
+                }
+            }
+
+            // look for nearest intersection to end of segmentIn
+            if (intersections.Count != 0)
+            {
+                double smallestDist = (intersections[0].Point - segmentIn.End).SquaredLength;
+                double dist;
+                int count = 0;
+
+                for (int i = 1; i < intersections.Count; i++)
+                {
+                    dist = (intersections[i].Point - segmentIn.End).SquaredLength;
+
+                    if (dist < smallestDist)
+                    {
+                        smallestDist = dist;
+                        count = i;
+                    }
+                }
+
+                return intersections[count];
+            } 
+
+            else
+            {
+                Intersection intersection = new Intersection();
+                return intersection;
+            }
+
         }
 
-        public void MakeCaldera()
+        public void MakeCaldera(Vector position, int size)
         {
+            for (int i = (int)position.X - size + 1; i <= (int)position.X + size + 1; i++)
+            {
+                for (int j = (int)position.Y - size + 1; j <= (int)position.Y + size + 1; j++)
+                {
+                    if ((position - new Vector(i, j)).Length <= size)
+                    {
+                        if ((i >= 0) && (i <= 320) && (j >= 0) && (j <= 200))
+                        {
+                            Pixels[i, j].IsSolid = false;
+                        }
+                    }
+                }
+            }
+
+            UpdatePixelLines();
+
+        }
+
+        private void createBlock(Vector p1, Vector p2)
+        {
+
+            int x1 = clamp((int)p1.X, xMin, xMax);
+            int x2 = clamp((int)p2.X, xMin, xMax);
+            int y1 = clamp((int)p1.Y, yMin, yMax);
+            int y2 = clamp((int)p2.Y, yMin, yMax);
+
+            for (int i = x1; i <= x2; i++)
+            {
+                for (int j = y1; j <= y2; j++)
+                {
+                    Pixels[i, j].IsSolid = true;
+                }
+            }
 
         }
 
@@ -181,6 +260,18 @@ namespace NanoGames.Games.Banana
                     line.Draw(g, c);
                 }
             }
+        }
+
+
+
+        private T clamp<T>(T value, T min, T max) where T : IComparable<T>
+        {
+            if (value.CompareTo(min) < 0)
+                return min;
+            if (value.CompareTo(max) > 0)
+                return max;
+
+            return value;
         }
 
     }
