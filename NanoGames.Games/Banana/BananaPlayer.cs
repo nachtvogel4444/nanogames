@@ -11,6 +11,8 @@ namespace NanoGames.Games.Banana
 {
     class BananaPlayer : Player<BananaMatch>
     {
+        // check fo rpositon player if it is on line of map => needs to be VERY near to an integer value
+
         public Vector Position = new Vector(0, 0);
         public Vector PositionBefore = new Vector(0, 0);
         public int[] PositionIndex = new int[2] { 0, 0 };
