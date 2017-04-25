@@ -20,9 +20,10 @@ namespace NanoGames.Games.Banana
 
         private double epsilon = 0.00000000001;
         
-        public Intersection()
+        public Intersection(bool isTrue)
         {
             // initializes a dummy intersection,
+            IsTrue = isTrue;
         }
 
         public Intersection(Segment s1, Segment s2)
