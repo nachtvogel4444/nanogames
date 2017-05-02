@@ -278,6 +278,10 @@ namespace NanoGames.Games.Banana
 
         public void Move()
         {
+            // player can only move in steps of 1
+            // player moves with velocity 2 as standard
+            // single tap on arrow key is one step
+
             int step = 0;
 
             if (Input.Left.WasActivated)
@@ -313,6 +317,9 @@ namespace NanoGames.Games.Banana
 
             if (Input.Right.IsPressed) { countRight++; }
             else { countRight = 0; }
+
+            // until here it is only tested if player moves one or two steps left or right
+            // now action begins ...
 
             if (step != 0)
             {

@@ -9,6 +9,7 @@ namespace NanoGames.Games.Banana
 {
     internal class Map
     {
+        private double epsilon = 0.0001;
         private Pixel[,] PixelMap = new Pixel[320, 200];
         private int xMin = 10;
         private int xMax = 310;
@@ -20,6 +21,7 @@ namespace NanoGames.Games.Banana
 
         private Intersection intersection = new Intersection(false);
         
+
 
         public void Initialize()
         {
@@ -112,8 +114,8 @@ namespace NanoGames.Games.Banana
                         }
                     }
 
-                    pixel.Right = new VectorInt(neighborsX[out2in + 1], neighborsY[out2in + 1]);
-                    pixel.Left = new VectorInt(neighborsX[in2out], neighborsY[in2out]);
+                    pixel.Right = new Vector(neighborsX[out2in + 1], neighborsY[out2in + 1]);
+                    pixel.Left = new Vector(neighborsX[in2out], neighborsY[in2out]);
 
                 }
             }
@@ -345,19 +347,41 @@ namespace NanoGames.Games.Banana
 
         }
 
-        // here I need to check if (int)pos.X, (int)pos.Y makes sense
-        public Vector getPositionLeft(Vector pos)
-        {
-            VectorInt left = PixelMap[(int)pos.X, (int)pos.Y].Left;
 
-            return new Vector(left.X, left.Y);
+        public Vector GoLeft(Vector pos)
+        {
+            int x = intX(pos);
+            int y = intY(pos);
+            
+            return PixelMap[x,y].Left;
         }
 
-        public Vector getPositionRight(Vector pos)
+        public Vector GoRight(Vector pos)
         {
-            VectorInt right = PixelMap[(int)pos.X, (int)pos.Y].Right;
+            int x = intX(pos);
+            int y = intY(pos);
 
-            return new Vector(right.X, right.Y);
+            return PixelMap[x, y].Right;
+        }
+
+        public Vector GoLeftLeft(Vector pos)
+        {
+            Vector left = GoLeft(pos);
+
+            int x = intX(left);
+            int y = intY(left);
+            
+            return PixelMap[x, y].Left;
+        }
+
+        public Vector GoRightRight(Vector pos)
+        {
+            Vector right = GoRight(pos);
+
+            int x = intX(right);
+            int y = intY(right);
+
+            return PixelMap[x, y].Left;
         }
 
 
@@ -406,6 +430,30 @@ namespace NanoGames.Games.Banana
         private int mod(int x, int m)
         {
             return (x % m + m) % m;
+        }
+
+        private int intX(Vector v)
+        {
+            if (Math.Abs(v.X % 1) <= epsilon)
+            {
+                return Convert.ToInt32(v.X);
+            }
+            else
+            {
+                throw new System.ArgumentException("Vector.X has no integer behaviour!");
+            }
+        }
+
+        private int intY(Vector v)
+        {
+            if (Math.Abs(v.Y % 1) <= epsilon)
+            {
+                return Convert.ToInt32(v.Y);
+            }
+            else
+            {
+                throw new System.ArgumentException("Vector.Y has no integer behaviour!");
+            }
         }
 
     }

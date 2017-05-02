@@ -12,6 +12,8 @@ namespace NanoGames.Games.Banana
 {
     internal class Grenade
     {
+        // show postion of 1 2 3 secs
+
         public Vector Position;
         public Vector PositionBefore;
         public Vector Velocity;

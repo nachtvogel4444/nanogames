@@ -14,8 +14,8 @@ namespace NanoGames.Games.Banana
         public bool IsSolid;
 
         //public VectorInt Position;
-        public VectorInt Left;
-        public VectorInt Right;
+        public Vector Left;
+        public Vector Right;
         public int Neighbors;
 
     }
