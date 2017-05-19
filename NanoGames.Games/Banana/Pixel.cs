@@ -18,9 +18,34 @@ namespace NanoGames.Games.Banana
         public Vector Right;
         public int Neighbors;
 
+        public Pixel()
+        {
+            IsSolid = false;
+            Left = new Vector(0, 0);
+            Right = new Vector(0, 0);
+            Neighbors = 0;
+            Line = new Segment(new Vector(0, 0), new Vector(1, 1));
+        }
+
+        public bool IsBorder()
+        {
+            if (IsSolid && Neighbors < 8)
+            {
+                return true;
+            }
+
+            else
+            {
+                return false;
+            }
+        }
+
         public void DrawLine(IGraphics g, Color c)
         {
-            Line.Draw(g, c);
+            if (IsBorder())
+            {
+                Line.Draw(g, c);
+            }
         }
 
     }

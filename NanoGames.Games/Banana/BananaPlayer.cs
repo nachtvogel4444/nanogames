@@ -125,7 +125,7 @@ namespace NanoGames.Games.Banana
             Output.Graphics.Print(new Color(1, 1, 1), 4, new Vector(270 - tmp.Length / 2 * 4, 15), tmp);
 
             /* Draw landscape */
-            Match.Land.Draw(Output.Graphics);
+            Match.Map.Draw(Output.Graphics, new Color(1, 1, 1));
             
             /* Draw each player. */
             for (int i = 0; i < Match.Players.Count; i++)
@@ -243,14 +243,11 @@ namespace NanoGames.Games.Banana
             }
         }
 
-        public void GetBorn()
+        public void GetBorn(Vector position)
         {
             Score = int.MaxValue;
 
-            PositionIndex[0] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border.Count - 1));
-            PositionIndex[1] = Convert.ToInt32(Match.Random.NextDouble() * (Match.Land.Border[PositionIndex[0]].Count - 1));
-
-            RecalcFromIndex();
+            Position = position;
 
             IdxWeapon = 0;
 
@@ -324,22 +321,7 @@ namespace NanoGames.Games.Banana
             if (step != 0)
             {
                 PositionIndex[1] = mod(PositionIndex[1] + step, Match.Land.Border[PositionIndex[0]].Count);
-                RecalcFromIndex();
                 Match.MatchAudioSettings.PlayerWalked = true;
-            }
-        }
-
-        public void RecalcFromIndex()
-        {
-            Position = Match.Land.Border[PositionIndex[0]][PositionIndex[1]];
-            Normal = Match.Land.Normal[PositionIndex[0]][PositionIndex[1]];
-            Alpha = Math.Atan2(Normal.Y, Normal.X);
-            Aiming += Alpha;
-
-            for (int i = 0; i <= 8; i++)
-            {
-                var angleA = Alpha - Math.PI / 2 + i * Math.PI / 8;
-                Hitbox[i] = Position + Normal + new Vector(3 * Math.Cos(angleA), 3 * Math.Sin(angleA));
             }
         }
 

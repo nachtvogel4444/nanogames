@@ -25,7 +25,16 @@ namespace NanoGames.Games.Banana
 
         public void Initialize()
         {
-            // fill Pixels with true
+
+            for (int i = 0; i < 320; i++)
+            {
+                for (int j = 0; j < 200; j++)
+                {
+                    PixelMap[i, j] = new Pixel();
+                }
+            }
+
+            // 
             createBlock(new Vector(50, 80), new Vector(200, 150));
             updateMap();            
         }
@@ -86,7 +95,6 @@ namespace NanoGames.Games.Banana
 
         private void updatePixel()
         {
-
             for (int i = xMin; i < xMax; i++)
             {
                 for (int j = yMin; j < yMax; j++)
@@ -98,7 +106,7 @@ namespace NanoGames.Games.Banana
 
                     for (int k = 0; k < 8; k++)
                     {
-                        int kk = mod(k, 8);
+                        int kk = mod(k, 7);
 
                         if (PixelMap[i + neighborsX[kk], j + neighborsY[kk]].IsSolid != PixelMap[i + neighborsX[kk + 1], j + neighborsY[kk + 1]].IsSolid)
                         {
@@ -113,12 +121,33 @@ namespace NanoGames.Games.Banana
                         }
                     }
 
-                    pixel.Right = new Vector(neighborsX[out2in + 1], neighborsY[out2in + 1]);
+                    pixel.Right = new Vector(i + neighborsX[out2in + 1], j + neighborsY[out2in + 1]);
                     pixel.Line = new Segment(new Vector(i, j), pixel.Right);
                     pixel.Left = new Vector(neighborsX[in2out], neighborsY[in2out]);
 
                 }
             }
+        }
+
+        public Vector GetRandomPosition(double r)
+        {
+            // count all border pixels
+            List<Vector> border = new List<Vector> { };
+
+            for (int i = xMin; i < xMax; i++)
+            {
+                for (int j = yMin; j < yMax; j++)
+                {
+                    if (PixelMap[i, j].IsBorder())
+                    {
+                        border.Add(new Vector(i, j));
+                    }
+                }
+            }
+
+            // get random border position
+            return border[(int)(r * border.Count)];
+
         }
 
 

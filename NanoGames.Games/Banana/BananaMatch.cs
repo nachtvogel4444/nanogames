@@ -35,17 +35,12 @@ namespace NanoGames.Games.Banana
 
         protected override void Initialize()
         {
-            //Land.BuildLandscape("Blocks");
-            //Land.BuildLandscape("owls");
-            Land.BuildLandscapeRandom(Random);
-            Land.InitializePoints(Random);
-
             // initialize map
             Map.Initialize();
 
             foreach (var player in Players)
             {
-                player.GetBorn();
+                player.GetBorn(Map.GetRandomPosition(Random.NextDouble()));
             }
 
             StartPlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));
@@ -243,14 +238,12 @@ namespace NanoGames.Games.Banana
                                         {
                                             player.PositionIndex[0] = ii;
                                             player.PositionIndex[1] = jj;
-                                            player.RecalcFromIndex();
                                         }
 
                                         else
                                         {
                                             player.PositionIndex[0] = ii;
                                             player.PositionIndex[1] = mod(jj + 1, Land.Border[ii].Count);
-                                            player.RecalcFromIndex();
                                         }
                                     }
                                 }
@@ -440,14 +433,12 @@ namespace NanoGames.Games.Banana
                         {
                             player.PositionIndex[0] = i;
                             player.PositionIndex[1] = j;
-                            player.RecalcFromIndex();
                         }
 
                         else
                         {
                             player.PositionIndex[0] = i;
                             player.PositionIndex[1] = mod(j + 1, Land.Border[i].Count);
-                            player.RecalcFromIndex();
                         }
                         
                         player.IsFalling = false;
