@@ -27,16 +27,15 @@ namespace NanoGames.Games.Banana
         {
             // fill Pixels with true
             createBlock(new Vector(50, 80), new Vector(200, 150));
-            updatePixelMap();            
+            updateMap();            
         }
         
 
-        private void updatePixelMap()
+        private void updateMap()
         {
             updateNumberOfNeighbours();
             removeAllSinglePixels();
-            updateLeftRight();
-            updatePixelLines();
+            updatePixel();
         }
 
         private void updateNumberOfNeighbours()
@@ -85,7 +84,7 @@ namespace NanoGames.Games.Banana
             }
         }
 
-        private void updateLeftRight()
+        private void updatePixel()
         {
 
             for (int i = xMin; i < xMax; i++)
@@ -115,154 +114,21 @@ namespace NanoGames.Games.Banana
                     }
 
                     pixel.Right = new Vector(neighborsX[out2in + 1], neighborsY[out2in + 1]);
+                    pixel.Line = new Segment(new Vector(i, j), pixel.Right);
                     pixel.Left = new Vector(neighborsX[in2out], neighborsY[in2out]);
 
                 }
             }
         }
 
-        private void updatePixelLines()
-        {
-            // updates all lines from each pixel by looking at the 8 neighbouring pixels
 
-            for (int i = xMin; i < xMax; i++)
-            {
-                for (int j = yMin; j < yMax; j++)
-                {
-                    var pixel = PixelMap[i, j];
-
-                    // remove all lines
-                    pixel.Lines.Clear();
-
-                    // add lines according to neighbours
-
-                    // left vertical line
-                    if (pixel.IsSolid &&
-                        !PixelMap[i - 1, j - 1].IsSolid &&
-                        !PixelMap[i - 1, j].IsSolid &&
-                        !PixelMap[i - 1, j + 1].IsSolid)
-                    {
-                        pixel.Lines.Add(new Segment(new Vector(i, j), new Vector(i, j + 1)));
-                    }
-
-                    // right vertical line
-                    if (pixel.IsSolid &&
-                        !PixelMap[i + 1, j - 1].IsSolid &&
-                        !PixelMap[i + 1, j].IsSolid &&
-                        !PixelMap[i + 1, j + 1].IsSolid)
-                    {
-                        pixel.Lines.Add(new Segment(new Vector(i + 1, j), new Vector(i + 1, j + 1)));
-                    }
-
-                    // top horizontal line
-                    if (pixel.IsSolid &&
-                        !PixelMap[i - 1, j - 1].IsSolid &&
-                        !PixelMap[i, j - 1].IsSolid &&
-                        !PixelMap[i + 1, j - 1].IsSolid)
-                    {
-                        pixel.Lines.Add(new Segment(new Vector(i, j), new Vector(i + 1, j)));
-                    }
-
-                    // right vertical line
-                    if (pixel.IsSolid &&
-                        !PixelMap[i - 1, j + 1].IsSolid &&
-                        !PixelMap[i, j + 1].IsSolid &&
-                        !PixelMap[i + 1, j + 1].IsSolid)
-                    {
-                        pixel.Lines.Add(new Segment(new Vector(i, j + 1), new Vector(i + 1, j + 1)));
-                    }
-
-                    // diagonals
-                    bool slashTop = PixelMap[i - 1, j].IsSolid && PixelMap[i, j - 1].IsSolid;
-                    bool backslashTop = PixelMap[i, j - 1].IsSolid && PixelMap[i + 1, j].IsSolid;
-                    bool slashBot = PixelMap[i + 1, j].IsSolid && PixelMap[i, j + 1].IsSolid;
-                    bool backslashBot = PixelMap[i - 1, j].IsSolid && PixelMap[i, j + 1].IsSolid;
-
-                    // slash
-                    if (!pixel.IsSolid &&
-                        (!slashTop && slashBot) ||
-                        (slashTop && !slashBot))
-                    {
-                        pixel.Lines.Add(new Segment(new Vector(i, j + 1), new Vector(i + 1, j)));
-                    }
-
-                    // backslash
-                    if (!pixel.IsSolid &&
-                        (backslashTop && !backslashBot) ||
-                        (!backslashTop && backslashBot))
-                    {
-                        pixel.Lines.Add(new Segment(new Vector(i, j), new Vector(i + 1, j + 1)));
-                    }
-
-                    // one pixel cavity
-
-                    // top side open
-                    if (!pixel.IsSolid &&
-                        !PixelMap[i, j - 1].IsSolid &&
-                        PixelMap[i - 1, j].IsSolid &&
-                        PixelMap[i + 1, j].IsSolid &&
-                        PixelMap[i, j + 1].IsSolid)
-                    {
-                        pixel.Lines.Add(new Segment(new Vector(i, j), new Vector(i + 0.5, j + 0.5)));
-                        pixel.Lines.Add(new Segment(new Vector(i + 0.5, j + 0.5), new Vector(i + 1, j)));
-                    }
-
-                    // bottom side open
-                    if (!pixel.IsSolid &&
-                        !PixelMap[i, j + 1].IsSolid &&
-                        PixelMap[i - 1, j].IsSolid &&
-                        PixelMap[i + 1, j].IsSolid &&
-                        PixelMap[i, j - 1].IsSolid)
-                    {
-                        pixel.Lines.Add(new Segment(new Vector(i, j + 1), new Vector(i + 0.5, j + 0.5)));
-                        pixel.Lines.Add(new Segment(new Vector(i + 0.5, j + 0.5), new Vector(i + 1, j + 1)));
-                    }
-
-                    // left side open
-                    if (!pixel.IsSolid &&
-                        !PixelMap[i - 1, j].IsSolid &&
-                        PixelMap[i, j - 1].IsSolid &&
-                        PixelMap[i, j + 1].IsSolid &&
-                        PixelMap[i + 1, j].IsSolid)
-                    {
-                        pixel.Lines.Add(new Segment(new Vector(i, j), new Vector(i + 0.5, j + 0.5)));
-                        pixel.Lines.Add(new Segment(new Vector(i + 0.5, j + 0.5), new Vector(i, j + 1)));
-                    }
-
-                    // right side open
-                    if (!pixel.IsSolid &&
-                        !PixelMap[i + 1, j].IsSolid &&
-                        PixelMap[i, j - 1].IsSolid &&
-                        PixelMap[i, j + 1].IsSolid &&
-                        PixelMap[i - 1, j].IsSolid)
-                    {
-                        pixel.Lines.Add(new Segment(new Vector(i + 1, j), new Vector(i + 0.5, j + 0.5)));
-                        pixel.Lines.Add(new Segment(new Vector(i + 0.5, j + 0.5), new Vector(i + 1, j + 1)));
-                    }
-
-                    // hole
-                    if (!pixel.IsSolid &&
-                        PixelMap[i - 1, j].IsSolid &&
-                        PixelMap[i + 1, j].IsSolid &&
-                        PixelMap[i, j - 1].IsSolid &&
-                        PixelMap[i, j + 1].IsSolid)
-                    {
-                        // maybe insert some little hole in here
-                    }
-
-                }
-            }
-        }
-
-
-        public Intersection CheckForHit(Segment s, int size)
+        public Intersection CheckForHit(Segment s, int sizeCaldera)
         {
             checkIntersection(s);
             
             if (intersection.IsTrue)
             {
-                makeCaldera(size);
-
+                makeCaldera(sizeCaldera);
             }
             
             return intersection;
@@ -273,24 +139,20 @@ namespace NanoGames.Games.Banana
             // bounding box
             List<int> bb = segmentIn.BBoxInt;
 
-            // search for intersections
+            // go through all pixels in bbox
             List<Intersection> intersections = new List<Intersection> { };
 
-            // go through all pixels in bbox
             for (int i = bb[0]; i <= bb[1]; i++)
             {
                 for (int j = bb[2]; j <= bb[3]; j++)
                 {
-                    // go through all lines in pixel
-                    foreach (Segment line in PixelMap[i, j].Lines)
-                    {
-                        Intersection intersection = new Intersection(segmentIn, line);
+                    Intersection tmpIntersection = new Intersection(segmentIn, PixelMap[i, j].Line);
 
-                        if (intersection.IsTrue)
-                        {
-                            intersections.Add(intersection);
-                        }
+                    if (tmpIntersection.IsTrue)
+                    {
+                        intersections.Add(tmpIntersection);
                     }
+                   
                 }
             }
 
@@ -343,7 +205,7 @@ namespace NanoGames.Games.Banana
                 }
             }
 
-            updatePixelMap();
+            updateMap();
 
         }
 
@@ -409,10 +271,7 @@ namespace NanoGames.Games.Banana
 
             foreach (Pixel pixel in PixelMap)
             {
-                foreach (Segment line in pixel.Lines)
-                {
-                    line.Draw(g, c);
-                }
+                pixel.DrawLine(g, c);
             }
         }
 

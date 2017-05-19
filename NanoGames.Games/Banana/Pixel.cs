@@ -9,7 +9,7 @@ namespace NanoGames.Games.Banana
 {
     internal class Pixel
     {
-        public List<Segment> Lines;
+        public Segment Line;
 
         public bool IsSolid;
 
@@ -17,6 +17,11 @@ namespace NanoGames.Games.Banana
         public Vector Left;
         public Vector Right;
         public int Neighbors;
+
+        public void DrawLine(IGraphics g, Color c)
+        {
+            Line.Draw(g, c);
+        }
 
     }
 }
