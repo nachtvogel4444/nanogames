@@ -16,6 +16,7 @@ namespace NanoGames.Games.Banana
         //public VectorInt Position;
         public Vector Left;
         public Vector Right;
+        public Vector Normal;
         public int Neighbors;
 
         public Pixel()
@@ -23,6 +24,7 @@ namespace NanoGames.Games.Banana
             IsSolid = false;
             Left = new Vector(0, 0);
             Right = new Vector(0, 0);
+            Normal = new Vector(0, 0);
             Neighbors = 0;
             Line = new Segment(new Vector(0, 0), new Vector(1, 1));
         }
@@ -44,7 +46,8 @@ namespace NanoGames.Games.Banana
         {
             if (IsBorder())
             {
-                Line.Draw(g, c);
+                // Line.Draw(g, c);
+                Line.DrawDebug(g, c);
             }
         }
 

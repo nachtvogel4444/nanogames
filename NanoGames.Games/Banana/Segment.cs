@@ -66,6 +66,11 @@ namespace NanoGames.Games.Banana
         public Vector Normal => new Vector(DirectionalVector.Y, -DirectionalVector.X).Normalized;
 
         /// <summary>
+        /// Gets the angle from (1,0) to segment, counterclockwise.
+        /// </summary>
+        public double AngleNormal => Math.Atan2(Normal.Y, Normal.X);
+
+        /// <summary>
         /// States if segment is orientated like a slash without regarding its orientation.
         /// </summary>
         public bool IsSlash => (
@@ -144,7 +149,7 @@ namespace NanoGames.Games.Banana
         public void DrawDebug(IGraphics g, Color c)
         {
             g.Line(c, Start, End);
-            g.Circle(c, Start, 1);
+            //g.Circle(c, Start, 1);
             g.Line(c, MidPoint, MidPoint + Normal);
         }
 

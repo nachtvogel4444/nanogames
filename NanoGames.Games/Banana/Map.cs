@@ -106,25 +106,25 @@ namespace NanoGames.Games.Banana
 
                     for (int k = 0; k < 8; k++)
                     {
-                        int kk = mod(k, 7);
 
-                        if (PixelMap[i + neighborsX[kk], j + neighborsY[kk]].IsSolid != PixelMap[i + neighborsX[kk + 1], j + neighborsY[kk + 1]].IsSolid)
+                        if (PixelMap[i + neighborsX[k], j + neighborsY[k]].IsSolid != PixelMap[i + neighborsX[mod(k + 1, 8)], j + neighborsY[mod(k + 1, 8)]].IsSolid)
                         {
-                            if (PixelMap[i + neighborsX[kk], j + neighborsY[kk]].IsSolid)
+                            if (PixelMap[i + neighborsX[k], j + neighborsY[k]].IsSolid)
                             {
-                                in2out = kk;
+                                in2out = k;
                             }
                             else
                             {
-                                out2in = kk;
+                                out2in = k;
                             }
                         }
                     }
 
-                    pixel.Right = new Vector(i + neighborsX[out2in + 1], j + neighborsY[out2in + 1]);
-                    pixel.Line = new Segment(new Vector(i, j), pixel.Right);
-                    pixel.Left = new Vector(neighborsX[in2out], neighborsY[in2out]);
+                    pixel.Left = new Vector(i + neighborsX[in2out], j + neighborsY[in2out]);
+                    pixel.Right = new Vector(i + neighborsX[mod(out2in + 1, 8)], j + neighborsY[mod(out2in + 1, 8)]);
 
+                    pixel.Line = new Segment(new Vector(i, j), pixel.Right);
+                    
                 }
             }
         }
@@ -244,7 +244,7 @@ namespace NanoGames.Games.Banana
             int x = intX(pos);
             int y = intY(pos);
             
-            return PixelMap[x,y].Left;
+            return PixelMap[x, y].Left;
         }
 
         public Vector GoRight(Vector pos)
@@ -272,7 +272,15 @@ namespace NanoGames.Games.Banana
             int x = intX(right);
             int y = intY(right);
 
-            return PixelMap[x, y].Left;
+            return PixelMap[x, y].Right;
+        }
+
+        public Pixel GetPixel(Vector pos)
+        {
+            int x = intX(pos);
+            int y = intY(pos);
+
+            return PixelMap[x, y];
         }
 
 

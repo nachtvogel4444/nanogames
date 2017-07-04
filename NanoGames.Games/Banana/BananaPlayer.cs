@@ -15,9 +15,9 @@ namespace NanoGames.Games.Banana
 
         public Vector Position = new Vector(0, 0);
         public Vector PositionBefore = new Vector(0, 0);
-        public int[] PositionIndex = new int[2] { 0, 0 };
         public Vector Normal = new Vector(0, 0);
         public double Alpha = 0;
+        
 
         public bool HasFinished = false;
         public double Radius = 4;
@@ -44,7 +44,10 @@ namespace NanoGames.Games.Banana
         public int IdxWeapon = 0;
         private string[] weapons = new string[] { "Bazooka", "Grenade 1sec", "Grenade 2sec", "Grenade 3sec" };
         private bool looksRight;
-        
+
+        //old stuff
+        public int[] PositionIndex = new int[] { 0, 0 };
+
         public void DrawScreen()
         {
             string tmp;
@@ -248,6 +251,8 @@ namespace NanoGames.Games.Banana
             Score = int.MaxValue;
 
             Position = position;
+            Normal = Match.Map.GetPixel(Position).Line.Normal;
+            Alpha = Match.Map.GetPixel(Position).Line.AngleNormal;
 
             IdxWeapon = 0;
 
@@ -278,20 +283,20 @@ namespace NanoGames.Games.Banana
             // player can only move in steps of 1
             // player moves with velocity 2 as standard
             // single tap on arrow key is one step
-
-            int step = 0;
-
-            if (Input.Left.WasActivated)
+            
+        if (Input.Left.WasActivated)
             {
                 looksRight = false;
 
                 if (countLeft < wait)
                 {
-                    step = -1;
+                    PositionBefore = Position;
+                    Position = Match.Map.GoLeft(Position);
                 }
                 else
                 {
-                    step = -2;
+                    PositionBefore = Position;
+                    Position = Match.Map.GoLeftLeft(Position);
                 }
             }
 
@@ -301,11 +306,13 @@ namespace NanoGames.Games.Banana
 
                 if (countRight < wait)
                 {
-                    step = 1;
+                    PositionBefore = Position;
+                    Position = Match.Map.GoRight(Position);
                 }
                 else
                 {
-                    step = 2;
+                    PositionBefore = Position;
+                    Position = Match.Map.GoRightRight(Position);
                 }
             }
 
@@ -315,14 +322,8 @@ namespace NanoGames.Games.Banana
             if (Input.Right.IsPressed) { countRight++; }
             else { countRight = 0; }
 
-            // until here it is only tested if player moves one or two steps left or right
-            // now action begins ...
-
-            if (step != 0)
-            {
-                PositionIndex[1] = mod(PositionIndex[1] + step, Match.Land.Border[PositionIndex[0]].Count);
-                Match.MatchAudioSettings.PlayerWalked = true;
-            }
+            Normal = Match.Map.GetPixel(Position).Line.Normal;
+            Alpha = Match.Map.GetPixel(Position).Line.AngleNormal;
         }
 
         public void SetAngle()
@@ -449,14 +450,6 @@ namespace NanoGames.Games.Banana
             Match.StateOfGame = "SomethingFlying";
 
 
-        }
-
-        public void Fall()
-        {
-            PositionBefore = Position;
-            Position += Velocity + 0.5 * new Vector(0, Constants.Gravity);
-            Velocity += new Vector(0, Constants.Gravity);
-            Match.MatchAudioSettings.PlayerHitGround = true;
         }
         
         public void Draw(IGraphics g, Color c, int i)

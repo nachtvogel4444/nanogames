@@ -24,7 +24,7 @@ namespace NanoGames.Games.Banana
         public int StartPlayerIdx = 0;
         private int activePlayerIdx = 0;
         public Map Map = new Map();
-        public Landscape Land = new Landscape();
+        //public Landscape Land = new Landscape();
         public Bullet Bullet = new Bullet();
         public Grenade Grenade = new Grenade();
         public Wind Wind = new Wind();
@@ -101,17 +101,6 @@ namespace NanoGames.Games.Banana
                     
                     // player falling/flying
                     somethingFlying = false;
-
-                    foreach (var player in Players)
-                    {
-                        if (player.IsFalling)
-                        {
-                            player.Fall();
-                            CheckCollisionPlayerLand(player);
-                            CheckCollisionPlayerScreen(player);
-                            somethingFlying = true;
-                        }
-                    }
 
                     // bullet flying
                     if (!Bullet.IsExploded)
@@ -275,8 +264,6 @@ namespace NanoGames.Games.Banana
                                 playerB.Health -= damage;
                             }
                             
-                            CheckIfPlayerIsFalling(playerB);
-                            RecalcPlayerPositionIndex(playerB);
                         }
 
                         return;
@@ -315,8 +302,6 @@ namespace NanoGames.Games.Banana
                             }
 
                             player.Health -= damage;
-                            CheckIfPlayerIsFalling(player);
-                            RecalcPlayerPositionIndex(player);
                         }
                         
                         return;
@@ -412,93 +397,8 @@ namespace NanoGames.Games.Banana
                     }
                     
                     player.Health -= damage;
-
-                    CheckIfPlayerIsFalling(player);
-                    RecalcPlayerPositionIndex(player);
                 }
             }
-        }
-
-        private void CheckCollisionPlayerLand(BananaPlayer player)
-        {
-            for (int i = 0; i < Land.Border.Count; i++)
-            {
-                for (int j = 0; j < Land.Border[i].Count; j++)
-                {
-                    Intersection intersection = new Intersection(player.Position, player.PositionBefore, Land.Border[i][j], Land.Border[i][mod(j + 1, Land.Border[i].Count)]);
-
-                    if (intersection.IsTrue)
-                    {
-                        if ((intersection.Point - Land.Border[i][j]).Length < (intersection.Point - Land.Border[i][mod(j + 1, Land.Border[i].Count)]).Length)
-                        {
-                            player.PositionIndex[0] = i;
-                            player.PositionIndex[1] = j;
-                        }
-
-                        else
-                        {
-                            player.PositionIndex[0] = i;
-                            player.PositionIndex[1] = mod(j + 1, Land.Border[i].Count);
-                        }
-                        
-                        player.IsFalling = false;
-                        player.Health -= player.Velocity.Length * 10;
-                        player.Velocity = new Vector(0, 0);
-                        MatchAudioSettings.PlayerHitGround = true;
-
-                        return;
-                    }
-                }
-            }
-        }
-
-        private void CheckCollisionPlayerScreen(BananaPlayer player)
-        {
-            if (player.Position.X < 0 || player.Position.X > 320 || player.Position.Y > 200)
-            {
-                player.Health = 0;
-                player.IsFalling = false;
-            }
-
-        }
-
-        private void CheckIfPlayerIsFalling(BananaPlayer player)
-        {
-            for (int i = 0; i < Land.Border.Count; i++)
-            {
-                for (int j = 0; j < Land.Border[i].Count; j++)
-                {
-                    if (player.Position == Land.Border[i][j])
-                    {
-                        return;
-                    }
-                }
-            }
-
-            // player is hovering in air
-            player.IsFalling = true;
-        }
-
-        public void RecalcPlayerPositionIndex(BananaPlayer player)
-        {
-            for (int i = 0; i < Land.Border.Count; i++)
-            {
-                for (int j = 0; j < Land.Border[i].Count; j++)
-                {
-                    Vector p = Land.Border[i][j];
-
-                    double epsilon = 0.000001;
-                    if ((p-player.Position).Length < epsilon)
-                    {
-                        player.PositionIndex[0] = i;
-                        player.PositionIndex[1] = j;
-                        player.Position = p;
-
-                        return;
-                    }
-                }
-            }
-
         }
 
         private int mod(int x, int m)
