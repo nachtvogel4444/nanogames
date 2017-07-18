@@ -10,7 +10,7 @@ namespace NanoGames.Games.Banana
     internal class Map
     {
         private double epsilon = 0.0001;
-        private Pixel[,] PixelMap = new Pixel[320, 200];
+        public Pixel[,] PixelMap = new Pixel[320, 200];
         private int xMin = 10;
         private int xMax = 310;
         private int yMin = 40;
@@ -30,7 +30,7 @@ namespace NanoGames.Games.Banana
             {
                 for (int j = 0; j < 200; j++)
                 {
-                    PixelMap[i, j] = new Pixel();
+                    PixelMap[i, j] = new Pixel(i, j);
                 }
             }
 
@@ -44,6 +44,7 @@ namespace NanoGames.Games.Banana
         {
             updateNumberOfNeighbours();
             removeAllSinglePixels();
+            updateNumberOfNeighbours();
             updatePixel();
         }
 
@@ -123,24 +124,24 @@ namespace NanoGames.Games.Banana
                     pixel.Left = new Vector(i + neighborsX[in2out], j + neighborsY[in2out]);
                     pixel.Right = new Vector(i + neighborsX[mod(out2in + 1, 8)], j + neighborsY[mod(out2in + 1, 8)]);
 
-                    pixel.Line = new Segment(new Vector(i, j), pixel.Right);
+                    pixel.Line = new Segment(new Vector(i + 0.5, j + 0.5), pixel.Right + new Vector(0.5, 0.5));
                     
                 }
             }
         }
 
-        public Vector GetRandomPosition(double r)
+        public Pixel GetRandomBorderPixel(double r)
         {
             // count all border pixels
-            List<Vector> border = new List<Vector> { };
+            List<Pixel> border = new List<Pixel> { };
 
             for (int i = xMin; i < xMax; i++)
             {
                 for (int j = yMin; j < yMax; j++)
                 {
-                    if (PixelMap[i, j].IsBorder())
+                    if (PixelMap[i, j].IsBorder)
                     {
-                        border.Add(new Vector(i, j));
+                        border.Add(PixelMap[i, j]);
                     }
                 }
             }
@@ -153,69 +154,57 @@ namespace NanoGames.Games.Banana
 
         public Intersection CheckForHit(Segment s, int sizeCaldera)
         {
-            checkIntersection(s);
+            Intersection intersection = checkIntersection(s);
             
             if (intersection.IsTrue)
             {
-                makeCaldera(sizeCaldera);
+                MakeCaldera(intersection.Point, sizeCaldera);
             }
             
             return intersection;
         }
 
-        private void checkIntersection(Segment segmentIn)
+        private Intersection checkIntersection(Segment segmentIn)
         {
-            // bounding box
             List<int> bb = segmentIn.BBoxInt;
+            Intersection intersection0 = new Intersection(false);
+            double dist0 = double.MaxValue;
 
-            // go through all pixels in bbox
-            List<Intersection> intersections = new List<Intersection> { };
-
-            for (int i = bb[0]; i <= bb[1]; i++)
+            // go through all pixels in bounding box
+            for (int i = bb[0] - 1; i <= bb[1]; i++)
             {
-                for (int j = bb[2]; j <= bb[3]; j++)
+                for (int j = bb[2] - 1; j <= bb[3]; j++)
                 {
-                    Intersection tmpIntersection = new Intersection(segmentIn, PixelMap[i, j].Line);
+                    Pixel pixel = GetPixel(i, j);
 
-                    if (tmpIntersection.IsTrue)
+                    if (pixel.IsBorder)
                     {
-                        intersections.Add(tmpIntersection);
+                        var t = 1;
                     }
-                   
+
+                    if (pixel.Exists && pixel.IsBorder)
+                    {
+                        Intersection intersection = new Intersection(segmentIn, pixel.Line);
+
+                        if (intersection.IsTrue)
+                        {
+                            double dist = (intersection.Point - segmentIn.Start).SquaredLength;
+
+                            if (dist < dist0)
+                            {
+                                intersection0 = intersection;
+                                dist0 = dist;
+                            }
+                        }
+                    }
                 }
             }
 
-            // look for nearest intersection to end of segmentIn
-            if (intersections.Count != 0)
-            {
-                double smallestDist = (intersections[0].Point - segmentIn.End).SquaredLength;
-                double dist;
-                int count = 0;
-
-                for (int i = 1; i < intersections.Count; i++)
-                {
-                    dist = (intersections[i].Point - segmentIn.End).SquaredLength;
-
-                    if (dist < smallestDist)
-                    {
-                        smallestDist = dist;
-                        count = i;
-                    }
-                }
-
-                intersection = intersections[count];
-            } 
-
-            else
-            {
-                intersection.IsTrue = false;
-            }
-
+            return intersection0;
         }
 
-        private void makeCaldera(int size)
+        public void MakeCaldera(Vector pos, int size)
         {
-            Vector pos = intersection.Point;
 
             int x = (int)Math.Round(pos.X);
             int y = (int)Math.Round(pos.Y);
@@ -277,10 +266,33 @@ namespace NanoGames.Games.Banana
 
         public Pixel GetPixel(Vector pos)
         {
-            int x = intX(pos);
-            int y = intY(pos);
+            int i = intX(pos);
+            int j = intY(pos);
 
-            return PixelMap[x, y];
+            if (i < 0 || i > 319 || j < 0 || j > 199)
+            {
+                Pixel pixel = new Pixel();
+                pixel.Exists = false;
+                return pixel;
+            }
+            else
+            {
+                return PixelMap[i, j];
+            }
+        }
+
+        public Pixel GetPixel(int i, int j)
+        {
+            if (i < 0 || i > 319 || j < 0 || j > 199 )
+            {
+                Pixel pixel = new Pixel();
+                pixel.Exists = false;
+                return pixel;
+            }
+            else
+            {
+                return PixelMap[i, j];
+            }
         }
 
 

@@ -68,10 +68,6 @@ namespace NanoGames.Games.Banana
                 Point.X = (B2 * C1 - B1 * C2) / det;
                 Point.Y = (A1 * C2 - A2 * C1) / det;
 
-                if (p21.X == 112 && p22.X == 113 && p21.Y == 104 && p22.Y == 105 && p11.Y > 104)
-                {
-
-                }
 
                 if ((Math.Min(p11.X, p12.X) <= Point.X + epsilon) && (Math.Max(p11.X, p12.X) >= Point.X - epsilon) &&
                     (Math.Min(p11.Y, p12.Y) <= Point.Y + epsilon) && (Math.Max(p11.Y, p12.Y) >= Point.Y - epsilon))

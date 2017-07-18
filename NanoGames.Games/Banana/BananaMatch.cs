@@ -24,7 +24,7 @@ namespace NanoGames.Games.Banana
         public int StartPlayerIdx = 0;
         private int activePlayerIdx = 0;
         public Map Map = new Map();
-        //public Landscape Land = new Landscape();
+        public Landscape Land = new Landscape();
         public Bullet Bullet = new Bullet();
         public Grenade Grenade = new Grenade();
         public Wind Wind = new Wind();
@@ -40,7 +40,7 @@ namespace NanoGames.Games.Banana
 
             foreach (var player in Players)
             {
-                player.GetBorn(Map.GetRandomPosition(Random.NextDouble()));
+                player.GetBorn(Map.GetRandomBorderPixel(Random.NextDouble()));
             }
 
             StartPlayerIdx = Convert.ToInt32(Math.Floor(Random.NextDouble() * Players.Count));
@@ -98,8 +98,7 @@ namespace NanoGames.Games.Banana
                     break;
 
                 case "SomethingFlying":
-                    
-                    // player falling/flying
+
                     somethingFlying = false;
 
                     // bullet flying
@@ -110,7 +109,7 @@ namespace NanoGames.Games.Banana
                         CheckCollisionBulletLand(); 
                         if (!Bullet.IsExploded)
                         {
-                            CheckCollisionBulletPlayers();
+                            //CheckCollisionBulletPlayers();
                         }
                         somethingFlying = true;
                     }
@@ -274,42 +273,31 @@ namespace NanoGames.Games.Banana
 
         private void CheckCollisionBulletLand()
         {
-            foreach (List<Vector> block in Land.Border)
+            Intersection intersection = Map.CheckForHit(new Segment(Bullet.PositionBefore, Bullet.Position), 5);
+            
+            if (intersection.IsTrue)
             {
-                for (int j = 0; j < block.Count; j++)
+                MatchAudioSettings.BulletExploded = true;
+                Bullet.IsExploded = true;
+                
+                foreach (var player in Players)
                 {
-                    Intersection intersection = new Intersection(Bullet.Position, Bullet.PositionBefore, block[j], block[mod(j + 1, block.Count)]);
+                    double damage = 0;
+                    double dist = (player.Position + player.Normal - Bullet.Position).Length;
 
-                    if (intersection.IsTrue)
+                    if (dist <= 4)
                     {
-                        MatchAudioSettings.BulletExploded = true;
-                        Bullet.IsExploded = true;
-                        Land.makeCaldera(intersection.Point, 5);
-
-                        foreach (var player in Players)
-                        {
-                            double damage = 0;
-                            double dist = (player.Position + player.Normal - Bullet.Position).Length;
-
-                            if (dist <= 4)
-                            {
-                                damage = 50;
-                            }
-
-                            if ((dist > 4) && (dist <= 6))
-                            {
-                                damage = -22.5 * dist + 140;
-                            }
-
-                            player.Health -= damage;
-                        }
-                        
-                        return;
+                        damage = 50;
                     }
+
+                    if ((dist > 4) && (dist <= 6))
+                    {
+                        damage = -22.5 * dist + 140;
+                    }
+
+                    player.Health -= damage;
                 }
             }
-
-
         }
         
         private void CheckCollisionGrenadeLand()

@@ -15,6 +15,7 @@ namespace NanoGames.Games.Banana
 
         public Vector Position = new Vector(0, 0);
         public Vector PositionBefore = new Vector(0, 0);
+        public Pixel Pixel = new Pixel(0, 0);
         public Vector Normal = new Vector(0, 0);
         public double Alpha = 0;
         
@@ -251,8 +252,8 @@ namespace NanoGames.Games.Banana
             Score = int.MaxValue;
 
             Position = position;
-            Normal = Match.Map.GetPixel(Position).Line.Normal;
-            Alpha = Match.Map.GetPixel(Position).Line.AngleNormal;
+            Normal = Match.Map.GetPixel(Position - new Vector(1, 0.5)).Line.Normal;
+            Alpha = Match.Map.GetPixel(Position - new Vector(1, 0.5)).Line.AngleNormal;
 
             IdxWeapon = 0;
 
@@ -291,12 +292,12 @@ namespace NanoGames.Games.Banana
                 if (countLeft < wait)
                 {
                     PositionBefore = Position;
-                    Position = Match.Map.GoLeft(Position);
+                    Position = Match.Map.GoLeft(Position - new Vector(1, 0.5)) + new Vector(1, 0.5);
                 }
                 else
                 {
                     PositionBefore = Position;
-                    Position = Match.Map.GoLeftLeft(Position);
+                    Position = Match.Map.GoLeftLeft(Position - new Vector(1, 0.5)) + new Vector(1, 0.5);
                 }
             }
 
@@ -307,12 +308,12 @@ namespace NanoGames.Games.Banana
                 if (countRight < wait)
                 {
                     PositionBefore = Position;
-                    Position = Match.Map.GoRight(Position);
+                    Position = Match.Map.GoRight(Position - new Vector(1, 0.5)) + new Vector(1, 0.5);
                 }
                 else
                 {
                     PositionBefore = Position;
-                    Position = Match.Map.GoRightRight(Position);
+                    Position = Match.Map.GoRightRight(Position - new Vector(1, 0.5)) + new Vector(1, 0.5);
                 }
             }
 
@@ -322,8 +323,8 @@ namespace NanoGames.Games.Banana
             if (Input.Right.IsPressed) { countRight++; }
             else { countRight = 0; }
 
-            Normal = Match.Map.GetPixel(Position).Line.Normal;
-            Alpha = Match.Map.GetPixel(Position).Line.AngleNormal;
+            Normal = Match.Map.GetPixel(Position - new Vector(1, 0.5)).Line.Normal;
+            Alpha = Match.Map.GetPixel(Position - new Vector(1, 0.5)).Line.AngleNormal;
         }
 
         public void SetAngle()
@@ -423,7 +424,7 @@ namespace NanoGames.Games.Banana
         {
             Vector velocity = SpeedProjectile * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
             //Vector velocity = 1 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
-            Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
+            Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming)) + velocity;
 
             Match.MatchAudioSettings.PlayerShot = true;
 

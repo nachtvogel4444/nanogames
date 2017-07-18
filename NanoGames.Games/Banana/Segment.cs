@@ -51,7 +51,7 @@ namespace NanoGames.Games.Banana
         public double Length => (End - Start).Length;
 
         /// <summary>
-        /// Gets the directional vector of the segment, pointing from start to stop.
+        /// Gets the directional vector of the segment, pointing from start to end.
         /// </summary>
         public Vector DirectionalVector => End - Start;
 
@@ -74,14 +74,9 @@ namespace NanoGames.Games.Banana
         /// States if segment is orientated like a slash without regarding its orientation.
         /// </summary>
         public bool IsSlash => (
-            ((Start.X < End.X) && (Start.Y < End.Y)) ||
-            ((Start.X > End.X) && (Start.Y > End.Y))
+            ((Start.X < End.X) && (Start.Y > End.Y)) ||
+            ((Start.X > End.X) && (Start.Y < End.Y))
             );
-
-        /// <summary>
-        /// Gives list of the first (top left) and second (bottom rigth) vector describing a bounding box of the segment.
-        /// </summary>
-        public List<Vector> BBox => GetBBox();
 
         /// <summary>
         /// Gives list of integers of the bounding box of the segment [x1, x2, y1, y2].
@@ -89,35 +84,35 @@ namespace NanoGames.Games.Banana
         public List<int> BBoxInt => GetBBoxInt();
 
         /// <summary>
-        /// Gets boundig box.
-        /// </summary>
-        public List<Vector> GetBBox()
-        {
-            if (IsSlash)
-            {
-                return new List<Vector> {new Vector(Start.X, End.Y), new Vector(End.X, Start.Y) };
-            }
-
-            else
-            {
-                return new List<Vector> { Start, End };
-            }
-        }
-
-        /// <summary>
         /// Gets boundig box with int values, so that the resulting bbox is always bigger.
         /// </summary>
         public List<int> GetBBoxInt()
         {
-            if (IsSlash)
-            {
-                return new List<int> { (int)Start.X, (int)End.Y, (int)End.X + 1, (int)Start.Y + 1 };
-            }
+            List<int> list = new List<int> { 0, 0, 0, 0 };
 
+            if (Start.X < End.X)
+            {
+                list[0] = (int)Start.X;
+                list[1] = (int)End.X + 1;
+            }
             else
             {
-                return new List<int> { (int)Start.X, (int)Start.Y + 1, (int)End.X + 1, (int)End.Y};
+                list[0] = (int)End.X;
+                list[1] = (int)Start.X + 1;
             }
+
+            if (Start.Y < End.Y)
+            {
+                list[2] = (int)Start.Y;
+                list[3] = (int)End.Y + 1;
+            }
+            else
+            {
+                list[2] = (int)End.Y;
+                list[3] = (int)Start.Y + 1;
+            }
+
+            return list;
         }
 
         /// <summary>
@@ -149,7 +144,7 @@ namespace NanoGames.Games.Banana
         public void DrawDebug(IGraphics g, Color c)
         {
             g.Line(c, Start, End);
-            //g.Circle(c, Start, 1);
+            g.Circle(c, Start, 1);
             g.Line(c, MidPoint, MidPoint + Normal);
         }
 
