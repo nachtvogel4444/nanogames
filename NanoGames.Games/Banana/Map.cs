@@ -41,17 +41,17 @@ namespace NanoGames.Games.Banana
 
         private void updateMap()
         {
-            //removeAllSinglePixels();
+            removeAllSinglePixels();
             updatePixel();
         }
 
         private void removeAllSinglePixels()
         {
-            bool test = true;
+            bool keepSearching = true;
 
-            while (test)
+            while (keepSearching)
             {
-                test = false;
+                keepSearching = false;
 
                 for (int i = xMin; i < xMax; i++)
                 {
@@ -61,16 +61,34 @@ namespace NanoGames.Games.Banana
 
                         if (pixel.IsSolid)
                         {
-                            if (!PixelMap[i + 1, j].IsSolid &&
-                                !PixelMap[i - 1, j].IsSolid &&
-                                !PixelMap[i, j + 1].IsSolid &&
-                                !PixelMap[i, j + 1].IsSolid)
+                            // get list with IsSolid of neighbors
+                            List<bool> neighborIsSolid = new List<bool> { };
+                            for (int k = 0; k < 8; k++)
+                            {
+                                if (PixelMap[i + neighborsX[k], j + neighborsY[k]].IsSolid) { neighborIsSolid.Add(true); }
+                                else { neighborIsSolid.Add(false); }
+                            }
+                            // add first element to end to circumvent the mod shit
+                            neighborIsSolid.Add(neighborIsSolid[0]);
+
+                            // test if two consecutive pixels are solid
+                            bool solid = false;
+                            for (int k = 0; k < 8; k++)
+                            {
+                                if (neighborIsSolid[k] && neighborIsSolid[k + 1])
+                                {
+                                    solid = true;
+                                }
+                            }
+
+                            if (!solid)
                             {
                                 pixel.IsSolid = false;
-                                test = true;
+                                pixel.IsBorder = false;
+                                keepSearching = true;
                             }
+
                         }
-                        
                     }
                 }
             }
@@ -83,42 +101,35 @@ namespace NanoGames.Games.Banana
                 for (int j = yMin; j < yMax; j++)
                 {
                     var pixel = PixelMap[i, j];
-
-                    // check if pixel.Isborder
+                    
                     if (pixel.IsSolid)
                     {
-                        pixel.IsBorder = false;
-                        
-                        int in2out = 0;
-                        int out2in = 0;
-
+                        // get list with IsSolid of neighbors
+                        List<bool> neighborIsSolid = new List<bool> { };
                         for (int k = 0; k < 8; k++)
                         {
-
-                            if (PixelMap[i + neighborsX[k], j + neighborsY[k]].IsSolid != PixelMap[i + neighborsX[mod(k + 1, 8)], j + neighborsY[mod(k + 1, 8)]].IsSolid)
+                            if (PixelMap[i + neighborsX[k], j + neighborsY[k]].IsSolid)
                             {
-                                if (PixelMap[i + neighborsX[k], j + neighborsY[k]].IsSolid)
-                                {
-                                    in2out = k;
-                                }
-                                else
-                                {
-                                    out2in = k;
-                                }
+                                neighborIsSolid.Add(true);
+                            }
+                            else
+                            {
+                                neighborIsSolid.Add(false);
                             }
                         }
+                        // add first element to end to circumvent the mod shit
+                        neighborIsSolid.Add(neighborIsSolid[0]);
 
-                        if ((out2in - in2out) > 1)
+                        // extract transition from solid to not solid
+                        int in2out = -1;
+                        int out2in = -1;
+                        for (int k = 0; k < 8; k++)
                         {
-                            pixel.IsBorder = true;
+                            if (neighborIsSolid[k] && !neighborIsSolid[k + 1]) { in2out = k; pixel.IsBorder = true; }
+                            if (!neighborIsSolid[k] && neighborIsSolid[k + 1]) { out2in = k; pixel.IsBorder = true; }
+                            
                         }
-
-                        if (((out2in - in2out) == 1) &&
-                            (out2in == 0) || (out2in == 2) || (out2in == 4) || (out2in == 6))
-                        {
-                            pixel.IsBorder = true;
-                        }
-
+                        
                         // if pixel is border do all the stuff which player needs to know
                         if (pixel.IsBorder)
                         {
@@ -138,7 +149,13 @@ namespace NanoGames.Games.Banana
                             // angle of line
                             pixel.Alpha = pixel.Line.AngleNormal;
                         }
-                    }               
+                    }
+
+                    else
+                    {
+                        // just to be save
+                        pixel.IsBorder = false;
+                    }             
                 }
             }
         }
@@ -231,6 +248,7 @@ namespace NanoGames.Games.Banana
                         if ((i >= xMin) && (i <= xMax) && (j >= yMin) && (j <= yMax))
                         {
                             PixelMap[i, j].IsSolid = false;
+                            PixelMap[i, j].IsBorder = false;
                         }
                     }
                 }
