@@ -104,6 +104,8 @@ namespace NanoGames.Games.Banana
                     
                     if (pixel.IsSolid)
                     {
+                        pixel.IsBorder = false;
+
                         // get list with IsSolid of neighbors
                         List<bool> neighborIsSolid = new List<bool> { };
                         for (int k = 0; k < 8; k++)
@@ -125,14 +127,27 @@ namespace NanoGames.Games.Banana
                         int out2in = -1;
                         for (int k = 0; k < 8; k++)
                         {
-                            if (neighborIsSolid[k] && !neighborIsSolid[k + 1]) { in2out = k; pixel.IsBorder = true; }
-                            if (!neighborIsSolid[k] && neighborIsSolid[k + 1]) { out2in = k; pixel.IsBorder = true; }
+                            if (neighborIsSolid[k] && !neighborIsSolid[k + 1]) { in2out = k;  }
+                            if (!neighborIsSolid[k] && neighborIsSolid[k + 1]) { out2in = k;  }
                             
                         }
                         
-                        // if pixel is border do all the stuff which player needs to know
-                        if (pixel.IsBorder)
+                        // check if there are two not solids 
+                        bool tmp = false;
+                        for (int k = 0; k < 8; k++)
                         {
+                            if (!neighborIsSolid[k] && !neighborIsSolid[k + 1])
+                            {
+                                tmp = true;
+                            }
+                        }
+
+
+                        // if pixel is border do all the stuff which player needs to know
+                        if ((out2in != -1) && tmp)
+                        {
+                            pixel.IsBorder = true;
+
                             // pixel left and right
                             pixel.Left = PixelMap[i + neighborsX[in2out], j + neighborsY[in2out]];
                             pixel.Right = PixelMap[i + neighborsX[mod(out2in + 1, 8)], j + neighborsY[mod(out2in + 1, 8)]];
