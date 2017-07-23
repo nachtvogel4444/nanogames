@@ -192,6 +192,7 @@ namespace NanoGames.Games.Banana
             }
         }
         
+        /*
         private void CheckCollisionBulletPlayers()
         {
             foreach (var player in Players)
@@ -208,9 +209,9 @@ namespace NanoGames.Games.Banana
 
                         // push player into caldera
                         bool foundSomething = false;
-                        Vector p1 = player.Position;
-                        Vector p2 = player.Position + Bullet.Velocity.Normalized;
-                        while ((p1 - player.Position).Length <= 6 && !foundSomething)
+                        Vector p1 = player.Pixel.Position;
+                        Vector p2 = player.Pixel.Position + Bullet.Velocity.Normalized;
+                        while ((p1 - player.Pixel.Position).Length <= 6 && !foundSomething)
                         {
                             for (int ii = 0; ii < Land.Border.Count; ii++)
                             {
@@ -270,6 +271,7 @@ namespace NanoGames.Games.Banana
                 }
             }              
         }
+        */
 
         private void CheckCollisionBulletLand()
         {
@@ -283,7 +285,7 @@ namespace NanoGames.Games.Banana
                 foreach (var player in Players)
                 {
                     double damage = 0;
-                    double dist = (player.Position + player.Normal - Bullet.Position).Length;
+                    double dist = (player.Pixel.Position + player.Pixel.Normal - Bullet.Position).Length;
 
                     if (dist <= 4)
                     {
@@ -372,7 +374,7 @@ namespace NanoGames.Games.Banana
                 foreach (var player in Players)
                 {
                     double damage = 0;
-                    double dist = (player.Position - Grenade.Position).Length;
+                    double dist = (player.Pixel.Position - Grenade.Position).Length;
 
                     if (dist <= 5)
                     {

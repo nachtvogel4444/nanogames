@@ -11,23 +11,14 @@ namespace NanoGames.Games.Banana
 {
     class BananaPlayer : Player<BananaMatch>
     {
-        // check fo rpositon player if it is on line of map => needs to be VERY near to an integer value
-
-        public Vector Position = new Vector(0, 0);
-        public Vector PositionBefore = new Vector(0, 0);
         public Pixel Pixel = new Pixel(0, 0);
-        public Vector Normal = new Vector(0, 0);
-        public double Alpha = 0;
         
-
         public bool HasFinished = false;
         public double Radius = 4;
         
         public Vector[] Hitbox = new Vector[10];
         // public AudioSettings PlayerAudioSettings = new AudioSettings();
-
-        public Vector Velocity = new Vector(0, 0);
-
+        
         public double SpeedProjectile = 0;
         public double Health = 100;
         public bool IsFalling = false;
@@ -45,10 +36,7 @@ namespace NanoGames.Games.Banana
         public int IdxWeapon = 0;
         private string[] weapons = new string[] { "Bazooka", "Grenade 1sec", "Grenade 2sec", "Grenade 3sec" };
         private bool looksRight;
-
-        //old stuff
-        public int[] PositionIndex = new int[] { 0, 0 };
-
+        
         public void DrawScreen()
         {
             string tmp;
@@ -247,25 +235,23 @@ namespace NanoGames.Games.Banana
             }
         }
 
-        public void GetBorn(Vector position)
+        public void GetBorn(Pixel pixel)
         {
             Score = int.MaxValue;
 
-            Position = position;
-            Normal = Match.Map.GetPixel(Position - new Vector(1, 0.5)).Line.Normal;
-            Alpha = Match.Map.GetPixel(Position - new Vector(1, 0.5)).Line.AngleNormal;
+            Pixel = pixel;
 
             IdxWeapon = 0;
 
             if (Match.Random.Next(0, 1) == 0)
             {
                 looksRight = false;
-                Aiming = Alpha - localAiming;
+                Aiming = pixel.Alpha - localAiming;
             }
             else
             {
                 looksRight = true;
-                Aiming = Alpha + localAiming;
+                Aiming = pixel.Alpha + localAiming;
             }
         }
 
@@ -291,13 +277,12 @@ namespace NanoGames.Games.Banana
 
                 if (countLeft < wait)
                 {
-                    PositionBefore = Position;
-                    Position = Match.Map.GoLeft(Position - new Vector(1, 0.5)) + new Vector(1, 0.5);
+                    Pixel = Pixel.Left;
                 }
                 else
                 {
-                    PositionBefore = Position;
-                    Position = Match.Map.GoLeftLeft(Position - new Vector(1, 0.5)) + new Vector(1, 0.5);
+                    Pixel = Pixel.Left;
+                    Pixel = Pixel.Left;
                 }
             }
 
@@ -307,13 +292,12 @@ namespace NanoGames.Games.Banana
 
                 if (countRight < wait)
                 {
-                    PositionBefore = Position;
-                    Position = Match.Map.GoRight(Position - new Vector(1, 0.5)) + new Vector(1, 0.5);
+                    Pixel = Pixel.Right;
                 }
                 else
                 {
-                    PositionBefore = Position;
-                    Position = Match.Map.GoRightRight(Position - new Vector(1, 0.5)) + new Vector(1, 0.5);
+                    Pixel = Pixel.Right;
+                    Pixel = Pixel.Right;
                 }
             }
 
@@ -322,9 +306,7 @@ namespace NanoGames.Games.Banana
 
             if (Input.Right.IsPressed) { countRight++; }
             else { countRight = 0; }
-
-            Normal = Match.Map.GetPixel(Position - new Vector(1, 0.5)).Line.Normal;
-            Alpha = Match.Map.GetPixel(Position - new Vector(1, 0.5)).Line.AngleNormal;
+            
         }
 
         public void SetAngle()
@@ -379,11 +361,11 @@ namespace NanoGames.Games.Banana
 
             if (looksRight)
             {
-                Aiming = Alpha + localAiming;
+                Aiming = Pixel.Alpha + localAiming;
             }
             else
             {
-                Aiming = Alpha - localAiming;
+                Aiming = Pixel.Alpha - localAiming;
             }
         }
         
@@ -391,7 +373,7 @@ namespace NanoGames.Games.Banana
         {
             if (Input.Fire.WasActivated)
             {
-                Vector guntip = Position + 5 * Normal + 5 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
+                Vector guntip = Pixel.Position + 5 * Pixel.Normal + 5 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
                 
                 if (Match.Land.CheckIsSolid(guntip))
                 {
@@ -423,52 +405,52 @@ namespace NanoGames.Games.Banana
         public void Shoot3()
         {
             Vector velocity = SpeedProjectile * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
-            //Vector velocity = 1 * new Vector(Math.Cos(aiming), Math.Sin(aiming));
-            Vector position = Position + 5 * Normal + 5 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming)) + velocity;
+            Vector guntip = Pixel.Position + 5 * Pixel.Normal + 5 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
 
             Match.MatchAudioSettings.PlayerShot = true;
 
             if (weapons[IdxWeapon] == "Bazooka")
             {
-                Match.Bullet.StartBullet(position, velocity);
+                Match.Bullet.StartBullet(guntip + velocity, velocity);
             }
             
             if (weapons[IdxWeapon] == "Grenade 1sec")
             {
-                Match.Grenade.StartGrenade(position, velocity, 60);
+                Match.Grenade.StartGrenade(guntip + velocity, velocity, 60);
             }
 
             if (weapons[IdxWeapon] == "Grenade 2sec")
             {
-                Match.Grenade.StartGrenade(position, velocity, 120);
+                Match.Grenade.StartGrenade(guntip + velocity, velocity, 120);
             }
 
             if (weapons[IdxWeapon] == "Grenade 3sec")
             {
-                Match.Grenade.StartGrenade(position, velocity, 180);
+                Match.Grenade.StartGrenade(guntip + velocity, velocity, 180);
             }
 
             Match.StateOfGame = "SomethingFlying";
-
-
+            
         }
         
         public void Draw(IGraphics g, Color c, int i)
         {
             string tmp = "";
 
+            Vector refpoint = Pixel.Position + 1 * Pixel.Normal;
+
             /* Body of the player */
-            g.CircleSegment(c, Position + 1 * Normal, 2, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
-            g.CircleSegment(c, Position + 1 * Normal, 3, Alpha - Math.PI / 2, Alpha + Math.PI / 2);
-            g.Line(c, Position + 1 * Normal + 3 * new Vector(-Normal.Y, Normal.X), Position + 1 * Normal + 3 * new Vector(Normal.Y, -Normal.X));
+            g.CircleSegment(c, refpoint, 2, Pixel.Alpha + Math.PI / 2, Pixel.Alpha - Math.PI / 2);
+            g.CircleSegment(c, refpoint, 3, Pixel.Alpha - Math.PI / 2, Pixel.Alpha + Math.PI / 2);
+            g.Line(c, refpoint + 3 * new Vector(-Pixel.Normal.Y, Pixel.Normal.X), Pixel.Position + 1 * Pixel.Normal + 3 * new Vector(Pixel.Normal.Y, -Pixel.Normal.X));
 
             /* Acitve Player is filled */
             if (this == Match.ActivePlayer)
             {
-                g.CircleSegment(c, Position + 1 * Normal, 0.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
-                g.CircleSegment(c, Position + 1 * Normal, 1, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
-                g.CircleSegment(c, Position + 1 * Normal, 1.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
-                g.CircleSegment(c, Position + 1 * Normal, 2.5, Alpha + Math.PI / 2, Alpha - Math.PI / 2);
+                g.CircleSegment(c, refpoint, 0.5, Pixel.Alpha + Math.PI / 2, Pixel.Alpha - Math.PI / 2);
+                g.CircleSegment(c, refpoint, 1.0, Pixel.Alpha + Math.PI / 2, Pixel.Alpha - Math.PI / 2);
+                g.CircleSegment(c, refpoint, 1.5, Pixel.Alpha + Math.PI / 2, Pixel.Alpha - Math.PI / 2);
+                g.CircleSegment(c, refpoint, 2.5, Pixel.Alpha + Math.PI / 2, Pixel.Alpha - Math.PI / 2);
             }
 
             /* hitbox*//*
@@ -478,32 +460,30 @@ namespace NanoGames.Games.Banana
             }*/
 
             /* Gun */
-            g.Line(c, Position + 5 * Normal, Position + 5 * Normal + 5 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming)));
+            g.Line(c, refpoint + 3 * Pixel.Normal, refpoint + 3 * Pixel.Normal + 5 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming)));
 
             /* crosshair*/
             if (this == Match.ActivePlayer)
             {
-                var p = Position + 5 * Normal + 15 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
+                var p = refpoint + 2 * Pixel.Normal + 15 * new Vector(Math.Cos(Aiming), Math.Sin(Aiming));
                 g.Line(c, p - 1 * new Vector(Math.Cos(Aiming + Math.PI / 4), Math.Sin(Aiming + Math.PI / 4)), p + 1 * new Vector(Math.Cos(Aiming + Math.PI / 4), Math.Sin(Aiming + Math.PI / 4)));
                 g.Line(c, p - 1 * new Vector(Math.Cos(Aiming - Math.PI / 4), Math.Sin(Aiming - Math.PI / 4)), p + 1 * new Vector(Math.Cos(Aiming - Math.PI / 4), Math.Sin(Aiming - Math.PI / 4)));
             }
 
             /* Name */
             tmp = ((i + Match.StartPlayerIdx) % Match.Players.Count + 1).ToString().ToUpper() + "." + Name;
-            g.Print(c, 3, Position + new Vector(-tmp.Length / 2 * 3, -18), tmp);
+            g.Print(c, 3, Pixel.Position + new Vector(-tmp.Length / 2 * 3, -18), tmp);
 
             /* Health */
             tmp = ((int)Health).ToString().ToUpper();
-            g.Print(c, 3, Position + new Vector(-tmp.Length / 2 * 3, -15), tmp);
-
-
+            g.Print(c, 3, Pixel.Position + new Vector(-tmp.Length / 2 * 3, -15), tmp);
+            
         }
 
         private int mod(int x, int m)
         {
             return (x % m + m) % m;
         }
-
         
     }
 }

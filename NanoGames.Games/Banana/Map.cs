@@ -33,8 +33,7 @@ namespace NanoGames.Games.Banana
                     PixelMap[i, j] = new Pixel(i, j);
                 }
             }
-
-            // 
+            
             createBlock(new Vector(50, 80), new Vector(200, 150));
             updateMap();            
         }
@@ -42,32 +41,8 @@ namespace NanoGames.Games.Banana
 
         private void updateMap()
         {
-            updateNumberOfNeighbours();
-            removeAllSinglePixels();
-            updateNumberOfNeighbours();
+            //removeAllSinglePixels();
             updatePixel();
-        }
-
-        private void updateNumberOfNeighbours()
-        {
-            for (int i = xMin; i < xMax; i++)
-            {
-                for (int j = yMin; j < yMax; j++)
-                {
-                    var pixel = PixelMap[i, j];
-                    pixel.Neighbors = 0;
-
-                    if (PixelMap[i - 1, j - 1].IsSolid) { pixel.Neighbors++; }
-                    if (PixelMap[i, j - 1].IsSolid) { pixel.Neighbors++; }
-                    if (PixelMap[i + 1, j - 1].IsSolid) { pixel.Neighbors++; }
-                    if (PixelMap[i + 1, j].IsSolid) { pixel.Neighbors++; }
-                    if (PixelMap[i + 1, j + 1].IsSolid) { pixel.Neighbors++; }
-                    if (PixelMap[i, j + 1].IsSolid) { pixel.Neighbors++; }
-                    if (PixelMap[i - 1, j + 1].IsSolid) { pixel.Neighbors++; }
-                    if (PixelMap[i - 1, j].IsSolid) { pixel.Neighbors++; }
-
-                }
-            }
         }
 
         private void removeAllSinglePixels()
@@ -84,11 +59,18 @@ namespace NanoGames.Games.Banana
                     {
                         var pixel = PixelMap[i, j];
 
-                        if (pixel.Neighbors <= 1 && pixel.IsSolid)
+                        if (pixel.IsSolid)
                         {
-                            pixel.IsSolid = false;
-                            test = true;
+                            if (!PixelMap[i + 1, j].IsSolid &&
+                                !PixelMap[i - 1, j].IsSolid &&
+                                !PixelMap[i, j + 1].IsSolid &&
+                                !PixelMap[i, j + 1].IsSolid)
+                            {
+                                pixel.IsSolid = false;
+                                test = true;
+                            }
                         }
+                        
                     }
                 }
             }
@@ -102,30 +84,61 @@ namespace NanoGames.Games.Banana
                 {
                     var pixel = PixelMap[i, j];
 
-                    int in2out = 0;
-                    int out2in = 0;
-
-                    for (int k = 0; k < 8; k++)
+                    // check if pixel.Isborder
+                    if (pixel.IsSolid)
                     {
+                        pixel.IsBorder = false;
+                        
+                        int in2out = 0;
+                        int out2in = 0;
 
-                        if (PixelMap[i + neighborsX[k], j + neighborsY[k]].IsSolid != PixelMap[i + neighborsX[mod(k + 1, 8)], j + neighborsY[mod(k + 1, 8)]].IsSolid)
+                        for (int k = 0; k < 8; k++)
                         {
-                            if (PixelMap[i + neighborsX[k], j + neighborsY[k]].IsSolid)
+
+                            if (PixelMap[i + neighborsX[k], j + neighborsY[k]].IsSolid != PixelMap[i + neighborsX[mod(k + 1, 8)], j + neighborsY[mod(k + 1, 8)]].IsSolid)
                             {
-                                in2out = k;
-                            }
-                            else
-                            {
-                                out2in = k;
+                                if (PixelMap[i + neighborsX[k], j + neighborsY[k]].IsSolid)
+                                {
+                                    in2out = k;
+                                }
+                                else
+                                {
+                                    out2in = k;
+                                }
                             }
                         }
-                    }
 
-                    pixel.Left = new Vector(i + neighborsX[in2out], j + neighborsY[in2out]);
-                    pixel.Right = new Vector(i + neighborsX[mod(out2in + 1, 8)], j + neighborsY[mod(out2in + 1, 8)]);
+                        if ((out2in - in2out) > 1)
+                        {
+                            pixel.IsBorder = true;
+                        }
 
-                    pixel.Line = new Segment(new Vector(i + 0.5, j + 0.5), pixel.Right + new Vector(0.5, 0.5));
-                    
+                        if (((out2in - in2out) == 1) &&
+                            (out2in == 0) || (out2in == 2) || (out2in == 4) || (out2in == 6))
+                        {
+                            pixel.IsBorder = true;
+                        }
+
+                        // if pixel is border do all the stuff which player needs to know
+                        if (pixel.IsBorder)
+                        {
+                            // pixel left and right
+                            pixel.Left = PixelMap[i + neighborsX[in2out], j + neighborsY[in2out]];
+                            pixel.Right = PixelMap[i + neighborsX[mod(out2in + 1, 8)], j + neighborsY[mod(out2in + 1, 8)]];
+
+                            // connection line between middle of pixel and righthand side pixel
+                            pixel.Line = new Segment(new Vector(i + 0.5, j + 0.5), new Vector(pixel.Right.I + 0.5, pixel.Right.J + 0.5));
+
+                            // position for player
+                            pixel.Position = pixel.Line.MidPoint;
+
+                            // normal for player
+                            pixel.Normal = pixel.Line.Normal;
+
+                            // angle of line
+                            pixel.Alpha = pixel.Line.AngleNormal;
+                        }
+                    }               
                 }
             }
         }
@@ -226,66 +239,12 @@ namespace NanoGames.Games.Banana
             updateMap();
 
         }
-
-
-        public Vector GoLeft(Vector pos)
-        {
-            int x = intX(pos);
-            int y = intY(pos);
-            
-            return PixelMap[x, y].Left;
-        }
-
-        public Vector GoRight(Vector pos)
-        {
-            int x = intX(pos);
-            int y = intY(pos);
-
-            return PixelMap[x, y].Right;
-        }
-
-        public Vector GoLeftLeft(Vector pos)
-        {
-            Vector left = GoLeft(pos);
-
-            int x = intX(left);
-            int y = intY(left);
-            
-            return PixelMap[x, y].Left;
-        }
-
-        public Vector GoRightRight(Vector pos)
-        {
-            Vector right = GoRight(pos);
-
-            int x = intX(right);
-            int y = intY(right);
-
-            return PixelMap[x, y].Right;
-        }
-
-        public Pixel GetPixel(Vector pos)
-        {
-            int i = intX(pos);
-            int j = intY(pos);
-
-            if (i < 0 || i > 319 || j < 0 || j > 199)
-            {
-                Pixel pixel = new Pixel();
-                pixel.Exists = false;
-                return pixel;
-            }
-            else
-            {
-                return PixelMap[i, j];
-            }
-        }
-
+       
         public Pixel GetPixel(int i, int j)
         {
             if (i < 0 || i > 319 || j < 0 || j > 199 )
             {
-                Pixel pixel = new Pixel();
+                Pixel pixel = new Pixel(i, j);
                 pixel.Exists = false;
                 return pixel;
             }
