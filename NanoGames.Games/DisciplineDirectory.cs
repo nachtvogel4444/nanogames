@@ -24,7 +24,8 @@ namespace NanoGames.Games
             Add<NanoSoccer.NanoSoccerMatch, NanoSoccer.NanoSoccerPlayer>("NANO SOCCER");
             Add<Snake.SnakeMatch, Snake.SnakePlayer>("SNAKE");
             Add<Banana.BananaMatch, Banana.BananaPlayer>("BANANA");
-            Add<BananaOrbit.BananaOrbitMatch, BananaOrbit.BananaOrbitPlayer>("BANANAORBIT");
+            // Add<BananaOrbit.BananaOrbitMatch, BananaOrbit.BananaOrbitPlayer>("BANANAORBIT");
+            Add<Circles.CirclesMatch, Circles.CirclesPlayer>("CIRCLES");
         }
 
         /// <summary>
