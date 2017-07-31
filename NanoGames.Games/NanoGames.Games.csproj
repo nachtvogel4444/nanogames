@@ -85,6 +85,7 @@
     <Compile Include="Bomberguy\Unbombable.cs" />
     <Compile Include="Circles\CirclesMatch.cs" />
     <Compile Include="Circles\CirclesPlayer.cs" />
+    <Compile Include="Circles\Flake.cs" />
     <Compile Include="Discipline.cs" />
     <Compile Include="DisciplineDirectory.cs" />
     <Compile Include="Discipline{TMatch,TPlayer}.cs" />
