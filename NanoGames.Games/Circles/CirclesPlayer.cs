@@ -13,10 +13,15 @@ namespace NanoGames.Games.Circles
     {
 
         public Vector Position;
+        public double Phi;
         public Vector Velocity;
-        public Vector Acceleration;
+        public double dPhi;
         public double Mass;
+        public double Inertia;
         public double Radius;
+        
+
+
 
     }
 }
