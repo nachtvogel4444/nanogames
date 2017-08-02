@@ -7,24 +7,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NanoGames.Games.Circles
+namespace NanoGames.Games.CatchMe
 {
-    class CirclesPlayer : Player<CirclesMatch>
+    internal class Flake
     {
-
         public Vector Position;
-        public double Phi;
         public Vector Velocity;
-        public double dPhi;
-        public double Mass;
-        public double Inertia;
-        public double Radius;
+        public Color Color;
 
-        public double boosterLeft;
-        public double boosterRight;
+        public double Time;
 
-
-
-
+        public Flake(Vector pos, Vector vel, Color col)
+        {
+            Position = pos;
+            Velocity = vel;
+            Time = 0;
+            Color = col;
+        }
+        
     }
 }
