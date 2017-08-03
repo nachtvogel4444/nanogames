@@ -14,11 +14,12 @@ namespace NanoGames.Games.CatchMe
         private double dt;
         private double dT;
         private double maxSpeed;
-        private int idxPrey;
         private string stateOfGame;
         private int frameCounter;
+        private int frameCounterStart;
         private int frameCounterEnd;
         private CatchMePlayer prey;
+        private Vector CatchPosisition;
 
         private int stepsPerFrame = 10;
         private double minDistance = 1;
@@ -33,6 +34,7 @@ namespace NanoGames.Games.CatchMe
             // stateOfGame, frameCounter
             stateOfGame = "Start";
             frameCounter = 0;
+            frameCounterStart = 0;
             frameCounterEnd = 0;
 
             // time
@@ -43,8 +45,7 @@ namespace NanoGames.Games.CatchMe
             maxSpeed = minDistance / dt;
 
             // prey
-            idxPrey = (int)(Players.Count * Random.NextDouble());
-            prey = Players[idxPrey];
+            prey = Players[(int)(Players.Count * Random.NextDouble())];
 
             // initialize each player
             for (int i = 0; i < Players.Count; ++i)
@@ -57,6 +58,9 @@ namespace NanoGames.Games.CatchMe
                 // Turbo
                 player.TurboCount = 0;
                 player.TurboNotCount = 0;
+
+                // Booster
+                player.BoosterPower = 20;
 
                 // position
                 double x = 270 * Random.NextDouble();
@@ -72,7 +76,7 @@ namespace NanoGames.Games.CatchMe
 
                 // phi and dphi 
                 player.Phi = Math.Sin(player.Velocity.Normalized.Y);
-                player.dPhi = 0;
+                player.DPhi = 0;
 
                 // mass and inertia
                 player.Mass = 1.0 / 27 * player.Radius * player.Radius * player.Radius;
@@ -89,19 +93,28 @@ namespace NanoGames.Games.CatchMe
              */
 
             // match has severeal states
-            if (frameCounter > 180) { stateOfGame = "Game"; }
 
             switch (stateOfGame)
             {
                 // start state
                 // prey is able to move
                 case "Start":
-                    {  
+                    {
+                        // check player input, only for prey
+                        checkPlayerInput(prey);
+
                         // do all the physics ( in increments to get more robust)
                         for (int i = 0; i < stepsPerFrame; i++)
                         {
-                            movePlayer(Players[idxPrey]);
+                            movePlayer(prey);
                         }
+
+                        if (frameCounterStart > 120)
+                        {
+                            stateOfGame = "Game";
+                        }
+
+                        frameCounterStart++;
 
                         break;
                     }
@@ -110,6 +123,12 @@ namespace NanoGames.Games.CatchMe
                 // everyone is able to move
                 case "Game":
                     {
+                        // check input
+                        foreach (CatchMePlayer player in Players)
+                        {
+                            checkPlayerInput(player);
+                        }
+
                         // do all the physics ( in increments to get more robust)
                         for (int i = 0; i < stepsPerFrame; i++)
                         {
@@ -128,24 +147,11 @@ namespace NanoGames.Games.CatchMe
                                     // get dist of player to prey
                                     double dist = (prey.Position - player.Position).Length;
 
-                                    if (dist < 4)
+                                    if (dist < 10)
                                     {
-                                        // make an explosion with flakes
-                                        Vector pos = (prey.Position + player.Position) / 2;
-                                        Color col = new Color(1, 1, 1);
-
-                                        for (int j = 0; j < 100; i++)
-                                        {
-                                            double alpha;
-                                            Vector direction;
-                                            
-                                            alpha = 2 * Math.PI * Random.NextDouble();
-                                            direction.X = Math.Cos(alpha);
-                                            direction.Y = Math.Sin(alpha);
-                                            flakes.Add(new Flake(pos, direction * 100, col));
-                                        }
-
-
+                                        // get postion of catch
+                                        CatchPosisition = (prey.Position + player.Position) / 2;
+                                        
                                         // end game
                                         stateOfGame = "End";
                                     }
@@ -161,12 +167,30 @@ namespace NanoGames.Games.CatchMe
                 // show end animation
                 case "End":
                     {
-                        // end game if 5 seconds passed
+                        // make an explosion with flakes
+                        Vector pos = CatchPosisition;
+                        Color col = new Color(1, 1, 1);
+                        double alpha;
+                        double delta;
+                        double fade;
+                        Vector direction;
+
+                        for (int j = 0; j < 100; j++)
+                        {
+                            alpha = 2 * Math.PI * Random.NextDouble();
+                            delta = 5 * Random.NextDouble();
+                            fade = Math.Pow(0.99, frameCounterEnd + 1);
+                            direction.X = Math.Cos(alpha);
+                            direction.Y = Math.Sin(alpha);
+                            flakes.Add(new Flake(pos + delta * direction, direction * 50, col * fade));
+                        }
+
+                        // end game if x seconds passed
                         if (frameCounterEnd > 300)
                         {
                             IsCompleted = true;
                         }
-
+                        
                         frameCounterEnd++;
 
                         break;
@@ -175,6 +199,9 @@ namespace NanoGames.Games.CatchMe
 
             // draw screen
             drawScreen();
+
+            // framecounter
+            frameCounter++;
         }
 
         private void movePlayer(CatchMePlayer player)
@@ -187,79 +214,53 @@ namespace NanoGames.Games.CatchMe
             player.Velocity = player.Velocity.Length * new Vector(Math.Cos(player.Phi), Math.Sin(player.Phi));
 
             // calculate forces and torque on player
+
+            // set inintial values to zero
             Vector force = new Vector(0, 0);
             double torque = 0;
 
-            // input
-            double power = 20;
+            double power;
 
-            // booster
-            player.boosterLeft = 0;
-            player.boosterRight = 0;
-            player.Turbo = 1;
-
-            // player moves forward
-            if (player.Input.Left.IsPressed && player.Input.Right.IsPressed)
+            // calculate power of one booster
+            if (!player.InputTurbo)
             {
-                force += 2 * power * player.Velocity.Normalized;
-                player.boosterLeft = 1;
-                player.boosterRight = 1;
-            }
-
-            // player moves forward with boost if possible
-            if (player.Input.Left.IsPressed && player.Input.Right.IsPressed && player.Input.Fire.IsPressed && (player.TurboCount < 40 * stepsPerFrame) && (player.TurboNotCount > 120*stepsPerFrame))
-            {
-                force += 4 * power * player.Velocity.Normalized;
-                player.boosterLeft = 1;
-                player.boosterRight = 1;
-                player.Turbo = 2;
-                player.TurboCount++;
-
-                if (player.TurboCount >= 40 * stepsPerFrame)
-                {
-                    player.TurboNotCount = 0;
-                }
+                power = player.BoosterPower;
             }
             else
             {
-                player.TurboNotCount++;
+                power = 3 * player.BoosterPower;
+            }
 
-                if (player.TurboNotCount >= 120 * stepsPerFrame)
-                {
-                    player.TurboCount = 0;
-                }
+            // player moves forward
+            if (player.InputMoveForward)
+            {
+                force += 2 * power * player.Velocity.Normalized;
             }
 
             // players moves right
-            if (player.Input.Right.IsPressed && !player.Input.Left.IsPressed)
+            if (player.InputMoveRight)
             {
                 force += 1 * power * player.Velocity.Normalized;
-                torque += 0.08 * (player.Radius + 2) * power;
-                player.boosterRight = 1;
+                torque += 0.08 * (player.Radius + 1.5) * power;
             }
 
             // player moves left
-            if (player.Input.Left.IsPressed && !player.Input.Right.IsPressed)
+            if (player.InputMoveLeft)
             {
                 force += 1 * power * player.Velocity.Normalized;
-                torque -= 0.08 * (player.Radius + 2) * power;
-                player.boosterLeft = 1;
+                torque -= 0.08 * (player.Radius + 1.5) * power;
             }
 
             // players circles right
-            if (player.Input.Right.IsPressed && !player.Input.Left.IsPressed && player.Input.Fire.IsPressed)
+            if (player.InputCircleRight)
             {
                 torque += 0.05 * (player.Radius + 1.5) * power;
-                player.boosterLeft = 1;
-                player.boosterRight = -1;
             }
 
             // player cirlces left
-            if (player.Input.Left.IsPressed && !player.Input.Right.IsPressed && player.Input.Fire.IsPressed)
+            if (player.InputCircleLeft)
             {
                 torque -= 0.05 * (player.Radius + 1.5) * power;
-                player.boosterLeft = -1;
-                player.boosterRight = 1;
             }
 
             // if force is zero add "standgas"
@@ -270,7 +271,7 @@ namespace NanoGames.Games.CatchMe
 
             // viscosity
             force -= 0.05 * player.Radius * viscosity * player.Velocity;
-            torque -= 0.04 * player.Radius * viscosity * player.Radius * player.dPhi;
+            torque -= 0.04 * player.Radius * viscosity * player.Radius * player.DPhi;
 
             // calculate acceleration and angular acceleration from forces and torque
             Vector acceleration = force / player.Mass;
@@ -281,8 +282,86 @@ namespace NanoGames.Games.CatchMe
             player.Velocity = speedCheck(player.Velocity + acceleration * dt);
 
             // calculate new phi and dphi
-            player.Phi = player.Phi + player.dPhi * dt + 0.5 * angularAcc * dt * dt;
-            player.dPhi = speedCheck(player.dPhi + angularAcc * dt, player.Radius);
+            player.Phi = player.Phi + player.DPhi * dt + 0.5 * angularAcc * dt * dt;
+            player.DPhi = speedCheck(player.DPhi + angularAcc * dt, player.Radius);
+        }
+
+        private void checkPlayerInput(CatchMePlayer player)
+        {
+            // set public variables of player according to input
+
+            // reset all 
+            player.InputMoveForward = false;
+            player.InputMoveBackward = false;
+            player.InputMoveLeft = false;
+            player.InputMoveRight = false;
+            player.InputCircleLeft = false;
+            player.InputCircleRight = false;
+            player.InputTurbo = false;
+            player.BoosterLeft = 0;
+            player.BoosterRight = 0;
+
+            // player moves forward
+            if (player.Input.Left.IsPressed && player.Input.Right.IsPressed)
+            {
+                player.InputMoveForward = true;
+                player.BoosterRight = 1;
+                player.BoosterLeft = 1;
+            }
+
+            // player gets turbo if possible
+            if (player.Input.AltFire.IsPressed && (player.TurboCount < 40) && (player.TurboNotCount > 120))
+            {
+                player.InputTurbo = true;
+
+                player.TurboCount++;
+
+                // turbonotcount is reset
+                if (player.TurboCount == 40)
+                {
+                    player.TurboNotCount = 0;
+                }
+            }
+            else
+            {
+                player.TurboNotCount++;
+
+                // turbocount is reset
+                if (player.TurboNotCount == 120)
+                {
+                    player.TurboCount = 0;
+                }
+            }
+
+            // players moves right
+            if (player.Input.Right.IsPressed && !player.Input.Left.IsPressed)
+            {
+                player.InputMoveRight = true;
+                player.BoosterRight = 1;
+            }
+
+            // player moves left
+            if (player.Input.Left.IsPressed && !player.Input.Right.IsPressed)
+            {
+                player.InputMoveLeft = true;
+                player.BoosterLeft = 1;
+            }
+
+            // players circles right
+            if (player.Input.Right.IsPressed && !player.Input.Left.IsPressed && player.Input.Fire.IsPressed)
+            {
+                player.InputCircleRight = true;
+                player.BoosterLeft = 1;
+                player.BoosterRight = -1;
+            }
+
+            // player cirlces left
+            if (player.Input.Left.IsPressed && !player.Input.Right.IsPressed && player.Input.Fire.IsPressed)
+            {
+                player.InputCircleRight = true;
+                player.BoosterLeft = -1;
+                player.BoosterRight = 1;
+            }
         }
 
         private void drawScreen()
@@ -317,48 +396,51 @@ namespace NanoGames.Games.CatchMe
                 g.Line(col, pos2 - 3 * dir, pos2 - ortho - 3 * dir);
 
                 // add flakes
-                for (int i = 0; i < 5 * player.Turbo; i++)
+                double alpha;
+                double delta;
+                Vector direction;
+
+                if (!player.InputTurbo)
                 {
-                    double alpha;
-                    double delta;
-                    Vector direction;
-
-                    if (player.Turbo == 1)
-                    {
+                    for (int i = 0; i < 5; i++)
+                    {   
                         // booster right
                         alpha = Math.PI / 4 * Random.NextDouble() - Math.PI / 8;
-                        delta = 100 * player.Turbo * dT * Random.NextDouble();
+                        delta = 100 * dT * Random.NextDouble();
                         direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
                         direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
-                        flakes.Add(new Flake(pos1 - (3 + delta) * dir + 0.5 * ortho, -direction * 100 * player.boosterRight, col));
+                        flakes.Add(new Flake(pos1 - (3 + delta) * dir + 0.5 * ortho, -direction * 100 * player.BoosterRight, col));
 
                         // booster left
                         alpha = Math.PI / 4 * Random.NextDouble() - Math.PI / 8;
-                        delta = 100 * player.Turbo * dT * Random.NextDouble();
+                        delta = 100 * dT * Random.NextDouble();
                         direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
                         direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
-                        flakes.Add(new Flake(pos2 - (3 + delta) * dir - 0.5 * ortho, -direction * 100 * player.boosterLeft, col));
-                    }
-                    
-                    if (player.Turbo == 2)
-                    {
-                        // booster right
-                        alpha = Math.PI / 3 * Random.NextDouble() - Math.PI / 6;
-                        delta = 100 * player.Turbo * dT * Random.NextDouble();
-                        direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
-                        direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
-                        flakes.Add(new Flake(pos1 - (3 + delta) * dir + 0.5 * ortho, -direction * 100 * player.boosterRight * 2, boostCol));
-
-                        // booster left
-                        alpha = Math.PI / 3 * Random.NextDouble() - Math.PI / 6;
-                        delta = 100 * player.Turbo * dT * Random.NextDouble();
-                        direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
-                        direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
-                        flakes.Add(new Flake(pos2 - (3 + delta) * dir - 0.5 * ortho, -direction * 100 * player.boosterLeft * player.Turbo, boostCol));
+                        flakes.Add(new Flake(pos2 - (3 + delta) * dir - 0.5 * ortho, -direction * 100 * player.BoosterLeft, col));
                     }
 
+                        
                 }
+                else
+                {
+                    for (int i = 0; i < 10; i++)
+                    { 
+                        // booster right
+                        alpha = Math.PI / 3 * Random.NextDouble() - Math.PI / 6;
+                        delta = 100 * 2 * dT * Random.NextDouble();
+                        direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
+                        direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
+                        flakes.Add(new Flake(pos1 - (3 + delta) * dir + 0.5 * ortho, -direction * 100 * player.BoosterRight * 2, boostCol));
 
+                        // booster left
+                        alpha = Math.PI / 3 * Random.NextDouble() - Math.PI / 6;
+                        delta = 100 * 2 * dT * Random.NextDouble();
+                        direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
+                        direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
+                        flakes.Add(new Flake(pos2 - (3 + delta) * dir - 0.5 * ortho, -direction * 100 * player.BoosterLeft * 2, boostCol));
+                    }
+                       
+                }
             }
 
             // draw output from boosters
