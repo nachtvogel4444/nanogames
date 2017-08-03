@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace NanoGames.Games.CatchMe
 {
@@ -20,12 +18,16 @@ namespace NanoGames.Games.CatchMe
         private int frameCounterEnd;
         private CatchMePlayer prey;
         private Vector CatchPosisition;
+        private List<Flake> flakes = new List<Flake> { };
+        private double xMin;
+        private double yMin;
+        private double xMax;
+        private double yMax;
 
-        private int stepsPerFrame = 10;
-        private double minDistance = 1;
-        private List<Flake> flakes = new List<Flake> {};
-
+        private const int stepsPerFrame = 10;
+        private const double minDistance = 1;
         private const double viscosity = 5;
+
 
         protected override void Initialize()
         {
@@ -36,6 +38,12 @@ namespace NanoGames.Games.CatchMe
             frameCounter = 0;
             frameCounterStart = 0;
             frameCounterEnd = 0;
+
+            // map
+            xMin = 40;
+            yMin = 0;
+            xMax = 320;
+            yMax = 200;
 
             // time
             dt = 1.0 / 60 / stepsPerFrame;
@@ -83,8 +91,7 @@ namespace NanoGames.Games.CatchMe
                 player.Inertia = 1.0 / 9 * player.Radius * player.Radius;
             }
         }
-
-
+        
         protected override void Update()
         {
             /*
@@ -263,6 +270,33 @@ namespace NanoGames.Games.CatchMe
                 torque -= 0.05 * (player.Radius + 1.5) * power;
             }
 
+            // calculate forces if player hits border of map
+
+            // player hits left border
+            if (player.Position.X < (xMin + player.Radius))
+            {
+                force += 10 * ((xMin + player.Radius) - player.Position.X) * new Vector(1, 0);
+               
+            }
+
+            // player hits right border
+            if (player.Position.X > (xMax - player.Radius))
+            {
+                force -= 1000 * (player.Position.X - (xMax - player.Radius)) * new Vector(1, 0);
+            }
+
+            // player hits top border
+            if (player.Position.Y < (yMin + player.Radius))
+            {
+                force += 1000 * ((yMin + player.Radius) - player.Position.Y) * new Vector(0, 1);
+            }
+
+            // player hits bottom border
+            if (player.Position.Y > (yMax - player.Radius))
+            {
+                force -= 1000 * (player.Position.Y - (yMax - player.Radius)) * new Vector(0, 1);
+            }
+
             // if force is zero add "standgas"
             if (force.Length == 0)
             {
@@ -272,6 +306,9 @@ namespace NanoGames.Games.CatchMe
             // viscosity
             force -= 0.05 * player.Radius * viscosity * player.Velocity;
             torque -= 0.04 * player.Radius * viscosity * player.Radius * player.DPhi;
+
+            Output.Graphics.Line(new Color(1, 1, 0), new Vector(160, 110), new Vector(160, 110) + force);
+            Output.Graphics.Circle(new Color(1, 1, 0), new Vector(160, 110), 1);
 
             // calculate acceleration and angular acceleration from forces and torque
             Vector acceleration = force / player.Mass;
@@ -368,6 +405,7 @@ namespace NanoGames.Games.CatchMe
         {
             var g = Output.Graphics;
             var boostCol = new Color(1, 0, 0);
+            var white = new Color(1, 1, 1);
                    
             // draw each player
             foreach (var player in Players)
@@ -476,6 +514,8 @@ namespace NanoGames.Games.CatchMe
             }
             flakes = tmp;
 
+            // draw border of map
+            g.Rectangle(white, new Vector(xMin, yMin), new Vector(xMax, yMax));
         }
 
         private Vector speedCheck(Vector input)
