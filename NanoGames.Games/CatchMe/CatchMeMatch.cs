@@ -93,6 +93,11 @@ namespace NanoGames.Games.CatchMe
                 player.Mass = 1.0 / 27 * player.Radius * player.Radius * player.Radius;
                 player.Inertia = 1.0 / 9 * player.Radius * player.Radius;
             }
+
+            // initialize moving circles
+            double areaFilled = 0.2 * (xMax - xMin) * (yMax - yMin);
+            
+            
         }
         
         protected override void Update()
@@ -256,14 +261,14 @@ namespace NanoGames.Games.CatchMe
             if (player.InputMoveRight)
             {
                 force += 1 * power * player.Heading;
-                torque += 0.08 * (player.Radius + 1.5) * power;
+                torque += 0.12 * (player.Radius + 1.5) * power;
             }
 
             // player moves left
             if (player.InputMoveLeft)
             {
                 force += 1 * power * player.Heading;
-                torque -= 0.08 * (player.Radius + 1.5) * power;
+                torque -= 0.12 * (player.Radius + 1.5) * power;
             }
 
             // players circles right
@@ -283,26 +288,29 @@ namespace NanoGames.Games.CatchMe
             // player hits left border
             if (player.Position.X < (xMin + player.Radius))
             {
-                force += 100 * ((xMin + player.Radius) - player.Position.X) * new Vector(1, 0);
-               
+                force += 1000 * (100 * Math.Atan((xMin + player.Radius) - player.Position.X) / Math.PI + 0.5) * new Vector(1, 0);
+                torque += 30 * player.Radius * player.Velocity.Y / Math.Abs(player.Velocity.Y);
             }
 
             // player hits right border
             if (player.Position.X > (xMax - player.Radius))
             {
-                force -= 100 * (player.Position.X - (xMax - player.Radius)) * new Vector(1, 0);
+                force -= 1000 * (100 * Math.Atan(player.Position.X - (xMax - player.Radius)) / Math.PI + 0.5) * new Vector(1, 0);
+                torque -= 30 * player.Radius * player.Velocity.Y / Math.Abs(player.Velocity.Y);
             }
 
             // player hits top border
             if (player.Position.Y < (yMin + player.Radius))
             {
-                force += 100 * ((yMin + player.Radius) - player.Position.Y) * new Vector(0, 1);
+                force += 1000 * (100 * Math.Atan((yMin + player.Radius) - player.Position.Y)  / Math.PI + 0.5) * new Vector(0, 1);
+                torque -= 30 * player.Radius * player.Velocity.X / Math.Abs(player.Velocity.X);
             }
 
             // player hits bottom border
             if (player.Position.Y > (yMax - player.Radius))
             {
-                force -= 100 * (player.Position.Y - (yMax - player.Radius)) * new Vector(0, 1);
+                force -= 1000 * (100 * Math.Atan(player.Position.Y - (yMax - player.Radius)) / Math.PI + 0.5) * new Vector(0, 1);
+                torque += 30 * player.Radius * player.Velocity.X / Math.Abs(player.Velocity.X);
             }
 
             // if force is zero add "standgas"

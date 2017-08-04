@@ -86,6 +86,7 @@
     <Compile Include="CatchMe\CatchMeMatch.cs" />
     <Compile Include="CatchMe\CatchMePlayer.cs" />
     <Compile Include="CatchMe\Flake.cs" />
+    <Compile Include="CatchMe\MovingCircle.cs" />
     <Compile Include="Discipline.cs" />
     <Compile Include="DisciplineDirectory.cs" />
     <Compile Include="Discipline{TMatch,TPlayer}.cs" />
