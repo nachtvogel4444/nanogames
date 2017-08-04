@@ -10,6 +10,7 @@ namespace NanoGames.Games.CatchMe
         public double Phi;
         public Vector Velocity;
         public double DPhi;
+        public Vector Heading;
         public double Mass;
         public double Inertia;
         public double Radius;
@@ -28,5 +29,7 @@ namespace NanoGames.Games.CatchMe
 
         public double TurboCount;
         public double TurboNotCount;
+        public double TurboLength;
+        public double TurboWait;
     }
 }

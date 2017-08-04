@@ -27,6 +27,11 @@ namespace NanoGames.Games.CatchMe
         private const int stepsPerFrame = 10;
         private const double minDistance = 1;
         private const double viscosity = 5;
+        
+        private Color white = new Color(1, 1, 1);
+        private Color red = new Color(1, 1, 1);
+        private Color orange = new Color(1, 0.647, 0);
+        private Color green = new Color(0, 1, 0);
 
 
         protected override void Initialize()
@@ -40,10 +45,10 @@ namespace NanoGames.Games.CatchMe
             frameCounterEnd = 0;
 
             // map
-            xMin = 40;
-            yMin = 0;
-            xMax = 320;
-            yMax = 200;
+            xMin = 10;
+            yMin = 10;
+            xMax = 290;
+            yMax = 190;
 
             // time
             dt = 1.0 / 60 / stepsPerFrame;
@@ -66,26 +71,24 @@ namespace NanoGames.Games.CatchMe
                 // Turbo
                 player.TurboCount = 0;
                 player.TurboNotCount = 0;
+                player.TurboWait = 360;
+                player.TurboLength = 150;
 
                 // Booster
                 player.BoosterPower = 20;
 
                 // position
-                double x = 270 * Random.NextDouble();
-                double y = 150 * Random.NextDouble();
+                double x = (xMax - xMin - 3 * player.Radius) * Random.NextDouble() + xMin + 1.5 * player.Radius;
+                double y = (yMax - yMin - 3 * player.Radius) * Random.NextDouble() + yMin + 1.5 * player.Radius;
                 
                 player.Position = new Vector(x, y);
                 // player.Position = new Vector(160, 100);
 
-                // velocity
-                double angle = 2 * Math.PI * Random.NextDouble();
-
-                player.Velocity = speedCheck(4 * new Vector(Math.Cos(angle), Math.Sin(angle)));
-
-                // phi and dphi 
-                player.Phi = Math.Sin(player.Velocity.Normalized.Y);
-                player.DPhi = 0;
-
+                // phi, heading
+                player.Phi = 2 * Math.PI * Random.NextDouble();
+                player.Heading.X = Math.Cos(player.Phi);
+                player.Heading.Y = Math.Sin(player.Phi);
+                
                 // mass and inertia
                 player.Mass = 1.0 / 27 * player.Radius * player.Radius * player.Radius;
                 player.Inertia = 1.0 / 9 * player.Radius * player.Radius;
@@ -213,15 +216,15 @@ namespace NanoGames.Games.CatchMe
 
         private void movePlayer(CatchMePlayer player)
         {
-            // The effects force and torque are calculated. These effects take place at the end of each time step
-            // => velocity changes, position changes and after that the player rotates
-            // This rotation of the previous timestep is implemented at the beginning of the next timestep
+            //  - initial parameters are calculated
+            //
+            // - force and torque from input is calculted
+            // - force if player hits boundary of map
+            // - force and torque from viscosity
+            // - acceleration, velocity and postion is calculated
+            // - angular acceleration, dPhi and phi/heading is calculated
 
-            // rotation of last time step is forced on velocity vector
-            player.Velocity = player.Velocity.Length * new Vector(Math.Cos(player.Phi), Math.Sin(player.Phi));
-
-            // calculate forces and torque on player
-
+            
             // set inintial values to zero
             Vector force = new Vector(0, 0);
             double torque = 0;
@@ -237,24 +240,29 @@ namespace NanoGames.Games.CatchMe
             {
                 power = 3 * player.BoosterPower;
             }
+            
+            // calculate forces and torque from input
+
+            // standgas of boosters
+            force = 2 * power / 10 * player.Heading;
 
             // player moves forward
             if (player.InputMoveForward)
             {
-                force += 2 * power * player.Velocity.Normalized;
+                force += 2 * power * player.Heading;
             }
 
             // players moves right
             if (player.InputMoveRight)
             {
-                force += 1 * power * player.Velocity.Normalized;
+                force += 1 * power * player.Heading;
                 torque += 0.08 * (player.Radius + 1.5) * power;
             }
 
             // player moves left
             if (player.InputMoveLeft)
             {
-                force += 1 * power * player.Velocity.Normalized;
+                force += 1 * power * player.Heading;
                 torque -= 0.08 * (player.Radius + 1.5) * power;
             }
 
@@ -270,31 +278,31 @@ namespace NanoGames.Games.CatchMe
                 torque -= 0.05 * (player.Radius + 1.5) * power;
             }
 
-            // calculate forces if player hits border of map
+            // calculate force if player hits boundary of map
 
             // player hits left border
             if (player.Position.X < (xMin + player.Radius))
             {
-                force += 10 * ((xMin + player.Radius) - player.Position.X) * new Vector(1, 0);
+                force += 100 * ((xMin + player.Radius) - player.Position.X) * new Vector(1, 0);
                
             }
 
             // player hits right border
             if (player.Position.X > (xMax - player.Radius))
             {
-                force -= 1000 * (player.Position.X - (xMax - player.Radius)) * new Vector(1, 0);
+                force -= 100 * (player.Position.X - (xMax - player.Radius)) * new Vector(1, 0);
             }
 
             // player hits top border
             if (player.Position.Y < (yMin + player.Radius))
             {
-                force += 1000 * ((yMin + player.Radius) - player.Position.Y) * new Vector(0, 1);
+                force += 100 * ((yMin + player.Radius) - player.Position.Y) * new Vector(0, 1);
             }
 
             // player hits bottom border
             if (player.Position.Y > (yMax - player.Radius))
             {
-                force -= 1000 * (player.Position.Y - (yMax - player.Radius)) * new Vector(0, 1);
+                force -= 100 * (player.Position.Y - (yMax - player.Radius)) * new Vector(0, 1);
             }
 
             // if force is zero add "standgas"
@@ -307,8 +315,9 @@ namespace NanoGames.Games.CatchMe
             force -= 0.05 * player.Radius * viscosity * player.Velocity;
             torque -= 0.04 * player.Radius * viscosity * player.Radius * player.DPhi;
 
-            Output.Graphics.Line(new Color(1, 1, 0), new Vector(160, 110), new Vector(160, 110) + force);
-            Output.Graphics.Circle(new Color(1, 1, 0), new Vector(160, 110), 1);
+            // for debug plot force vector in middle of the screen
+            // Output.Graphics.Line(new Color(1, 1, 0), new Vector(160, 110), new Vector(160, 110) + force);
+            // Output.Graphics.Circle(new Color(1, 1, 0), new Vector(160, 110), 1);
 
             // calculate acceleration and angular acceleration from forces and torque
             Vector acceleration = force / player.Mass;
@@ -321,6 +330,10 @@ namespace NanoGames.Games.CatchMe
             // calculate new phi and dphi
             player.Phi = player.Phi + player.DPhi * dt + 0.5 * angularAcc * dt * dt;
             player.DPhi = speedCheck(player.DPhi + angularAcc * dt, player.Radius);
+
+            // calcualte heading from phi
+            player.Heading.X = Math.Cos(player.Phi);
+            player.Heading.Y = Math.Sin(player.Phi);
         }
 
         private void checkPlayerInput(CatchMePlayer player)
@@ -347,14 +360,14 @@ namespace NanoGames.Games.CatchMe
             }
 
             // player gets turbo if possible
-            if (player.Input.AltFire.IsPressed && (player.TurboCount < 40) && (player.TurboNotCount > 120))
+            if (player.Input.AltFire.IsPressed && (player.TurboCount < player.TurboLength) && (player.TurboNotCount > player.TurboWait))
             {
                 player.InputTurbo = true;
 
                 player.TurboCount++;
 
                 // turbonotcount is reset
-                if (player.TurboCount == 40)
+                if (player.TurboCount == player.TurboLength)
                 {
                     player.TurboNotCount = 0;
                 }
@@ -364,7 +377,7 @@ namespace NanoGames.Games.CatchMe
                 player.TurboNotCount++;
 
                 // turbocount is reset
-                if (player.TurboNotCount == 120)
+                if (player.TurboNotCount == player.TurboWait)
                 {
                     player.TurboCount = 0;
                 }
@@ -405,16 +418,20 @@ namespace NanoGames.Games.CatchMe
         {
             var g = Output.Graphics;
             var boostCol = new Color(1, 0, 0);
-            var white = new Color(1, 1, 1);
                    
             // draw each player
             foreach (var player in Players)
             {
                 var pos = player.Position;
                 var radius = player.Radius;
-                var dir = player.Velocity.Normalized;
-                var ortho = player.Velocity.Normalized.RotatedLeft;
+                var dir = player.Heading;
+                var ortho = player.Heading.RotatedLeft;
                 var col = player.LocalColor;
+                
+                // Name
+                string name = player.Name.ToUpper();
+                Vector namePosition = player.Position + new Vector(-name.Length / 2 * 3, -18);
+                g.Print(col, 3, namePosition, name);
 
                 // body
                 g.Circle(col, pos, radius);
@@ -432,6 +449,67 @@ namespace NanoGames.Games.CatchMe
                 g.Line(col, pos2 - ortho, pos2 - ortho - 3 * dir);
                 g.Line(col, pos2, pos2 - ortho);
                 g.Line(col, pos2 - 3 * dir, pos2 - ortho - 3 * dir);
+
+                // indication of booster power
+                Color barColor;
+                int barNumber;
+
+                if (player.InputTurbo)
+                {
+                    barColor = green;
+                    barNumber = 6;
+
+                    if (player.TurboCount < (player.TurboLength * 5.0 / 6))
+                    {
+                        barNumber = 5;
+
+                        if (player.TurboCount < (player.TurboLength * 5.0 / 6))
+                        {
+                            barNumber = 4;
+                            barColor = orange;
+
+                            if (player.TurboCount < (player.TurboLength * 4.0 / 6))
+                            {
+                                barNumber = 3;
+
+                                if (player.TurboCount < (player.TurboLength * 3.0 / 6))
+                                {
+                                    barNumber = 2;
+                                    barColor = red;
+
+                                    if (player.TurboCount < (player.TurboLength * 2.0 / 6))
+                                    {
+                                        barNumber = 1;
+                                        barColor = red;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    barColor = red;
+                    barNumber = 1;
+
+                    if (player.TurboNotCount > (player.TurboWait * 1.0 / 3))
+                    {
+                        barColor = orange;
+                        barNumber = 2;
+
+                        if (player.TurboNotCount > player.TurboWait * 2.0 / 3)
+                        {
+                            barColor = green;
+                            barNumber = 3;
+                        }
+                    }
+                }
+
+                // draw bars
+                for (int i = 0; i < barNumber; i++)
+                {
+                    g.Line(barColor, namePosition - new Vector(-10, i), namePosition - new Vector(-7, i));
+                }
 
                 // add flakes
                 double alpha;
