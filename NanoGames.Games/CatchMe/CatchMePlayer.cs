@@ -31,5 +31,7 @@ namespace NanoGames.Games.CatchMe
         public double TurboNotCount;
         public double TurboLength;
         public double TurboWait;
+
+        
     }
 }

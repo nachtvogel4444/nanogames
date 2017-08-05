@@ -19,6 +19,7 @@ namespace NanoGames.Games.CatchMe
         private CatchMePlayer prey;
         private Vector CatchPosisition;
         private List<Flake> flakes = new List<Flake> { };
+        private List<MovingCircle> movingCircles = new List<MovingCircle> { };
         private double xMin;
         private double yMin;
         private double xMax;
@@ -93,11 +94,7 @@ namespace NanoGames.Games.CatchMe
                 player.Mass = 1.0 / 27 * player.Radius * player.Radius * player.Radius;
                 player.Inertia = 1.0 / 9 * player.Radius * player.Radius;
             }
-
-            // initialize moving circles
-            double areaFilled = 0.2 * (xMax - xMin) * (yMax - yMin);
-            
-            
+ 
         }
         
         protected override void Update()
@@ -213,7 +210,10 @@ namespace NanoGames.Games.CatchMe
             }
 
             // draw screen
-            drawScreen();
+            foreach (CatchMePlayer player in Players)
+            {
+                drawScreenPlayer(player);
+            }
 
             // framecounter
             frameCounter++;
@@ -422,10 +422,13 @@ namespace NanoGames.Games.CatchMe
             }
         }
 
-        private void drawScreen()
+        private void drawScreenPlayer(CatchMePlayer p)
         {
-            var g = Output.Graphics;
+            // draw the screen on the monitor of the player
+
+            var g = p.Output.Graphics;
             var boostCol = new Color(1, 0, 0);
+            Vector shift = p.Position;
                    
             // draw each player
             foreach (var player in Players)
@@ -627,5 +630,20 @@ namespace NanoGames.Games.CatchMe
                 return dphi;
             }
         }
+
+        private Vector randomPosition(Vector topLeft, Vector bottomRight)
+        {
+            // returns a random vector in the rectangle from topleft to bottomright
+            double x = (bottomRight.X - topLeft.X) * Random.NextDouble();
+            double y = (bottomRight.Y - topLeft.Y) * Random.NextDouble();
+
+            return new Vector(x, y);
+        }
+
+        private Vector shift(Vector input, Vector shift)
+        {
+            return input + shift;
+        }
+
     }
 }
