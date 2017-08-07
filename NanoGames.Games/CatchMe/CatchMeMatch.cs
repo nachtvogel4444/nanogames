@@ -95,6 +95,7 @@ namespace NanoGames.Games.CatchMe
                 // mass and inertia
                 player.Mass = 1.0 / 27 * player.Radius * player.Radius * player.Radius;
                 player.Inertia = 1.0 / 9 * player.Radius * player.Radius;
+
             }
 
             // fill map with random points
