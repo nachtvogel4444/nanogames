@@ -20,19 +20,23 @@ namespace NanoGames.Games.CatchMe
         private Vector CatchPosisition;
         private List<Flake> flakes = new List<Flake> { };
         private List<MovingCircle> movingCircles = new List<MovingCircle> { };
-        private double xMin;
-        private double yMin;
+
         private double xMax;
         private double yMax;
 
         private const int stepsPerFrame = 10;
         private const double minDistance = 1;
         private const double viscosity = 5;
-        
+
         private Color white = new Color(1, 1, 1);
         private Color red = new Color(1, 1, 1);
         private Color orange = new Color(1, 0.647, 0);
         private Color green = new Color(0, 1, 0);
+
+        private Vector shift;
+        private Vector screenPosition;
+
+        private List<Vector> mapRandomPoints =  new List<Vector> {};
 
 
         protected override void Initialize()
@@ -46,11 +50,9 @@ namespace NanoGames.Games.CatchMe
             frameCounterEnd = 0;
 
             // map
-            xMin = 10;
-            yMin = 10;
-            xMax = 290;
-            yMax = 190;
-
+            xMax = 400;
+            yMax = 300;
+            
             // time
             dt = 1.0 / 60 / stepsPerFrame;
             dT = 1.0 / 60;
@@ -79,8 +81,8 @@ namespace NanoGames.Games.CatchMe
                 player.BoosterPower = 20;
 
                 // position
-                double x = (xMax - xMin - 3 * player.Radius) * Random.NextDouble() + xMin + 1.5 * player.Radius;
-                double y = (yMax - yMin - 3 * player.Radius) * Random.NextDouble() + yMin + 1.5 * player.Radius;
+                double x = (xMax - 3 * player.Radius) * Random.NextDouble() + 1.5 * player.Radius;
+                double y = (yMax - 3 * player.Radius) * Random.NextDouble() + 1.5 * player.Radius;
                 
                 player.Position = new Vector(x, y);
                 // player.Position = new Vector(160, 100);
@@ -93,6 +95,12 @@ namespace NanoGames.Games.CatchMe
                 // mass and inertia
                 player.Mass = 1.0 / 27 * player.Radius * player.Radius * player.Radius;
                 player.Inertia = 1.0 / 9 * player.Radius * player.Radius;
+            }
+
+            // fill map with random points
+            for (int i = 0; i < 250; i++)
+            {
+                mapRandomPoints.Add(randomPosition(new Vector(0, 0), new Vector(xMax, yMax)));                
             }
  
         }
@@ -286,9 +294,9 @@ namespace NanoGames.Games.CatchMe
             // calculate force if player hits boundary of map
 
             // player hits left border
-            if (player.Position.X < (xMin + player.Radius))
+            if (player.Position.X < (player.Radius))
             {
-                force += 1000 * (100 * Math.Atan((xMin + player.Radius) - player.Position.X) / Math.PI + 0.5) * new Vector(1, 0);
+                force += 1000 * (100 * Math.Atan((player.Radius) - player.Position.X) / Math.PI + 0.5) * new Vector(1, 0);
                 torque += 30 * player.Radius * player.Velocity.Y / Math.Abs(player.Velocity.Y);
             }
 
@@ -300,9 +308,9 @@ namespace NanoGames.Games.CatchMe
             }
 
             // player hits top border
-            if (player.Position.Y < (yMin + player.Radius))
+            if (player.Position.Y < (player.Radius))
             {
-                force += 1000 * (100 * Math.Atan((yMin + player.Radius) - player.Position.Y)  / Math.PI + 0.5) * new Vector(0, 1);
+                force += 1000 * (100 * Math.Atan((player.Radius) - player.Position.Y)  / Math.PI + 0.5) * new Vector(0, 1);
                 torque -= 30 * player.Radius * player.Velocity.X / Math.Abs(player.Velocity.X);
             }
 
@@ -428,8 +436,17 @@ namespace NanoGames.Games.CatchMe
 
             var g = p.Output.Graphics;
             var boostCol = new Color(1, 0, 0);
-            Vector shift = p.Position;
-                   
+
+            // get shift and screenpostion
+            screenPosition = p.Position;
+            
+            if (screenPosition.X < 150) { screenPosition.X = 150; }
+            if (screenPosition.X > (xMax - 150)) { screenPosition.X = (xMax - 150); }
+            if (screenPosition.Y < 90) { screenPosition.Y = 90; }
+            if (screenPosition.Y > (yMax - 90)) { screenPosition.Y = (yMax - 90); }
+            
+            shift = new Vector(160, 100) - screenPosition;
+
             // draw each player
             foreach (var player in Players)
             {
@@ -442,24 +459,24 @@ namespace NanoGames.Games.CatchMe
                 // Name
                 string name = player.Name.ToUpper();
                 Vector namePosition = player.Position + new Vector(-name.Length / 2 * 3, -18);
-                g.Print(col, 3, namePosition, name);
+                g.Print(col, 3, doShift(namePosition), name);
 
                 // body
-                g.Circle(col, pos, radius);
+                g.Circle(col, doShift(pos), radius);
 
                 // booster
                 var pos1 = pos + (radius + 1) * ortho + dir;
                 var pos2 = pos - (radius + 1) * ortho + dir;
                 
-                g.Line(col, pos1, pos1 - 3 * dir);
-                g.Line(col, pos1 + ortho, pos1 + ortho - 3 * dir);
-                g.Line(col, pos1, pos1 + ortho);
-                g.Line(col, pos1 - 3 * dir, pos1 + ortho - 3 * dir);
+                g.Line(col, doShift(pos1), doShift(pos1 - 3 * dir));
+                g.Line(col, doShift(pos1) + ortho, doShift(pos1 + ortho - 3 * dir));
+                g.Line(col, doShift(pos1), doShift(pos1 + ortho));
+                g.Line(col, doShift(pos1 - 3 * dir), doShift(pos1 + ortho - 3 * dir));
 
-                g.Line(col, pos2, pos2 - 3 * dir);
-                g.Line(col, pos2 - ortho, pos2 - ortho - 3 * dir);
-                g.Line(col, pos2, pos2 - ortho);
-                g.Line(col, pos2 - 3 * dir, pos2 - ortho - 3 * dir);
+                g.Line(col, doShift(pos2), doShift(pos2 - 3 * dir));
+                g.Line(col, doShift(pos2 - ortho), doShift(pos2 - ortho - 3 * dir));
+                g.Line(col, doShift(pos2), doShift(pos2 - ortho));
+                g.Line(col, doShift(pos2 - 3 * dir), doShift(pos2 - ortho - 3 * dir));
 
                 // indication of booster power
                 Color barColor;
@@ -519,7 +536,7 @@ namespace NanoGames.Games.CatchMe
                 // draw bars
                 for (int i = 0; i < barNumber; i++)
                 {
-                    g.Line(barColor, namePosition - new Vector(-10, i), namePosition - new Vector(-7, i));
+                    g.Line(barColor, doShift(namePosition - new Vector(-10, i)), doShift(namePosition - new Vector(-7, i)));
                 }
 
                 // add flakes
@@ -575,7 +592,7 @@ namespace NanoGames.Games.CatchMe
             // draw all flakes
             foreach (Flake flake in flakes)
             {
-                g.Point(flake.Color, flake.Position);
+                g.Point(flake.Color, doShift(flake.Position));
             }
 
             // move flakes, set time and fade out
@@ -604,7 +621,13 @@ namespace NanoGames.Games.CatchMe
             flakes = tmp;
 
             // draw border of map
-            g.Rectangle(white, new Vector(xMin, yMin), new Vector(xMax, yMax));
+            g.Rectangle(white, doShift(new Vector(0, 0)), doShift(new Vector(xMax, yMax)));
+
+            // draw random points of map
+            foreach (Vector v in mapRandomPoints)
+            {
+                g.Point(white, doShift(v));
+            }
         }
 
         private Vector speedCheck(Vector input)
@@ -640,7 +663,7 @@ namespace NanoGames.Games.CatchMe
             return new Vector(x, y);
         }
 
-        private Vector shift(Vector input, Vector shift)
+        private Vector doShift(Vector input)
         {
             return input + shift;
         }
