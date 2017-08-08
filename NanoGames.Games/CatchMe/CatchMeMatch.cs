@@ -19,7 +19,7 @@ namespace NanoGames.Games.CatchMe
         private CatchMePlayer prey;
         private Vector CatchPosisition;
         private List<Flake> flakes = new List<Flake> { };
-        private List<MovingCircle> movingCircles = new List<MovingCircle> { };
+        private List<FixedCircle> fixedCircles = new List<FixedCircle> { };
 
         private double xMax;
         private double yMax;
@@ -64,7 +64,7 @@ namespace NanoGames.Games.CatchMe
             prey = Players[(int)(Players.Count * Random.NextDouble())];
 
             // initialize each player
-            for (int i = 0; i < Players.Count; ++i)
+            for (int i = 0; i < Players.Count; i++)
             {
                 var player = Players[i];
                 
@@ -96,6 +96,38 @@ namespace NanoGames.Games.CatchMe
                 player.Mass = 1.0 / 27 * player.Radius * player.Radius * player.Radius;
                 player.Inertia = 1.0 / 9 * player.Radius * player.Radius;
 
+            }
+
+            // fixed circles
+            int ii = 0;
+            double dMin = 10;
+            double rMin = 10;
+            double rMax = 60;
+            while (ii < 10000 && fixedCircles.Count < 7)
+            {
+                // get random circle
+                double r = (rMax - rMin) * Random.NextDouble() + rMin;
+                double x = (xMax - 2 * (dMin + r)) * Random.NextDouble() + r + dMin;
+                double y = (yMax - 2 * (dMin + r)) * Random.NextDouble() + r + dMin;
+                Vector pos = new Vector(x, y);
+
+                // check if random circle is standing free
+                bool isOk = true;
+                foreach (FixedCircle fixedCircle in fixedCircles)
+                {
+                    if ((pos - fixedCircle.Position).Length < (r + fixedCircle.Radius + dMin))
+                    {
+                        isOk = false;
+                    }
+                }
+
+                // add random circle if standing free
+                if (isOk)
+                {
+                    fixedCircles.Add(new FixedCircle(pos, r));
+                }
+
+                ii++;
             }
 
             // fill map with random points
@@ -322,6 +354,16 @@ namespace NanoGames.Games.CatchMe
                 torque += 30 * player.Radius * player.Velocity.X / Math.Abs(player.Velocity.X);
             }
 
+            // check if player hits fixed circle
+            foreach (FixedCircle fixedCircle in fixedCircles)
+            {
+                if ((player.Position - fixedCircle.Position).Length < (player.Radius + fixedCircle.Radius))
+                {
+                    force += 1000 * (100 * Math.Atan((player.Position - fixedCircle.Position).Length - (player.Radius + fixedCircle.Radius)) / Math.PI + 0.5) * (-player.Position + fixedCircle.Position).Normalized;
+                }
+
+            }
+
             // if force is zero add "standgas"
             if (force.Length == 0)
             {
@@ -478,68 +520,7 @@ namespace NanoGames.Games.CatchMe
                 g.Line(col, doShift(pos2 - ortho), doShift(pos2 - ortho - 3 * dir));
                 g.Line(col, doShift(pos2), doShift(pos2 - ortho));
                 g.Line(col, doShift(pos2 - 3 * dir), doShift(pos2 - ortho - 3 * dir));
-
-                // indication of booster power
-                Color barColor;
-                int barNumber;
-
-                if (player.InputTurbo)
-                {
-                    barColor = green;
-                    barNumber = 6;
-
-                    if (player.TurboCount < (player.TurboLength * 5.0 / 6))
-                    {
-                        barNumber = 5;
-
-                        if (player.TurboCount < (player.TurboLength * 5.0 / 6))
-                        {
-                            barNumber = 4;
-                            barColor = orange;
-
-                            if (player.TurboCount < (player.TurboLength * 4.0 / 6))
-                            {
-                                barNumber = 3;
-
-                                if (player.TurboCount < (player.TurboLength * 3.0 / 6))
-                                {
-                                    barNumber = 2;
-                                    barColor = red;
-
-                                    if (player.TurboCount < (player.TurboLength * 2.0 / 6))
-                                    {
-                                        barNumber = 1;
-                                        barColor = red;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    barColor = red;
-                    barNumber = 1;
-
-                    if (player.TurboNotCount > (player.TurboWait * 1.0 / 3))
-                    {
-                        barColor = orange;
-                        barNumber = 2;
-
-                        if (player.TurboNotCount > player.TurboWait * 2.0 / 3)
-                        {
-                            barColor = green;
-                            barNumber = 3;
-                        }
-                    }
-                }
-
-                // draw bars
-                for (int i = 0; i < barNumber; i++)
-                {
-                    g.Line(barColor, doShift(namePosition - new Vector(-10, i)), doShift(namePosition - new Vector(-7, i)));
-                }
-
+                
                 // add flakes
                 double alpha;
                 double delta;
@@ -623,6 +604,12 @@ namespace NanoGames.Games.CatchMe
 
             // draw border of map
             g.Rectangle(white, doShift(new Vector(0, 0)), doShift(new Vector(xMax, yMax)));
+
+            // draw fixed circles
+            foreach (FixedCircle fixedCircle in fixedCircles)
+            {
+                g.Circle(white, doShift(fixedCircle.Position), fixedCircle.Radius);
+            }
 
             // draw random points of map
             foreach (Vector v in mapRandomPoints)

@@ -85,6 +85,7 @@
     <Compile Include="Bomberguy\Unbombable.cs" />
     <Compile Include="CatchMe\CatchMeMatch.cs" />
     <Compile Include="CatchMe\CatchMePlayer.cs" />
+    <Compile Include="CatchMe\FixedCircle.cs" />
     <Compile Include="CatchMe\Flake.cs" />
     <Compile Include="CatchMe\MovingCircle.cs" />
     <Compile Include="Discipline.cs" />
