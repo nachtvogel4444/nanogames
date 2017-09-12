@@ -32,6 +32,8 @@ namespace NanoGames.Games.CatchMe
         public double TurboLength;
         public double TurboWait;
 
-        
+        public Vector ScreenPosition;
+
+
     }
 }
