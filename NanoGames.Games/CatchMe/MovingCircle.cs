@@ -7,24 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NanoGames.Games.Circles
+namespace NanoGames.Games.CatchMe
 {
-    class CirclesPlayer : Player<CirclesMatch>
+    internal class MovingCircle
     {
+        // moving circle / obstacle
 
         public Vector Position;
         public double Phi;
         public Vector Velocity;
-        public double dPhi;
+        public double DPhi;
+        public Vector Heading;
         public double Mass;
         public double Inertia;
         public double Radius;
-
-        public double boosterLeft;
-        public double boosterRight;
-
-
-
 
     }
 }

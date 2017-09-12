@@ -7,23 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NanoGames.Games.Circles
+namespace NanoGames.Games.CatchMe
 {
-    internal class Flake
+    internal class FixedCircle
     {
         public Vector Position;
-        public Vector Velocity;
-        public Color Color;
+        public double Radius;
 
-        public double Time;
-
-        public Flake(Vector pos, Vector vel, Color col)
+        public FixedCircle(Vector pos, double r)
         {
             Position = pos;
-            Velocity = vel;
-            Time = 0;
-            Color = col;
+            Radius = r;
         }
-        
     }
 }
