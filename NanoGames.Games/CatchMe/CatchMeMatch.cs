@@ -100,10 +100,10 @@ namespace NanoGames.Games.CatchMe
 
             // fixed circles
             int ii = 0;
-            double dMin = 10;
+            double dMin = 20;
             double rMin = 10;
             double rMax = 60;
-            while (ii < 10000 && fixedCircles.Count < 7)
+            while (ii < 10000 && fixedCircles.Count < 12)
             {
                 // get random circle
                 double r = (rMax - rMin) * Random.NextDouble() + rMin;
@@ -330,6 +330,7 @@ namespace NanoGames.Games.CatchMe
             if (player.Position.X < (player.Radius))
             {
                 force += 1000 * (100 * Math.Atan((player.Radius) - player.Position.X) / Math.PI + 0.5) * new Vector(1, 0);
+                force -= 20 * player.Velocity;
                 torque += 30 * player.Radius * player.Velocity.Y / Math.Abs(player.Velocity.Y);
             }
 
@@ -337,6 +338,7 @@ namespace NanoGames.Games.CatchMe
             if (player.Position.X > (xMax - player.Radius))
             {
                 force -= 1000 * (100 * Math.Atan(player.Position.X - (xMax - player.Radius)) / Math.PI + 0.5) * new Vector(1, 0);
+                force -= 20 * player.Velocity;
                 torque -= 30 * player.Radius * player.Velocity.Y / Math.Abs(player.Velocity.Y);
             }
 
@@ -344,6 +346,7 @@ namespace NanoGames.Games.CatchMe
             if (player.Position.Y < (player.Radius))
             {
                 force += 1000 * (100 * Math.Atan((player.Radius) - player.Position.Y)  / Math.PI + 0.5) * new Vector(0, 1);
+                force -= 20 * player.Velocity;
                 torque -= 30 * player.Radius * player.Velocity.X / Math.Abs(player.Velocity.X);
             }
 
@@ -351,6 +354,7 @@ namespace NanoGames.Games.CatchMe
             if (player.Position.Y > (yMax - player.Radius))
             {
                 force -= 1000 * (100 * Math.Atan(player.Position.Y - (yMax - player.Radius)) / Math.PI + 0.5) * new Vector(0, 1);
+                force -= 20 * player.Velocity;
                 torque += 30 * player.Radius * player.Velocity.X / Math.Abs(player.Velocity.X);
             }
 
@@ -360,6 +364,7 @@ namespace NanoGames.Games.CatchMe
                 if ((player.Position - fixedCircle.Position).Length < (player.Radius + fixedCircle.Radius))
                 {
                     force += 1000 * (100 * Math.Atan((player.Position - fixedCircle.Position).Length - (player.Radius + fixedCircle.Radius)) / Math.PI + 0.5) * (-player.Position + fixedCircle.Position).Normalized;
+                    force -= 20 * player.Velocity;
                 }
 
             }
