@@ -34,6 +34,9 @@ namespace NanoGames.Games.CatchMe
 
         public Vector ScreenPosition;
 
-
+        public bool AddonJump;
+        public bool AddonPush;
+        public bool Addon2;
+        public int AddonMarker;
     }
 }

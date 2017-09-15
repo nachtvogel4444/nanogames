@@ -14,9 +14,11 @@ namespace NanoGames.Games.CatchMe
         private double maxSpeed;
         private string stateOfGame;
         private int frameCounter;
-        private int frameCounterStart;
         private int frameCounterEnd;
+        private int frameMax;
+        private int huntersWaitTime;
         private CatchMePlayer prey;
+        private List<CatchMePlayer> hunters = new List<CatchMePlayer> { };
         private Vector CatchPosisition;
         private List<Flake> flakes = new List<Flake> { };
         private List<FixedCircle> fixedCircles = new List<FixedCircle> { };
@@ -31,9 +33,10 @@ namespace NanoGames.Games.CatchMe
         private const double viscosity = 5;
 
         private Color white = new Color(1, 1, 1);
-        private Color red = new Color(1, 1, 1);
+        private Color red = new Color(1, 0, 0);
         private Color orange = new Color(1, 0.647, 0);
         private Color green = new Color(0, 1, 0);
+        private Color blue = new Color(0, 0, 1);
         private Color grey = new Color(0.3, 0.3, 0.3);
 
         private Vector screenPosition;
@@ -51,8 +54,9 @@ namespace NanoGames.Games.CatchMe
             // stateOfGame, frameCounter
             stateOfGame = "Start";
             frameCounter = 0;
-            frameCounterStart = 0;
             frameCounterEnd = 0;
+            frameMax = 60 * 120;
+            huntersWaitTime = 600;
 
             // map
             xMap = 1500;
@@ -72,7 +76,7 @@ namespace NanoGames.Games.CatchMe
             // fixed circles
             double dMin = 10;
             double rMin = 10;
-            double rMax = 60;
+            double rMax = 80;
             while (fixedCircles.Count < 20)
             {
                 // get random circle
@@ -96,8 +100,15 @@ namespace NanoGames.Games.CatchMe
 
             // players
 
-            // prey
+            // prey and hunter
             prey = Players[(int)(Players.Count * Random.NextDouble())];
+            foreach (var player in Players)
+            {
+                if (player != prey)
+                {
+                    hunters.Add(player);
+                }
+            }
 
             // initialize each player
             for (int i = 0; i < Players.Count; i++)
@@ -116,12 +127,18 @@ namespace NanoGames.Games.CatchMe
                 // Booster
                 player.BoosterPower = 20;
 
+                //Addons
+                player.AddonJump = true;
+                player.Addon2 = false;
+                player.AddonPush = true;
+                player.AddonMarker = 0;
+
                 // position
                 Vector pos = new Vector(0, 0); 
                 bool notDone = true;
                 while (notDone)
                 {
-                    // get new positionof player
+                    // get new position of player
                     double x = (xMap - 3 * player.Radius) * Random.NextDouble() + 1.5 * player.Radius;
                     double y = (yMap - 3 * player.Radius) * Random.NextDouble() + 1.5 * player.Radius;
 
@@ -145,51 +162,7 @@ namespace NanoGames.Games.CatchMe
                 // mass and inertia
                 player.Mass = 1.0 / 27 * player.Radius * player.Radius * player.Radius;
                 player.Inertia = 1.0 / 9 * player.Radius * player.Radius;
-
-<<<<<<< HEAD
             }
-
-            // fixed circles
-            int ii = 0;
-            double dMin = 20;
-            double rMin = 10;
-            double rMax = 60;
-            while (ii < 10000 && fixedCircles.Count < 12)
-            {
-                // get random circle
-                double r = (rMax - rMin) * Random.NextDouble() + rMin;
-                double x = (xMax - 2 * (dMin + r)) * Random.NextDouble() + r + dMin;
-                double y = (yMax - 2 * (dMin + r)) * Random.NextDouble() + r + dMin;
-                Vector pos = new Vector(x, y);
-
-                // check if random circle is standing free
-                bool isOk = true;
-                foreach (FixedCircle fixedCircle in fixedCircles)
-                {
-                    if ((pos - fixedCircle.Position).Length < (r + fixedCircle.Radius + dMin))
-                    {
-                        isOk = false;
-                    }
-                }
-
-                // add random circle if standing free
-                if (isOk)
-                {
-                    fixedCircles.Add(new FixedCircle(pos, r));
-                }
-
-                ii++;
-            }
-
-            // fill map with random points
-            for (int i = 0; i < 250; i++)
-            {
-                mapRandomPoints.Add(randomPosition(new Vector(0, 0), new Vector(xMax, yMax)));                
-            }
- 
-=======
-            } 
->>>>>>> e1c05e283474421d71e0d0bd7ee287ba9e4af2b8
         }
         
         protected override void Update()
@@ -215,13 +188,13 @@ namespace NanoGames.Games.CatchMe
                         {
                             movePlayer(prey);
                         }
-
-                        if (frameCounterStart > 120)
+                        
+                        if (frameCounter > huntersWaitTime)
                         {
                             stateOfGame = "Game";
                         }
 
-                        frameCounterStart++;
+                        frameCounter++;
 
                         break;
                     }
@@ -247,21 +220,18 @@ namespace NanoGames.Games.CatchMe
                             }
 
                             // check for collsion with prey
-                            foreach (CatchMePlayer player in Players)
+                            foreach (CatchMePlayer player in hunters)
                             {
-                                if (player != prey)
-                                {
-                                    // get dist of player to prey
-                                    double dist = (prey.Position - player.Position).Length;
+                                // get dist of player to prey
+                                double dist = (prey.Position - player.Position).Length;
 
-                                    if (dist < 10)
-                                    {
-                                        // get postion of catch
-                                        CatchPosisition = (prey.Position + player.Position) / 2;
+                                if (dist < 10)
+                                {
+                                    // get postion of catch
+                                    CatchPosisition = (prey.Position + player.Position) / 2;
                                         
-                                        // end game
-                                        stateOfGame = "End";
-                                    }
+                                    // end game
+                                    stateOfGame = "End";
                                 }
                             }
 
@@ -400,12 +370,8 @@ namespace NanoGames.Games.CatchMe
             // player hits right border
             if (player.Position.X > (xMap - player.Radius))
             {
-<<<<<<< HEAD
-                force -= 1000 * (100 * Math.Atan(player.Position.X - (xMax - player.Radius)) / Math.PI + 0.5) * new Vector(1, 0);
                 force -= 20 * player.Velocity;
-=======
                 force -= 1000 * (100 * Math.Atan(player.Position.X - (xMap - player.Radius)) / Math.PI + 0.5) * new Vector(1, 0);
->>>>>>> e1c05e283474421d71e0d0bd7ee287ba9e4af2b8
                 torque -= 30 * player.Radius * player.Velocity.Y / Math.Abs(player.Velocity.Y);
             }
 
@@ -420,12 +386,8 @@ namespace NanoGames.Games.CatchMe
             // player hits bottom border
             if (player.Position.Y > (yMap - player.Radius))
             {
-<<<<<<< HEAD
-                force -= 1000 * (100 * Math.Atan(player.Position.Y - (yMax - player.Radius)) / Math.PI + 0.5) * new Vector(0, 1);
                 force -= 20 * player.Velocity;
-=======
                 force -= 1000 * (100 * Math.Atan(player.Position.Y - (yMap - player.Radius)) / Math.PI + 0.5) * new Vector(0, 1);
->>>>>>> e1c05e283474421d71e0d0bd7ee287ba9e4af2b8
                 torque += 30 * player.Radius * player.Velocity.X / Math.Abs(player.Velocity.X);
             }
 
@@ -475,6 +437,15 @@ namespace NanoGames.Games.CatchMe
         {
             // set public variables of player according to input
 
+            // marker for addon
+            if (player.Input.AltFire.WasActivated)
+            {
+                player.AddonMarker++;
+
+                if (player.AddonMarker > 2) { player.AddonMarker = 0; };
+            }
+
+            // set everything related to movement
             // reset all 
             player.InputMoveForward = false;
             player.InputMoveBackward = false;
@@ -494,6 +465,7 @@ namespace NanoGames.Games.CatchMe
                 player.BoosterLeft = 1;
             }
 
+            /*
             // player gets turbo if possible
             if (player.Input.AltFire.IsPressed && (player.TurboCount < player.TurboLength) && (player.TurboNotCount > player.TurboWait))
             {
@@ -517,6 +489,7 @@ namespace NanoGames.Games.CatchMe
                     player.TurboCount = 0;
                 }
             }
+            */
 
             // players moves right
             if (player.Input.Right.IsPressed && !player.Input.Left.IsPressed)
@@ -555,9 +528,70 @@ namespace NanoGames.Games.CatchMe
 
             var g = p.Output.Graphics;
             var boostCol = new Color(1, 0, 0);
+            string s;
+            Color colAddon;
+            Vector posAddon;
 
             // get shift            
             shift = new Vector(160, 100) - p.ScreenPosition;
+
+            // info
+            if (p == prey)
+            {
+                // instruction
+                s = "RUN FROM EVERYONE";
+                g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 2.5), s);
+
+                // countdown
+                s = ((frameMax - (frameCounter - huntersWaitTime)) / 60).ToString();
+                g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
+            }
+            else
+            {
+                // instruction
+                s = "CATCH " + prey.Name.ToUpper();
+                g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 2.5), s);
+
+                // countdown
+                if (frameCounter < huntersWaitTime)
+                {
+                    s = "WAIT " + ((huntersWaitTime - frameCounter) / 60).ToString(); ;
+                    g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
+                }
+                else
+                {
+                    s = ((frameMax - (frameCounter - huntersWaitTime)) / 60).ToString();
+                    g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
+                }
+
+            }
+
+            // draw addon info
+
+            // draw addon jump
+            if (p.AddonJump) { colAddon = red; }
+            else { colAddon = grey; }
+            posAddon = new Vector(320 - 19 - xMiniMap, 200 - 23 - yMiniMap);
+            g.Line(colAddon, posAddon, posAddon + new Vector(3, 0));
+            g.Line(colAddon, posAddon, posAddon + new Vector(1.5, -3));
+            g.Line(colAddon, posAddon + new Vector(3, 0), posAddon + new Vector(1.5, -3));
+
+            // draw addon 2
+            if (p.Addon2) { colAddon = blue; }
+            else { colAddon = grey; }
+            posAddon = new Vector(320 - 13 - xMiniMap, 200 - 26 - yMiniMap);
+            g.Rectangle(colAddon, posAddon, posAddon + new Vector(3, 3));
+            
+            // draw addon push
+            if (p.AddonPush) { colAddon = green; }
+            else { colAddon = grey; }
+            posAddon = new Vector(320 - 7 - xMiniMap, 200 - 24.5 - yMiniMap);
+            g.Circle(colAddon, posAddon, 1.5);
+
+            // draw addon marker
+            colAddon = grey;
+            posAddon = new Vector(320 - 20 - xMiniMap + p.AddonMarker * 6, 200 - 27 - yMiniMap);
+            g.Rectangle(colAddon, posAddon, posAddon + new Vector(5, 5));
 
             // draw each player
             foreach (var player in Players)
@@ -567,12 +601,14 @@ namespace NanoGames.Games.CatchMe
                 var dir = player.Heading;
                 var ortho = player.Heading.RotatedLeft;
                 var col = player.LocalColor;
-                
-                // Name
-                string name = player.Name.ToUpper();
-                Vector namePosition = player.Position + new Vector(-name.Length / 2 * 3, -18);
-                g.Print(col, 3, doShift(namePosition), name);
 
+                // Name
+                if (player != p)
+                {
+                    s = player.Name.ToUpper();
+                    g.Print(col, 3, doShift(player.Position + new Vector(-s.Length / 2 * 3, -18)), s);
+                }
+                
                 // body
                 g.Circle(col, doShift(pos), radius);
 
@@ -609,7 +645,7 @@ namespace NanoGames.Games.CatchMe
                         g.Circle(col, convertToMiniMap(pos), 0.5);
                     }
                 }
-
+                
                 // booster
                 var pos1 = pos + (radius + 1) * ortho + dir;
                 var pos2 = pos - (radius + 1) * ortho + dir;
@@ -815,14 +851,11 @@ namespace NanoGames.Games.CatchMe
         {
             preyIsSeen = false;
 
-            foreach (var player in Players)
+            foreach (var player in hunters)
             {
-                if (player != prey)
+                if (Math.Abs(prey.Position.X - player.ScreenPosition.X) < 160 && Math.Abs(prey.Position.Y - player.ScreenPosition.Y) < 100)
                 {
-                    if (Math.Abs(prey.Position.X - player.ScreenPosition.X) < 160 && Math.Abs(prey.Position.Y - player.ScreenPosition.Y) < 100)
-                    {
-                        preyIsSeen = true;
-                    }
+                    preyIsSeen = true;
                 }
             }
 
