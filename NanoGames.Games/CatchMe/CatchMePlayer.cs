@@ -38,5 +38,7 @@ namespace NanoGames.Games.CatchMe
         public bool AddonPush;
         public bool Addon2;
         public int AddonMarker;
+
+        public double IntegratedDistance;
     }
 }

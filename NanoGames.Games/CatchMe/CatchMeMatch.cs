@@ -21,6 +21,7 @@ namespace NanoGames.Games.CatchMe
         private List<CatchMePlayer> hunters = new List<CatchMePlayer> { };
         private Vector CatchPosisition;
         private List<Flake> flakes = new List<Flake> { };
+        private List<Ring> rings = new List<Ring> { };
         private List<FixedCircle> fixedCircles = new List<FixedCircle> { };
 
         private double xMap;
@@ -45,6 +46,10 @@ namespace NanoGames.Games.CatchMe
         private List<Vector> mapRandomPoints =  new List<Vector> {};
 
         private bool preyIsSeen;
+        private bool preyWasCatched = false;
+        private List<CatchMePlayer> sortedHunters;
+
+        private CompareHunterDistance chd = new CompareHunterDistance();
 
 
         protected override void Initialize()
@@ -128,9 +133,9 @@ namespace NanoGames.Games.CatchMe
                 player.BoosterPower = 20;
 
                 //Addons
-                player.AddonJump = true;
+                player.AddonJump = false;
                 player.Addon2 = false;
-                player.AddonPush = true;
+                player.AddonPush = false;
                 player.AddonMarker = 0;
 
                 // position
@@ -229,12 +234,20 @@ namespace NanoGames.Games.CatchMe
                                 {
                                     // get postion of catch
                                     CatchPosisition = (prey.Position + player.Position) / 2;
+
+                                    // prey was catched
+                                    preyWasCatched = true;
                                         
                                     // end game
                                     stateOfGame = "End";
                                 }
                             }
 
+                        }
+
+                        if (frameCounter > (frameMax - huntersWaitTime))
+                        {
+                            stateOfGame = "End";
                         }
 
                         break;
@@ -244,30 +257,63 @@ namespace NanoGames.Games.CatchMe
                 // show end animation
                 case "End":
                     {
-                        // make an explosion with flakes
+                        // do all the stuff which is only needed to do once in end
+                        if (frameCounterEnd == 0)
+                        {
+                            // sort hunters
+                            sortedHunters = hunters;
+                            sortedHunters.Sort(chd);
+
+                            // give points to players
+                            if (preyWasCatched)
+                            {
+                                prey.Score = 0;
+
+                                for (int i = 0; i < sortedHunters.Count; i++)
+                                {
+                                    sortedHunters[i].Score = 1000 - i;
+                                }
+                            }
+                            else
+                            {
+                                prey.Score = 2000;
+
+                                for (int i = 0; i < sortedHunters.Count; i++)
+                                {
+                                    sortedHunters[i].Score = 1000 - i;
+                                }
+                            }
+
+                        }
+
+                        // make an explosion with rings
                         Vector pos = CatchPosisition;
                         Color col = new Color(1, 1, 1);
-                        double alpha;
-                        double delta;
-                        double fade;
-                        Vector direction;
-
-                        for (int j = 0; j < 100; j++)
+                        
+                        if ((frameCounterEnd % 60) == 0)
                         {
-                            alpha = 2 * Math.PI * Random.NextDouble();
-                            delta = 5 * Random.NextDouble();
-                            fade = Math.Pow(0.99, frameCounterEnd + 1);
-                            direction.X = Math.Cos(alpha);
-                            direction.Y = Math.Sin(alpha);
-                            flakes.Add(new Flake(pos + delta * direction, direction * 50, col * fade));
+                            rings.Add(new Ring(pos, blue));
+                        }
+
+                        // show order of hunters
+                        for (int i = 0; i < sortedHunters.Count; i++)
+                        {
+                            string s = i + ". " + sortedHunters[i].Name;
+                            Output.Graphics.Print(white, 4, new Vector(230, 100 + i * 5), s);
+
+                            if (preyWasCatched)
+                            {
+                                Output.Graphics.Print(white, 5, new Vector(230, 94), "PREY WAS CATCHED");
+                            }
+                            else
+                            {
+                                Output.Graphics.Print(white, 5, new Vector(230, 94), "PREY HAS WON");
+                            }
                         }
 
                         // end game if x seconds passed
-                        if (frameCounterEnd > 300)
+                        if (frameCounterEnd > 600)
                         {
-                            // set points for players
-
-
                             IsCompleted = true;
                         }
                         
@@ -277,11 +323,12 @@ namespace NanoGames.Games.CatchMe
                     }
             }
 
-            // update Screen position
+            // update stuff
             updateScreenPosition();
-
-            // check if prey is seen by anyone
             updatePreyIsSeen();
+            updateIntegratedDistance();
+            updateFlakes();
+            updateRings();
 
             // draw screen
             foreach (CatchMePlayer player in Players)
@@ -585,7 +632,7 @@ namespace NanoGames.Games.CatchMe
             // draw addon push
             if (p.AddonPush) { colAddon = green; }
             else { colAddon = grey; }
-            posAddon = new Vector(320 - 7 - xMiniMap, 200 - 24.5 - yMiniMap);
+            posAddon = new Vector(320 - 5.5 - xMiniMap, 200 - 24.5 - yMiniMap);
             g.Circle(colAddon, posAddon, 1.5);
 
             // draw addon marker
@@ -716,30 +763,12 @@ namespace NanoGames.Games.CatchMe
                 g.Point(flake.Color, doShift(flake.Position));
             }
 
-            // move flakes, set time and fade out
-            foreach (Flake flake in flakes)
+            // draw all rings
+            foreach (Ring ring in rings)
             {
-                // velocity and postition
-                flake.Position = flake.Position + flake.Velocity * dT - 0.5 * 0.001 * viscosity * flake.Velocity.Normalized * dT * dT;
-                flake.Velocity = flake.Velocity + 0.001 * viscosity * flake.Velocity.Normalized * dT;
-
-                // fade
-                flake.Color = flake.Color * 0.85;
-
-                // time
-                flake.Time++;
+                g.Circle(ring.Color, doShift(ring.Position), ring.Time * 0.7);
+                g.Circle(ring.Color, convertToMiniMap(ring.Position), convertToMiniMap(ring.Time * 0.7));
             }
-
-            // remove old flakes
-            List<Flake> tmp = new List<Flake> { };
-            for (int i = 0; i < flakes.Count; i++)
-            {
-                if (flakes[i].Time < 20)
-                {
-                    tmp.Add(flakes[i]);
-                }
-            }
-            flakes = tmp;
 
             // draw border of map
             g.Rectangle(white, doShift(new Vector(0, 0)), doShift(new Vector(xMap, yMap)));
@@ -859,6 +888,63 @@ namespace NanoGames.Games.CatchMe
                 }
             }
 
+        }
+
+        private void updateIntegratedDistance()
+        {
+            foreach (CatchMePlayer hunter in hunters)
+            {
+                double dist = (hunter.Position - prey.Position).Length;
+                hunter.IntegratedDistance += dist;
+            }
+        }
+
+        private void updateFlakes()
+        {
+            // move flakes, set time and fade out
+            foreach (Flake flake in flakes)
+            {
+                // velocity and postition
+                flake.Position = flake.Position + flake.Velocity * dT - 0.5 * 0.001 * viscosity * flake.Velocity.Normalized * dT * dT;
+                flake.Velocity = flake.Velocity + 0.001 * viscosity * flake.Velocity.Normalized * dT;
+
+                // fade
+                flake.Color = flake.Color * 0.85;
+
+                // time
+                flake.Time++;
+            }
+
+            // remove old flakes
+            List<Flake> tmpFlake = new List<Flake> { };
+            for (int i = 0; i < flakes.Count; i++)
+            {
+                if (flakes[i].Time < 20)
+                {
+                    tmpFlake.Add(flakes[i]);
+                }
+            }
+
+            flakes = tmpFlake;
+        }
+
+        private void updateRings()
+        {
+            // set time and fade out 
+            foreach (Ring ring in rings)
+            {
+                // fade
+                ring.Color = ring.Color * 0.995;
+
+                // time
+                ring.Time++;
+            }
+
+            // remove old flakes
+            if (rings.Count > 10)
+            {
+                rings.RemoveAt(0);
+            }
         }
 
     }
