@@ -193,7 +193,11 @@ namespace NanoGames.Games.CatchMe
                         {
                             movePlayer(prey);
                         }
-                        
+
+                        // add flakes to every booster of every player
+                        addFlakes();
+                        updateFlakes();
+
                         if (frameCounter > huntersWaitTime)
                         {
                             stateOfGame = "Game";
@@ -230,7 +234,7 @@ namespace NanoGames.Games.CatchMe
                                 // get dist of player to prey
                                 double dist = (prey.Position - player.Position).Length;
 
-                                if (dist < 10)
+                                if (dist < 6)
                                 {
                                     // get postion of catch
                                     CatchPosisition = (prey.Position + player.Position) / 2;
@@ -244,6 +248,10 @@ namespace NanoGames.Games.CatchMe
                             }
 
                         }
+
+                        // add flakes to every booster of every player
+                        addFlakes();
+                        updateFlakes();
 
                         if (frameCounter > (frameMax - huntersWaitTime))
                         {
@@ -260,6 +268,7 @@ namespace NanoGames.Games.CatchMe
                         // do all the stuff which is only needed to do once in end
                         if (frameCounterEnd == 0)
                         {
+
                             // sort hunters
                             sortedHunters = hunters;
                             sortedHunters.Sort(chd);
@@ -298,16 +307,16 @@ namespace NanoGames.Games.CatchMe
                         // show order of hunters
                         for (int i = 0; i < sortedHunters.Count; i++)
                         {
-                            string s = i + ". " + sortedHunters[i].Name;
-                            Output.Graphics.Print(white, 4, new Vector(230, 100 + i * 5), s);
+                            string s = (i+1) + ". " + sortedHunters[i].Name;
+                            Output.Graphics.Print(white, 4, new Vector(210, 100 + i * 5), s);
 
                             if (preyWasCatched)
                             {
-                                Output.Graphics.Print(white, 5, new Vector(230, 94), "PREY WAS CATCHED");
+                                Output.Graphics.Print(white, 5, new Vector(210, 94), "RABBIT WAS CATCHED");
                             }
                             else
                             {
-                                Output.Graphics.Print(white, 5, new Vector(230, 94), "PREY HAS WON");
+                                Output.Graphics.Print(white, 5, new Vector(210, 94), "RABBIT HAS WON");
                             }
                         }
 
@@ -327,7 +336,6 @@ namespace NanoGames.Games.CatchMe
             updateScreenPosition();
             updatePreyIsSeen();
             updateIntegratedDistance();
-            updateFlakes();
             updateRings();
 
             // draw screen
@@ -586,7 +594,7 @@ namespace NanoGames.Games.CatchMe
             if (p == prey)
             {
                 // instruction
-                s = "RUN FROM EVERYONE";
+                s = "YOU ARE THE RABBIT - RUN FROM EVERYONE";
                 g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 2.5), s);
 
                 // countdown
@@ -596,13 +604,13 @@ namespace NanoGames.Games.CatchMe
             else
             {
                 // instruction
-                s = "CATCH " + prey.Name.ToUpper();
+                s = "YOU ARE A FOX - CATCH THE RABBIT " + prey.Name.ToUpper();
                 g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 2.5), s);
 
                 // countdown
                 if (frameCounter < huntersWaitTime)
                 {
-                    s = "WAIT " + ((huntersWaitTime - frameCounter) / 60).ToString(); ;
+                    s = "WAIT, ONLY RABBIT CAN MOVE NOW " + ((huntersWaitTime - frameCounter) / 60).ToString(); ;
                     g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
                 }
                 else
@@ -655,7 +663,7 @@ namespace NanoGames.Games.CatchMe
                     s = player.Name.ToUpper();
                     g.Print(col, 3, doShift(player.Position + new Vector(-s.Length / 2 * 3, -18)), s);
                 }
-                
+
                 // body
                 g.Circle(col, doShift(pos), radius);
 
@@ -692,11 +700,11 @@ namespace NanoGames.Games.CatchMe
                         g.Circle(col, convertToMiniMap(pos), 0.5);
                     }
                 }
-                
+
                 // booster
                 var pos1 = pos + (radius + 1) * ortho + dir;
                 var pos2 = pos - (radius + 1) * ortho + dir;
-                
+
                 g.Line(col, doShift(pos1), doShift(pos1 - 3 * dir));
                 g.Line(col, doShift(pos1) + ortho, doShift(pos1 + ortho - 3 * dir));
                 g.Line(col, doShift(pos1), doShift(pos1 + ortho));
@@ -706,53 +714,7 @@ namespace NanoGames.Games.CatchMe
                 g.Line(col, doShift(pos2 - ortho), doShift(pos2 - ortho - 3 * dir));
                 g.Line(col, doShift(pos2), doShift(pos2 - ortho));
                 g.Line(col, doShift(pos2 - 3 * dir), doShift(pos2 - ortho - 3 * dir));
-                
-                // add flakes
-                double alpha;
-                double delta;
-                Vector direction;
 
-                if (!player.InputTurbo)
-                {
-                    for (int i = 0; i < 5; i++)
-                    {   
-                        // booster right
-                        alpha = Math.PI / 4 * Random.NextDouble() - Math.PI / 8;
-                        delta = 100 * dT * Random.NextDouble();
-                        direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
-                        direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
-                        flakes.Add(new Flake(pos1 - (3 + delta) * dir + 0.5 * ortho, -direction * 100 * player.BoosterRight, col));
-
-                        // booster left
-                        alpha = Math.PI / 4 * Random.NextDouble() - Math.PI / 8;
-                        delta = 100 * dT * Random.NextDouble();
-                        direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
-                        direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
-                        flakes.Add(new Flake(pos2 - (3 + delta) * dir - 0.5 * ortho, -direction * 100 * player.BoosterLeft, col));
-                    }
-
-                        
-                }
-                else
-                {
-                    for (int i = 0; i < 10; i++)
-                    { 
-                        // booster right
-                        alpha = Math.PI / 3 * Random.NextDouble() - Math.PI / 6;
-                        delta = 100 * 2 * dT * Random.NextDouble();
-                        direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
-                        direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
-                        flakes.Add(new Flake(pos1 - (3 + delta) * dir + 0.5 * ortho, -direction * 100 * player.BoosterRight * 2, boostCol));
-
-                        // booster left
-                        alpha = Math.PI / 3 * Random.NextDouble() - Math.PI / 6;
-                        delta = 100 * 2 * dT * Random.NextDouble();
-                        direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
-                        direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
-                        flakes.Add(new Flake(pos2 - (3 + delta) * dir - 0.5 * ortho, -direction * 100 * player.BoosterLeft * 2, boostCol));
-                    }
-                       
-                }
             }
 
             // draw output from boosters
@@ -899,33 +861,73 @@ namespace NanoGames.Games.CatchMe
             }
         }
 
-        private void updateFlakes()
+        private void addFlakes()
         {
-            // move flakes, set time and fade out
-            foreach (Flake flake in flakes)
+            foreach (CatchMePlayer player in Players)
             {
-                // velocity and postition
-                flake.Position = flake.Position + flake.Velocity * dT - 0.5 * 0.001 * viscosity * flake.Velocity.Normalized * dT * dT;
-                flake.Velocity = flake.Velocity + 0.001 * viscosity * flake.Velocity.Normalized * dT;
+                // add flakes
+                double alpha;
+                double delta;
+                Vector direction;
 
-                // fade
-                flake.Color = flake.Color * 0.85;
+                var pos = player.Position;
+                var radius = player.Radius;
+                var dir = player.Heading;
+                var ortho = player.Heading.RotatedLeft;
+                var col = player.LocalColor;
 
-                // time
-                flake.Time++;
-            }
+                var pos1 = pos + (radius + 1) * ortho + dir;
+                var pos2 = pos - (radius + 1) * ortho + dir;
 
-            // remove old flakes
-            List<Flake> tmpFlake = new List<Flake> { };
-            for (int i = 0; i < flakes.Count; i++)
-            {
-                if (flakes[i].Time < 20)
+                for (int i = 0; i < 5; i++)
                 {
-                    tmpFlake.Add(flakes[i]);
+                    // booster right
+                    alpha = Math.PI / 4 * Random.NextDouble() - Math.PI / 8;
+                    delta = 100 * dT * Random.NextDouble();
+                    direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
+                    direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
+                    flakes.Add(new Flake(pos1 - (3 + delta) * dir + 0.5 * ortho, -direction * 100 * player.BoosterRight, col));
+
+                    // booster left
+                    alpha = Math.PI / 4 * Random.NextDouble() - Math.PI / 8;
+                    delta = 100 * dT * Random.NextDouble();
+                    direction.X = Math.Cos(alpha) * dir.X + Math.Sin(alpha) * dir.Y;
+                    direction.Y = +Math.Sin(alpha) * dir.X + Math.Cos(alpha) * dir.Y;
+                    flakes.Add(new Flake(pos2 - (3 + delta) * dir - 0.5 * ortho, -direction * 100 * player.BoosterLeft, col));
                 }
             }
+        }
 
-            flakes = tmpFlake;
+        private void updateFlakes()
+        {
+            if (stateOfGame != "End")
+            {
+                // move flakes, set time and fade out
+                foreach (Flake flake in flakes)
+                {
+                    // velocity and postition
+                    flake.Position = flake.Position + flake.Velocity * dT - 0.5 * 0.001 * viscosity * flake.Velocity.Normalized * dT * dT;
+                    flake.Velocity = flake.Velocity + 0.001 * viscosity * flake.Velocity.Normalized * dT;
+
+                    // fade
+                    flake.Color = flake.Color * 0.85;
+
+                    // time
+                    flake.Time++;
+                }
+
+                // remove old flakes
+                List<Flake> tmpFlake = new List<Flake> { };
+                for (int i = 0; i < flakes.Count; i++)
+                {
+                    if (flakes[i].Time < 20)
+                    {
+                        tmpFlake.Add(flakes[i]);
+                    }
+                }
+
+                flakes = tmpFlake;
+            }
         }
 
         private void updateRings()
