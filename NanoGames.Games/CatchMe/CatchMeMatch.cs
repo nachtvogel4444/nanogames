@@ -47,7 +47,12 @@ namespace NanoGames.Games.CatchMe
 
         private bool preyIsSeen;
         private bool preyWasCatched = false;
+        private Vector preyPosForHunters;
+        private Color preyColForHunters;
         private List<CatchMePlayer> sortedHunters;
+        private CatchMePlayer catcher;
+
+        FrameCounter tenSeconds = new FrameCounter(10);
 
         private CompareHunterDistance chd = new CompareHunterDistance();
 
@@ -60,12 +65,14 @@ namespace NanoGames.Games.CatchMe
             stateOfGame = "Start";
             frameCounter = 0;
             frameCounterEnd = 0;
-            frameMax = 60 * 120;
+            frameMax = 60 * 60 * 2;
             huntersWaitTime = 600;
 
             // map
-            xMap = 1500;
-            yMap = 600;
+            double aspectRatio = 2.5;
+            double areaPerPlayer = 320 * 200;
+            xMap = Math.Sqrt(aspectRatio * areaPerPlayer * Players.Count);
+            yMap = Math.Sqrt(1 / aspectRatio * areaPerPlayer * Players.Count);
             xMiniMap = 50;
             yMiniMap = 50 * yMap / xMap;
             
@@ -80,9 +87,10 @@ namespace NanoGames.Games.CatchMe
 
             // fixed circles
             double dMin = 10;
-            double rMin = 10;
-            double rMax = 80;
-            while (fixedCircles.Count < 20)
+            double rMin = 8;
+            double rMax = 60;
+            double numberOfCircles = 0.02 * Math.Sqrt(areaPerPlayer * Players.Count);
+            while (fixedCircles.Count <  numberOfCircles)
             {
                 // get random circle
                 double r = (rMax - rMin) * Random.NextDouble() + rMin;
@@ -168,6 +176,10 @@ namespace NanoGames.Games.CatchMe
                 player.Mass = 1.0 / 27 * player.Radius * player.Radius * player.Radius;
                 player.Inertia = 1.0 / 9 * player.Radius * player.Radius;
             }
+
+            // prey stuff            
+            preyPosForHunters = prey.Position;
+            preyColForHunters = prey.Color;
         }
         
         protected override void Update()
@@ -241,6 +253,7 @@ namespace NanoGames.Games.CatchMe
 
                                     // prey was catched
                                     preyWasCatched = true;
+                                    catcher = player;
                                         
                                     // end game
                                     stateOfGame = "End";
@@ -253,10 +266,25 @@ namespace NanoGames.Games.CatchMe
                         addFlakes();
                         updateFlakes();
 
-                        if (frameCounter > (frameMax - huntersWaitTime))
+                        // update Preyposition and color for hunters every 10 sec
+                        if (preyIsSeen || tenSeconds.Tock())
+                        {
+                            preyPosForHunters = prey.Position;
+                            preyColForHunters = prey.Color;
+                        }
+                        else
+                        {
+                            preyColForHunters = prey.Color * (1 - tenSeconds.RatioExpGrowth());
+                        }
+
+                        if ((frameCounter - huntersWaitTime) > frameMax)
                         {
                             stateOfGame = "End";
+                            CatchPosisition = prey.Position;
                         }
+
+                        // update Counters
+                        tenSeconds.Tick();
 
                         break;
                     }
@@ -276,15 +304,20 @@ namespace NanoGames.Games.CatchMe
                             // give points to players
                             if (preyWasCatched)
                             {
-                                prey.Score = 0;
-
                                 for (int i = 0; i < sortedHunters.Count; i++)
                                 {
                                     sortedHunters[i].Score = 1000 - i;
                                 }
+
+                                // player who catches prey is always first
+                                catcher.Score = 2000;
+
+                                // prey is always last if catched
+                                prey.Score = 0;
                             }
                             else
                             {
+                                // prey is always first if it survived
                                 prey.Score = 2000;
 
                                 for (int i = 0; i < sortedHunters.Count; i++)
@@ -577,54 +610,87 @@ namespace NanoGames.Games.CatchMe
             }
         }
 
-        private void drawScreenPlayer(CatchMePlayer p)
+        private void drawScreenPlayer(CatchMePlayer player)
         {
             // draw the screen on the monitor of the player
 
-            var g = p.Output.Graphics;
+            var g = player.Output.Graphics;
             var boostCol = new Color(1, 0, 0);
             string s;
             Color colAddon;
             Vector posAddon;
 
             // get shift            
-            shift = new Vector(160, 100) - p.ScreenPosition;
+            shift = new Vector(160, 100) - player.ScreenPosition;
 
             // info
-            if (p == prey)
+            if (player == prey)
             {
-                // instruction
+                // generall instruction
                 s = "YOU ARE THE RABBIT - RUN FROM EVERYONE";
                 g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 2.5), s);
 
-                // countdown
-                s = ((frameMax - (frameCounter - huntersWaitTime)) / 60).ToString();
-                g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
+                // info
+                if (stateOfGame == "Start")
+                {
+                    s = "ONLY YOU CAN MOVE, RUN " + ((huntersWaitTime - frameCounter) / 60).ToString(); ;
+                    g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
+                }
+                if (stateOfGame == "Game")
+                {
+                    s = "TIME TO SURVIVE: " + ((frameMax - (frameCounter - huntersWaitTime)) / 60).ToString();
+                    g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
+                }
+                if (stateOfGame == "End")
+                {
+                    if (preyWasCatched)
+                    {
+                        s = "YOU LOST, YOU WERE CATCHED BY " + catcher.Name.ToUpper();
+                        g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
+                    }
+                    else
+                    {
+                        s = "YOU WON, NOBODY WAS FAST ENOUGH";
+                        g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
+                    }
+                }
             }
             else
             {
-                // instruction
+                // generall instruction
                 s = "YOU ARE A FOX - CATCH THE RABBIT " + prey.Name.ToUpper();
                 g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 2.5), s);
 
-                // countdown
-                if (frameCounter < huntersWaitTime)
+                // info
+                if (stateOfGame == "Start")
                 {
-                    s = "WAIT, ONLY RABBIT CAN MOVE NOW " + ((huntersWaitTime - frameCounter) / 60).ToString(); ;
+                    s = "BUT WAIT, ONLY RABBIT CAN MOVE NOW " + ((huntersWaitTime - frameCounter) / 60).ToString(); ;
                     g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
                 }
-                else
+                if (stateOfGame == "Game")
                 {
-                    s = ((frameMax - (frameCounter - huntersWaitTime)) / 60).ToString();
+                    s = "GO GO GO, TIME LEFT: " + ((frameMax - (frameCounter - huntersWaitTime)) / 60).ToString();
                     g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
                 }
-
+                if (stateOfGame == "End")
+                {
+                    if (preyWasCatched)
+                    {
+                        s = "YOU WON, RABBIT WAS CATCHED BY " + catcher.Name.ToUpper();
+                        g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
+                    }
+                    else
+                    {
+                        s = "YOU LOST, RABBIT ESCAPED ";
+                        g.Print(blue, 5, new Vector(160 - 2.5 * s.Length, 12.5), s);
+                    }
+                }
             }
 
             // draw addon info
 
             // draw addon jump
-            if (p.AddonJump) { colAddon = red; }
+            if (player.AddonJump) { colAddon = red; }
             else { colAddon = grey; }
             posAddon = new Vector(320 - 19 - xMiniMap, 200 - 23 - yMiniMap);
             g.Line(colAddon, posAddon, posAddon + new Vector(3, 0));
@@ -632,70 +698,71 @@ namespace NanoGames.Games.CatchMe
             g.Line(colAddon, posAddon + new Vector(3, 0), posAddon + new Vector(1.5, -3));
 
             // draw addon 2
-            if (p.Addon2) { colAddon = blue; }
+            if (player.Addon2) { colAddon = blue; }
             else { colAddon = grey; }
             posAddon = new Vector(320 - 13 - xMiniMap, 200 - 26 - yMiniMap);
             g.Rectangle(colAddon, posAddon, posAddon + new Vector(3, 3));
             
             // draw addon push
-            if (p.AddonPush) { colAddon = green; }
+            if (player.AddonPush) { colAddon = green; }
             else { colAddon = grey; }
             posAddon = new Vector(320 - 5.5 - xMiniMap, 200 - 24.5 - yMiniMap);
             g.Circle(colAddon, posAddon, 1.5);
 
             // draw addon marker
             colAddon = grey;
-            posAddon = new Vector(320 - 20 - xMiniMap + p.AddonMarker * 6, 200 - 27 - yMiniMap);
+            posAddon = new Vector(320 - 20 - xMiniMap + player.AddonMarker * 6, 200 - 27 - yMiniMap);
             g.Rectangle(colAddon, posAddon, posAddon + new Vector(5, 5));
 
             // draw each player
-            foreach (var player in Players)
+            foreach (var otherPlayer in Players)
             {
-                var pos = player.Position;
-                var radius = player.Radius;
-                var dir = player.Heading;
-                var ortho = player.Heading.RotatedLeft;
-                var col = player.LocalColor;
+                var pos = otherPlayer.Position;
+                var radius = otherPlayer.Radius;
+                var dir = otherPlayer.Heading;
+                var ortho = otherPlayer.Heading.RotatedLeft;
+                var col = otherPlayer.LocalColor;
 
                 // Name
-                if (player != p)
+                if (otherPlayer != player)
                 {
-                    s = player.Name.ToUpper();
-                    g.Print(col, 3, doShift(player.Position + new Vector(-s.Length / 2 * 3, -18)), s);
+                    s = otherPlayer.Name.ToUpper();
+                    g.Print(col, 3, doShift(otherPlayer.Position + new Vector(-s.Length / 2 * 3, -18)), s);
                 }
 
                 // body
                 g.Circle(col, doShift(pos), radius);
 
                 // point in minimap
-                if (player != prey)
+                if (otherPlayer != prey)
                 {
                     g.Circle(col, convertToMiniMap(pos), 0.5);
                 }
 
                 // add lines if player is prey
-                if (player == prey)
+                if (otherPlayer == prey)
                 {
                     // drawScreenPlayer on map
-                    g.Line(col, doShift(player.Position + new Vector(0, 3 * player.Radius)), doShift(player.Position + new Vector(0, 5 * player.Radius)));
-                    g.Line(col, doShift(player.Position - new Vector(0, 3 * player.Radius)), doShift(player.Position - new Vector(0, 5 * player.Radius)));
-                    g.Line(col, doShift(player.Position + new Vector(3 * player.Radius, 0)), doShift(player.Position + new Vector(5 * player.Radius, 0)));
-                    g.Line(col, doShift(player.Position - new Vector(3 * player.Radius, 0)), doShift(player.Position - new Vector(5 * player.Radius, 0)));
+                    g.Line(col, doShift(pos + new Vector(0, 3 * radius)), doShift(pos + new Vector(0, 5 * radius)));
+                    g.Line(col, doShift(pos - new Vector(0, 3 * radius)), doShift(pos - new Vector(0, 5 * radius)));
+                    g.Line(col, doShift(pos + new Vector(3 * radius, 0)), doShift(pos + new Vector(5 * radius, 0)));
+                    g.Line(col, doShift(pos - new Vector(3 * radius, 0)), doShift(pos - new Vector(5 * radius, 0)));
                     g.Circle(col, doShift(pos), 0.7 * radius);
                     g.Circle(col, doShift(pos), 0.4 * radius);
 
-                    // draw on minimap
-                    if (preyIsSeen && (p != prey))
+                    // draw prey on for hunters minimap
+                    if (player != prey)
                     {
-                        g.Line(col, convertToMiniMap(player.Position) + new Vector(0, 1), convertToMiniMap(player.Position) + new Vector(0, 2.5));
-                        g.Line(col, convertToMiniMap(player.Position) - new Vector(0, 1), convertToMiniMap(player.Position) - new Vector(0, 2.5));
-                        g.Line(col, convertToMiniMap(player.Position) + new Vector(1, 0), convertToMiniMap(player.Position) + new Vector(2.5, 0));
-                        g.Line(col, convertToMiniMap(player.Position) - new Vector(1, 0), convertToMiniMap(player.Position) - new Vector(2.5, 0));
+                        g.Line(preyColForHunters, convertToMiniMap(preyPosForHunters) + new Vector(0, 1), convertToMiniMap(preyPosForHunters) + new Vector(0, 2.5));
+                        g.Line(preyColForHunters, convertToMiniMap(preyPosForHunters) - new Vector(0, 1), convertToMiniMap(preyPosForHunters) - new Vector(0, 2.5));
+                        g.Line(preyColForHunters, convertToMiniMap(preyPosForHunters) + new Vector(1, 0), convertToMiniMap(preyPosForHunters) + new Vector(2.5, 0));
+                        g.Line(preyColForHunters, convertToMiniMap(preyPosForHunters) - new Vector(1, 0), convertToMiniMap(preyPosForHunters) - new Vector(2.5, 0));
 
-                        g.Circle(col, convertToMiniMap(pos), 0.5);
+                        g.Circle(preyColForHunters, convertToMiniMap(preyPosForHunters), 0.5);
                     }
 
-                    if (p == prey)
+                    // draw prey on minimap for prey
+                    if (player == prey)
                     {
                         g.Circle(col, convertToMiniMap(pos), 0.5);
                     }

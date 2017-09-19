@@ -7,7 +7,6 @@ namespace NanoGames.Games.CatchMe
     internal class Ring
     {
         public Vector Position;
-        public Vector Velocity;
         public Color Color;
 
         public double Time;
