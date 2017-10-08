@@ -118,6 +118,7 @@ namespace NanoGames
             double angle = endAngle - startAngle;
 
             int steps = Math.Max(8, (int)Math.Ceiling(Math.Abs(radius) * 2 * Math.PI));
+            steps = Math.Min(steps, 50);
             for (int i = 0; i < steps; ++i)
             {
                 var angleA = startAngle + i * angle / steps;
