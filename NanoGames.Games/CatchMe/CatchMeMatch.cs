@@ -65,12 +65,12 @@ namespace NanoGames.Games.CatchMe
             stateOfGame = "Start";
             frameCounter = 0;
             frameCounterEnd = 0;
-            frameMax = 60 * 60 * 2;
-            huntersWaitTime = 600;
+            frameMax = 5 * 60 * 2;
+            huntersWaitTime = 300;
 
             // map
             double aspectRatio = 2.5;
-            double areaPerPlayer = 320 * 200;
+            double areaPerPlayer = 2 * 320 * 200;
             xMap = Math.Sqrt(aspectRatio * areaPerPlayer * Players.Count);
             yMap = Math.Sqrt(1 / aspectRatio * areaPerPlayer * Players.Count);
             xMiniMap = 50;
@@ -106,9 +106,23 @@ namespace NanoGames.Games.CatchMe
             }
 
             // fill map with random points
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < (0.01 * areaPerPlayer * Players.Count); i++)
             {
-                mapRandomPoints.Add(randomPosition(new Vector(0, 0), new Vector(xMap, yMap)));
+                Vector pos = randomPosition(new Vector(0, 0), new Vector(xMap, yMap));
+
+                bool isInCircle = false;
+                foreach (FixedCircle fixedCircle in fixedCircles)
+                {
+                    if (fixedCircle.Radius >= (fixedCircle.Position - pos).Length)
+                    {
+                        isInCircle = true;
+                    }
+                }
+
+                if (!isInCircle)
+                {
+                    mapRandomPoints.Add(pos);
+                }
             }
 
             // players
@@ -214,8 +228,6 @@ namespace NanoGames.Games.CatchMe
                         {
                             stateOfGame = "Game";
                         }
-
-                        frameCounter++;
 
                         break;
                     }
@@ -622,6 +634,15 @@ namespace NanoGames.Games.CatchMe
 
             // get shift            
             shift = new Vector(160, 100) - player.ScreenPosition;
+
+            if (stateOfGame == "End" && player != prey)
+            {
+                Vector shiftToGo = new Vector(160, 100) - prey.ScreenPosition;
+                Vector dir = (shiftToGo - shift).Normalized;
+                double dist = (shiftToGo - shift).Length;
+
+                shift = shift + (1 - Math.Exp(-10.0 * frameCounterEnd / 600)) * (shiftToGo - shift);
+            }
 
             // info
             if (player == prey)
