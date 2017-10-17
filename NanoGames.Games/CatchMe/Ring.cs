@@ -17,6 +17,13 @@ namespace NanoGames.Games.CatchMe
             Time = 0;
             Color = col;
         }
-        
+
+        public Ring(Vector pos, Color col, int time)
+        {
+            Position = pos;
+            Time = time;
+            Color = col;
+        }
+
     }
 }

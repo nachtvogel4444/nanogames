@@ -11,9 +11,9 @@ namespace NanoGames.Games.CatchMe
         private int internalCounter = 0;
         private int maxCount;
 
-        public FrameCounter(int mc)
+        public FrameCounter(double mc)
         {
-            maxCount = mc * 60;
+            maxCount = (int)(mc * 60);
         }
 
         public void Tick()

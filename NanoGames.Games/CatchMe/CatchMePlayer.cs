@@ -1,6 +1,8 @@
 ﻿// Copyright (c) the authors of nanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
+using System;
+using System.Collections.Generic;
 
 namespace NanoGames.Games.CatchMe
 {
@@ -26,6 +28,9 @@ namespace NanoGames.Games.CatchMe
         public bool InputCircleLeft;
         public bool InputCircleRight;
         public bool InputTurbo;
+        public bool InputBlast;
+
+        public int NumberOfBlast;
 
         public double TurboCount;
         public double TurboNotCount;
@@ -40,5 +45,7 @@ namespace NanoGames.Games.CatchMe
         public int AddonMarker;
 
         public double IntegratedDistance;
+
+        public List<Vector> LastPositions = new List<Vector> { };
     }
 }

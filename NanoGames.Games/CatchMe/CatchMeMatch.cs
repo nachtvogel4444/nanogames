@@ -21,7 +21,8 @@ namespace NanoGames.Games.CatchMe
         private List<CatchMePlayer> hunters = new List<CatchMePlayer> { };
         private Vector CatchPosisition;
         private List<Flake> flakes = new List<Flake> { };
-        private List<Ring> rings = new List<Ring> { };
+        private List<Ring> ringsEnd = new List<Ring> { };
+        private List<Ring> ringsBlast = new List<Ring> { };
         private List<FixedCircle> fixedCircles = new List<FixedCircle> { };
 
         private double xMap;
@@ -48,11 +49,15 @@ namespace NanoGames.Games.CatchMe
         private bool preyIsSeen;
         private bool preyWasCatched = false;
         private Vector preyPosForHunters;
+        private List<Vector> preyLastPosForHunters = new List<Vector> { };
         private Color preyColForHunters;
         private List<CatchMePlayer> sortedHunters;
         private CatchMePlayer catcher;
 
         FrameCounter tenSeconds = new FrameCounter(10);
+        FrameCounter halfSecond = new FrameCounter(0.4);
+
+        private double minDist = double.MaxValue;
 
         private CompareHunterDistance chd = new CompareHunterDistance();
 
@@ -65,7 +70,7 @@ namespace NanoGames.Games.CatchMe
             stateOfGame = "Start";
             frameCounter = 0;
             frameCounterEnd = 0;
-            frameMax = 5 * 60 * 2;
+            frameMax = 60 * 60 * 2;
             huntersWaitTime = 300;
 
             // map
@@ -106,7 +111,7 @@ namespace NanoGames.Games.CatchMe
             }
 
             // fill map with random points
-            for (int i = 0; i < (0.01 * areaPerPlayer * Players.Count); i++)
+            for (int i = 0; i < (0.001 * areaPerPlayer * Players.Count); i++)
             {
                 Vector pos = randomPosition(new Vector(0, 0), new Vector(xMap, yMap));
 
@@ -181,6 +186,13 @@ namespace NanoGames.Games.CatchMe
                 player.Position = pos;
                 // player.Position = new Vector(160, 100);
 
+                // Last postion
+                for (int j = 0; j < 30; j++)
+                {
+                    player.LastPositions.Add(pos);
+                    preyLastPosForHunters.Add(prey.Position);
+                }
+
                 // phi, heading
                 player.Phi = 2 * Math.PI * Random.NextDouble();
                 player.Heading.X = Math.Cos(player.Phi);
@@ -194,6 +206,7 @@ namespace NanoGames.Games.CatchMe
             // prey stuff            
             preyPosForHunters = prey.Position;
             preyColForHunters = prey.Color;
+            prey.NumberOfBlast = Players.Count / 2;
         }
         
         protected override void Update()
@@ -223,6 +236,13 @@ namespace NanoGames.Games.CatchMe
                         // add flakes to every booster of every player
                         addFlakes();
                         updateFlakes();
+
+                        // update last postion
+                        if (halfSecond.Tock())
+                        {
+                            prey.LastPositions.Add(prey.Position);
+                            prey.LastPositions.RemoveAt(0);
+                        }
 
                         if (frameCounter > huntersWaitTime)
                         {
@@ -278,15 +298,28 @@ namespace NanoGames.Games.CatchMe
                         addFlakes();
                         updateFlakes();
 
+                        // update last postion
+                        if (halfSecond.Tock())
+                        {
+                            foreach (var player in Players)
+                            {
+                                player.LastPositions.Add(player.Position);
+                                player.LastPositions.RemoveAt(0);
+                            }
+                        }
+
                         // update Preyposition and color for hunters every 10 sec
                         if (preyIsSeen || tenSeconds.Tock())
                         {
                             preyPosForHunters = prey.Position;
                             preyColForHunters = prey.Color;
+                            preyLastPosForHunters = new List<Vector>(prey.LastPositions);
                         }
                         else
                         {
                             preyColForHunters = prey.Color * (1 - tenSeconds.RatioExpGrowth());
+                            preyLastPosForHunters.Add(preyPosForHunters);
+                            preyLastPosForHunters.RemoveAt(0);
                         }
 
                         if ((frameCounter - huntersWaitTime) > frameMax)
@@ -295,8 +328,6 @@ namespace NanoGames.Games.CatchMe
                             CatchPosisition = prey.Position;
                         }
 
-                        // update Counters
-                        tenSeconds.Tick();
 
                         break;
                     }
@@ -346,7 +377,7 @@ namespace NanoGames.Games.CatchMe
                         
                         if ((frameCounterEnd % 60) == 0)
                         {
-                            rings.Add(new Ring(pos, blue));
+                            ringsEnd.Add(new Ring(pos, blue));
                         }
 
                         // show order of hunters
@@ -376,12 +407,14 @@ namespace NanoGames.Games.CatchMe
                         break;
                     }
             }
-
+            
             // update stuff
             updateScreenPosition();
             updatePreyIsSeen();
             updateIntegratedDistance();
             updateRings();
+            tenSeconds.Tick();
+            halfSecond.Tick();
 
             // draw screen
             foreach (CatchMePlayer player in Players)
@@ -395,6 +428,7 @@ namespace NanoGames.Games.CatchMe
 
         private void movePlayer(CatchMePlayer player)
         {
+
             //  - initial parameters are calculated
             //
             // - force and torque from input is calculted
@@ -403,7 +437,6 @@ namespace NanoGames.Games.CatchMe
             // - acceleration, velocity and postion is calculated
             // - angular acceleration, dPhi and phi/heading is calculated
 
-            
             // set inintial values to zero
             Vector force = new Vector(0, 0);
             double torque = 0;
@@ -502,10 +535,20 @@ namespace NanoGames.Games.CatchMe
 
             }
 
-            // if force is zero add "standgas"
+            // add "standgas"
             if (force.Length == 0)
             {
                 force = 4 * player.Velocity.Normalized;
+
+            }
+
+            // blast
+            if (prey.InputBlast && player != prey)
+            {
+                if ((player.Position - prey.Position).Length <= 20)
+                {
+                    force += (player.Position - prey.Position).Normalized * 4000;
+                }
             }
 
             // viscosity
@@ -619,6 +662,22 @@ namespace NanoGames.Games.CatchMe
                 player.InputCircleRight = true;
                 player.BoosterLeft = -1;
                 player.BoosterRight = 1;
+            }
+
+            //  blast of prey
+            if (player == prey)
+            {
+                if (player.Input.Fire.WasActivated && player.NumberOfBlast > 0)
+                {
+                    player.InputBlast = true;
+                    player.NumberOfBlast--;
+                    ringsBlast.Add(new Ring(prey.Position, blue));
+                    ringsBlast.Add(new Ring(prey.Position, blue, 3));
+                }
+                else
+                {
+                    player.InputBlast = false;
+                }
             }
         }
 
@@ -734,7 +793,7 @@ namespace NanoGames.Games.CatchMe
             colAddon = grey;
             posAddon = new Vector(320 - 20 - xMiniMap + player.AddonMarker * 6, 200 - 27 - yMiniMap);
             g.Rectangle(colAddon, posAddon, posAddon + new Vector(5, 5));
-
+           
             // draw each player
             foreach (var otherPlayer in Players)
             {
@@ -743,6 +802,7 @@ namespace NanoGames.Games.CatchMe
                 var dir = otherPlayer.Heading;
                 var ortho = otherPlayer.Heading.RotatedLeft;
                 var col = otherPlayer.LocalColor;
+                var lastPositions = otherPlayer.LastPositions;
 
                 // Name
                 if (otherPlayer != player)
@@ -758,6 +818,11 @@ namespace NanoGames.Games.CatchMe
                 if (otherPlayer != prey)
                 {
                     g.Circle(col, convertToMiniMap(pos), 0.5);
+
+                    for (int i = 0; i < lastPositions.Count - 1; i++)
+                    {
+                        g.Point(0.4 * i / lastPositions.Count * col, convertToMiniMap(lastPositions[i]));
+                    }
                 }
 
                 // add lines if player is prey
@@ -770,8 +835,8 @@ namespace NanoGames.Games.CatchMe
                     g.Line(col, doShift(pos - new Vector(3 * radius, 0)), doShift(pos - new Vector(5 * radius, 0)));
                     g.Circle(col, doShift(pos), 0.7 * radius);
                     g.Circle(col, doShift(pos), 0.4 * radius);
-
-                    // draw prey on for hunters minimap
+                    
+                    // draw prey on minimap for hunters 
                     if (player != prey)
                     {
                         g.Line(preyColForHunters, convertToMiniMap(preyPosForHunters) + new Vector(0, 1), convertToMiniMap(preyPosForHunters) + new Vector(0, 2.5));
@@ -780,12 +845,25 @@ namespace NanoGames.Games.CatchMe
                         g.Line(preyColForHunters, convertToMiniMap(preyPosForHunters) - new Vector(1, 0), convertToMiniMap(preyPosForHunters) - new Vector(2.5, 0));
 
                         g.Circle(preyColForHunters, convertToMiniMap(preyPosForHunters), 0.5);
+
+                        for (int i = 0; i < preyLastPosForHunters.Count - 1; i++)
+                        {
+                            g.Point(0.4 * i / preyLastPosForHunters.Count * preyColForHunters, convertToMiniMap(preyLastPosForHunters[i]));
+                        }
                     }
 
-                    // draw prey on minimap for prey
+                    // draw prey on minimap for prey plus blast info
                     if (player == prey)
                     {
                         g.Circle(col, convertToMiniMap(pos), 0.5);
+
+                        for (int i = 0; i < lastPositions.Count - 1; i++)
+                        {
+                            g.Point(0.4 * i / lastPositions.Count * col, convertToMiniMap(lastPositions[i]));
+                        }
+                        
+                        string tmp = "BLAST: " + prey.NumberOfBlast.ToString().ToUpper();
+                        g.Print(grey, 3, new Vector(320 - 40 - tmp.Length, 200 - 24 - yMiniMap), tmp);
                     }
                 }
 
@@ -814,10 +892,16 @@ namespace NanoGames.Games.CatchMe
             }
 
             // draw all rings
-            foreach (Ring ring in rings)
+            foreach (Ring ring in ringsEnd)
             {
                 g.Circle(ring.Color, doShift(ring.Position), ring.Time * 0.7);
                 g.Circle(ring.Color, convertToMiniMap(ring.Position), convertToMiniMap(ring.Time * 0.7));
+            }
+
+            foreach (Ring ring in ringsBlast)
+            {
+                g.Circle(ring.Color, doShift(ring.Position), ring.Time * 2.0);
+                g.Circle(ring.Color, convertToMiniMap(ring.Position), convertToMiniMap(ring.Time * 2.0));
             }
 
             // draw border of map
@@ -841,6 +925,26 @@ namespace NanoGames.Games.CatchMe
 
             // draw minimap
             g.Rectangle(grey, convertToMiniMap(new Vector(0, 0)), convertToMiniMap(new Vector(xMap, yMap)));
+
+            // draw mindist
+            foreach (var hunter in hunters)
+            {
+                double dist = (hunter.Position - prey.Position).Length;
+
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                }
+                
+            }
+            string tmp2 = "MIN " + (minDist - 5.9).ToString("F1").ToUpper();
+            g.Print(grey, 3, new Vector(320 - 20 - xMiniMap, 200 - 33 - yMiniMap), tmp2);
+
+            // draw speed
+            tmp2 = "SPEED " + (player.Velocity.Length * 1.709).ToString("F0").ToUpper();
+            g.Print(grey, 3, new Vector(320 - 20 - xMiniMap, 200 - 37 - yMiniMap), tmp2);
+
+
         }
 
         private Vector speedCheck(Vector input)
@@ -1020,8 +1124,10 @@ namespace NanoGames.Games.CatchMe
 
         private void updateRings()
         {
+            // ringsEnd
+
             // set time and fade out 
-            foreach (Ring ring in rings)
+            foreach (Ring ring in ringsEnd)
             {
                 // fade
                 ring.Color = ring.Color * 0.995;
@@ -1030,10 +1136,32 @@ namespace NanoGames.Games.CatchMe
                 ring.Time++;
             }
 
-            // remove old flakes
-            if (rings.Count > 10)
+            // remove old rings
+            if (ringsEnd.Count > 10)
             {
-                rings.RemoveAt(0);
+                ringsEnd.RemoveAt(0);
+            }
+
+            // ringsblast
+
+            // remove old rings
+            List<Ring> tmp = new List<Ring> { }; 
+            foreach (Ring ring in ringsBlast)
+            {
+                if (ring.Time < 10)
+                {
+                    tmp.Add(ring);
+                }
+            }
+            ringsBlast = tmp;
+
+            foreach (Ring ring in ringsBlast)
+            {
+                // fade
+                ring.Color = ring.Color * 0.99;
+
+                // time
+                ring.Time++;
             }
         }
 
