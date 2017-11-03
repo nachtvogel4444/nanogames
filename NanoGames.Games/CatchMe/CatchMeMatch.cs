@@ -75,7 +75,7 @@ namespace NanoGames.Games.CatchMe
 
             // map
             double aspectRatio = 2.5;
-            double areaPerPlayer = 2 * 320 * 200;
+            double areaPerPlayer = 1.5 * 320 * 200;
             xMap = Math.Sqrt(aspectRatio * areaPerPlayer * Players.Count);
             yMap = Math.Sqrt(1 / aspectRatio * areaPerPlayer * Players.Count);
             xMiniMap = 50;
@@ -545,9 +545,9 @@ namespace NanoGames.Games.CatchMe
             // blast
             if (prey.InputBlast && player != prey)
             {
-                if ((player.Position - prey.Position).Length <= 20)
+                if ((player.Position - prey.Position).Length <= 60)
                 {
-                    force += (player.Position - prey.Position).Normalized * 4000;
+                    force += (player.Position - prey.Position).Normalized * 8000;
                 }
             }
 
@@ -817,7 +817,7 @@ namespace NanoGames.Games.CatchMe
                 // point in minimap
                 if (otherPlayer != prey)
                 {
-                    g.Circle(col, convertToMiniMap(pos), 0.5);
+                    //g.Circle(col, convertToMiniMap(pos), 0.5);
 
                     for (int i = 0; i < lastPositions.Count - 1; i++)
                     {
