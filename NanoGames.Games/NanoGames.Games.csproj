@@ -103,6 +103,7 @@
     <Compile Include="Bomberguy\Unbombable.cs" />
     <Compile Include="CatchMe\CatchMeMatch.cs" />
     <Compile Include="CatchMe\CatchMePlayer.cs" />
+    <Compile Include="CatchMe\Blast.cs" />
     <Compile Include="CatchMe\CompareHunterDistance.cs" />
     <Compile Include="CatchMe\FixedCircle.cs" />
     <Compile Include="CatchMe\FrameCounter.cs" />
@@ -144,6 +145,19 @@
     <Compile Include="Snake\SegmentBuffer.cs" />
     <Compile Include="Snake\SnakeMatch.cs" />
     <Compile Include="Snake\SnakePlayer.cs" />
+    <Compile Include="Tanks\JCamera.cs" />
+    <Compile Include="Tanks\JCube.cs" />
+    <Compile Include="Tanks\JLine3D.cs" />
+    <Compile Include="Tanks\JMatrix3D.cs" />
+    <Compile Include="Tanks\JMesh3D.cs" />
+    <Compile Include="Tanks\JQuaternion3D.cs" />
+    <Compile Include="Tanks\JRotationMatrix3D.cs" />
+    <Compile Include="Tanks\JScaleMatrix3D.cs" />
+    <Compile Include="Tanks\JTranslationMatrix3D.cs" />
+    <Compile Include="Tanks\JVector3.cs" />
+    <Compile Include="Tanks\JVertex3D.cs" />
+    <Compile Include="Tanks\TanksPlayer.cs" />
+    <Compile Include="Tanks\TanksMatch.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NanoGames.Core\NanoGames.Core.csproj">

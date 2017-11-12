@@ -25,7 +25,8 @@ namespace NanoGames.Games
             Add<Snake.SnakeMatch, Snake.SnakePlayer>("SNAKE");
             Add<Banana.BananaMatch, Banana.BananaPlayer>("BANANA");
             // Add<BananaOrbit.BananaOrbitMatch, BananaOrbit.BananaOrbitPlayer>("BANANAORBIT");*/
-            Add<CatchMe.CatchMeMatch, CatchMe.CatchMePlayer>("CATCHME");
+            // Add<CatchMe.CatchMeMatch, CatchMe.CatchMePlayer>("CATCHME");
+            Add<Tanks.TanksMatch, Tanks.TanksPlayer>("TANKS");
         }
 
         /// <summary>
