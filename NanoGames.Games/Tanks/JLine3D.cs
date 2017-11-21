@@ -26,19 +26,19 @@ namespace NanoGames.Games.Tanks
         }
 
 
-        public double SquaredLength => (Start - Stop).SquaredLength;
+        public double SquaredLength => (Start.X - Stop.X) * (Start.X - Stop.X) +
+                                       (Start.Y - Stop.Y) * (Start.Y - Stop.Y) + 
+                                       (Start.Z - Stop.Z) * (Start.Z - Stop.Z);
 
-        public double Length => (Stop - Start).Length;
-        
-        public JVertex3D Direction => Stop - Start; //pointing from start to stop
+        public double Length => Math.Sqrt(SquaredLength);
 
-        public JVertex3D MidPoint => midpoint();
+        public JVertex3D Direction => new JVertex3D(Stop.X - Start.X, Stop.Y - Start.Y, Stop.Z - Start.Z, 0);
 
-        private JVertex3D midpoint()
-        {
-            JVertex3D mid = Start + 0.5 * Direction;
-            mid.W = 1;
-            return mid;
-        }
+        public JVertex3D DirectionN => Direction / Length;
+
+        public JVertex3D MidPoint => new JVertex3D(Start.X + 0.5 * Direction.X,
+                                                   Start.Y + 0.5 * Direction.Y,
+                                                   Start.Z + 0.5 * Direction.Z,
+                                                   0);
     }
 }

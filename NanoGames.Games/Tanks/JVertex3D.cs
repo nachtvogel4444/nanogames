@@ -42,17 +42,6 @@ namespace NanoGames.Games.Tanks
                 0);
         }
 
-        public static JVertex3D operator +(JVertex3D a, JVertex3D b)
-        {
-            return new JVertex3D(a.X + b.X, a.Y + b.Y, a.Z + b.Z, 0);            
-        }
-
-        public static JVertex3D operator -(JVertex3D a, JVertex3D b)
-        {
-            return new JVertex3D(a.X - b.X, a.Y - b.Y, a.Z - b.Z, 0);
-            
-        }
-
         public static JVertex3D operator *(JVertex3D v, double f)
         {
             return new JVertex3D(f * v.X, f * v.Y, f * v.Z, v.W);
@@ -83,5 +72,18 @@ namespace NanoGames.Games.Tanks
             return !(a == b);
         }
 
+
+        /* old methods
+        public static JVertex3D operator +(JVertex3D a, JVertex3D b)
+        {
+            return new JVertex3D(a.X + b.X, a.Y + b.Y, a.Z + b.Z, 0);            
+        }
+
+        public static JVertex3D operator -(JVertex3D a, JVertex3D b)
+        {
+            return new JVertex3D(a.X - b.X, a.Y - b.Y, a.Z - b.Z, 0);
+            
+        }
+         */
     }
 }

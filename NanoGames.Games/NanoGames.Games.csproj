@@ -145,11 +145,14 @@
     <Compile Include="Snake\SegmentBuffer.cs" />
     <Compile Include="Snake\SnakeMatch.cs" />
     <Compile Include="Snake\SnakePlayer.cs" />
+    <Compile Include="Tanks\CoordSystem.cs" />
+    <Compile Include="Tanks\JBody3D.cs" />
     <Compile Include="Tanks\JCamera.cs" />
     <Compile Include="Tanks\JCube.cs" />
     <Compile Include="Tanks\JLine3D.cs" />
     <Compile Include="Tanks\JMatrix3D.cs" />
-    <Compile Include="Tanks\JMesh3D.cs" />
+    <Compile Include="Tanks\JOrthoProject3D.cs" />
+    <Compile Include="Tanks\JRigidBody3D.cs" />
     <Compile Include="Tanks\JQuaternion3D.cs" />
     <Compile Include="Tanks\JRotationMatrix3D.cs" />
     <Compile Include="Tanks\JScaleMatrix3D.cs" />

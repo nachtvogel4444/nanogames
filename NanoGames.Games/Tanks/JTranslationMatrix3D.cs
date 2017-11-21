@@ -7,9 +7,6 @@ namespace NanoGames.Games.Tanks
     {
         public JTranslationMatrix3D(JVertex3D translation) : base()
         {
-            Elements[0, 0] = 1;
-            Elements[1, 1] = 1;
-            Elements[2, 2] = 1;
             Elements[0, 3] = translation.X;
             Elements[1, 3] = translation.Y;
             Elements[2, 3] = translation.Z;

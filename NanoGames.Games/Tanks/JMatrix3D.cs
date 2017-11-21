@@ -11,7 +11,7 @@ namespace NanoGames.Games.Tanks
 
         public JMatrix3D()
         {
-            Elements = new double[4, 4] { { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 1 } };
+            Elements = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
         }
 
 

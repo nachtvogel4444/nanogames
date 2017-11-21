@@ -24,6 +24,14 @@ namespace NanoGames.Games.Tanks
             Normalize();
         }
 
+        public JQuaternion3D()
+        {
+            X = 1;
+            Y = 0;
+            Z = 0;
+            W = 0;
+        }
+
         public JQuaternion3D(JVertex3D axis, double angle)
         {
             axis = axis.Normalized; // this provides that the quaternion is normalized
@@ -36,14 +44,32 @@ namespace NanoGames.Games.Tanks
 
         public JQuaternion3D(JVertex3D a, JVertex3D b) // rotation from a to b
         {
-            JVertex3D v = JVertex3D.Cross(a, b).Normalized;
+            double normAB = Math.Sqrt(a.SquaredLength * b.SquaredLength);
+            double ct = JVertex3D.Dot(a, b) / normAB;
+            double hc = Math.Sqrt(0.5 * (1.0 + ct));
+            JVertex3D w = JVertex3D.Cross(a, b) / (normAB * 2.0 * hc);
 
-            X = v.X;
-            Y = v.Y;
-            Z = v.Z;
-            W = Math.Sqrt(a.SquaredLength * b.SquaredLength) + JVertex3D.Dot(a, b);
+            X = w.X;
+            Y = w.Y;
+            Z = w.Z;
+            W = hc;
+
+            Normalize();
+
+            /*
+            float norm_u_norm_v = sqrt(sqlength(u) * sqlength(v));
+            float cos_theta = dot(u, v) / norm_u_norm_v;
+            float half_cos = sqrt(0.5f * (1.f + cos_theta));
+            vec3 w = cross(u, v) / (norm_u_norm_v * 2.f * half_cos);
+            return quat(half_cos, w.x, w.y, w.z);
+            */
         }
-
+        
+        public static JQuaternion3D operator -(JQuaternion3D q)
+        {
+            q.Normalize();
+            return new JQuaternion3D(-q.X, -q.Y, -q.Z, q.W);
+        }
 
         public JQuaternion3D Normalized()
         {
