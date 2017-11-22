@@ -5,7 +5,7 @@ using System;
 
 namespace NanoGames.Games.Tanks
 {
-    public class JLine3D
+    public struct JLine3D
     {
         public JVertex3D Start;
         public JVertex3D Stop;

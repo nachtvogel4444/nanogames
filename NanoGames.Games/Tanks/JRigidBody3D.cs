@@ -5,32 +5,28 @@ namespace NanoGames.Games.Tanks
 {
     public class JRigidBody3D
     {
-        public JVertex3D[] Vertices;
-        public JLine3D[] Lines;
-        public JVertex3D Position;
-        public JQuaternion3D Rotation;
-        public JVertex3D Scale;
-        public Color Color;
+        public JVertex3D[] Vertices { get; set; }
+        public JLine3D[] Lines { get; set; }
+        public JVertex3D Position { get; set; }
+        public JQuaternion3D Rotation { get; set; }
+        public JVertex3D Scale { get; set; }
+        public Color Color { get; set; }
+ 
 
-
-        public JRigidBody3D(JVertex3D[] vertices, JLine3D[] lines, JVertex3D pos, JQuaternion3D rot, JVertex3D scale)
+        public JBody3D ToJBody3D()
         {
-            Vertices = vertices;
-            Lines = lines;
-            Position = pos;
-            Rotation = rot;
-            Scale = scale;
-            Color = new Color(1, 1, 1);
-        }
+            JBody3D body = new JBody3D();
+            body.Position = Position;
+            body.Rotation = Rotation;
+            body.Scale = Scale;
 
-        public JRigidBody3D(JVertex3D[] vertices, JLine3D[] lines, JVertex3D pos, JQuaternion3D rot, JVertex3D scale, Color col)
-        {
-            Vertices = vertices;
-            Lines = lines;
-            Position = pos;
-            Rotation = rot;
-            Scale = scale;
-            Color = col;
+            Scale = new JVertex3D(1, 1, 1, 0);
+            Position = new JVertex3D(0, 0, 0, 1);
+            Rotation = new JQuaternion3D(1, 0, 0, 0);
+
+            body.RigidBodies = new JRigidBody3D[1] { this };
+
+            return body;
         }
     }
 }

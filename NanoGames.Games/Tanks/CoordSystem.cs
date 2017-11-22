@@ -14,7 +14,7 @@ namespace NanoGames.Games.Tanks
             Position = pos;
             Rotation = new JQuaternion3D();
             Scale = scale;
-
+            /*
             XAxis = new JRigidBody3D(new JVertex3D[2] { new JVertex3D(0, 0, 0, 1), new JVertex3D(1, 0, 0, 1) },
                                      new JLine3D[1] { new JLine3D(new JVertex3D(0, 0, 0, 1), new JVertex3D(1, 0, 0, 1)) },
                                      new JVertex3D(0, 0, 0, 1),
@@ -36,7 +36,7 @@ namespace NanoGames.Games.Tanks
                                      new JVertex3D(1, 1, 1, 0),
                                      new Color(0, 0, 1));
 
-            RigidBodies = new JRigidBody3D[3] { XAxis, YAxis, ZAxis };
+            RigidBodies = new JRigidBody3D[3] { XAxis, YAxis, ZAxis };*/
         }
     }
 }

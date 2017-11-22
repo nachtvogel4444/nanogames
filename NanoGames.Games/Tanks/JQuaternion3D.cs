@@ -6,12 +6,12 @@ using System;
 
 namespace NanoGames.Games.Tanks
 {
-    public class JQuaternion3D
+    public struct JQuaternion3D
     {
-        public double X;
-        public double Y;
-        public double Z;
-        public double W;
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Z { get; set; }
+        public double W { get; set; }
 
 
         public JQuaternion3D(double x, double y, double z, double w)
@@ -20,16 +20,8 @@ namespace NanoGames.Games.Tanks
             Y = y;
             Z = z;
             W = w;
-
+            
             Normalize();
-        }
-
-        public JQuaternion3D()
-        {
-            X = 1;
-            Y = 0;
-            Z = 0;
-            W = 0;
         }
 
         public JQuaternion3D(JVertex3D axis, double angle)

@@ -29,8 +29,16 @@ namespace NanoGames.Games.Tanks
 
             // make all bodies
             bodiesList = new List<JBody3D> { };
-            var coordinatesystem = new CoordSystem(new JVertex3D(0, 0, 0, 1), new JVertex3D(20, 20, 20, 0));
-            bodiesList.Add(coordinatesystem);
+            // var coordinatesystem = new CoordSystem(new JVertex3D(0, 0, 0, 1), new JVertex3D(20, 20, 20, 0));
+            // bodiesList.Add(coordinatesystem);
+            var xpoint = new JRigidBody3D();
+            xpoint.Position = new JVertex3D(0, 0, 0, 1);
+            xpoint.Rotation = new JQuaternion3D(new JVertex3D(1, 0, 0, 0), 0);
+            xpoint.Scale = new JVertex3D(1, 1, 1, 0);
+            xpoint.Color = white;
+            xpoint.Vertices = new JVertex3D[1] { new JVertex3D(1, 0, 0, 1) };
+            xpoint.Lines = new JLine3D[0] { };
+            bodiesList.Add(xpoint.ToJBody3D());
 
             // bodies to array
             bodies = bodiesList.ToArray();

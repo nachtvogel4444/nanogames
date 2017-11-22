@@ -145,6 +145,13 @@
     <Compile Include="Snake\SegmentBuffer.cs" />
     <Compile Include="Snake\SnakeMatch.cs" />
     <Compile Include="Snake\SnakePlayer.cs" />
+    <Compile Include="Tanks2\CameraPerspective.cs" />
+    <Compile Include="Tanks2\Floor.cs" />
+    <Compile Include="Tanks2\CameraOrtho.cs" />
+    <Compile Include="Tanks2\Tanks2Match.cs" />
+    <Compile Include="Tanks2\Tanks2Player.cs" />
+    <Compile Include="Tanks2\Quaternion.cs" />
+    <Compile Include="Tanks2\Vector3.cs" />
     <Compile Include="Tanks\CoordSystem.cs" />
     <Compile Include="Tanks\JBody3D.cs" />
     <Compile Include="Tanks\JCamera.cs" />
