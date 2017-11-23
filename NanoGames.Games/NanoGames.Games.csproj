@@ -147,10 +147,13 @@
     <Compile Include="Snake\SnakePlayer.cs" />
     <Compile Include="Tanks2\CameraPerspective.cs" />
     <Compile Include="Tanks2\Floor.cs" />
-    <Compile Include="Tanks2\CameraOrtho.cs" />
+    <Compile Include="Tanks2\Geometrie.cs" />
+    <Compile Include="Tanks2\Point.cs" />
+    <Compile Include="Tanks2\Segment.cs" />
     <Compile Include="Tanks2\Tanks2Match.cs" />
     <Compile Include="Tanks2\Tanks2Player.cs" />
     <Compile Include="Tanks2\Quaternion.cs" />
+    <Compile Include="Tanks2\Triangle.cs" />
     <Compile Include="Tanks2\Vector3.cs" />
     <Compile Include="Tanks\CoordSystem.cs" />
     <Compile Include="Tanks\JBody3D.cs" />

@@ -25,7 +25,7 @@ namespace NanoGames.Games.Tanks2
         /// The Y component.
         /// </summary>
         public double Y;
-        
+
         /// <summary>
         /// The Z component.
         /// </summary>
@@ -70,9 +70,9 @@ namespace NanoGames.Games.Tanks2
         {
             Vector3 a1 = axis1.Normalized;
             Vector3 a2 = axis2.Normalized;
-            double d = Vector3.Dot(a1, a2);
+            double d = Geometrie.Dot(a1, a2);
 
-            if (d > (1 - 1e-6)) 
+            if (d > (1 - 1e-6))
             {
                 W = 1;
                 X = 0;
@@ -82,11 +82,11 @@ namespace NanoGames.Games.Tanks2
 
             else if (d < (-1 + 1e-6))
             {
-                Vector3 rotAxis = Vector3.Cross(a1, new Vector3(1, 0, 0));
+                Vector3 rotAxis = Geometrie.Cross(a1, new Vector3(1, 0, 0));
 
                 if (rotAxis.SquaredLength <= 1e-6)
                 {
-                    rotAxis = Vector3.Cross(a1, new Vector3(0, 1, 0));
+                    rotAxis = Geometrie.Cross(a1, new Vector3(0, 1, 0));
                 }
 
                 rotAxis = rotAxis.Normalized;
@@ -97,7 +97,7 @@ namespace NanoGames.Games.Tanks2
             else
             {
                 double hc = Math.Sqrt(0.5 * (1.0 + d));
-                Vector3 w = Vector3.Cross(a1, a2) / (2.0 * hc);
+                Vector3 w = Geometrie.Cross(a1, a2) / (2.0 * hc);
 
                 W = hc;
                 X = w.X;
@@ -123,14 +123,14 @@ namespace NanoGames.Games.Tanks2
         /// Gets the quaternion normalized to length 1.
         /// </summary>
         public Quaternion Normalized => this / Length;
-        
+
         /// <summary>
         /// Gets the conjugate.
         /// </summary>
         public Quaternion Conjugate => new Quaternion(W, -X, -Y, -Z);
 
         public Vector3 ToVector3 => new Vector3(X, Y, Z);
-        
+
         public static Quaternion operator +(Quaternion a, Quaternion b)
         {
             return new Quaternion(a.W + b.W, a.X + b.X, a.Y + b.Y, a.Z + b.Z);
@@ -150,7 +150,7 @@ namespace NanoGames.Games.Tanks2
         {
             return new Quaternion(f * q.W, f * q.X, f * q.Y, f * q.Z);
         }
-        
+
         public static Quaternion operator *(Quaternion q, double f)
         {
             return new Quaternion(f * q.W, f * q.X, f * q.Y, f * q.Z);
@@ -160,7 +160,7 @@ namespace NanoGames.Games.Tanks2
         {
             return (1 / f) * q;
         }
-        
+
         public static Quaternion operator *(Quaternion a, Quaternion b)
         {
             return new Quaternion(a.W * b.W - a.X * b.X - a.Y * b.Y - a.Z * b.Z,
@@ -171,9 +171,9 @@ namespace NanoGames.Games.Tanks2
 
         public static Vector3 operator *(Vector3 v, Quaternion q)
         {
-            Vector3 qv = q.ToVector3; 
-            Vector3 t = 2 * Vector3.Cross(qv, v);
-            return v + q.W * t + Vector3.Cross(qv, t);
+            Vector3 qv = q.ToVector3;
+            Vector3 t = 2 * Geometrie.Cross(qv, v);
+            return v + q.W * t + Geometrie.Cross(qv, t);
         }
 
 
