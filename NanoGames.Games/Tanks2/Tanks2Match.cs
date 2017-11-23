@@ -14,16 +14,16 @@ namespace NanoGames.Games.Tanks2
         private Color green = new Color(0, 1, 0);
         private Color blue = new Color(0, 0, 1);
 
-        private CameraOrtho cam;
-        //private CameraPerspective cam;
+        //private CameraOrtho cam;
+        private CameraPerspective cam;
         private Floor floor;
 
 
         protected override void Initialize()
         {
-            cam = new CameraOrtho(new Vector3(0, 0, 100), new Vector3(0, 0, 1));
-            //cam = new CameraPerspective(new Vector3(0, 0, 100), new Vector3(0, 0, 1));
-            floor = new Floor(15, 15);
+            //cam = new CameraOrtho(new Vector3(0, 0, 100), new Vector3(0, 0, 1));
+            cam = new CameraPerspective(new Vector3(0, 0, 100), new Vector3(0, 0, 1));
+            floor = new Floor(20, 20);
         }
 
         protected override void Update()
@@ -83,9 +83,9 @@ namespace NanoGames.Games.Tanks2
             var whitep = new Vector3(0, 0, 10);
 
             // draw
-            cam.DrawPoint(g, red, 1.5 * redp);
-            cam.DrawPoint(g, green, 1.5 * greenp);
-            cam.DrawPoint(g, blue, 1.5 * bluep);
+            cam.DrawPoint(g, red, new Vector3(30, 0, 10));
+            cam.DrawPoint(g, green, new Vector3(0, 30, 10));
+            cam.DrawPoint(g, blue, new Vector3(0, 0, 40));
             cam.DrawLine(g, red, whitep, redp);
             cam.DrawLine(g, green, whitep, greenp);
             cam.DrawLine(g, blue, whitep, bluep);

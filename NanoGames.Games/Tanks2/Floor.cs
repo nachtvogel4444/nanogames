@@ -20,12 +20,12 @@ namespace NanoGames.Games.Tanks2
 
         public Floor(double xdensity, double ydensity)
         {
-            grey = new Color(0.3, 0.3, 0.3);
+            grey = new Color(0.1, 0.1, 0.1);
             
             int nx = (int)(width / xdensity) + 1;
             int ny = (int)(length / ydensity) + 1;
-            XDensity = width / nx;
-            YDensity = length / ny;
+            XDensity = width / (nx - 1);
+            YDensity = length / (ny - 1);
             N = nx + ny;
 
             Start = new Vector3[N];

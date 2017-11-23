@@ -82,9 +82,9 @@ namespace NanoGames.Games.Tanks2
 
         private Vector3 projectedSpace(Vector3 point)
         {
-            double x = 1.0 / Math.Tan(0.5 * FOVX) * point.X;
-            double y = 1.0 / Math.Tan(0.5 * FOVY) * point.Y;
-            double z = -(ZFar / (ZFar - ZNear) + 1);
+            double x = point.X / (point.Z * Math.Tan(0.5 * FOVX));
+            double y = point.Y / (point.Z * Math.Tan(0.5 * FOVY));
+            double z = 1;
 
             return new Vector3(x, y, z);
         }
