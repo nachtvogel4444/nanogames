@@ -17,7 +17,7 @@ namespace NanoGames.Games.Tanks2
         private CameraPerspective cam;
 
         private List<Point> points;
-        private List<Segment> lines;
+        private List<Segment> segments;
         private List<Triangle> triangles;
 
         private IGraphics g;
@@ -69,9 +69,9 @@ namespace NanoGames.Games.Tanks2
 
         private void AddStuffToDraw()
         {
-            // refresh points, lines and triangles
+            // refresh points, segments and triangles
             points = new List<Point> { };
-            lines = new List<Segment> { };
+            segments = new List<Segment> { };
             triangles = new List<Triangle> { };
 
             // points
@@ -84,16 +84,16 @@ namespace NanoGames.Games.Tanks2
             points.Add(pgreen);
             points.Add(pblue);
 
-            // lines
+            // segments
             var lred = new Segment(red, new Vector3(0, 0, 10), new Vector3(20, 0, 10));
             var lgreen = new Segment(green, new Vector3(0, 0, 10), new Vector3(0, 20, 10));
             var lblue = new Segment(blue, new Vector3(0, 0, 10), new Vector3(0, 0, 30));
-            lines.Add(lred);
-            lines.Add(lgreen);
-            lines.Add(lblue);
+            segments.Add(lred);
+            segments.Add(lgreen);
+            segments.Add(lblue);
 
             // triangles
-            var twhite = new Triangle(white, new Vector3(0, 0, 10), new Vector3(30, 0, 40), new Vector3(0, 30, 40));
+            var twhite = new Triangle(white, new Vector3(-10, -10, 10), new Vector3(30, 0, 40), new Vector3(0, 30, 40));
             triangles.Add(twhite);
 
         }
@@ -106,14 +106,14 @@ namespace NanoGames.Games.Tanks2
                 point.Projection = WorldToProjection(point.Position);
             }
 
-            // lines
-            foreach (Segment line in lines)
+            // segments
+            foreach (Segment segment in segments)
             {
-                line.ProjectionStart = WorldToProjection(line.Start);
-                line.ProjectionStop = WorldToProjection(line.Stop);
+                segment.ProjectionStart = WorldToProjection(segment.Start);
+                segment.ProjectionStop = WorldToProjection(segment.Stop);
 
-                line.ZMin = Math.Min(line.ProjectionStart.Z, line.ProjectionStop.Z);
-                line.ZMax = Math.Max(line.ProjectionStart.Z, line.ProjectionStop.Z);
+                segment.ZMin = Math.Min(segment.ProjectionStart.Z, segment.ProjectionStop.Z);
+                segment.ZMax = Math.Max(segment.ProjectionStart.Z, segment.ProjectionStop.Z);
             }
 
             // triangles
@@ -127,7 +127,7 @@ namespace NanoGames.Games.Tanks2
                 triangle.ZMax = Math.Max(triangle.ProjectionA.Z, Math.Max(triangle.ProjectionB.Z, triangle.ProjectionC.Z));
             }
 
-            // draw
+            // check if stuff is visible
             foreach (Point point in points)
             {
                 point.IsVisible = true;
@@ -164,16 +164,35 @@ namespace NanoGames.Games.Tanks2
                     }
 
                 }
-
-                if (point.IsVisible)
-                {
-                    g.Point(point.Color, ProjectionToImage(point.Projection));
-                }
             }
 
-            foreach (Segment line in lines)
+            foreach (Segment segment in segments)
             {
-                g.Line(line.Color, ProjectionToImage(line.ProjectionStart), ProjectionToImage(line.ProjectionStop));
+                segment.S1 = 0;
+                segment.S2 = 1;
+
+                foreach (Triangle triangle in triangles)
+                {
+                    // calclate Intesection of plane of triangle with segment of segment
+                    IntersectionSegmentTriangle intersec = new IntersectionSegmentTriangle(segment, triangle);
+
+                    if (intersec.Exists)
+                    {
+                        if (intersec.FrontToBack)
+                        {
+                            segment.S2 = Math.Min(intersec.S, segment.S2);
+                        }
+                        else
+                        {
+                            segment.S1 = Math.Max(intersec.S, segment.S1);
+                        }
+                    }
+
+                    else
+                    {
+                        // 
+                    }
+                }
             }
 
             foreach (Triangle triangle in triangles)
@@ -183,9 +202,27 @@ namespace NanoGames.Games.Tanks2
                 g.Line(triangle.Color, ProjectionToImage(triangle.ProjectionA), ProjectionToImage(triangle.ProjectionC));
             }
 
+            // draw stuff
+            foreach (Point point in points)
+            {
+                if (point.IsVisible)
+                {
+                    g.Point(point.Color, ProjectionToImage(point.Projection));
+                }
+            }
+
+            foreach (Segment segment in segments)
+            {
+                Vector3 u = segment.ProjectionStop - segment.ProjectionStart;
+                Vector3 a = segment.ProjectionStop - segment.S1 * u;
+                Vector3 b = segment.ProjectionStop - segment.S2 * u;
+
+                g.Line(segment.Color, ProjectionToImage(a), ProjectionToImage(b));
+            }
+
             // draw info
             g.Print(white, 4, new Vector(10, 10), "POINTS     " + points.Count.ToString());
-            g.Print(white, 4, new Vector(10, 16), "LINES      " + lines.Count.ToString());
+            g.Print(white, 4, new Vector(10, 16), "SEGMENTS   " + segments.Count.ToString());
             g.Print(white, 4, new Vector(10, 22), "TRIANGLES  " + triangles.Count.ToString());
         }
 
@@ -207,7 +244,7 @@ namespace NanoGames.Games.Tanks2
 
         private double IntersectionZAxis(Triangle triangle)
         {
-            Vector3 cross = Geometrie.Cross(triangle.B, triangle.C);
+            Vector3 cross = Vector3.Cross(triangle.B, triangle.C);
 
             return (triangle.A.X * cross.X + triangle.A.Y * cross.Y) / cross.Z + triangle.A.Z;
         }

@@ -147,7 +147,7 @@
     <Compile Include="Snake\SnakePlayer.cs" />
     <Compile Include="Tanks2\CameraPerspective.cs" />
     <Compile Include="Tanks2\Floor.cs" />
-    <Compile Include="Tanks2\Geometrie.cs" />
+    <Compile Include="Tanks2\IntersectionSegmentTriangle.cs" />
     <Compile Include="Tanks2\Point.cs" />
     <Compile Include="Tanks2\Segment.cs" />
     <Compile Include="Tanks2\Tanks2Match.cs" />

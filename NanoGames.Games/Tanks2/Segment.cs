@@ -10,6 +10,8 @@ namespace NanoGames.Games.Tanks2
         public Vector3 Stop;
         public Vector3 ProjectionStart;
         public Vector3 ProjectionStop;
+        public double S1;
+        public double S2;
         public double ZMax;
         public double ZMin;
         public Color Color;

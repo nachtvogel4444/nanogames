@@ -94,7 +94,41 @@ namespace NanoGames.Games.Tanks2
             return !(a == b);
         }
 
+        /// <summary>
+        /// Computes the linear combination of two vectors.
+        /// </summary>
+        /// <param name="a">The first vector.</param>
+        /// <param name="b">The second vector.</param>
+        /// <param name="ratio">The mix ratio.</param>
+        /// <returns>The linear combination of two vectors.</returns>
+        public static Vector3 Mix(Vector3 a, Vector3 b, double ratio)
+        {
+            return a * (1 - ratio) + b * ratio;
+        }
 
+        /// <summary>
+        /// Returns the dot product of two vectors.
+        /// </summary>
+        /// <param name="a">The first vector.</param>
+        /// <param name="b">The second vector.</param>
+        /// <returns>The dot product.</returns>
+        public static double Dot(Vector3 a, Vector3 b)
+        {
+            return a.X * b.X + a.Y * b.Y + a.Z * b.Z;
+        }
+
+        /// <summary>
+        /// Returns the cross product of two vectors.
+        /// </summary>
+        /// <param name="a">The first vector.</param>
+        /// <param name="b">The second vector.</param>
+        /// <returns>The dot product.</returns>
+        public static Vector3 Cross(Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.Y * b.Z - a.Z * b.Y,
+                               a.Z * b.X - a.X * b.Z,
+                               a.X * b.Y - a.Y * b.X);
+        }
 
         /// <inheritdoc/>
         public override bool Equals(object obj)

@@ -70,7 +70,7 @@ namespace NanoGames.Games.Tanks2
         {
             Vector3 a1 = axis1.Normalized;
             Vector3 a2 = axis2.Normalized;
-            double d = Geometrie.Dot(a1, a2);
+            double d = Vector3.Dot(a1, a2);
 
             if (d > (1 - 1e-6))
             {
@@ -82,11 +82,11 @@ namespace NanoGames.Games.Tanks2
 
             else if (d < (-1 + 1e-6))
             {
-                Vector3 rotAxis = Geometrie.Cross(a1, new Vector3(1, 0, 0));
+                Vector3 rotAxis = Vector3.Cross(a1, new Vector3(1, 0, 0));
 
                 if (rotAxis.SquaredLength <= 1e-6)
                 {
-                    rotAxis = Geometrie.Cross(a1, new Vector3(0, 1, 0));
+                    rotAxis = Vector3.Cross(a1, new Vector3(0, 1, 0));
                 }
 
                 rotAxis = rotAxis.Normalized;
@@ -97,7 +97,7 @@ namespace NanoGames.Games.Tanks2
             else
             {
                 double hc = Math.Sqrt(0.5 * (1.0 + d));
-                Vector3 w = Geometrie.Cross(a1, a2) / (2.0 * hc);
+                Vector3 w = Vector3.Cross(a1, a2) / (2.0 * hc);
 
                 W = hc;
                 X = w.X;
@@ -172,8 +172,8 @@ namespace NanoGames.Games.Tanks2
         public static Vector3 operator *(Vector3 v, Quaternion q)
         {
             Vector3 qv = q.ToVector3;
-            Vector3 t = 2 * Geometrie.Cross(qv, v);
-            return v + q.W * t + Geometrie.Cross(qv, t);
+            Vector3 t = 2 * Vector3.Cross(qv, v);
+            return v + q.W * t + Vector3.Cross(qv, t);
         }
 
 
