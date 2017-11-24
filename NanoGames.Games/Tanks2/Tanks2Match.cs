@@ -19,6 +19,7 @@ namespace NanoGames.Games.Tanks2
         private List<Point> points;
         private List<Segment> segments;
         private List<Triangle> triangles;
+        private List<Box> boxes;
 
         private IGraphics g;
 
@@ -73,6 +74,7 @@ namespace NanoGames.Games.Tanks2
             points = new List<Point> { };
             segments = new List<Segment> { };
             triangles = new List<Triangle> { };
+            boxes = new List<Box> { };
 
             // points
             var pwhite = new Point(white, new Vector3(0, 0, 0));
@@ -93,9 +95,22 @@ namespace NanoGames.Games.Tanks2
             segments.Add(lblue);
 
             // triangles
-            var twhite = new Triangle(white, new Vector3(-10, -10, 10), new Vector3(30, 0, 40), new Vector3(0, 30, 40));
-            triangles.Add(twhite);
+            //var twhite = new Triangle(white, new Vector3(-10, -10, 10), new Vector3(30, 0, 40), new Vector3(0, 30, 40));
+            //triangles.Add(twhite);
 
+            // boxes
+            var bwhite = new Box(white, 40, 20, 20, new Vector3(-20, -10, 10));
+            var bblue = new Box(white, 40, 20, 20, new Vector3(-20, -50, 10));
+            boxes.Add(bwhite);
+            boxes.Add(bblue);
+            foreach (Box box in boxes)
+            {
+                foreach (Segment segment in box.Segments)
+                {
+                    segments.Add(segment);
+                }
+
+            }
         }
 
         private void Draw()
@@ -126,6 +141,7 @@ namespace NanoGames.Games.Tanks2
                 triangle.ZMin = Math.Min(triangle.ProjectionA.Z, Math.Min(triangle.ProjectionB.Z, triangle.ProjectionC.Z));
                 triangle.ZMax = Math.Max(triangle.ProjectionA.Z, Math.Max(triangle.ProjectionB.Z, triangle.ProjectionC.Z));
             }
+            
 
             // check if stuff is visible
             foreach (Point point in points)

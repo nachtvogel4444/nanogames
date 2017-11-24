@@ -145,6 +145,7 @@
     <Compile Include="Snake\SegmentBuffer.cs" />
     <Compile Include="Snake\SnakeMatch.cs" />
     <Compile Include="Snake\SnakePlayer.cs" />
+    <Compile Include="Tanks2\Box.cs" />
     <Compile Include="Tanks2\CameraPerspective.cs" />
     <Compile Include="Tanks2\Floor.cs" />
     <Compile Include="Tanks2\IntersectionSegmentTriangle.cs" />
