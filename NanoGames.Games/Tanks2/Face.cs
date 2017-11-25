@@ -12,6 +12,8 @@ namespace NanoGames.Games.Tanks2
 
         public Color Color;
 
+        // there is really a face
+
 
     }
 }
