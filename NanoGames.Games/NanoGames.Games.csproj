@@ -101,6 +101,10 @@
     <Compile Include="Bomberguy\Explosion.cs" />
     <Compile Include="Bomberguy\RectbombularThing.cs" />
     <Compile Include="Bomberguy\Unbombable.cs" />
+    <Compile Include="Bots\Bot.cs" />
+    <Compile Include="Bots\BotsMatch.cs" />
+    <Compile Include="Bots\BotsPlayer.cs" />
+    <Compile Include="Bots\Bullet.cs" />
     <Compile Include="CatchMe\CatchMeMatch.cs" />
     <Compile Include="CatchMe\CatchMePlayer.cs" />
     <Compile Include="CatchMe\Blast.cs" />
@@ -147,6 +151,7 @@
     <Compile Include="Snake\SnakePlayer.cs" />
     <Compile Include="Tanks2\Box.cs" />
     <Compile Include="Tanks2\CameraPerspective.cs" />
+    <Compile Include="Tanks2\Face.cs" />
     <Compile Include="Tanks2\Floor.cs" />
     <Compile Include="Tanks2\IntersectionSegmentTriangle.cs" />
     <Compile Include="Tanks2\Point.cs" />

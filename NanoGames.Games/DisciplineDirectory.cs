@@ -27,7 +27,8 @@ namespace NanoGames.Games
             // Add<BananaOrbit.BananaOrbitMatch, BananaOrbit.BananaOrbitPlayer>("BANANAORBIT");*/
             // Add<CatchMe.CatchMeMatch, CatchMe.CatchMePlayer>("CATCHME");
             // Add<Tanks.TanksMatch, Tanks.TanksPlayer>("TANKS");
-            Add<Tanks2.Tanks2Match, Tanks2.Tanks2Player>("TANKS2");
+            // Add<Tanks2.Tanks2Match, Tanks2.Tanks2Player>("TANKS2");
+            Add<Bots.BotsMatch, Bots.BotsPlayer>("BOTS");
         }
 
         /// <summary>

@@ -3,6 +3,7 @@
 
 using System;
 using System.Globalization;
+using System.Collections.Generic;
 
 namespace NanoGames.Games.Tanks2
 {
@@ -94,6 +95,44 @@ namespace NanoGames.Games.Tanks2
             return !(a == b);
         }
 
+        public Vector ToVector => new Vector(X, Y);
+
+
+        /*
+        /// <summary>
+        /// Computes the linear combination of two vectors.
+        /// </summary>
+        /// <param name="a">The first vector.</param>
+        /// <param name="b">The second vector.</param>
+        /// <param name="ratio">The mix ratio.</param>
+        /// <returns>The linear combination of two vectors.</returns>
+        public static List<Vector> Intersect2DSegSeg(Segment a, Segment b)
+        {
+
+            Vector u = (a.Stop - a.Start).ToVector;
+            Vector v = (b.Stop - b.Start).ToVector;
+            Vector w = (a.Start - b.Start).ToVector;
+            double d = Vector.Dot(u, v);
+
+            // check for parallel and idetical segements
+
+            double s = Vector.Dot(v, w) / d;
+
+            if (s > 0 && s < 1)
+            
+                { }
+                
+
+            // get the intersect parameter for S2
+            float tI = perp(u, w) / D;
+            if (tI < 0 || tI > 1)                // no intersect with S2
+                return 0;
+
+            I0 = S1.P0 + sI * u;                // compute S1 intersect point
+        }
+
+    */
+        
         /// <summary>
         /// Computes the linear combination of two vectors.
         /// </summary>
