@@ -105,6 +105,7 @@
     <Compile Include="Bots\BotsMatch.cs" />
     <Compile Include="Bots\BotsPlayer.cs" />
     <Compile Include="Bots\Bullet.cs" />
+    <Compile Include="Bots\Counter.cs" />
     <Compile Include="CatchMe\CatchMeMatch.cs" />
     <Compile Include="CatchMe\CatchMePlayer.cs" />
     <Compile Include="CatchMe\Blast.cs" />

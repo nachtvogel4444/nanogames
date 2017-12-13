@@ -8,6 +8,8 @@ namespace NanoGames.Games.Bots
     {
         public Vector Position;
         public Vector Velocity;
+        public double Radius;
+        public int Damage;
         
         public bool IsExploded = true;
 
@@ -15,6 +17,8 @@ namespace NanoGames.Games.Bots
         {
             Position = pos;
             Velocity = vel;
+            Radius = 1;
+            Damage = 10;
             IsExploded = false;
         }    
     }
