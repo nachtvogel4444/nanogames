@@ -12,6 +12,7 @@ namespace NanoGames.Games.Bots
         public double StepSize;
         public double AngleSize;
         public int HealthPoints;
+        public bool IsDead;
 
         public double Radius;
         public double GunLength;
@@ -27,6 +28,7 @@ namespace NanoGames.Games.Bots
             GunSpeed = 3 * StepSize;
             GunCounter = new Counter(0.1, 0);
             HealthPoints = 100;
+            IsDead = false;
         }
         
         public Vector GunTip => Position + GunLength * Direction;

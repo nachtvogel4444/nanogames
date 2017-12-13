@@ -13,6 +13,8 @@ namespace NanoGames.Games.Bots
         private List<Bullet> Bullets;
         private Color white;
         private string tmp;
+        private List<BotsPlayer> PlayersAlive;
+        private int currentScore;
 
         protected override void Initialize()
         {
@@ -37,13 +39,21 @@ namespace NanoGames.Games.Bots
             // initialzie stuff
             Bullets = new List<Bullet> { };
             white = new Color(1, 1, 1);
+            PlayersAlive = new List<BotsPlayer> { };
+            foreach (var player in Players)
+            {
+                PlayersAlive.Add(player);
+            }
+            currentScore = 0;
         }
 
         protected override void Update()
         {
             // Move players
-            foreach (var player in Players)
+            foreach (var player in PlayersAlive)
             {
+                Vector newPosition; 
+
                 if (player.Input.Left.WasActivated)
                 {
                     player.Direction = player.Direction.Rotated(-player.AngleSize);
@@ -54,11 +64,23 @@ namespace NanoGames.Games.Bots
                 }
                 if (player.Input.Up.WasActivated)
                 {
-                    player.Position += player.StepSize * player.Direction;
+                    newPosition = player.Position + player.StepSize * player.Direction;
+
+                    if (newPosition.X > 0 && newPosition.X < 320 &&
+                        newPosition.Y > 0 && newPosition.Y < 200)
+                    {
+                        player.Position = newPosition;
+                    }
                 }
                 if (player.Input.Down.WasActivated)
                 {
-                    player.Position -= player.StepSize * player.Direction;
+                    newPosition = player.Position - player.StepSize * player.Direction;
+
+                    if (newPosition.X > 0 && newPosition.X < 320 &&
+                        newPosition.Y > 0 && newPosition.Y < 200)
+                    {
+                        player.Position = newPosition;
+                    }
                 }
             }
 
@@ -69,20 +91,25 @@ namespace NanoGames.Games.Bots
             {
                 bullet.Position += bullet.Velocity;
                 
-                foreach (var player in Players)
+                foreach (var player in PlayersAlive)
                 {
                     if ((bullet.Position - player.Position).Length <= player.Radius)
                     {
                         player.HealthPoints -= bullet.Damage;
                         bullet.IsExploded = true;
-
                     }
 
+                }
+
+                if (bullet.Position.X < 0 || bullet.Position.X > 320 ||
+                    bullet.Position.Y < 0 || bullet.Position.Y > 200)
+                {
+                    bullet.IsExploded = true;
                 }
             }
 
             // players shot
-            foreach (var player in Players)
+            foreach (var player in PlayersAlive)
             {
                 if (player.Input.Fire.WasActivated && player.GunCounter.AfterFirstEvent(Frame))
                 {
@@ -90,9 +117,36 @@ namespace NanoGames.Games.Bots
                     Bullets.Add(new Bullet(player.GunTip, player.GunSpeed * player.Direction));
                 }
             }
-            
+
+            // remove dead players from game
+            var newList = new List<BotsPlayer> { };
+            foreach (var player in PlayersAlive)
+            {
+                if (player.HealthPoints > 0)
+                {
+                    newList.Add(player);
+                }
+                else
+                {
+                    player.Score = currentScore;
+                    currentScore++;
+                }
+            }
+            PlayersAlive = newList;
+
+            // remove exploded bullets from game
+            var newList2 = new List<Bullet> { };
+            foreach (Bullet bullet in Bullets)
+            {
+                if (!bullet.IsExploded)
+                {
+                    newList2.Add(bullet);
+                }
+            }
+            Bullets = newList2;
+
             // Draw all players
-            foreach (var player in Players)
+            foreach (var player in PlayersAlive)
             {
                 Output.Graphics.Circle(player.LocalColor, player.Position, player.Radius);
                 Output.Graphics.Line(player.LocalColor, player.Position, player.Position + player.Direction * player.GunLength);
