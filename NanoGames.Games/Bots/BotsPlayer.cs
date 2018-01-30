@@ -24,7 +24,7 @@ namespace NanoGames.Games.Bots
             Radius = 3;
             GunLength = 1.5 * Radius;
             StepSize = 1.5;
-            AngleSize = 15 * Math.PI / 180;
+            AngleSize = 1 * Math.PI / 180;
             GunSpeed = 3 * StepSize;
             GunCounter = new Counter(0.1, 0);
             HealthPoints = 100;
