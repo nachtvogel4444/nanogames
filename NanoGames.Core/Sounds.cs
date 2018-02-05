@@ -7,7 +7,17 @@ namespace NanoGames
     /// A set of pre-defined sounds.
     /// </summary>
     public static class Sounds
-    {
+    {        
+        /// <summary>
+        /// One frame of noise.
+        /// </summary>
+        public static readonly Sound Noise = Sound.Noise(0.1, Pitch.C(2), Pitch.C(3));
+
+        /// <summary>
+        /// A low noise sound.
+        /// </summary>
+        public static readonly Sound LowNoise = Sound.Noise(0.1, Pitch.C(-2), Pitch.C(0));
+
         /// <summary>
         /// A high beep sound.
         /// </summary>

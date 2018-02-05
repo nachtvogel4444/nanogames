@@ -46,6 +46,8 @@ namespace NanoGames.Games.CatchMe
 
         public double IntegratedDistance;
 
+        public int Sound; // 0; silence, 1: noise, 2: toc, 3: explosion
+
         public List<Vector> LastPositions = new List<Vector> { };
     }
 }

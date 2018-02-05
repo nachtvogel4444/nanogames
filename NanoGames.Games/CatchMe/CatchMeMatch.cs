@@ -201,6 +201,9 @@ namespace NanoGames.Games.CatchMe
                 // mass and inertia
                 player.Mass = 1.0 / 27 * player.Radius * player.Radius * player.Radius;
                 player.Inertia = 1.0 / 9 * player.Radius * player.Radius;
+
+                // sound
+                player.Sound = 0;
             }
 
             // prey stuff            
@@ -408,6 +411,15 @@ namespace NanoGames.Games.CatchMe
                     }
             }
             
+            // sounds
+            if (0==1) //((frameCounter % 3) == 0)
+            {
+                foreach (var player in Players)
+                {
+                    makeSounds(player);
+                }
+            }
+
             // update stuff
             updateScreenPosition();
             updatePreyIsSeen();
@@ -498,6 +510,7 @@ namespace NanoGames.Games.CatchMe
                 force += 1000 * (100 * Math.Atan((player.Radius) - player.Position.X) / Math.PI + 0.5) * new Vector(1, 0);
                 force -= 20 * player.Velocity;
                 torque += 30 * player.Radius * player.Velocity.Y / Math.Abs(player.Velocity.Y);
+                player.Sound = 2;
             }
 
             // player hits right border
@@ -506,6 +519,7 @@ namespace NanoGames.Games.CatchMe
                 force -= 20 * player.Velocity;
                 force -= 1000 * (100 * Math.Atan(player.Position.X - (xMap - player.Radius)) / Math.PI + 0.5) * new Vector(1, 0);
                 torque -= 30 * player.Radius * player.Velocity.Y / Math.Abs(player.Velocity.Y);
+                player.Sound = 2;
             }
 
             // player hits top border
@@ -514,6 +528,7 @@ namespace NanoGames.Games.CatchMe
                 force += 1000 * (100 * Math.Atan((player.Radius) - player.Position.Y)  / Math.PI + 0.5) * new Vector(0, 1);
                 force -= 20 * player.Velocity;
                 torque -= 30 * player.Radius * player.Velocity.X / Math.Abs(player.Velocity.X);
+                player.Sound = 2;
             }
 
             // player hits bottom border
@@ -522,6 +537,7 @@ namespace NanoGames.Games.CatchMe
                 force -= 20 * player.Velocity;
                 force -= 1000 * (100 * Math.Atan(player.Position.Y - (yMap - player.Radius)) / Math.PI + 0.5) * new Vector(0, 1);
                 torque += 30 * player.Radius * player.Velocity.X / Math.Abs(player.Velocity.X);
+                player.Sound = 2;
             }
 
             // check if player hits fixed circle
@@ -531,6 +547,7 @@ namespace NanoGames.Games.CatchMe
                 {
                     force += 1000 * (100 * Math.Atan((player.Position - fixedCircle.Position).Length - (player.Radius + fixedCircle.Radius)) / Math.PI + 0.5) * (-player.Position + fixedCircle.Position).Normalized;
                     force -= 20 * player.Velocity;
+                    player.Sound = 2;
                 }
 
             }
@@ -606,6 +623,7 @@ namespace NanoGames.Games.CatchMe
                 player.InputMoveForward = true;
                 player.BoosterRight = 1;
                 player.BoosterLeft = 1;
+                player.Sound = 1;
             }
 
             /*
@@ -1165,5 +1183,20 @@ namespace NanoGames.Games.CatchMe
             }
         }
 
+        private void makeSounds(CatchMePlayer player)
+        {
+
+            if (player.Sound == 1)
+            {
+                player.Output.Audio.Play(Sounds.LowNoise);
+                player.Sound = 0;
+            }
+
+            if (player.Sound == 2)
+            {
+                player.Output.Audio.Play(Sounds.LowBeep);
+                player.Sound = 0;
+            }
+        }
     }
 }
