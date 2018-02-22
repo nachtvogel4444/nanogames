@@ -97,6 +97,17 @@ namespace NanoGames
             return !(a == b);
         }
 
+        public static bool operator <(Vector a, Vector b)
+        {
+            return Math.Abs(a.X) - Math.Abs(b.X) < 0 &&
+                   Math.Abs(a.Y) - Math.Abs(b.Y) < 0;
+        }
+
+        public static bool operator >(Vector a, Vector b)
+        {
+            return Math.Abs(a.X) - Math.Abs(b.X) > 0 ||
+                   Math.Abs(a.Y) - Math.Abs(b.Y) > 0;
+        }
         /// <summary>
         /// Computes the linear combination of two vectors.
         /// </summary>
@@ -166,6 +177,26 @@ namespace NanoGames
             var y = -(X - origin.X) * Math.Sin(angle) + (Y - origin.Y) * Math.Cos(angle) + origin.Y;
             return new Vector(x, y);
         }
+
+        /// <summary>
+        /// Gets a translated vector.
+        /// </summary>
+        /// <param name="t">The translation vector.</param>
+        /// <returns>"Returns translated Vector"</returns>
+        public Vector Translate(Vector t) => this + t;
+
+        /// <summary>
+        /// Gets a scaled vector.
+        /// </summary>
+        /// <param name="s">The scaling factor.</param>
+        /// <returns>"Returns the scaled vector"</returns>
+        public Vector Scaled(double s) => s * this;
+
+        /// <summary>
+        /// Gets a to the origin translated vector.
+        /// </summary>
+        /// <returns>"Returns the translated Segment"</returns>
+        public Vector ToOrigin() => this + new Vector(160, 100);
 
         /// <inheritdoc/>
         public override bool Equals(object obj)

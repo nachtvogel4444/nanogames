@@ -87,6 +87,7 @@
     <Compile Include="Properties\SharedAssemblyInfo.cs" />
     <Compile Include="RandomExtensions.cs" />
     <Compile Include="Rotation.cs" />
+    <Compile Include="Segment.cs" />
     <Compile Include="Sound.cs" />
     <Compile Include="Sounds.cs" />
     <Compile Include="Vector.cs" />

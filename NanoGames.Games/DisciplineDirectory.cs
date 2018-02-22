@@ -28,7 +28,8 @@ namespace NanoGames.Games
             // Add<CatchMe.CatchMeMatch, CatchMe.CatchMePlayer>("CATCHME");
             // Add<Tanks.TanksMatch, Tanks.TanksPlayer>("TANKS");
             // Add<Tanks2.Tanks2Match, Tanks2.Tanks2Player>("TANKS2");
-            Add<Bots.BotsMatch, Bots.BotsPlayer>("BOTS");
+            // Add<Bots.BotsMatch, Bots.BotsPlayer>("BOTS");
+            Add<Infinity.InfinityMatch, Infinity.InfinityPlayer>("INFINITY");
         }
 
         /// <summary>
