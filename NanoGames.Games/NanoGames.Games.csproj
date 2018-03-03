@@ -115,12 +115,15 @@
     <Compile Include="CatchMe\Ring.cs" />
     <Compile Include="CatchMe\Flake.cs" />
     <Compile Include="CatchMe\MovingCircle.cs" />
+    <Compile Include="Infinity\Interval.cs" />
+    <Compile Include="Infinity\Star.cs" />
     <Compile Include="Discipline.cs" />
     <Compile Include="DisciplineDirectory.cs" />
     <Compile Include="Discipline{TMatch,TPlayer}.cs" />
     <Compile Include="Infinity\InfinityMatch.cs" />
     <Compile Include="Infinity\InfintiyPlayer.cs" />
     <Compile Include="Infinity\MyColors.cs" />
+    <Compile Include="Infinity\Planet.cs" />
     <Compile Include="Infinity\Tile.cs" />
     <Compile Include="KartRace\Constants.cs" />
     <Compile Include="KartRace\KartPlayer.cs" />
