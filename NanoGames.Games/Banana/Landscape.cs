@@ -295,26 +295,26 @@ namespace NanoGames.Games.Banana
 
             if (name == "lady")
             {
-                readImageToIsSolid(@"Banana\img\lady.bmp");
+                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\lady.bmp");
             }
 
             if (name == "boarder")
             {
-                readImageToIsSolid(@"Banana\img\boarder.bmp");
+                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\boarder.bmp");
             }
 
             if (name == "skier")
             {
-                readImageToIsSolid(@"Banana\img\skier.bmp");
+                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\skier.bmp");
             }
 
             if (name == "airplane")
             {
-                readImageToIsSolid(@"Banana\img\airplane.bmp");
+                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\airplane.bmp");
             }
             if (name == "owls")
             {
-                readImageToIsSolid(@"Banana\img\owls.bmp");
+                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\owls.bmp");
             }
 
             Refresh();
