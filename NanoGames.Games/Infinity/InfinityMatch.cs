@@ -277,7 +277,7 @@ namespace NanoGames.Games.Infinity
                 // ship contour
                 foreach (Segment seg in player.Contour)
                 {
-                    var td = seg.Scaled(s).Rotated(a).Translate(p).Scaled(m).ToOrigin();
+                    var td = seg.Scaled(s).Rotated(a).Translated(p).Scaled(m).ToOrigin();
                     g.Line(c, td.Start, td.End);
                 }
             }
@@ -286,7 +286,7 @@ namespace NanoGames.Games.Infinity
                 // triangle
                 foreach (Segment seg in player.Triangle)
                 {
-                    var td = seg.Scaled(1.0 / m).Rotated(a).Translate(p).Scaled(m).ToOrigin();
+                    var td = seg.Scaled(1.0 / m).Rotated(a).Translated(p).Scaled(m).ToOrigin();
                     g.Line(c, td.Start, td.End);
                 }
             }
@@ -310,29 +310,32 @@ namespace NanoGames.Games.Infinity
                     if (!debug)
                     {
                         if (star.IsDiscovered)
-                        {
+                        { /*
                             var td = star.Position.Translate(p).Scaled(m).ToOrigin();
                             var c = m * myColor.White;
 
                             g.Point(c, td);
+                            */
                         }
                     }
 
                     else
                     {
                         if (star.IsDiscovered)
-                        {
+                        {/*
                             var td = star.Position.Translate(p).Scaled(m).ToOrigin();
                             var c = myColor.White;
 
                             g.Point(c, td);
+                            */
                         }
                         else
-                        {
+                        { /*
                             var td = star.Position.Translate(p).Scaled(m).ToOrigin();
                             var c = myColor.Green;
 
                             g.Point(c, td);
+                            */
                         }
                     }
                 }
@@ -347,6 +350,8 @@ namespace NanoGames.Games.Infinity
 
             foreach (Planet planet in tile.Planets)
             {
+                /*
+                // flo
                 var td = planet.Position.Translate(p).Scaled(m).ToOrigin();
                 var c = myColor.White;
                 var r =  m * planet.Radius;
@@ -355,6 +360,7 @@ namespace NanoGames.Games.Infinity
                 {
                     g.CircleSegment(c, td, r, alpha.A, alpha.B);
                 }
+                */
             }
         }
 
@@ -381,10 +387,10 @@ namespace NanoGames.Games.Infinity
                 var r = myColor.Blue;
                 var m = 1 / observer.ZoomOut;
                 var p = -observer.Position + tile.Position;
-                g.Point(r, new Vector(0, 0).Translate(p).Scaled(m).ToOrigin());
-                g.Point(r, new Vector(tileSize, 0).Translate(p).Scaled(m).ToOrigin());
-                g.Point(r, new Vector(tileSize, tileSize).Translate(p).Scaled(m).ToOrigin());
-                g.Point(r, new Vector(0, tileSize).Translate(p).Scaled(m).ToOrigin());
+                g.Point(r, new Vector(0, 0).Translated(p).Scaled(m).ToOrigin());
+                g.Point(r, new Vector(tileSize, 0).Translated(p).Scaled(m).ToOrigin());
+                g.Point(r, new Vector(tileSize, tileSize).Translated(p).Scaled(m).ToOrigin());
+                g.Point(r, new Vector(0, tileSize).Translated(p).Scaled(m).ToOrigin());
             }
 
             // Players

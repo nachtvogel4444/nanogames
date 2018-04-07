@@ -59,6 +59,7 @@ namespace NanoGames.Games.Infinity
 
         public List<Interval> Merge(List<Interval> intervals, Interval newInterval)
         {
+            //flo
             var output = new List<Interval> { };
             intervals.Add(newInterval);
             

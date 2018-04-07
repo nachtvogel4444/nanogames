@@ -9,7 +9,7 @@ namespace NanoGames.Games.Infinity
     class InfinityPlayer : Player<InfinityMatch>
     {
         public Vector Position;
-        public int X = int.MaxValue;
+        public int X = int.MaxValue; // flo
         public int Y = int.MaxValue;
         public int TileIndex;
         public Vector Heading;

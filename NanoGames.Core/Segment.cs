@@ -61,25 +61,16 @@ namespace NanoGames
         /// Gets a segment rotated counterclockwise around origin.
         /// </summary>
         /// <param name="angle">The angle of the rotation.</param>
-        /// <param name="origin">The origin of the rotation.</param>
-        /// <returns>"Returns rotated Segment"</returns>
-        public Segment Rotated(double angle, Vector origin) =>
-            new Segment(Start.RotateAngle(angle, origin), End.RotateAngle(angle, origin));
-
-        /// <summary>
-        /// Gets a segment rotated counterclockwise around origin.
-        /// </summary>
-        /// <param name="angle">The angle of the rotation.</param>
         /// <returns>"Returns rotated Segment"</returns>
         public Segment Rotated(double angle) =>
-            new Segment(Start.RotateAngle(angle), End.RotateAngle(angle));
+            new Segment(Start.Rotated(angle), End.Rotated(angle));
 
         /// <summary>
         /// Gets a translated segment.
         /// </summary>
         /// <param name="t">The translation vector.</param>
         /// <returns>"Returns translated Segment"</returns>
-        public Segment Translate(Vector t) => new Segment(Start + t, End + t);
+        public Segment Translated(Vector t) => new Segment(Start + t, End + t);
 
         /// <summary>
         /// Gets a scaled segment.
@@ -92,6 +83,6 @@ namespace NanoGames
         /// Gets a to the origin translated segment.
         /// </summary>
         /// <returns>"Returns the translated Segment"</returns>
-        public Segment ToOrigin() => Translate(new Vector(160, 100));
+        public Segment ToOrigin() => Translated(new Vector(160, 100));
     }
 }

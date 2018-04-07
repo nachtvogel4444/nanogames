@@ -30,6 +30,7 @@ namespace NanoGames.Games
             // Add<Tanks2.Tanks2Match, Tanks2.Tanks2Player>("TANKS2");
             // Add<Bots.BotsMatch, Bots.BotsPlayer>("BOTS");
             Add<Infinity.InfinityMatch, Infinity.InfinityPlayer>("INFINITY");
+            Add<Cluster.ClusterMatch, Cluster.ClusterPlayer>("CLUSTER");
         }
 
         /// <summary>

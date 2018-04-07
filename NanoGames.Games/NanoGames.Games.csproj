@@ -66,13 +66,6 @@
     <Compile Include="..\NanoGames.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="BananaOrbit\BananaOrbitMatch.cs" />
-    <Compile Include="BananaOrbit\BananaOrbitPlayer.cs" />
-    <Compile Include="BananaOrbit\body.cs" />
-    <Compile Include="BananaOrbit\Constants.cs" />
-    <Compile Include="BananaOrbit\ConvexPolygon.cs" />
-    <Compile Include="BananaOrbit\Polygon.cs" />
-    <Compile Include="BananaOrbit\Segment.cs" />
     <Compile Include="Banana\AudioSettings.cs" />
     <Compile Include="Banana\BananaMatch.cs" />
     <Compile Include="Banana\BananaPlayer.cs" />
@@ -115,6 +108,13 @@
     <Compile Include="CatchMe\Ring.cs" />
     <Compile Include="CatchMe\Flake.cs" />
     <Compile Include="CatchMe\MovingCircle.cs" />
+    <Compile Include="Cluster\LBeam.cs" />
+    <Compile Include="Cluster\ClusterMatch.cs" />
+    <Compile Include="Cluster\ClusterPlayer.cs" />
+    <Compile Include="Cluster\Constants.cs" />
+    <Compile Include="Cluster\Planet.cs" />
+    <Compile Include="Cluster\World.cs" />
+    <Compile Include="Cluster\Star.cs" />
     <Compile Include="Infinity\Interval.cs" />
     <Compile Include="Infinity\Star.cs" />
     <Compile Include="Discipline.cs" />

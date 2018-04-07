@@ -122,8 +122,8 @@ namespace NanoGames.Games.Banana
         /// <param name="angle">The angle of the rotation.</param>
         public void Rotate(double angle, Vector origin)
         {
-            Start = Start.RotateAngle(angle, origin);
-            End = End.RotateAngle(angle, origin);
+            //Start = Start.RotateAngle(angle, origin);
+            //End = End.RotateAngle(angle, origin);
         }
 
         /// <summary>

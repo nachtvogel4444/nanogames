@@ -43,6 +43,11 @@ namespace NanoGames
         public double Length => Math.Sqrt(SquaredLength);
 
         /// <summary>
+        /// Gets the length of the vector.
+        /// </summary>
+        public double LengthBBox => Math.Abs(Math.Min(X, Y));
+
+        /// <summary>
         /// Gets the vector normalized to length 1.
         /// </summary>
         public Vector Normalized => this / Length;
@@ -151,31 +156,7 @@ namespace NanoGames
             var ca = Math.Cos(angle);
             var sa = Math.Sin(angle);
             return new Vector(ca * X - sa * Y, sa * X + ca * Y);
-        }
-
-        /// <summary>
-        /// Gets the vector rotated "angle" degrees counterclockwise
-        /// </summary>
-        /// <param name="angle">angle of rotation counterclockwise</param>
-        /// <returns>The rotated angle.</returns>
-        public Vector RotateAngle(double angle)
-        {
-            var x = X * Math.Cos(angle) + Y * Math.Sin(angle);
-            var y = -X * Math.Sin(angle) + Y * Math.Cos(angle);
-            return new Vector(x, y);
-        }
-
-        /// <summary>
-        /// Gets the vector rotated "angle" degrees counterclockwise around origin
-        /// </summary>
-        /// <param name="angle">angle of rotaion counterclockwise</param>
-        /// <param name="origin">origin of rotation</param>
-        /// <returns>The rotated vector.</returns>
-        public Vector RotateAngle(double angle, Vector origin)
-        {
-            var x = (X - origin.X) * Math.Cos(angle) + (Y - origin.Y) * Math.Sin(angle) + origin.X;
-            var y = -(X - origin.X) * Math.Sin(angle) + (Y - origin.Y) * Math.Cos(angle) + origin.Y;
-            return new Vector(x, y);
+            //return new Vector(ca * X + sa * Y, -(sa * X - ca * Y));
         }
 
         /// <summary>
@@ -183,7 +164,7 @@ namespace NanoGames
         /// </summary>
         /// <param name="t">The translation vector.</param>
         /// <returns>"Returns translated Vector"</returns>
-        public Vector Translate(Vector t) => this + t;
+        public Vector Translated(Vector t) => this + t;
 
         /// <summary>
         /// Gets a scaled vector.

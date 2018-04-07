@@ -32,5 +32,30 @@ namespace NanoGames
         /// The color used for errors.
         /// </summary>
         public static readonly Color Error = new Color(1.0, 0.15, 0.0);
+
+        /// <summary>
+        /// Full red.
+        /// </summary>
+        public static readonly Color Red = new Color(1, 0, 0);
+
+        /// <summary>
+        /// Orange.
+        /// </summary>
+        public static readonly Color Orange = new Color(1, 0.647, 0);
+
+        /// <summary>
+         /// Full Green.
+         /// </summary>
+        public static readonly Color Green = new Color(0, 1, 0);
+
+        /// <summary>
+        /// Full blue.
+        /// </summary>
+        public static readonly Color Blue = new Color(0, 0, 1);
+
+        /// <summary>
+        /// Grey.
+        /// </summary>
+        public static readonly Color Grey = new Color(0.3, 0.3, 0.3);
     }
 }
