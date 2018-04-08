@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 
 
 namespace NanoGames.Games.Banana
@@ -103,10 +102,10 @@ namespace NanoGames.Games.Banana
         {
             Border.Clear();
             Normal.Clear();
-            
+
             int n = isBorder.GetLength(0);
             int m = isBorder.GetLength(1);
-            
+
             bool[,] wasTaken = new bool[n, m];
 
             for (int x = 0; x < n; x++)
@@ -117,42 +116,17 @@ namespace NanoGames.Games.Banana
                     {
                         int xx = x;
                         int yy = y;
-                        List<Vector> tmpB = new List<Vector>();
-                        
+                        Border.Add(new List<Vector>());
+                        Normal.Add(new List<Vector>());
+                        Vector s;
+
                         int last = 3;
                         int[,] mylist = new int[8, 2] { { -1, -1 }, { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { -1, 1 }, { -1, 0 } };
-                        
+
+                        // while (!wasTaken[xx, yy])
                         do
                         {
                             wasTaken[xx, yy] = true;
-   
-                            tmpB.Add(new Vector(xx, yy));
-
-                            for (int k = 0; k < 8; k++)
-                            {
-                                int loc = mod(last - 3 + k, 8);
-
-                                if (isBorder[xx + mylist[loc, 0], yy + mylist[loc, 1]])
-                                {
-                                    xx += mylist[loc, 0];
-                                    yy += mylist[loc, 1];
-                                    last = loc;
-                                    break;
-                                }
-                            }
-
-                        } while ((xx != x) || (yy != y));
-
-                        // remove duplicates
-                        var B = tmpB.Distinct().ToList();
-
-                        // make normals
-                        List<Vector> N = new List<Vector>();
-                        Vector s;
-                        foreach (Vector b in B)
-                        {
-                            xx = (int)b.X;
-                            yy = (int)b.Y;
 
                             s = new Vector(0, 0);
                             for (int k = -2; k <= 2; k++)
@@ -170,25 +144,28 @@ namespace NanoGames.Games.Banana
                                 }
                             }
 
-                            N.Add(-s.Normalized);
+                            Normal[Normal.Count - 1].Add(-s.Normalized);
+                            Border[Border.Count - 1].Add(new Vector(xx, yy));
 
-                        }
+                            for (int k = 0; k < 8; k++)
+                            {
+                                int loc = mod(last - 3 + k, 8);
 
-                        Normal.Add(N);
-                        Border.Add(B);
-                                        
+                                if (isBorder[xx + mylist[loc, 0], yy + mylist[loc, 1]])
+                                {
+                                    xx += mylist[loc, 0];
+                                    yy += mylist[loc, 1];
+                                    last = loc;
+                                    break;
+                                }
+                            }
 
-                        // add tmpBorder and tmpNormal to Border and Nnormal if they are long enough
-                        //if (tmpBorder.Count > 7)
-                        //{
-                        //    Normal.Add(tmpNormal);
-                        //    Border.Add(tmpBorder);
-                        //}
+                        } while ((xx != x) || (yy != y));
 
                     }
                 }
             }
-            
+
         }
 
         public void makeCaldera(Vector position, int size)
@@ -231,9 +208,6 @@ namespace NanoGames.Games.Banana
 
         public void Draw(IGraphics g)
         {
-
-            //List<Color> colorList = new List<Color> { new Color(0, 0, 1), new Color(0, 1, 1), new Color(1, 1, 1), new Color(1, 0, 1), new Color(1, 1, 0) };
-
             for (int i = 0; i <= 320; i++)
             {
                 for (int j = 0; j <= 200; j++)
@@ -245,13 +219,14 @@ namespace NanoGames.Games.Banana
                 }
             }
 
-            for (int i = 0; i < Border.Count; i++)
+            foreach (List<Vector> piece in Border)
             {
-                for (int j = 0; j < Border[i].Count; j++)
+                for (int i = 0; i < piece.Count - 1; i++)
                 {
-                    g.Line(new Color(1, 1, 1), Border[i][j], Border[i][mod(j + 1, Border[i].Count)]);
+                    g.Line(new Color(1, 1, 1), piece[i], piece[i + 1]);
                 }
-                
+
+                g.Line(new Color(1, 1, 1), piece[piece.Count - 1], piece[0]);
             }
         }
 
@@ -279,7 +254,7 @@ namespace NanoGames.Games.Banana
                 createBlock(new Vector(120, 120), new Vector(190, 300));
                 createBlock(new Vector(150, 100), new Vector(300, 130));
             }
-            
+
             if (name == "blocks")
             {
                 createBlock(new Vector(30, 60), new Vector(100, 90));
@@ -295,26 +270,26 @@ namespace NanoGames.Games.Banana
 
             if (name == "lady")
             {
-                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\lady.bmp");
+                readImageToIsSolid(@"Banana\img\lady.bmp");
             }
 
             if (name == "boarder")
             {
-                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\boarder.bmp");
+                readImageToIsSolid(@"Banana\img\boarder.bmp");
             }
 
             if (name == "skier")
             {
-                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\skier.bmp");
+                readImageToIsSolid(@"Banana\img\skier.bmp");
             }
 
             if (name == "airplane")
             {
-                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\airplane.bmp");
+                readImageToIsSolid(@"Banana\img\airplane.bmp");
             }
             if (name == "owls")
             {
-                readImageToIsSolid(@"H:\Projekte\nanogames\NanoGames.Games\Banana\owls.bmp");
+                readImageToIsSolid(@"Banana\img\owls.bmp");
             }
 
             Refresh();

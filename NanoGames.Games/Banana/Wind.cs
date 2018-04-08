@@ -36,6 +36,6 @@ namespace NanoGames.Games.Banana
         {
             Speed = speed;
         }
-           
+
     }
 }

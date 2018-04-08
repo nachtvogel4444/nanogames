@@ -40,6 +40,6 @@ namespace NanoGames.Games.Banana
             NextPlayer = false;
             CannotShot = false;
         }
-    
+
     }
 }

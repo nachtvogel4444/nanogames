@@ -16,36 +16,11 @@ namespace NanoGames.Games.Banana
         public bool InSegment1 = false;
         public bool InSegment2 = false;
         public bool IsTrue = false;
-        public Vector Point = new Vector(0, 0);
+        public Vector Point;
 
         private double epsilon = 0.00000000001;
-        
-        public Intersection(bool isTrue)
-        {
-            // initializes a dummy intersection,
-            IsTrue = isTrue;
-        }
-
-        public Intersection(Segment s1, Segment s2)
-        {
-            initialize(s1.Start, s1.End, s2.Start, s2.End);
-        }
 
         public Intersection(Vector p11, Vector p12, Vector p21, Vector p22)
-        {
-            initialize(p11, p12, p21, p22);
-        }
-
-        public Intersection(Vector a, Vector b, Vector c)
-        {
-            Vector ab = b - a;
-            Vector ac = c - a;
-            double cross = ab.X * ac.Y - ab.Y * ab.X;
-
-            IsTrue = true;
-        }
-
-        private void initialize(Vector p11, Vector p12, Vector p21, Vector p22)
         {
             p11.Y = -p11.Y;
             p12.Y = -p12.Y;
@@ -68,6 +43,10 @@ namespace NanoGames.Games.Banana
                 Point.X = (B2 * C1 - B1 * C2) / det;
                 Point.Y = (A1 * C2 - A2 * C1) / det;
 
+                if (p21.X == 112 && p22.X == 113 && p21.Y == 104 && p22.Y == 105 && p11.Y > 104)
+                {
+
+                }
 
                 if ((Math.Min(p11.X, p12.X) <= Point.X + epsilon) && (Math.Max(p11.X, p12.X) >= Point.X - epsilon) &&
                     (Math.Min(p11.Y, p12.Y) <= Point.Y + epsilon) && (Math.Max(p11.Y, p12.Y) >= Point.Y - epsilon))
@@ -92,6 +71,15 @@ namespace NanoGames.Games.Banana
             p21.Y = -p21.Y;
             p22.Y = -p22.Y;
             Point.Y = -Point.Y;
+        }
+
+        public Intersection(Vector a, Vector b, Vector c)
+        {
+            Vector ab = b - a;
+            Vector ac = c - a;
+            double cross = ab.X * ac.Y - ab.Y * ab.X;
+
+            IsTrue = true;
         }
 
     }

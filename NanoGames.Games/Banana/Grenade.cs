@@ -10,10 +10,8 @@ using System.Threading.Tasks;
 
 namespace NanoGames.Games.Banana
 {
-    internal class Grenade
+    class Grenade
     {
-        // show postion of 1 2 3 secs
-
         public Vector Position;
         public Vector PositionBefore;
         public Vector Velocity;
@@ -85,12 +83,12 @@ namespace NanoGames.Games.Banana
             {
                 p2 = p1;
             }
-            
+
 
             outgoing = (p2 - intersection).Normalized;
 
             l = Velocity.Length - (PositionBefore - intersection).Length;
-            
+
             Position = intersection + l * outgoing;
 
             Velocity = 0.6 * Velocity.Length * outgoing;

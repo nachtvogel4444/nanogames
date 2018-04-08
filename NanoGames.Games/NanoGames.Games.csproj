@@ -74,8 +74,6 @@
     <Compile Include="Banana\Landscape.cs" />
     <Compile Include="Banana\Bullet.cs" />
     <Compile Include="Banana\Constants.cs" />
-    <Compile Include="Banana\Pixel.cs" />
-    <Compile Include="Banana\Map.cs" />
     <Compile Include="Banana\Segment.cs" />
     <Compile Include="Banana\Wind.cs" />
     <Compile Include="AsteroidHunt\Asteroid.cs" />
@@ -191,9 +189,6 @@
       <Project>{be63934a-7c7f-45b4-ba4e-65ce906e5efe}</Project>
       <Name>NanoGames.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Banana\tmpcode.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

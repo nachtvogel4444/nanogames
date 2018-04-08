@@ -14,7 +14,7 @@ namespace NanoGames.Games.Banana
         public Vector Position;
         public Vector PositionBefore;
         public Vector Velocity;
-        
+
         public bool IsExploded = true;
 
         public void StartBullet(Vector pos, Vector vel)
@@ -30,6 +30,6 @@ namespace NanoGames.Games.Banana
             PositionBefore = Position;
             Position += Velocity + 0.5 * new Vector(0, Constants.Gravity);
             Velocity += new Vector(0, Constants.Gravity) + 0.008 * new Vector(w.Speed, 0);
-        }       
+        }
     }
 }
