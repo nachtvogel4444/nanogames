@@ -19,11 +19,12 @@ namespace NanoGames.Games.Cluster
         public double View = 100;
 
         public double Mass = 1;
-        public double Size = 3;
+        public double Size = 7;
         
-        public double BoosterPower = 100;
+        public double BoosterPower = 200;
 
         private int waitFire;
+        private bool isFired;
 
         public List<Segment> Ship = new List<Segment> {
             new Segment( new Vector(-0.1, 1),   new Vector(0.1, 1)),
@@ -48,6 +49,7 @@ namespace NanoGames.Games.Cluster
             new Segment(new Vector(1, -1),  new Vector(-1, -1)),
             new Segment(new Vector(-1, -1), new Vector(0, 2)),
         };
+
         public List<Segment> Gun = new List<Segment> {
             new Segment(new Vector(0.7, -0.1), new Vector(0.7, 0.7)),
             new Segment(new Vector(-0.7, -0.1), new Vector(-0.7, 0.7))
@@ -124,15 +126,7 @@ namespace NanoGames.Games.Cluster
             Omega += angularAcc * dt;
         }
 
-        public void MoveLBeams()
-        {
-            foreach (LBeam lBeam in LBeams)
-            {
-                lBeam.Move();
-            }
-        }
-
-        public void Shoot()
+        public void Shoot(World world)
         {
             waitFire++;
 
@@ -141,10 +135,11 @@ namespace NanoGames.Games.Cluster
                 Vector p1 = Position + Gun[0].Start.Scaled(Size).Rotated(Angle);
                 Vector p2 = Position + Gun[1].Start.Scaled(Size).Rotated(Angle);
 
-                LBeams.Add(new LBeam(p1, Heading));
-                LBeams.Add(new LBeam(p2, Heading));
+                world.LBeams.Add(new LBeam(p1, Heading));
+                world.LBeams.Add(new LBeam(p2, Heading));
 
                 waitFire = 0;
+                isFired = true;
             }
         }
 
@@ -207,7 +202,7 @@ namespace NanoGames.Games.Cluster
                     Segment seg = part.Scaled(Size).Rotated(Angle).Translated(p).Scaled(m).ToOrigin();
                     g.LLine(LocalColor, seg.Start, seg.End);
                 }
-
+                
                 if (Weapon == 0)
                 {
                     foreach (Segment part in Gun)
@@ -215,11 +210,6 @@ namespace NanoGames.Games.Cluster
                         Segment seg = part.Scaled(Size).Rotated(Angle).Translated(p).Scaled(m).ToOrigin();
                         g.LLine(LocalColor, seg.Start, seg.End);
                     }
-                }
-
-                foreach (LBeam lbeam in LBeams)
-                {
-                    lbeam.Draw(observer);
                 }
             }
             
@@ -229,6 +219,22 @@ namespace NanoGames.Games.Cluster
                 g.LLine(LocalColor, p.Scaled(m).ToOrigin(), (p + 5 * Heading).Scaled(m).ToOrigin());
                 g.LLine(Colors.Blue, p.Scaled(m).ToOrigin(), (p + 5 * Velocity.Normalized).Scaled(m).ToOrigin());
             }
+        }
+
+        public void PlaySound(ClusterPlayer observer)
+        {
+            double m = observer.Magnification;
+            IAudio a = observer.Output.Audio;
+            
+             if (Math.Abs(Position.X - observer.Position.X) < (160 / m) &&
+                Math.Abs(Position.Y - observer.Position.Y) < (100 / m))
+             {
+                if (isFired)
+                {
+                    a.Play(Sounds.Toc);
+                    isFired = false;
+                }
+             }
         }
     }
 }

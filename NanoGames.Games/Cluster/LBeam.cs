@@ -15,12 +15,12 @@ namespace NanoGames.Games.Cluster
         private Vector Velocity;
         private double length;
         
-        public bool IsGone;
+        public bool Explodes;
 
         public LBeam(Vector pos, Vector heading)
         {
             Velocity = heading * Constants.LBeam.Speed;
-            IsGone = false;
+            Explodes = false;
             length = Constants.LBeam.Length;
             Position = pos + Velocity.Normalized * length;
         }
@@ -36,10 +36,10 @@ namespace NanoGames.Games.Cluster
             if ((planet.Position - Position).LengthBBox < planet.Radius &&
                 (planet.Position - Position).Length < planet.Radius)
             {
-                IsGone = true;
+                Explodes = true;
             }
         }
-
+        
         public void Draw(ClusterPlayer observer)
         {
             double m = observer.Magnification;

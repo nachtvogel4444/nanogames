@@ -11,6 +11,8 @@ namespace NanoGames.Games.Cluster
     {
         public List<Star> Stars = new List<Star> { };
         public List<Planet> Planets = new List<Planet> { };
+        public List<LBeam> LBeams = new List<LBeam> { };
+        public List<Explosion> Explosions = new List<Explosion> { };
 
         public double XMax;
         public double YMax;
@@ -160,6 +162,24 @@ namespace NanoGames.Games.Cluster
             foreach (Planet planet in Planets)
             {
                 planet.Draw(observer);
+            }
+            
+            foreach (LBeam lbeam in LBeams)
+            {
+                lbeam.Draw(observer);
+            }
+
+            foreach (Explosion explosion in Explosions)
+            {
+                explosion.Draw(observer);
+            }
+        }
+
+        public void PlaySound(ClusterPlayer observer)
+        {
+            foreach (Explosion explosion in Explosions)
+            {
+                explosion.PlaySound(observer);
             }
         }
 

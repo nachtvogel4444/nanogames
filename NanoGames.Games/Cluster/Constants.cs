@@ -29,9 +29,9 @@ namespace NanoGames.Games.Cluster
 
         public static class LBeam
         {
-            public const double Speed = 1000;
-            public const double Length = 40;
-            public const int FireTime = 12;
+            public const double Speed = 500;
+            public const double Length = 10;
+            public const int FireTime = 20;
         }
     }
 }
