@@ -9,13 +9,12 @@ namespace NanoGames.Games.Cluster
 {
     internal class ClusterMatch : Match<ClusterPlayer>
     {
-        private World world = new World();
+        private World world;
         
         protected override void Initialize()
         {
-            world.AddPlanets(Random);
-            world.AddStars(Random);
-            world.PlayerPositions(Random, Players);
+            world = new World(Players, Random);
+            world.Init();
 
             foreach (ClusterPlayer player in Players)
             {
@@ -26,32 +25,14 @@ namespace NanoGames.Games.Cluster
         }
 
         protected override void Update()
-        {/*
-            double alpha = Frame * Math.PI / 180;
-            Vector middle = new Vector(160, 100);
-            Vector right = new Vector(180, 100);
-            Vector rright = new Vector(200, 100);
+        {
+            // Collide -> Move(move) -> Draw -> PlaySound -> Update -> CleanUp
+            world.Collide();
 
-            Vector h = new Vector(Math.Cos(alpha), Math.Sin(alpha));
-            Vector hh = new Vector(1, 0);
+            world.Move();
 
-            Output.Graphics.Line(Colors.White, middle, middle + 10 * h);
-            Output.Graphics.Line(Colors.White, right, right + 10 * hh.Rotated(alpha));
-            Output.Graphics.Line(Colors.White, rright, rright + 10 * Vector.FromAngle(alpha));
-            */
             
-            // Everything moves
-            foreach (ClusterPlayer player in Players)
-            {
-                player.Move();
-            }
-
-            foreach (LBeam lbeam in world.LBeams)
-            {
-                lbeam.Move();
-            }
-            
-            // Everything collides
+            /*// Everything collides (major change needed here)
             if (Players.Count > 1)
             {
                 for (int i = 0; i < Players.Count; i++)
@@ -61,40 +42,13 @@ namespace NanoGames.Games.Cluster
                         Players[i].Collide(Players[j]);
                     }
                 }
-            }
-            
-            foreach (ClusterPlayer player in Players)
-            {
-                foreach (Planet planet in world.Planets)
-                {
-                    player.Collide(planet);
-                }
-            }
+            }*/
 
-            List<LBeam> tmp = new List<LBeam> { };
-            foreach (LBeam lBeam in world.LBeams)
-            {
-                foreach (Planet planet in world.Planets)
-                {
-                    lBeam.Collide(planet);
-                }
-
-                if (!lBeam.Explodes)
-                {
-                    tmp.Add(lBeam);
-                }
-                else
-                {
-                    world.Explosions.Add(new Explosion(lBeam.Position, 100, 300, 20, Random));
-                }
-            }
-
-            world.LBeams = tmp;
             
             // everthing can act
             foreach (ClusterPlayer player in Players)
             {
-                player.Shoot(world);
+                player.Shoot(world, Random);
                 player.DoMagnification();
             }
 
@@ -103,27 +57,14 @@ namespace NanoGames.Games.Cluster
             {
                 world.Draw(observer);
                 world.PlaySound(observer);
-                
-                foreach (ClusterPlayer player in Players)
-                {
-                    player.Draw(observer);
-                    player.PlaySound(observer);
-                }
             }
 
-            // remove everthing which is not needed anymore
-            /*
-            List<Explosion> tmp2 = new List<Explosion> { };
-            foreach (Explosion explosion in world.Explosions)
-            {
-                if (!explosion.IsExploded)
-                {
-                    tmp2.Add(explosion);
-                }
-            }
-            world.Explosions = tmp2;
-            */
+            world.Update();
+
+            world.CleanUp();
             
+
+
         }
     }
 }

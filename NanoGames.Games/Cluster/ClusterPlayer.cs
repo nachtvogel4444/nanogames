@@ -58,6 +58,7 @@ namespace NanoGames.Games.Cluster
         public List<LBeam> LBeams = new List<LBeam> { };
 
         public Vector Heading => Vector.FromAngle(Angle);
+
         
         public void Birth()
         {
@@ -126,7 +127,7 @@ namespace NanoGames.Games.Cluster
             Omega += angularAcc * dt;
         }
 
-        public void Shoot(World world)
+        public void Shoot(World world, Random ran)
         {
             waitFire++;
 
@@ -135,25 +136,41 @@ namespace NanoGames.Games.Cluster
                 Vector p1 = Position + Gun[0].Start.Scaled(Size).Rotated(Angle);
                 Vector p2 = Position + Gun[1].Start.Scaled(Size).Rotated(Angle);
 
-                world.LBeams.Add(new LBeam(p1, Heading));
-                world.LBeams.Add(new LBeam(p2, Heading));
+                world.LBeams.Add(new LBeam(p1, Heading, ran));
+                world.LBeams.Add(new LBeam(p2, Heading, ran));
 
                 waitFire = 0;
                 isFired = true;
             }
         }
 
+        public void Collide (World world)
+        {
+            foreach (ClusterPlayer other in world.Players)
+            {
+                Collide(other);
+            }
+
+            foreach (Planet planet in world.Planets)
+            {
+                Collide(planet);
+            }
+        }
+
         public void Collide(ClusterPlayer other)
         {
-            if ((other.Position - Position).LengthBBox < other.Size + Size && 
-                (other.Position - Position).Length < other.Size + Size)
+            if (this != other)
             {
-                Vector dv = Velocity - other.Velocity;
-                Vector dx = Position - other.Position;
-                double fullMass = Mass + other.Mass;
+                if ((other.Position - Position).LengthBBox < other.Size + Size &&
+                (other.Position - Position).Length < other.Size + Size)
+                {
+                    Vector dv = Velocity - other.Velocity;
+                    Vector dx = Position - other.Position;
+                    double fullMass = Mass + other.Mass;
 
-                Velocity -= 2 * other.Mass / fullMass * Vector.Dot(dv, dx) / dx.SquaredLength * dx;
-                other.Velocity += 2 * Mass / fullMass * Vector.Dot(-dv, -dx) / dx.SquaredLength * dx;
+                    Velocity -= 2 * other.Mass / fullMass * Vector.Dot(dv, dx) / dx.SquaredLength * dx;
+                    //other.Velocity += 2 * Mass / fullMass * Vector.Dot(-dv, -dx) / dx.SquaredLength * dx;
+                }
             }
         }
 
@@ -188,6 +205,7 @@ namespace NanoGames.Games.Cluster
                 Magnification = Math.Max(Magnification, MagnificationMin);
             }
         }
+
         
         public void Draw(ClusterPlayer observer)
         {
@@ -228,7 +246,7 @@ namespace NanoGames.Games.Cluster
             
              if (Math.Abs(Position.X - observer.Position.X) < (160 / m) &&
                 Math.Abs(Position.Y - observer.Position.Y) < (100 / m))
-             {
+            {
                 if (isFired)
                 {
                     a.Play(Sounds.Toc);

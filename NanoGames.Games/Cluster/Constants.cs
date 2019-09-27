@@ -31,7 +31,7 @@ namespace NanoGames.Games.Cluster
         {
             public const double Speed = 500;
             public const double Length = 10;
-            public const int FireTime = 20;
+            public const int FireTime = 10;
         }
     }
 }

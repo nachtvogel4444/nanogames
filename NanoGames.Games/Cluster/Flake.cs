@@ -24,37 +24,44 @@ namespace NanoGames.Games.Cluster
         public bool IsStarted;
         public bool IsDead;
 
-        public Flake(Vector pos, Random ran)
+
+        public Flake(Vector pos, int maxTime, Random ran)
         {
             Position = pos;
             double angle = ran.NextDouble() * 2 * Math.PI;
-            Velocity = getRan(ran, 0.5, 1) * new Vector(Math.Sin(angle), Math.Cos(angle));
-            MaxTime = (int)getRan(ran, 10, 30);
-            StartTime = (int)getRan(ran, -15, 0);
-            ColorList = new List<Color> { new Color(0.996, 1, 0.710), new Color(0.996, 1, 0.710), new Color(0.996, 1, 0.710), new Color(0.996, 1, 0.710), new Color(0.996, 1, 0.710), new Color(0.996, 1, 0.710),
-                new Color(1, 0.753, 0.443), new Color(1, 0.753, 0.443), new Color(1, 0.753, 0.443), new Color(1, 0.753, 0.443), new Color(1, 0.753, 0.443), new Color(1, 0.753, 0.443),
-                new Color(1, 0.635, 0.333), new Color(1, 0.635, 0.333), new Color(1, 0.635, 0.333), new Color(1, 0.635, 0.333), new Color(1, 0.635, 0.333), new Color(1, 0.635, 0.333),
-                new Color(1, 0.357, 0.0784), new Color(1, 0.357, 0.0784), new Color(1, 0.357, 0.0784), new Color(1, 0.357, 0.0784), new Color(1, 0.357, 0.0784), new Color(1, 0.357, 0.0784),
-                new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137) };
+            Velocity = Functions.NextDoubleBtw(ran, 0.5, 1) * new Vector(Math.Sin(angle), Math.Cos(angle));
+            
+            StartTime = (int)Functions.NextDoubleBtw(ran, 0, 10);
+            MaxTime = maxTime;
+
+            ColorList = new List<Color> { new Color(0.996, 1, 0.710), new Color(0.996, 1, 0.710), new Color(0.996, 1, 0.710), new Color(0.996, 1, 0.710), new Color(0.996, 1, 0.710), new Color(0.996, 1, 0.710), new Color(0.996, 1, 0.710),
+                new Color(1, 0.753, 0.443), new Color(1, 0.753, 0.443), new Color(1, 0.753, 0.443), new Color(1, 0.753, 0.443), new Color(1, 0.753, 0.443), new Color(1, 0.753, 0.443), new Color(1, 0.753, 0.443),
+                new Color(1, 0.635, 0.333), new Color(1, 0.635, 0.333), new Color(1, 0.635, 0.333), new Color(1, 0.635, 0.333), new Color(1, 0.635, 0.333), new Color(1, 0.635, 0.333), new Color(1, 0.635, 0.333),
+                new Color(1, 0.357, 0.0784), new Color(1, 0.357, 0.0784), new Color(1, 0.357, 0.0784), new Color(1, 0.357, 0.0784), new Color(1, 0.357, 0.0784), new Color(1, 0.357, 0.0784), new Color(1, 0.357, 0.0784),
+                new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137), new Color(1, 0.137, 0.137) };
 
             IsDead = false;
             IsStarted = false;
 
             Time = 0;
         }
-
-        private double getRan(Random ran, double a, double b)
-        {
-            return a + (b - a) * ran.NextDouble();
-        }
+        
 
         public void Update()
         {
-            Position += Velocity;
-            IsDead = Time > MaxTime + StartTime;
+            IsDead = Time > MaxTime;
             IsStarted = Time > StartTime;
             Time++; 
         }
+
+        public void Move()
+        {
+            if (IsStarted)
+            {
+                Position += Velocity;
+            }
+        }
+
 
         public void Draw(ClusterPlayer observer)
         {
@@ -69,6 +76,5 @@ namespace NanoGames.Games.Cluster
                 g.PPoint(Color, p);
             }
         }
-
     }
 }

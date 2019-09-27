@@ -13,11 +13,136 @@ namespace NanoGames.Games.Cluster
         public List<Planet> Planets = new List<Planet> { };
         public List<LBeam> LBeams = new List<LBeam> { };
         public List<Explosion> Explosions = new List<Explosion> { };
+        public IReadOnlyList<ClusterPlayer> Players;
 
         public double XMax;
         public double YMax;
+        public Random Random;
 
-        public void AddPlanets(Random rand)
+
+        public World(IReadOnlyList<ClusterPlayer> players, Random random)
+        {
+            Players = players;
+            Random = random;
+        }
+
+        public void Init()
+        {
+            AddPlanets();
+            AddStars();
+            PositionPlayers();
+        }
+
+        public void Update()
+        {
+            foreach (Explosion explosion in Explosions)
+            {
+                explosion.Update();
+            }
+        }
+
+        public void Move()
+        {
+            foreach (LBeam lBeam in LBeams)
+            {
+                lBeam.Move();
+            }
+
+            foreach (Explosion explosion in Explosions)
+            {
+                explosion.Move();
+            }
+
+            foreach (ClusterPlayer player in Players)
+            {
+                player.Move();
+            }
+        }
+
+        public void Collide()
+        {
+            foreach (LBeam lBeam in LBeams)
+            {
+                lBeam.Collide(this);
+            }
+
+            foreach (ClusterPlayer player in Players)
+            {
+                player.Collide(this);
+            }
+        }
+
+        public void CleanUp()
+        {
+            List<Explosion> tmp = new List<Explosion> { };
+            foreach (Explosion explosion in Explosions)
+            {
+                if (!explosion.ReadyToDelete)
+                {
+                    tmp.Add(explosion);
+                }
+            }
+            Explosions = tmp;
+
+            List<LBeam> tmp2 = new List<LBeam> { };
+            foreach (LBeam lBeam in LBeams)
+            {
+                if (!lBeam.ReadyToDelete)
+                {
+                    tmp2.Add(lBeam);
+                }
+            }
+            LBeams = tmp2;
+        }
+
+
+        public void Draw(ClusterPlayer observer)
+        {
+            Vector obs = observer.Position;
+            double m = observer.Magnification;
+            IGraphics g = observer.Output.Graphics;
+
+            foreach (ClusterPlayer player in Players)
+            {
+                player.Draw(observer);
+            }
+
+            foreach (Star star in Stars)
+            {
+                star.Draw(observer);
+            }
+
+            foreach (Planet planet in Planets)
+            {
+                planet.Draw(observer);
+            }
+            
+            foreach (LBeam lbeam in LBeams)
+            {
+                lbeam.Draw(observer);
+            }
+
+            foreach (Explosion explosion in Explosions)
+            {
+                explosion.Draw(observer);
+            }
+        }
+
+        public void PlaySound(ClusterPlayer observer)
+        {
+            foreach (Explosion explosion in Explosions)
+            {
+                explosion.PlaySound(observer);
+            }
+
+            foreach (ClusterPlayer player in Players)
+            {
+                player.PlaySound(observer);
+            }
+        }
+
+
+        public void AddPlanets()
         {
             double xmax = 0;
             double ymax = 0;
@@ -33,7 +158,8 @@ namespace NanoGames.Games.Cluster
                 {
                     bool valid = true;
 
-                    p = new Vector(normDouble(rand, 0, Constants.World.SigmaX), normDouble(rand, 0, Constants.World.SigmaY));
+                    p = new Vector(Functions.NextDoubleNormal(Random, 0, Constants.World.SigmaX),
+                        Functions.NextDoubleNormal(Random, 0, Constants.World.SigmaY));
                     r = Constants.World.MaxR * Math.Pow(i, -Constants.World.C);
 
                     foreach (Planet planet in Planets)
@@ -69,18 +195,19 @@ namespace NanoGames.Games.Cluster
             YMax = 1.1 * ymax;
         }
 
-        public void AddStars(Random rand)
+        public void AddStars()
         {
             int n = (int)(Constants.World.DensityOfStars * 4 * XMax * YMax);
 
             for (int i = 0; i < n; i++)
             {
-                Vector p = new Vector(normDouble(rand, 0, Constants.World.SigmaX), normDouble(rand, 0, Constants.World.SigmaY));
+                Vector p = new Vector(Functions.NextDoubleNormal(Random, 0, Constants.World.SigmaX),
+                    Functions.NextDoubleNormal(Random, 0, Constants.World.SigmaY));
                 bool canBeSeen = true;
 
                 foreach (Planet planet in Planets)
                 {
-                    if((p - planet.Position).Length <= planet.Radius)
+                    if ((p - planet.Position).Length <= planet.Radius)
                     {
                         canBeSeen = false;
                         break;
@@ -89,18 +216,18 @@ namespace NanoGames.Games.Cluster
 
                 if (canBeSeen)
                 {
-                    Stars.Add(new Star(p, 0.2 + 0.8 * rand.NextDouble()));
+                    Stars.Add(new Star(p, 0.2 + 0.8 * Random.NextDouble()));
                 }
             }
         }
 
-        public void PlayerPositions(Random rand, IReadOnlyList<ClusterPlayer> players)
+        public void PositionPlayers()
         {
-            for (int i = 0; i < players.Count; i++)
+            for (int i = 0; i < Players.Count; i++)
             {
                 bool foundplace = false;
                 int counter = 0;
-                ClusterPlayer player = players[i];
+                ClusterPlayer player = Players[i];
                 double size = player.Size;
                 Vector p = new Vector(0, 0);
 
@@ -108,7 +235,8 @@ namespace NanoGames.Games.Cluster
                 {
                     bool valid = true;
 
-                    p = new Vector(normDouble(rand, 0, Constants.World.SigmaX), normDouble(rand, 0, Constants.World.SigmaY));
+                    p = new Vector(Functions.NextDoubleNormal(Random, 0, Constants.World.SigmaX),
+                        Functions.NextDoubleNormal(Random, 0, Constants.World.SigmaY));
 
                     foreach (Planet planet in Planets)
                     {
@@ -122,7 +250,7 @@ namespace NanoGames.Games.Cluster
 
                     for (int j = 0; j < i; j++)
                     {
-                        double d = (players[j].Position - p).Length - (players[j].Size + size);
+                        double d = (Players[j].Position - p).Length - (Players[j].Size + size);
 
                         if (d < Constants.World.MinD)
                         {
@@ -139,58 +267,13 @@ namespace NanoGames.Games.Cluster
 
                     if (counter > 100000)
                     {
-                        throw new Exception("Too many iterations to find a place for the planet");
+                        throw new Exception("Too many iterations to find a place for the player");
                     }
                 }
 
                 player.Position = p;
 
             }
-        }
-
-        public void Draw(ClusterPlayer observer)
-        {
-            Vector obs = observer.Position;
-            double m = observer.Magnification;
-            IGraphics g = observer.Output.Graphics;
-            
-            foreach (Star star in Stars)
-            {
-                star.Draw(observer);
-            }
-
-            foreach (Planet planet in Planets)
-            {
-                planet.Draw(observer);
-            }
-            
-            foreach (LBeam lbeam in LBeams)
-            {
-                lbeam.Draw(observer);
-            }
-
-            foreach (Explosion explosion in Explosions)
-            {
-                explosion.Draw(observer);
-            }
-        }
-
-        public void PlaySound(ClusterPlayer observer)
-        {
-            foreach (Explosion explosion in Explosions)
-            {
-                explosion.PlaySound(observer);
-            }
-        }
-
-        private double normDouble(Random rand, double mu, double sigma)
-        {
-            double u1 = 1 - rand.NextDouble();
-            double u2 = 1 - rand.NextDouble();
-            double randStdNormal = Math.Sqrt(-2 * Math.Log(u1)) * Math.Sin(2 * Math.PI * u2);
-
-
-            return mu + sigma * randStdNormal;
         }
     }
 }

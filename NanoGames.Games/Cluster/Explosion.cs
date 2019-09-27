@@ -12,34 +12,59 @@ namespace NanoGames.Games.Cluster
     internal class Explosion
     {
 
-        private Vector position;
-        private double speed;
-        private int duration;
-        private int lifetime;
+        public Vector Position;
+        private int maxtime;
         private int number;
         private Random random;
         private List<Flake> flakes;
-        public bool IsExploded;
 
-        public Explosion(Vector pos, double s, int dur, int n, Random ran)
+        public bool AudioActive;
+        public bool ReadyToDelete;
+        public int Time;
+
+
+        public Explosion(Vector pos, Random ran)
         {
-            position = pos;
+            Position = pos;
             number = 200;
             random = ran;
-            IsExploded = false;
+            AudioActive = true;
+            
+            maxtime = 22;
+            Time = 0;
 
             flakes = new List<Flake> { };
             for (int i = 0; i < number; i++)
             {
-                flakes.Add(new Flake(position, random));
+                flakes.Add(new Flake(Position, maxtime, random));
             }
         }
+
+
+        public void Update()
+        {
+            foreach (Flake flake in flakes)
+            {
+                flake.Update();
+            }
+
+            Time++;
+            if (Time > maxtime-1) { ReadyToDelete = true; }
+        }
+
+        public void Move()
+        {
+            foreach (Flake flake in flakes)
+            {
+                flake.Move();
+            }
+        }
+
 
         public void Draw(ClusterPlayer observer)
         {
             foreach (Flake flake in flakes)
             {
-                flake.Update();
                 flake.Draw(observer);
             }
 
@@ -49,10 +74,16 @@ namespace NanoGames.Games.Cluster
         {
             IAudio a = observer.Output.Audio;
 
-            if (!IsExploded)
+            double m = observer.Magnification;
+            Vector obs = observer.Position;
+
+            Vector posOnScreen = Position.Translated(-obs).Scaled(m).ToOrigin();
+
+            if (AudioActive &&
+                posOnScreen.X > 0 && posOnScreen.X < 320 && posOnScreen.Y > 0 && posOnScreen.Y < 200)
             {
                 a.Play(Sounds.Explosion);
-                IsExploded = true;
+                AudioActive = false;
             }
         }
 

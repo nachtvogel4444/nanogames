@@ -108,6 +108,7 @@
     <Compile Include="CatchMe\MovingCircle.cs" />
     <Compile Include="Cluster\Explosion.cs" />
     <Compile Include="Cluster\Flake.cs" />
+    <Compile Include="Cluster\Functions.cs" />
     <Compile Include="Cluster\LBeam.cs" />
     <Compile Include="Cluster\ClusterMatch.cs" />
     <Compile Include="Cluster\ClusterPlayer.cs" />

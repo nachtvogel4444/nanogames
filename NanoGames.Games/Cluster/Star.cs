@@ -10,11 +10,13 @@ namespace NanoGames.Games.Cluster
         public Vector Position;
         public double Brightness;
 
+
         public Star(Vector pos, double b)
         {
             Position = pos;
             Brightness = b;
         }
+
 
         public void Draw(ClusterPlayer observer)
         {

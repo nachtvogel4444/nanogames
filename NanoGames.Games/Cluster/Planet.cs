@@ -11,12 +11,14 @@ namespace NanoGames.Games.Cluster
         public Vector Position;
         public double Radius;
 
+
         public Planet(Vector pos, double r)
         {
             Position = pos;
             Radius = r;
         }
         
+
         public void Draw(ClusterPlayer observer)
         {
             double m = observer.Magnification;

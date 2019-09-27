@@ -12,33 +12,51 @@ namespace NanoGames.Games.Cluster
     internal class LBeam
     {
         public Vector Position;
-        private Vector Velocity;
+
+        private Vector velocity;
         private double length;
         
-        public bool Explodes;
+        public bool ReadyToDelete;
 
-        public LBeam(Vector pos, Vector heading)
+
+        public LBeam(Vector pos, Vector heading, Random ran)
         {
-            Velocity = heading * Constants.LBeam.Speed;
-            Explodes = false;
+            velocity = (heading + 0.02 *(ran.NextDouble() - 0.5) * heading.RotatedLeft) * Constants.LBeam.Speed;
             length = Constants.LBeam.Length;
-            Position = pos + Velocity.Normalized * length;
+            Position = pos + velocity.Normalized * length;
         }
+
 
         public void Move()
         {
-            Position += Velocity * Constants.dt;
+            Position += velocity * Constants.dt;
         }
 
-
-        public void Collide(Planet planet)
+        public void Collide(World world)
         {
-            if ((planet.Position - Position).LengthBBox < planet.Radius &&
-                (planet.Position - Position).Length < planet.Radius)
+            foreach (Planet planet in world.Planets)
             {
-                Explodes = true;
+                if ((planet.Position - Position).LengthBBox < planet.Radius &&
+                    (planet.Position - Position).Length < planet.Radius)
+                {
+                    world.Explosions.Add(new Explosion(Position, world.Random));
+                    ReadyToDelete = true;
+                    break;
+                }
+            }
+            
+            foreach (ClusterPlayer player in world.Players)
+            {
+                if ((player.Position - Position).LengthBBox < player.Size &&
+                    (player.Position - Position).Length < player.Size && false)
+                {
+                    world.Explosions.Add(new Explosion(Position, world.Random));
+                    ReadyToDelete = true;
+                    break;
+                }
             }
         }
+
         
         public void Draw(ClusterPlayer observer)
         {
@@ -48,7 +66,7 @@ namespace NanoGames.Games.Cluster
             IGraphics g = observer.Output.Graphics;
             
             Vector p1 = Position.Translated(-obs).Scaled(m).ToOrigin();
-            Vector p2 = (Position - Velocity.Normalized*length).Translated(-obs).Scaled(m).ToOrigin();
+            Vector p2 = (Position - velocity.Normalized*length).Translated(-obs).Scaled(m).ToOrigin();
 
             g.LLine(c, p1, p2);
         }
