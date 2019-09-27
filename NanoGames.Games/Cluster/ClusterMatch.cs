@@ -26,33 +26,10 @@ namespace NanoGames.Games.Cluster
 
         protected override void Update()
         {
-            // Collide -> Move(move) -> Draw -> PlaySound -> Update -> CleanUp
             world.Collide();
-
             world.Move();
+            world.Act();
 
-            
-            /*// Everything collides (major change needed here)
-            if (Players.Count > 1)
-            {
-                for (int i = 0; i < Players.Count; i++)
-                {
-                    for (int j = i + 1; j < Players.Count; j++)
-                    {
-                        Players[i].Collide(Players[j]);
-                    }
-                }
-            }*/
-
-            
-            // everthing can act
-            foreach (ClusterPlayer player in Players)
-            {
-                player.Shoot(world, Random);
-                player.DoMagnification();
-            }
-
-            // Everthing is drawn, sound is played
             foreach (ClusterPlayer observer in Players)
             {
                 world.Draw(observer);
@@ -60,11 +37,7 @@ namespace NanoGames.Games.Cluster
             }
 
             world.Update();
-
             world.CleanUp();
-            
-
-
         }
     }
 }

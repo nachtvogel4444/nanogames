@@ -33,6 +33,7 @@ namespace NanoGames.Games.Cluster
             PositionPlayers();
         }
 
+
         public void Update()
         {
             foreach (Explosion explosion in Explosions)
@@ -56,6 +57,15 @@ namespace NanoGames.Games.Cluster
             foreach (ClusterPlayer player in Players)
             {
                 player.Move();
+            }
+        }
+
+        public void Act()
+        {
+            foreach (ClusterPlayer player in Players)
+            {
+                player.Shoot(this, Random);
+                player.DoMagnification();
             }
         }
 
