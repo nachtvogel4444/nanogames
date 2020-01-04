@@ -14,13 +14,12 @@ namespace NanoGames.Games.Cluster
 
         public static class World
         {
-            public const double SigmaX = 5000.0 / 3.0;
+            public const double SigmaX = 3000.0 / 3.0;
             public const double SigmaRatio = 1.0 / 3.0;
 
             public const double DensityOfStars = 0.00005;
 
-            // public const int NumberOfPlanets = 200;
-            public const int NumberOfPlanets = 1;
+            public const int NumberOfPlanets = 150;
             public const double MaxR = 500;
             public const double C = 0.6;
             public const double MinD = 20;
@@ -33,6 +32,11 @@ namespace NanoGames.Games.Cluster
             public const double Speed = 500;
             public const double Length = 10;
             public const int FireTime = 10;
+        }
+
+        public static class Planet
+        {
+            public const double VoronoiDensity = 1.0 / (20.0 * 20.0);
         }
     }
 }

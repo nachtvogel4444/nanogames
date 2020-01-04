@@ -196,7 +196,7 @@ namespace NanoGames.Games.Cluster
                     }
                 }
 
-                Planets.Add(new Planet(p, r));
+                Planets.Add(new Planet(p, r, Random));
 
                 xmax = Math.Max(xmax, Math.Abs(p.X) + r);
                 ymax = Math.Max(ymax, Math.Abs(p.Y) + r);
