@@ -19,7 +19,8 @@ namespace NanoGames.Games.Cluster
 
             public const double DensityOfStars = 0.00005;
 
-            public const int NumberOfPlanets = 200;
+            // public const int NumberOfPlanets = 200;
+            public const int NumberOfPlanets = 1;
             public const double MaxR = 500;
             public const double C = 0.6;
             public const double MinD = 20;

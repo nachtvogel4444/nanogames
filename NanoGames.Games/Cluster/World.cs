@@ -28,9 +28,9 @@ namespace NanoGames.Games.Cluster
 
         public void Init()
         {
-            AddPlanets();
-            AddStars();
-            PositionPlayers();
+            addPlanets();
+            addStars();
+            positionPlayers();
         }
 
 
@@ -152,11 +152,12 @@ namespace NanoGames.Games.Cluster
         }
 
 
-        public void AddPlanets()
+        private void addPlanets()
         {
             double xmax = 0;
             double ymax = 0;
 
+            // put planets in random position, with no overlap
             for (int i = 1; i <= Constants.World.NumberOfPlanets; i++)
             {
                 bool foundplace = false;
@@ -201,11 +202,17 @@ namespace NanoGames.Games.Cluster
                 ymax = Math.Max(ymax, Math.Abs(p.Y) + r);
             }
 
+            // update the size of world 
             XMax = 1.1 * xmax;
             YMax = 1.1 * ymax;
         }
 
-        public void AddStars()
+        private void addVoronoiToPlanet(Planet planet)
+        {
+            
+        }
+
+        private void addStars()
         {
             int n = (int)(Constants.World.DensityOfStars * 4 * XMax * YMax);
 
@@ -231,7 +238,7 @@ namespace NanoGames.Games.Cluster
             }
         }
 
-        public void PositionPlayers()
+        private void positionPlayers()
         {
             for (int i = 0; i < Players.Count; i++)
             {

@@ -165,7 +165,6 @@ namespace NanoGames.Games.Cluster
                 (other.Position - Position).Length < other.Size + Size)
                 {
                     Vector dv = Velocity - other.Velocity;
-
                     Vector dx = Position - other.Position;
                     double fullMass = Mass + other.Mass;
 

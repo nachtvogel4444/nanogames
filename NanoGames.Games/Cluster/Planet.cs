@@ -10,12 +10,18 @@ namespace NanoGames.Games.Cluster
     {
         public Vector Position;
         public double Radius;
+        public List<Tile> VoronoiTiles;
+        public Random Random;
+        public List<Vector> VoronoiPoints;
 
 
-        public Planet(Vector pos, double r)
+        public Planet(Vector pos, double r, int n, Random random)
         {
             Position = pos;
             Radius = r;
+            Random = random;
+
+            addTiles(n);
         }
         
 
@@ -32,6 +38,35 @@ namespace NanoGames.Games.Cluster
                 Vector p = Position.Translated(-obs).Scaled(m).ToOrigin();
                 
                 g.CCircle(c, p, r);
+            }
+        }
+
+        private void addTiles(int n)
+        {
+            // find n random points in planet
+            for (int i = 0; i < n; i++)
+            {
+                bool foundplace = false;
+                Vector p = new Vector(0, 0);
+
+                while (!foundplace)
+                {
+                    p = new Vector(Functions.NextDoubleBtw(Random, -Radius, Radius), Functions.NextDoubleBtw(Random, -Radius, Radius));
+
+                    if (p.Length < Radius)
+                    {
+                        foundplace = true;
+                    }
+
+                }
+
+                VoronoiPoints.Add(p);
+            }
+
+            // do voronoi stuff
+            foreach (Vector voronoiPoint in VoronoiPoints)
+            {
+
             }
         }
     }
