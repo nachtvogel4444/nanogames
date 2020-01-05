@@ -179,6 +179,13 @@ namespace NanoGames
         /// <returns>"Returns the translated Segment"</returns>
         public Vector ToOrigin() => this + new Vector(160, 100);
 
+        /// <summary>
+        /// Gets the mid point of this vector and other vector.
+        /// </summary>
+        /// <param name="otherVector">The other vector.</param>
+        /// <returns>"Returns the vector to the mid point"</returns>
+        public Vector MidPointTo(Vector otherVector) => 0.5 * (this + otherVector);
+
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {

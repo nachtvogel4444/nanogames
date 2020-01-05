@@ -47,6 +47,11 @@ namespace NanoGames.Games.Cluster
                 Vector p = (Position + vp).Translated(-obs).Scaled(m).ToOrigin();
                 g.PPoint(c, p);
             }
+
+            foreach (Tile tile in VoronoiTiles)
+            {
+                tile.Draw(observer);
+            }
         }
 
 
@@ -75,11 +80,65 @@ namespace NanoGames.Games.Cluster
             }
 
             // do voronoi stuff
-            foreach (Vector voronoiPoint in VoronoiPoints)
+            n = VoronoiPoints.Count;
+
+            foreach (Vector vp in VoronoiPoints)
             {
                 // continue here with calculation of voronoipoints
                 // pixel based, handwaving
+                
+                double dist = double.MaxValue;
+                Vector vp1 = new Vector(0, 0);
+                
+                foreach (Vector othervp in VoronoiPoints)
+                {
+                    if (othervp != vp)
+                    {
+                        if (dist > (vp - othervp).Length)
+                        {
+                            vp1 = othervp;
+                            dist = (vp - othervp).Length;
+                        }
+                    }
+                }
 
+                Vector p = vp.MidPointTo(vp1);
+                Vector dir = (p - vp).RotatedLeft.Normalized;
+
+                // step-by-step search fornext tilepoint
+                int foundIt = 0;
+                int counter = 0;
+               
+                while (foundIt == 0 && counter < 10000)
+                {
+                    foreach (Vector othervp in VoronoiPoints)
+                    {
+                        if ((othervp != vp) && (othervp != vp1))
+                        {
+                            if (Math.Abs((p - vp).Length  - (p - othervp).Length) < Constants.Planet.VoronoiError)
+                            {
+                                foundIt++;
+                            }
+                        }
+                    }
+
+                    p = p + Constants.Planet.VoronoiStep * dir;
+
+                    if (p.Length >= Radius)
+                    {
+                        foundIt = 1;
+                    }
+
+                    counter++;
+                }
+
+                if (true)
+                {
+                    Tile tile = new Tile();
+                    tile.Segments.Add(new Segment(Position + vp.MidPointTo(vp1), Position + p));
+                    VoronoiTiles.Add(tile);
+                }
+                
             }
         }
     }
