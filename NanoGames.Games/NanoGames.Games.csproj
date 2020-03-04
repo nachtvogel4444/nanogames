@@ -115,6 +115,7 @@
     <Compile Include="Cluster\Constants.cs" />
     <Compile Include="Cluster\Planet.cs" />
     <Compile Include="Cluster\Tile.cs" />
+    <Compile Include="Cluster\Voronoi.cs" />
     <Compile Include="Cluster\World.cs" />
     <Compile Include="Cluster\Star.cs" />
     <Compile Include="Infinity\Interval.cs" />

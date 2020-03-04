@@ -9,11 +9,12 @@ namespace NanoGames.Games.Cluster
     internal class Tile
     {
         public List<Segment> Segments;
-
+        public Vector CenterPoint;
 
         public Tile()
         {
             Segments = new List<Segment> { };
+            CenterPoint = new Vector(0, 0);
         }
 
 
