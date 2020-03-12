@@ -15,6 +15,11 @@ namespace NanoGames.Games.Cluster
         public Random Random;
         public List<Vector> VoronoiPoints = new List<Vector> { };
 
+        public List<Vector> PointsToPlot1 = new List<Vector> { };
+        public List<Vector> PointsToPlot2 = new List<Vector> { };
+        public List<Vector> PointsToPlot3 = new List<Vector> { };
+        public List<Vector> PointsToPlot4 = new List<Vector> { };
+
 
         public Planet(Vector pos, double r, Random random)
         {
@@ -48,6 +53,30 @@ namespace NanoGames.Games.Cluster
                 Vector p = (Position + vp).Translated(-obs).Scaled(m).ToOrigin();
                 g.PPoint(c, p);
             }
+
+            for (int idx = 0; idx < PointsToPlot1.Count; idx++)
+            {
+                Color c = Colors.Red;
+                Vector p1 = (Position + PointsToPlot1[idx]).Translated(-obs).Scaled(m).ToOrigin();
+                Vector p2 = (Position + PointsToPlot2[idx]).Translated(-obs).Scaled(m).ToOrigin();
+                g.LLine(c, p1, p2);
+            }
+            foreach (Vector pp in PointsToPlot3)
+            {
+                Color c = Colors.White;
+                Vector p = (Position + pp).Translated(-obs).Scaled(m).ToOrigin();
+                g.PPoint(c, p);
+
+            }
+            foreach (Vector pp in PointsToPlot4)
+            {
+                Color c = Colors.Green;
+                Vector p = (Position + pp).Translated(-obs).Scaled(m).ToOrigin();
+                g.CCircle(c, p, 2);
+
+            }
+            g.CCircle(Colors.Red, (Position + VoronoiPoints[0]).Translated(-obs).Scaled(m).ToOrigin(), 2);
+
 
             foreach (Tile tile in VoronoiTiles)
             {
@@ -86,7 +115,8 @@ namespace NanoGames.Games.Cluster
 
         private void getAllTiles()
         {
-            for (int i = 0; i < VoronoiPoints.Count; i++)
+            //for (int i = 0; i < VoronoiPoints.Count; i++)
+            for (int i = 0; i < 1; i++)
             {
                 addOneTile(i);
             }
@@ -97,13 +127,16 @@ namespace NanoGames.Games.Cluster
             var thisCenterPoint = VoronoiPoints[idx_thisCenterPoint];
 
             // sort all centerPoints by their distance to thisCenterPoint
-            var distancesSquared = VoronoiPoints.Select(x => (x - thisCenterPoint).Length).ToList();
-            var sortedCenterPoints = VoronoiPoints.Zip(distancesSquared, (x, y) => (x: x, y: y)).OrderBy(t => t.y).Select(t => t.x).ToList();
+            // var distancesSquared = VoronoiPoints.Select(x => (x - thisCenterPoint).Length).ToList();
+            // var sortedCenterPoints = VoronoiPoints.Zip(distancesSquared, (x, y) => (x: x, y: y)).OrderBy(t => t.y).Select(t => t.x).ToList();
 
             // find all midLines. Midlines have the form midline = m + k * d. k is a scalar.
-            var m = sortedCenterPoints.Select(x => 0.5 * (x - thisCenterPoint)).ToList();
+            var m = VoronoiPoints.Select(x => 0.5 * (x + thisCenterPoint)).ToList();
             var d = m.Select(x => (x - thisCenterPoint).RotatedLeft).ToList();
             var midlines = m.Zip(d, (a, b) => (m: a, d: b)).ToList();
+
+            PointsToPlot1 = m.Zip(d, (a, b) => a + 50 * b.Normalized).ToList();
+            PointsToPlot2 = m.Zip(d, (a, b) => a - 50 * b.Normalized).ToList();
 
             // find all intersections od midlines.
             var counter = 1;
@@ -129,11 +162,16 @@ namespace NanoGames.Games.Cluster
                     double k1 = (d2.Y * m1.X - d2.X * m1.Y - d2.Y * m2.X + d2.X * m2.Y) / denom;
                     Vector intersection = m1 + k1 * d1;
 
-                    intersections.Add(intersection);
+                    if (intersection.Length <= Radius)
+                    {
+                        intersections.Add(intersection);
+                    }
                 }
 
                 counter++;
             }
+
+            PointsToPlot3 = intersections;
 
             // take only valid intersection for tile
             List<Vector> validIntersections = new List<Vector> { };
@@ -151,7 +189,7 @@ namespace NanoGames.Games.Cluster
 
                     var distToOCP = (intersection - point).SquaredLength;
 
-                    if (distToCP > distToOCP - Constants.Planet.epsilon)
+                    if (distToCP > (distToOCP + Constants.Planet.epsilon))
                     {
                         isvalid = false;
                         break;
@@ -164,9 +202,11 @@ namespace NanoGames.Games.Cluster
                 }
             }
 
+            PointsToPlot4 = validIntersections;
+
             if (validIntersections.Count > 2)
             {
-                VoronoiTiles.Add(new Tile(thisCenterPoint, validIntersections));
+                VoronoiTiles.Add(new Tile(Position + thisCenterPoint, validIntersections.Select(x => Position + x).ToList()));
             }
 
         }

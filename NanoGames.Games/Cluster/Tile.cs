@@ -32,7 +32,7 @@ namespace NanoGames.Games.Cluster
             foreach (Segment part in Segments)
             {
                 Segment seg = part.Translated(-obs).Scaled(m).ToOrigin();
-                g.LLine(Colors.Orange, seg.Start, seg.End);
+                g.LLine(Colors.White, seg.Start, seg.End);
             }
         }
         
