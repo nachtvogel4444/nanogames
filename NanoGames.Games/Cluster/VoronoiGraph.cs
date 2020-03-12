@@ -47,7 +47,7 @@ namespace NanoGames.Games.Cluster
             // find all intersections od midlines.
             var counter = 1;
             var length = CenterPoints.Count;
-            List<Vector> intersections = new List<Vector { };
+            List<Vector> intersections = new List<Vector> { };
             foreach (var t in midlines)
             {
                 for (int idx = counter; idx < length; idx++)
