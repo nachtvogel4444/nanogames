@@ -11,10 +11,15 @@ namespace NanoGames.Games.Cluster
         public List<Segment> Segments;
         public Vector CenterPoint;
 
-        public Tile()
+        public Tile(Vector centerPoint, List<Vector> points)
         {
-            Segments = new List<Segment> { };
-            CenterPoint = new Vector(0, 0);
+            Segments = new List<Segment> { new Segment(points[points.Count - 1], points[0]) };
+            CenterPoint = centerPoint;
+
+            for (int idx = 0; idx < points.Count -1; idx++)
+            {
+                Segments.Add(new Segment(points[idx], points[idx + 1]));
+            }
         }
 
 

@@ -135,7 +135,7 @@ namespace NanoGames
         {
             return a.X * b.X + a.Y * b.Y;
         }
-        
+
         /// <summary>
         /// Computes the unit vector with the given angle.
         /// </summary>

@@ -39,6 +39,7 @@ namespace NanoGames.Games.Cluster
             public const double VoronoiDensity = 1.0 / (20.0 * 20.0);
             public const double VoronoiError = 0.1;
             public const double VoronoiStep = 0.01;
+            public const double epsilon = 0.1;
         }
     }
 }

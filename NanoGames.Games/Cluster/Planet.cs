@@ -21,6 +21,11 @@ namespace NanoGames.Games.Cluster
             Radius = r;
             Random = random;
 
+
+            LengthPoints = points.Count;
+            CenterPoints = points;
+            Tiles = new List<Tile> { };
+
             addTiles();
         }
         
@@ -55,91 +60,93 @@ namespace NanoGames.Games.Cluster
         }
 
 
-        private void addTiles()
+
+
+        private List<Tile> getAllTiles()
         {
-            // find random voronoi points in planet
-            int n = (int)(Radius * Radius * Math.PI * Constants.Planet.VoronoiDensity);
-
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < LengthPoints; i++)
             {
-                bool foundplace = false;
-                Vector p = new Vector(0, 0);
-
-                while (!foundplace)
-                {
-                    p = new Vector(Functions.NextDoubleBtw(Random, -Radius, Radius), Functions.NextDoubleBtw(Random, -Radius, Radius));
-
-                    if (p.Length < Radius)
-                    {
-                        foundplace = true;
-                    }
-
-                }
-
-                VoronoiPoints.Add(p);
+                Tiles.Add(getOneTile(i));
             }
 
-            // do voronoi stuff
-            n = VoronoiPoints.Count;
-
-            foreach (Vector vp in VoronoiPoints)
-            {
-                // continue here with calculation of voronoipoints
-                // pixel based, handwaving
-                
-                double dist = double.MaxValue;
-                Vector vp1 = new Vector(0, 0);
-                
-                foreach (Vector othervp in VoronoiPoints)
-                {
-                    if (othervp != vp)
-                    {
-                        if (dist > (vp - othervp).Length)
-                        {
-                            vp1 = othervp;
-                            dist = (vp - othervp).Length;
-                        }
-                    }
-                }
-
-                Vector p = vp.MidPointTo(vp1);
-                Vector dir = (p - vp).RotatedLeft.Normalized;
-
-                // step-by-step search fornext tilepoint
-                int foundIt = 0;
-                int counter = 0;
-               
-                while (foundIt == 0 && counter < 10000)
-                {
-                    foreach (Vector othervp in VoronoiPoints)
-                    {
-                        if ((othervp != vp) && (othervp != vp1))
-                        {
-                            if (Math.Abs((p - vp).Length  - (p - othervp).Length) < Constants.Planet.VoronoiError)
-                            {
-                                foundIt++;
-                            }
-                        }
-                    }
-
-                    p = p + Constants.Planet.VoronoiStep * dir;
-
-                    if (p.Length >= Radius)
-                    {
-                        foundIt = 1;
-                    }
-
-                    counter++;
-                }
-
-                if (true)
-                {
-                    Tile tile = new Tile();
-                    tile.Segments.Add(new Segment(Position + vp.MidPointTo(vp1), Position + p));
-                    VoronoiTiles.Add(tile);
-                }
-                
-            }
+            return Tiles;
         }
+
+        private Tile getOneTile(int idx_thisCenterPoint)
+        {
+            var thisCenterPoint = CenterPoints[idx_thisCenterPoint];
+
+            // sort all centerPoints by their distance to thisCenterPoint
+            var distancesSquared = CenterPoints.Select(x => (x - thisCenterPoint).Length).ToList();
+            var sortedCenterPoints = CenterPoints.Zip(distancesSquared, (x, y) => (x: x, y: y)).OrderBy(t => t.y).Select(t => t.x).ToList();
+
+            // find all midLines. Midlines have the form midline = m + k * d. k is a scalar.
+            var m = sortedCenterPoints.Select(x => 0.5 * (x - thisCenterPoint)).ToList();
+            var d = m.Select(x => (x - thisCenterPoint).RotatedLeft).ToList();
+            var midlines = m.Zip(d, (a, b) => (m: a, d: b)).ToList();
+
+            // find all intersections od midlines.
+            var counter = 1;
+            var length = CenterPoints.Count;
+            List<Vector> intersections = new List<Vector { };
+            foreach (var t in midlines)
+            {
+                for (int idx = counter; idx < length; idx++)
+                {
+                    Vector m1 = t.m;
+                    Vector m2 = midlines[idx].m;
+                    Vector d1 = t.d;
+                    Vector d2 = midlines[idx].d;
+
+                    double denom = d1.Y * d2.X - d1.X * d2.Y;
+
+                    if (denom == 0.0)
+                    {
+                        break;
+                    }
+
+                    // from wolfram alpha k1 = (d22 m11 - d21 m12 - d22 m21 + d21 m22) / (d12 d21 - d11 d22);
+                    double k1 = (d2.Y * m1.X - d2.X * m1.Y - d2.Y * m2.X + d2.X * m2.Y) / denom;
+                    Vector intersection = m1 + k1 * d1;
+
+                    intersections.Add(intersection);
+                }
+
+                counter++;
+            }
+
+            // take only valid intersection for tile
+            List<Vector> validIntersections = new List<Vector> { };
+            foreach (Vector intersection in intersections)
+            {
+                var distToCP = (intersection - thisCenterPoint).SquaredLength;
+                var isvalid = true;
+
+                foreach (Vector point in CenterPoints)
+                {
+                    if (point == thisCenterPoint)
+                    {
+                        continue;
+                    }
+
+                    var distToOCP = (intersection - point).SquaredLength;
+
+                    if (distToCP > distToOCP - Constants.Planet.epsilon)
+                    {
+                        isvalid = false;
+                        break;
+                    }
+                }
+
+                if (isvalid)
+                {
+                    validIntersections.Add(intersection);
+                }
+            }
+
+            return new Tile(thisCenterPoint, validIntersections);
+
+        }
+
     }
 }

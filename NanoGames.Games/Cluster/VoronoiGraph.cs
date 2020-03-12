@@ -1,18 +1,16 @@
 ﻿// Copyright (c) the authors of nanoGames. All rights reserved.
 // Licensed under the MIT license. See LICENSE.txt in the project root.
 
-using System;
 using System.Collections.Generic;
-using System.Linq
-using System.
+using System.Linq;
+
 
 namespace NanoGames.Games.Cluster
 {
     internal class VoronoiGraph
     {
         public int LengthPoints;
-        //public List<Vector> CenterPoints;
-        public Vector[] CenterPoints = { };
+        public List<Vector> CenterPoints;
         public List<Tile> Tiles;
         public double RadBoundary;
 
@@ -20,7 +18,6 @@ namespace NanoGames.Games.Cluster
         {
             LengthPoints = points.Count;
             CenterPoints = points;
-            RadBoundary = radboundary;
             Tiles = new List<Tile> { };
         }
 
@@ -36,32 +33,6 @@ namespace NanoGames.Games.Cluster
 
         private Tile getOneTile(int idx_thisCenterPoint)
         {
-            /*int idx_nearestNeighbor = getIndexNearestNeighbor(idx_thisPoint);
-
-            Vector m = 0.5 * (Points[idx_nearestNeighbor] - Points[idx_thisPoint]);
-            Vector d = (m - Points[idx_thisPoint]).RotatedLeft;
-            Vector g = Points[idx_thisPoint] - m;
-
-            //while 
-            while ()
-
-
-            Vector h = Points[idx_nearestNeighbor] - m;
-
-            double k = 0.5 * (g.SquaredLength - h.SquaredLength) / (d.X * (g.X - h.X) + d.Y * (g.Y - g.Y));
-            Vector p = m + k * d;
-
-            Tile newTile = new Tile();
-            newTile.CenterPoint = Points[idx_thisPoint];
-            newTile.Segments.Add(new Segment())*/
-
-            // procedere:
-            // a) 
-            // b) find all midlines. Midlines have the form m = p + k * d. k is a scalar.
-            
-            // d) go through list of intersectoins and find the ones. distance to this_point <= distance all other points.
-
-
             var thisCenterPoint = CenterPoints[idx_thisCenterPoint];
 
             // sort all centerPoints by their distance to thisCenterPoint
@@ -73,9 +44,9 @@ namespace NanoGames.Games.Cluster
             var d = m.Select(x => (x - thisCenterPoint).RotatedLeft).ToList();
             var midlines = m.Zip(d, (a, b) => (m: a, d: b)).ToList();
 
-            // find all intersections od midlines. In this list are all the points of the final voronoi graph
+            // find all intersections od midlines.
             var counter = 1;
-            var length = CenterPoints.Length;
+            var length = CenterPoints.Count;
             List<Vector> intersections = new List<Vector { };
             foreach (var t in midlines)
             {
@@ -87,47 +58,55 @@ namespace NanoGames.Games.Cluster
                     Vector d2 = midlines[idx].d;
 
                     double denom = d1.Y * d2.X - d1.X * d2.Y;
-                    // check if denom is zero
-                    double k1 = (d2.Y * m1.X - d2.X * m1.Y - d2.Y * m2.X + d2.X * m2.Y) / denom;
+
+                    if (denom == 0.0)
+                    {
+                        break;
+                    }
+
                     // from wolfram alpha k1 = (d22 m11 - d21 m12 - d22 m21 + d21 m22) / (d12 d21 - d11 d22);
+                    double k1 = (d2.Y * m1.X - d2.X * m1.Y - d2.Y * m2.X + d2.X * m2.Y) / denom;
                     Vector intersection = m1 + k1 * d1;
+
                     intersections.Add(intersection);
                 }
 
                 counter++;
             }
 
-
-
-
-
-
-
-        }
-
-
-
-        private int getIndexNearestNeighbor(int idx_thisPoint)
-        {
-            double sqaredDist = double.MaxValue;
-            int idx_minDist = -1;
-
-            for (int i = 0; i < LengthPoints; i++)
+            // take only valid intersection for tile
+            List<Vector> validIntersections = new List<Vector> { };
+            foreach (Vector intersection in intersections)
             {
-                if (i != idx_thisPoint)
-                {
-                    double newSqaredDist = (CenterPoints[i] - CenterPoints[idx_thisPoint]).SquaredLength;
+                var distToCP = (intersection - thisCenterPoint).SquaredLength;
+                var isvalid = true;
 
-                    if (newSqaredDist < sqaredDist)
+                foreach (Vector point in CenterPoints)
+                {
+                    if (point == thisCenterPoint)
                     {
-                        idx_minDist = i;
+                        continue;
                     }
+
+                    var distToOCP = (intersection - point).SquaredLength;
+
+                    if (distToCP > distToOCP - Constants.Planet.epsilon)
+                    {
+                        isvalid = false;
+                        break;
+                    }
+                }
+
+                if (isvalid)
+                {
+                    validIntersections.Add(intersection);
                 }
             }
 
-            return idx_minDist;
+            return new Tile(thisCenterPoint, validIntersections);
+            
         }
-
+        
 
     }
 }
