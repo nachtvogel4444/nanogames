@@ -15,7 +15,7 @@ namespace NanoGames.Games.Cluster
         {
             Segments = new List<Segment> { new Segment(points[points.Count - 1], points[0]) };
             CenterPoint = centerPoint;
-
+            
             for (int idx = 0; idx < points.Count -1; idx++)
             {
                 Segments.Add(new Segment(points[idx], points[idx + 1]));

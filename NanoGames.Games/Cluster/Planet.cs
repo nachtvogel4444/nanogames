@@ -51,9 +51,9 @@ namespace NanoGames.Games.Cluster
             {
                 Color c = Colors.Blue;
                 Vector p = (Position + vp).Translated(-obs).Scaled(m).ToOrigin();
-                g.PPoint(c, p);
+                g.CCircle(c, p, 0.2 );
             }
-
+            /*
             for (int idx = 0; idx < PointsToPlot1.Count; idx++)
             {
                 Color c = Colors.Red;
@@ -75,7 +75,7 @@ namespace NanoGames.Games.Cluster
                 g.CCircle(c, p, 2);
 
             }
-            g.CCircle(Colors.Red, (Position + VoronoiPoints[0]).Translated(-obs).Scaled(m).ToOrigin(), 2);
+            g.CCircle(Colors.Red, (Position + VoronoiPoints[0]).Translated(-obs).Scaled(m).ToOrigin(), 2);*/
 
 
             foreach (Tile tile in VoronoiTiles)
@@ -115,8 +115,8 @@ namespace NanoGames.Games.Cluster
 
         private void getAllTiles()
         {
-            //for (int i = 0; i < VoronoiPoints.Count; i++)
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < VoronoiPoints.Count; i++)
+            // for (int i = 0; i < 1; i++)
             {
                 addOneTile(i);
             }
@@ -204,9 +204,13 @@ namespace NanoGames.Games.Cluster
 
             PointsToPlot4 = validIntersections;
 
+            // sort valid intersections
+            var angles = validIntersections.Select(x => Math.Atan2(x.Y - thisCenterPoint.Y, x.X - thisCenterPoint.X));
+            var sortedValidIntersections = validIntersections.Zip(angles, (x, y) => (x: x, y: y)).OrderBy(t => t.y).Select(t => t.x).ToList();
+
             if (validIntersections.Count > 2)
             {
-                VoronoiTiles.Add(new Tile(Position + thisCenterPoint, validIntersections.Select(x => Position + x).ToList()));
+                VoronoiTiles.Add(new Tile(Position + thisCenterPoint, sortedValidIntersections.Select(x => Position + x).ToList()));
             }
 
         }
