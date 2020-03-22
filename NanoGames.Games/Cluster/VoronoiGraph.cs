@@ -103,7 +103,7 @@ namespace NanoGames.Games.Cluster
                 }
             }
 
-            return new Tile(thisCenterPoint, validIntersections);
+            return new Tile(thisCenterPoint, validIntersections, intersections);
             
         }
         

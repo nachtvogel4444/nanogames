@@ -19,6 +19,8 @@ namespace NanoGames.Games.Cluster
         public double YMax;
         public Random Random;
 
+        public int DebugIteration = 0;
+
 
         public World(IReadOnlyList<ClusterPlayer> players, Random random)
         {
@@ -66,6 +68,7 @@ namespace NanoGames.Games.Cluster
             {
                 player.Shoot(this, Random);
                 player.DoMagnification();
+                player.DoStuff(this);
             }
         }
 
@@ -124,7 +127,7 @@ namespace NanoGames.Games.Cluster
 
             foreach (Planet planet in Planets)
             {
-                planet.Draw(observer);
+                planet.Draw(observer, DebugIteration);
             }
             
             foreach (LBeam lbeam in LBeams)

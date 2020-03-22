@@ -19,8 +19,8 @@ namespace NanoGames.Games.Cluster
 
             public const double DensityOfStars = 0.00005;
 
-            public const int NumberOfPlanets = 15;
-            public const double MaxR = 100;
+            public const int NumberOfPlanets = 5;
+            public const double MaxR = 200;
             public const double C = 0.6;
             public const double MinD = 20;
             
@@ -36,9 +36,7 @@ namespace NanoGames.Games.Cluster
 
         public static class Planet
         {
-            public const double VoronoiDensity = 3.0 / (20.0 * 20.0);
-            public const double VoronoiError = 0.1;
-            public const double VoronoiStep = 0.01;
+            public const double VoronoiDensity = 0.003;
             public const double epsilon = 0.00001;
         }
     }

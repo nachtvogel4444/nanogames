@@ -144,6 +144,14 @@ namespace NanoGames.Games.Cluster
             }
         }
 
+        public void DoStuff(World world)
+        {
+            if (Input.AltFire.WasActivated)
+            {
+                world.DebugIteration++;
+            }
+        }
+
         public void Collide (World world)
         {
             foreach (ClusterPlayer other in world.Players)

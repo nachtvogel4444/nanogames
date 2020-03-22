@@ -31,7 +31,7 @@ namespace NanoGames.Games.Cluster
         }
         
 
-        public void Draw(ClusterPlayer observer)
+        public void Draw(ClusterPlayer observer, int debugIteration)
         {
             double m = observer.Magnification;
             double r = Radius * m;
@@ -39,9 +39,10 @@ namespace NanoGames.Games.Cluster
             IGraphics g = observer.Output.Graphics;
             Vector obs = observer.Position;
 
+            /*
             if (r > 0.5)
             {
-                Color c = Colors.White;
+                Color c = Colors.Grey;
                 Vector p = Position.Translated(-obs).Scaled(m).ToOrigin();
                 
                 g.CCircle(c, p, r);
@@ -53,35 +54,18 @@ namespace NanoGames.Games.Cluster
                 Vector p = (Position + vp).Translated(-obs).Scaled(m).ToOrigin();
                 g.CCircle(c, p, 0.2 );
             }
-            /*
-            for (int idx = 0; idx < PointsToPlot1.Count; idx++)
-            {
-                Color c = Colors.Red;
-                Vector p1 = (Position + PointsToPlot1[idx]).Translated(-obs).Scaled(m).ToOrigin();
-                Vector p2 = (Position + PointsToPlot2[idx]).Translated(-obs).Scaled(m).ToOrigin();
-                g.LLine(c, p1, p2);
-            }
-            foreach (Vector pp in PointsToPlot3)
-            {
-                Color c = Colors.White;
-                Vector p = (Position + pp).Translated(-obs).Scaled(m).ToOrigin();
-                g.PPoint(c, p);
-
-            }
-            foreach (Vector pp in PointsToPlot4)
-            {
-                Color c = Colors.Green;
-                Vector p = (Position + pp).Translated(-obs).Scaled(m).ToOrigin();
-                g.CCircle(c, p, 2);
-
-            }
-            g.CCircle(Colors.Red, (Position + VoronoiPoints[0]).Translated(-obs).Scaled(m).ToOrigin(), 2);*/
-
+            */
 
             foreach (Tile tile in VoronoiTiles)
             {
                 tile.Draw(observer);
             }
+            
+
+            //int idx = debugIteration % VoronoiTiles.Count;
+            //VoronoiTiles[idx].Draw(observer);
+
+            
         }
 
 
@@ -89,7 +73,7 @@ namespace NanoGames.Games.Cluster
         {
             // find random voronoi points in planet
             int n = (int)(Radius * Radius * Math.PI * Constants.Planet.VoronoiDensity);
-
+            
             for (int i = 0; i < n; i++)
             {
                 bool foundplace = false;
@@ -131,6 +115,7 @@ namespace NanoGames.Games.Cluster
             // var sortedCenterPoints = VoronoiPoints.Zip(distancesSquared, (x, y) => (x: x, y: y)).OrderBy(t => t.y).Select(t => t.x).ToList();
 
             // find all midLines. Midlines have the form midline = m + k * d. k is a scalar.
+            // here this center point ius stil in the list. not needed
             var m = VoronoiPoints.Select(x => 0.5 * (x + thisCenterPoint)).ToList();
             var d = m.Select(x => (x - thisCenterPoint).RotatedLeft).ToList();
             var midlines = m.Zip(d, (a, b) => (m: a, d: b)).ToList();
@@ -140,22 +125,26 @@ namespace NanoGames.Games.Cluster
 
             // find all intersections od midlines.
             var counter = 1;
+            var idx1 = 0;
+            var c2 = 0;
             var length = VoronoiPoints.Count;
             List<Vector> intersections = new List<Vector> { };
             foreach (var t in midlines)
             {
-                for (int idx = counter; idx < length; idx++)
+                for (int idx2 = counter; idx2 < length; idx2++)
                 {
+                    c2++;
+
                     Vector m1 = t.m;
-                    Vector m2 = midlines[idx].m;
+                    Vector m2 = midlines[idx2].m;
                     Vector d1 = t.d;
-                    Vector d2 = midlines[idx].d;
+                    Vector d2 = midlines[idx2].d;
 
                     double denom = d1.Y * d2.X - d1.X * d2.Y;
 
                     if (denom == 0.0)
                     {
-                        break;
+                        continue;
                     }
 
                     // from wolfram alpha k1 = (d22 m11 - d21 m12 - d22 m21 + d21 m22) / (d12 d21 - d11 d22);
@@ -167,7 +156,7 @@ namespace NanoGames.Games.Cluster
                         intersections.Add(intersection);
                     }
                 }
-
+                idx1++;
                 counter++;
             }
 
@@ -210,7 +199,7 @@ namespace NanoGames.Games.Cluster
 
             if (validIntersections.Count > 2)
             {
-                VoronoiTiles.Add(new Tile(Position + thisCenterPoint, sortedValidIntersections.Select(x => Position + x).ToList()));
+                VoronoiTiles.Add(new Tile(Position + thisCenterPoint, sortedValidIntersections.Select(x => Position + x).ToList(), intersections.Select(x => Position + x).ToList()));
             }
 
         }
