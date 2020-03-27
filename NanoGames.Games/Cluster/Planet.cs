@@ -20,6 +20,8 @@ namespace NanoGames.Games.Cluster
         public List<Vector> PointsToPlot3 = new List<Vector> { };
         public List<Vector> PointsToPlot4 = new List<Vector> { };
 
+        public int Iterations = 2;
+
 
         public Planet(Vector pos, double r, Random random)
         {
@@ -74,33 +76,43 @@ namespace NanoGames.Games.Cluster
             // find random voronoi points in planet
             int n = (int)(Radius * Radius * Math.PI * Constants.Planet.VoronoiDensity);
             
+            // add random voronoi points with some distribution
             for (int i = 0; i < n; i++)
             {
-                bool foundplace = false;
-                Vector p = new Vector(0, 0);
-
-                while (!foundplace)
+                double rad = 2 * Radius;
+                while (rad > Radius)
                 {
-                    p = new Vector(Functions.NextDoubleBtw(Random, -Radius, Radius), Functions.NextDoubleBtw(Random, -Radius, Radius));
-
-                    if (p.Length < Radius)
-                    {
-                        foundplace = true;
-                    }
-
+                    rad = (1 - Functions.NextDoubleNormal(Random, 0, 0.25)) * Radius;
                 }
+                double angle = Random.NextDouble() * 2 * Math.PI;
+
+                Vector p = new Vector(Math.Cos(angle), Math.Sin(angle)) * rad;
 
                 VoronoiPoints.Add(p);
             }
 
             getAllTiles();
+
+            for (int i = 1; i <= Iterations; i++)
+            {
+                // calc new Voroinoipoints
+                List<Vector> tmp = new List<Vector> { };
+                foreach (Tile tile in VoronoiTiles)
+                {
+                    tmp.Add(tile.CenterOfGraphity);
+                }
+                VoronoiPoints = tmp;
+
+                // recalc tiles 
+                VoronoiTiles = new List<Tile> { };
+                getAllTiles();
+            }
             
         }
 
         private void getAllTiles()
         {
             for (int i = 0; i < VoronoiPoints.Count; i++)
-            // for (int i = 0; i < 1; i++)
             {
                 addOneTile(i);
             }

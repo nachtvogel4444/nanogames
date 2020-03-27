@@ -11,7 +11,8 @@ namespace NanoGames.Games.Cluster
         public List<Segment> Segments;
         public Vector CenterPoint;
 
-        public List<Vector> Points; 
+        public List<Vector> Points;
+        public Vector CenterOfGraphity = new Vector(0, 0);
         public List<Vector> AddPoints;
 
         public Tile(Vector centerPoint, List<Vector> points, List<Vector> addPoints)
@@ -25,6 +26,13 @@ namespace NanoGames.Games.Cluster
             {
                 Segments.Add(new Segment(points[idx], points[idx + 1]));
             }
+
+            foreach (Vector p in points)
+            {
+                CenterOfGraphity += p;
+            }
+
+            CenterOfGraphity = CenterOfGraphity / points.Count - CenterPoint;
         }
 
 
