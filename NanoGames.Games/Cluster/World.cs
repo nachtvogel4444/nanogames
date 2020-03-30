@@ -209,11 +209,7 @@ namespace NanoGames.Games.Cluster
             XMax = 1.1 * xmax;
             YMax = 1.1 * ymax;
         }
-
-        private void addVoronoiToPlanet(Planet planet)
-        {
-            
-        }
+        
 
         private void addStars()
         {

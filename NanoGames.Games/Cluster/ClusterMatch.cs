@@ -10,10 +10,12 @@ namespace NanoGames.Games.Cluster
     internal class ClusterMatch : Match<ClusterPlayer>
     {
         private World world;
+        private String state;
         
         protected override void Initialize()
-        {
+        {   
             world = new World(Players, Random);
+            state = "buildingWorld";
             world.Init();
 
             foreach (ClusterPlayer player in Players)
@@ -26,6 +28,20 @@ namespace NanoGames.Games.Cluster
 
         protected override void Update()
         {
+            switch (state)
+            {
+                case "buildingWorld":
+
+                    world.Build();
+
+                    break;
+
+
+
+            }
+
+
+
             world.Collide();
             world.Move();
             world.Act();
