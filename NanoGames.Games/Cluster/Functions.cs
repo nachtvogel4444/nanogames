@@ -49,5 +49,20 @@ namespace NanoGames.Games.Cluster
         {
             return Math.Pow(ran.NextDouble(), 2.0 / 3.0);
         }
+
+        static public List<Color> ColorGradient(Color start, Color stop, int n)
+        {
+            double dr = -(start.R - stop.R) / n;
+            double dg = -(start.G - stop.G) / n;
+            double db = -(start.B - stop.B) / n;
+
+            List<Color> colors = new List<Color> { };
+            for (int idx=0; idx < n; idx++)
+            {
+                colors.Add(new Color(start.R + idx * dr, start.G + idx * dg, start.B + idx * db));
+            }
+
+            return colors;
+        }
     }
 }

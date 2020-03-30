@@ -102,12 +102,21 @@ namespace NanoGames.Games.Cluster
         {
             getVoronoipoints();
             getAllTiles();
-            recenterVoronoipoints();
-            getAllTiles();
-            //recenterVoronoipoints();
-            //getAllTiles();
-            
+            addColors();
+        }
 
+        private void addColors()
+        {
+            int n = VoronoiTiles.Count;
+            var colors = Functions.ColorGradient(new Color(93.0/255, 173.0 / 255, 226.0 / 255),
+                new Color(203.0 / 255, 67.0 / 255, 53.0 / 255), n);
+
+            int idx = 0;
+            foreach (Tile tile in VoronoiTiles)
+            {
+                tile.Color = colors[idx];
+                idx++;
+            }
         }
 
         private void getAllTiles()

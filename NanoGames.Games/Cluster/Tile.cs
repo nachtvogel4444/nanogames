@@ -10,6 +10,7 @@ namespace NanoGames.Games.Cluster
     {
         public List<Segment> Segments;
         public Vector CenterPoint;
+        public Color Color;
 
         public List<Vector> Points;
         public Vector CenterOfGraphity = new Vector(0, 0);
@@ -33,6 +34,7 @@ namespace NanoGames.Games.Cluster
             }
 
             CenterOfGraphity = CenterOfGraphity / points.Count - CenterPoint;
+            Color = Colors.White;
         }
 
 
@@ -40,7 +42,7 @@ namespace NanoGames.Games.Cluster
         {
             double m = observer.Magnification;
             Vector obs = observer.Position;
-            Color c = 0.35 * Math.Pow(m, 0.3) * Colors.White;
+            Color c = 0.35 * Math.Pow(m, 0.3) * Color;
             IGraphics g = observer.Output.Graphics;
 
             foreach (Segment part in Segments)
