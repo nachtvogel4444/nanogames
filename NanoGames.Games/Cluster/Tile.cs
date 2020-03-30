@@ -42,7 +42,7 @@ namespace NanoGames.Games.Cluster
         {
             double m = observer.Magnification;
             Vector obs = observer.Position;
-            Color c = 0.35 * Math.Pow(m, 0.3) * Color;
+            Color c = 0.45 * Math.Pow(m, 0.3) * Color;
             IGraphics g = observer.Output.Graphics;
 
             foreach (Segment part in Segments)

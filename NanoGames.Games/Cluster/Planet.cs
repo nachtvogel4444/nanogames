@@ -85,6 +85,9 @@ namespace NanoGames.Games.Cluster
 
                 VoronoiPoints.Add(p);
             }
+
+
+            VoronoiPoints = VoronoiPoints.OrderBy(x => x.SquaredLength).ToList();
         }
 
         private void recenterVoronoipoints()
@@ -108,8 +111,12 @@ namespace NanoGames.Games.Cluster
         private void addColors()
         {
             int n = VoronoiTiles.Count;
-            var colors = Functions.ColorGradient(new Color(93.0/255, 173.0 / 255, 226.0 / 255),
-                new Color(203.0 / 255, 67.0 / 255, 53.0 / 255), n);
+            var c1 = new Color(203.0 / 255, 67.0 / 255, 53.0 / 255);
+            var c2 = new Color(93.0 / 255, 173.0 / 255, 226.0 / 255);
+
+            //var c1 = new Color(Random.NextDouble(), Random.NextDouble(), Random.NextDouble());
+            //var c2 = new Color(Random.NextDouble(), Random.NextDouble(), Random.NextDouble());
+            var colors = Functions.ColorGradient(c1, c2, n); 
 
             int idx = 0;
             foreach (Tile tile in VoronoiTiles)
