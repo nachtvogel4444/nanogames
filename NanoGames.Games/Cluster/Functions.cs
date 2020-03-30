@@ -24,5 +24,30 @@ namespace NanoGames.Games.Cluster
         {
             return a + (b - a) * ran.NextDouble();
         }
+
+        static public double NextDoubleLinDist(Random ran)
+        {
+            return Math.Sqrt(ran.NextDouble());
+        }
+
+        static public double NextDoubleDist(Random ran, double e)
+        {
+            return Math.Pow(ran.NextDouble(), e);
+        }
+
+        static public double NextDoubleQuadDist(Random ran)
+        {
+            return Math.Pow(ran.NextDouble(), 1.0 / 3.0);
+        }
+
+        static public double NextDoubleCubeDist(Random ran)
+        {
+            return Math.Pow(ran.NextDouble(), 0.25);
+        }
+
+        static public double NextDoubleSqrtDist(Random ran)
+        {
+            return Math.Pow(ran.NextDouble(), 2.0 / 3.0);
+        }
     }
 }

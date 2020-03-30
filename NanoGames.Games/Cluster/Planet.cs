@@ -71,43 +71,43 @@ namespace NanoGames.Games.Cluster
         }
 
 
-        private void addTiles()
+        private void getVoronoipoints()
         {
             // find random voronoi points in planet
             int n = (int)(Radius * Radius * Math.PI * Constants.Planet.VoronoiDensity);
-            
-            // add random voronoi points with some distribution
+
             for (int i = 0; i < n; i++)
             {
-                double rad = 2 * Radius;
-                while (rad > Radius)
-                {
-                    rad = (1 - Functions.NextDoubleNormal(Random, 0, 0.25)) * Radius;
-                }
+                double rad = Functions.NextDoubleDist(Random, 0.3) * Radius;
                 double angle = Random.NextDouble() * 2 * Math.PI;
 
                 Vector p = new Vector(Math.Cos(angle), Math.Sin(angle)) * rad;
 
                 VoronoiPoints.Add(p);
             }
+        }
 
-            getAllTiles();
-
-            for (int i = 1; i <= Iterations; i++)
+        private void recenterVoronoipoints()
+        {
+            List<Vector> tmp = new List<Vector> { };
+            foreach (Tile tile in VoronoiTiles)
             {
-                // calc new Voroinoipoints
-                List<Vector> tmp = new List<Vector> { };
-                foreach (Tile tile in VoronoiTiles)
-                {
-                    tmp.Add(tile.CenterOfGraphity);
-                }
-                VoronoiPoints = tmp;
-
-                // recalc tiles 
-                VoronoiTiles = new List<Tile> { };
-                getAllTiles();
+                tmp.Add(tile.CenterOfGraphity - Position);
             }
+
+            VoronoiPoints = tmp;
+        }
+
+        private void addTiles()
+        {
+            getVoronoipoints();
+            getAllTiles();
+            recenterVoronoipoints();
+            getAllTiles();
+            //recenterVoronoipoints();
+            //getAllTiles();
             
+
         }
 
         private void getAllTiles()
@@ -172,6 +172,34 @@ namespace NanoGames.Games.Cluster
                 counter++;
             }
 
+            // get intersecitons with radius of planet
+            foreach (var midline in midlines)
+            {
+                double dx = midline.d.X;
+                double dy = midline.d.Y;
+
+                double dxsq = dx * dx;
+                double dysq = dy * dy;
+
+                if (dxsq + dysq == 0)
+                {
+                    continue;
+                }
+
+                double mx = midline.m.X;
+                double my = midline.m.Y;
+
+                double rsq = Radius * Radius;
+
+                // from wolfram alpha: (-d1 m1 - d2 m2 + sqrt(2 d1 d2 m1 m2 + d2^2 (-m1^2 + r^2) + d1^2 (-m2^2 + r^2)))/(d1^2 + d2^2)
+                double k1 = (-dx * mx - dy * my + Math.Sqrt(-(dy * mx - dx * my) * (dy * mx - dx * my) + (dxsq + dysq) * rsq)) / (dxsq + dysq);
+                double k2 = (-dx * mx - dy * my - Math.Sqrt(-(dy * mx - dx * my) * (dy * mx - dx * my) + (dxsq + dysq) * rsq)) / (dxsq + dysq);
+
+                intersections.Add(midline.m + k1 * midline.d);
+                intersections.Add(midline.m + k2 * midline.d);
+                
+            }
+
             PointsToPlot3 = intersections;
 
             // take only valid intersection for tile
@@ -211,7 +239,9 @@ namespace NanoGames.Games.Cluster
 
             if (validIntersections.Count > 2)
             {
-                VoronoiTiles.Add(new Tile(Position + thisCenterPoint, sortedValidIntersections.Select(x => Position + x).ToList(), intersections.Select(x => Position + x).ToList()));
+                VoronoiTiles.Add(new Tile(Position + thisCenterPoint, 
+                    sortedValidIntersections.Select(x => Position + x + new Vector(0*Random.NextDouble(), 0)).ToList(), 
+                    intersections.Select(x => Position + x).ToList()));
             }
 
         }

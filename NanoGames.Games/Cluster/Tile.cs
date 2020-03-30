@@ -40,15 +40,15 @@ namespace NanoGames.Games.Cluster
         {
             double m = observer.Magnification;
             Vector obs = observer.Position;
+            Color c = 0.35 * Math.Pow(m, 0.3) * Colors.White;
             IGraphics g = observer.Output.Graphics;
 
             foreach (Segment part in Segments)
             {
                 Segment seg = part.Translated(-obs).Scaled(m).ToOrigin();
-                g.LLine(Colors.White, seg.Start, seg.End);
+                g.LLine(c, seg.Start, seg.End);
             }
-
-            /* debug
+            /*
             foreach (Vector point in Points)
             {
                 Vector p = point.Translated(-obs).Scaled(m).ToOrigin();
@@ -60,10 +60,10 @@ namespace NanoGames.Games.Cluster
                 Vector p = point.Translated(-obs).Scaled(m).ToOrigin();
                 g.PPoint(Colors.White, p);
             }
-
+            
             Vector cp = CenterPoint.Translated(-obs).Scaled(m).ToOrigin();
-            g.CCircle(Colors.Orange, cp, 1);
-            */
+            g.CCircle(Colors.Orange, cp, 0.3*/
+            
         }
         
     }

@@ -37,7 +37,7 @@ namespace NanoGames.Games.Cluster
         public static class Planet
         {
             public const double VoronoiDensity = 0.003;
-            public const double epsilon = 0.00001;
+            public const double epsilon = 0.001;
         }
     }
 }
