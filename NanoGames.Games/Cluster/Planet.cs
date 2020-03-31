@@ -91,15 +91,20 @@ namespace NanoGames.Games.Cluster
 
         private void buildOneTile(Vector thisCenterPoint)
         {
+            // reduce number of points to the nearest 
+            var squaredDistances = CenterPoints.Select(x => (thisCenterPoint - x).Length);
+            var nearestCenterPoints = CenterPoints.Zip(squaredDistances, (x, y) => (x: x, y: y)).OrderBy(t => t.y).Select(t => t.x).Select(v => v).ToList();
+            nearestCenterPoints = nearestCenterPoints.Take(50).ToList();
+
             // find all midLines. Midlines have the form midline = m + k * d. k is a scalar.
             // here thisCenterPoint is still in the list. Not needed
-            var m = CenterPoints.Select(x => 0.5 * (x + thisCenterPoint)).ToList();
+            var m = nearestCenterPoints.Select(x => 0.5 * (x + thisCenterPoint)).ToList();
             var d = m.Select(x => (x - thisCenterPoint).RotatedLeft).ToList();
             var midlines = m.Zip(d, (a, b) => (m: a, d: b)).ToList();
             
             // find all intersections of all midlines.
             int idx1 = 0;
-            int length = CenterPoints.Count;
+            int length = nearestCenterPoints.Count;
             List<Vector> intersections = new List<Vector> { };
             foreach (var t in midlines)
             {
@@ -165,7 +170,7 @@ namespace NanoGames.Games.Cluster
                 var distToCP = (intersection - thisCenterPoint).SquaredLength;
                 var isvalid = true;
 
-                foreach (Vector point in CenterPoints)
+                foreach (Vector point in nearestCenterPoints)
                 {
                     if (point == thisCenterPoint)
                     {
