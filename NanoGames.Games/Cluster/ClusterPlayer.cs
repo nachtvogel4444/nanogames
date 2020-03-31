@@ -148,7 +148,7 @@ namespace NanoGames.Games.Cluster
         {
             if (Input.AltFire.WasActivated)
             {
-                world.DebugIteration++;
+
             }
         }
 

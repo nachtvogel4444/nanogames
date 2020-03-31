@@ -10,50 +10,62 @@ namespace NanoGames.Games.Cluster
     internal class ClusterMatch : Match<ClusterPlayer>
     {
         private World world;
-        private String state;
+        private String gameState;
         
         protected override void Initialize()
         {   
             world = new World(Players, Random);
-            state = "buildingWorld";
-            world.Init();
+            gameState = "BuildingWorld";
 
             foreach (ClusterPlayer player in Players)
             {
-                player.Birth();
                 player.MagnificationMin = Math.Min(160.0 / world.XMax, 100.0 / world.YMax);
+                player.Birth();
             }
             
         }
 
         protected override void Update()
         {
-            switch (state)
+            switch (gameState)
             {
-                case "buildingWorld":
+                case "BuildingWorld":
 
-                    world.Build();
+                    bool worldIsBuild = world.Build();
+                    //bool worldIsBuild = false;
+                    //bool d = world.Build();
+
+                    if (worldIsBuild)
+                    {
+                        gameState = "GameRunning";
+                    }
+                    
+                    foreach (ClusterPlayer observer in Players)
+                    {
+                        world.Draw(observer);
+                        world.PlaySound(observer);
+                    }
 
                     break;
 
+                case "GameRunning":
 
+                    world.Collide();
+                    world.Move();
+                    world.Act();
+
+                    foreach (ClusterPlayer observer in Players)
+                    {
+                        world.Draw(observer);
+                        world.PlaySound(observer);
+                    }
+
+                    world.Update();
+                    world.CleanUp();
+
+                    break;
 
             }
-
-
-
-            world.Collide();
-            world.Move();
-            world.Act();
-
-            foreach (ClusterPlayer observer in Players)
-            {
-                world.Draw(observer);
-                world.PlaySound(observer);
-            }
-
-            world.Update();
-            world.CleanUp();
         }
     }
 }

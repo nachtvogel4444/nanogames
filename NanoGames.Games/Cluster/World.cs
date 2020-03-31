@@ -18,23 +18,22 @@ namespace NanoGames.Games.Cluster
         public double XMax;
         public double YMax;
         public Random Random;
-
-        public int DebugIteration = 0;
+        
+        public int BuildIdxPlanets;
 
 
         public World(IReadOnlyList<ClusterPlayer> players, Random random)
         {
             Players = players;
             Random = random;
-        }
 
-        public void Init()
-        {
             addPlanets();
             addStars();
             positionPlayers();
-        }
 
+            BuildIdxPlanets = 0;
+        }
+        
 
         public void Update()
         {
@@ -127,7 +126,7 @@ namespace NanoGames.Games.Cluster
 
             foreach (Planet planet in Planets)
             {
-                planet.Draw(observer, DebugIteration);
+                planet.Draw(observer);
             }
             
             foreach (LBeam lbeam in LBeams)
@@ -154,6 +153,25 @@ namespace NanoGames.Games.Cluster
             }
         }
 
+
+        public bool Build()
+        {
+            Planet planet = Planets[BuildIdxPlanets];
+
+            if (planet.Build())
+            {
+                BuildIdxPlanets++;
+            }
+
+            if (BuildIdxPlanets == Planets.Count)
+            {
+                // all planets have been build
+                return true;
+            }
+
+            return false;
+
+        }
 
         private void addPlanets()
         {
@@ -210,7 +228,6 @@ namespace NanoGames.Games.Cluster
             YMax = 1.1 * ymax;
         }
         
-
         private void addStars()
         {
             int n = (int)(Constants.World.DensityOfStars * 4 * XMax * YMax);

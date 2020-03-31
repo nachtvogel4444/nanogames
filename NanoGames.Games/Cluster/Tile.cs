@@ -14,14 +14,12 @@ namespace NanoGames.Games.Cluster
 
         public List<Vector> Points;
         public Vector CenterOfGraphity = new Vector(0, 0);
-        public List<Vector> AddPoints;
 
-        public Tile(Vector centerPoint, List<Vector> points, List<Vector> addPoints)
+        public Tile(Vector centerPoint, List<Vector> points, Color color)
         {
             Segments = new List<Segment> { new Segment(points[points.Count - 1], points[0]) };
             CenterPoint = centerPoint;
             Points = points;
-            AddPoints = addPoints;
             
             for (int idx = 0; idx < points.Count -1; idx++)
             {
@@ -34,7 +32,7 @@ namespace NanoGames.Games.Cluster
             }
 
             CenterOfGraphity = CenterOfGraphity / points.Count - CenterPoint;
-            Color = Colors.White;
+            Color = color;
         }
 
 
@@ -55,12 +53,6 @@ namespace NanoGames.Games.Cluster
             {
                 Vector p = point.Translated(-obs).Scaled(m).ToOrigin();
                 g.CCircle(Colors.Red, p, 1);
-            }
-
-            foreach (Vector point in AddPoints)
-            {
-                Vector p = point.Translated(-obs).Scaled(m).ToOrigin();
-                g.PPoint(Colors.White, p);
             }
             
             Vector cp = CenterPoint.Translated(-obs).Scaled(m).ToOrigin();

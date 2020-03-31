@@ -11,9 +11,13 @@ namespace NanoGames.Games.Cluster
     {
         public Vector Position;
         public double Radius;
-        public List<Tile> VoronoiTiles = new List<Tile> { };
+        public List<Tile> Tiles = new List<Tile> { };
         public Random Random;
-        public List<Vector> VoronoiPoints = new List<Vector> { };
+        public List<Vector> CenterPoints = new List<Vector> { };
+
+        public int BuildIdxTiles;
+
+        private List<Color> tileColors = new List<Color> { };
                
 
         public Planet(Vector pos, double r, Random random)
@@ -22,7 +26,10 @@ namespace NanoGames.Games.Cluster
             Radius = r;
             Random = random;
             
-            addTiles();
+            getCenterPoints();
+            getColors();
+
+            BuildIdxTiles = 0;
         }
         
 
@@ -34,14 +41,29 @@ namespace NanoGames.Games.Cluster
             IGraphics g = observer.Output.Graphics;
             Vector obs = observer.Position;
             
-            foreach (Tile tile in VoronoiTiles)
+            foreach (Tile tile in Tiles)
             {
                 tile.Draw(observer);
             }          
         }
 
 
-        private void getVoronoipoints()
+        public bool Build()
+        {
+            Vector centerpoint = CenterPoints[BuildIdxTiles];
+            buildOneTile(centerpoint);
+            BuildIdxTiles++;
+
+            if (BuildIdxTiles == CenterPoints.Count)
+            {
+                // all tiles of this planet have been build
+                return true;
+            }
+
+            return false;
+        }
+
+        private void getCenterPoints()
         {
             int n = (int)(Radius * Radius * Math.PI * Constants.Planet.VoronoiDensity);
 
@@ -52,71 +74,37 @@ namespace NanoGames.Games.Cluster
 
                 Vector p = new Vector(Math.Cos(angle), Math.Sin(angle)) * rad;
 
-                VoronoiPoints.Add(p);
+                CenterPoints.Add(p);
             }
 
 
-            VoronoiPoints = VoronoiPoints.OrderBy(x => x.SquaredLength).ToList();
+            CenterPoints = CenterPoints.OrderBy(x => x.SquaredLength).ToList();
         }
-        
-        private void addTiles()
+       
+        private void getColors()
         {
-            getVoronoipoints();
-            getAllTiles();
-            addColors();
-        }
+            Color c1 = new Color(1.0, 1.0, Functions.NextDoubleBtw(Random, 0.0, 0.4));
+            Color c2 = new Color(1.0, 0, 0.0);
 
-        private void addColors()
-        {
-            int n = VoronoiTiles.Count;
-            
-            var c1 = new Color(1.0, 1.0, Functions.NextDoubleBtw(Random, 0.0, 0.4));
-            var c2 = new Color(1.0, 0, 0.0);
-
-            var colors = Functions.ColorGradient(c1, c2, n); 
-
-            int idx = 0;
-            foreach (Tile tile in VoronoiTiles)
-            {
-                tile.Color = colors[idx];
-                idx++;
-            }
+            tileColors = Functions.ColorGradient(c1, c2, CenterPoints.Count); 
         }
 
-        private void getAllTiles()
+        private void buildOneTile(Vector thisCenterPoint)
         {
-            for (int i = 0; i < VoronoiPoints.Count; i++)
-            {
-                addOneTile(i);
-            }
-        }
-
-        private void addOneTile(int idx_thisCenterPoint)
-        {
-            var thisCenterPoint = VoronoiPoints[idx_thisCenterPoint];
-
-            // sort all centerPoints by their distance to thisCenterPoint
-            // var distancesSquared = VoronoiPoints.Select(x => (x - thisCenterPoint).Length).ToList();
-            // var sortedCenterPoints = VoronoiPoints.Zip(distancesSquared, (x, y) => (x: x, y: y)).OrderBy(t => t.y).Select(t => t.x).ToList();
-
             // find all midLines. Midlines have the form midline = m + k * d. k is a scalar.
-            // here this center point ius stil in the list. not needed
-            var m = VoronoiPoints.Select(x => 0.5 * (x + thisCenterPoint)).ToList();
+            // here thisCenterPoint is still in the list. Not needed
+            var m = CenterPoints.Select(x => 0.5 * (x + thisCenterPoint)).ToList();
             var d = m.Select(x => (x - thisCenterPoint).RotatedLeft).ToList();
             var midlines = m.Zip(d, (a, b) => (m: a, d: b)).ToList();
             
-            // find all intersections od midlines.
-            var counter = 1;
-            var idx1 = 0;
-            var c2 = 0;
-            var length = VoronoiPoints.Count;
+            // find all intersections of all midlines.
+            int idx1 = 0;
+            int length = CenterPoints.Count;
             List<Vector> intersections = new List<Vector> { };
             foreach (var t in midlines)
             {
-                for (int idx2 = counter; idx2 < length; idx2++)
+                for (int idx2 = idx1+1; idx2 < length; idx2++)
                 {
-                    c2++;
-
                     Vector m1 = t.m;
                     Vector m2 = midlines[idx2].m;
                     Vector d1 = t.d;
@@ -138,11 +126,11 @@ namespace NanoGames.Games.Cluster
                         intersections.Add(intersection);
                     }
                 }
-                idx1++;
-                counter++;
-            }
 
-            // get intersecitons with radius of planet
+                idx1++;
+            }
+            
+            // get intersections with edge of planet
             foreach (var midline in midlines)
             {
                 double dx = midline.d.X;
@@ -170,14 +158,14 @@ namespace NanoGames.Games.Cluster
                 
             }
             
-            // take only valid intersection for tile
+            // take only valid intersection for tile. this is the main problem. n**3 actions ....
             List<Vector> validIntersections = new List<Vector> { };
             foreach (Vector intersection in intersections)
             {
                 var distToCP = (intersection - thisCenterPoint).SquaredLength;
                 var isvalid = true;
 
-                foreach (Vector point in VoronoiPoints)
+                foreach (Vector point in CenterPoints)
                 {
                     if (point == thisCenterPoint)
                     {
@@ -198,18 +186,19 @@ namespace NanoGames.Games.Cluster
                     validIntersections.Add(intersection);
                 }
             }
-
+            
             // sort valid intersections
             var angles = validIntersections.Select(x => Math.Atan2(x.Y - thisCenterPoint.Y, x.X - thisCenterPoint.X));
             var sortedValidIntersections = validIntersections.Zip(angles, (x, y) => (x: x, y: y)).OrderBy(t => t.y).Select(t => t.x).ToList();
 
+            // add full tile to list
             if (validIntersections.Count > 2)
             {
-                VoronoiTiles.Add(new Tile(Position + thisCenterPoint, 
-                    sortedValidIntersections.Select(x => Position + x + new Vector(0*Random.NextDouble(), 0)).ToList(), 
-                    intersections.Select(x => Position + x).ToList()));
+                Tiles.Add(new Tile(Position + thisCenterPoint, 
+                    sortedValidIntersections.Select(x => Position + x).ToList(), 
+                    tileColors[BuildIdxTiles]));
             }
-
+            
         }
 
     }
