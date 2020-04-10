@@ -11,7 +11,6 @@ namespace NanoGames.Games.Cluster
 {
     internal class Explosion
     {
-
         public Vector Position;
         private int maxtime;
         private int number;

@@ -202,14 +202,14 @@ namespace NanoGames.Games.Cluster
             if (Input.Up.WasActivated)
             {
                 Magnification *= 2;
-                Magnification = Math.Min(Magnification, 16);
+                Magnification = Math.Min(Magnification, 1);
                 Magnification = Math.Max(Magnification, MagnificationMin);
             }
             
             if (Input.Down.WasActivated)
             {
                 Magnification /= 2;
-                Magnification = Math.Min(Magnification, 16);
+                Magnification = Math.Min(Magnification, 1);
                 Magnification = Math.Max(Magnification, MagnificationMin);
             }
         }

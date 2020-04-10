@@ -69,7 +69,7 @@ namespace NanoGames.Games.Cluster
             {
                 double m = observer.Magnification;
                 Vector obs = observer.Position;
-                Color = ColorList[Time - StartTime];
+                Color = 1.5 * Math.Pow(m, 0.4) * ColorList[Time - StartTime];
                 IGraphics g = observer.Output.Graphics;
 
                 Vector p = Position.Translated(-obs).Scaled(m).ToOrigin();

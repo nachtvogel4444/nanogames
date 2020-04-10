@@ -19,7 +19,7 @@ namespace NanoGames.Games.Cluster
 
             foreach (ClusterPlayer player in Players)
             {
-                player.MagnificationMin = Math.Min(160.0 / world.XMax, 100.0 / world.YMax);
+                player.MagnificationMin = 0.75 * Math.Min(160.0 / world.XMax, 100.0 / world.YMax);
                 player.Birth();
             }
             
@@ -30,12 +30,8 @@ namespace NanoGames.Games.Cluster
             switch (gameState)
             {
                 case "BuildingWorld":
-
-                    bool worldIsBuild = world.Build();
-                    //bool worldIsBuild = false;
-                    //bool d = world.Build();
-
-                    if (worldIsBuild)
+                    
+                    if (world.Build())
                     {
                         gameState = "GameRunning";
                     }

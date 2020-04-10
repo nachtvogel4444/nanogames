@@ -34,13 +34,7 @@ namespace NanoGames.Games.Cluster
         
 
         public void Draw(ClusterPlayer observer)
-        {
-            double m = observer.Magnification;
-            double r = Radius * m;
-
-            IGraphics g = observer.Output.Graphics;
-            Vector obs = observer.Position;
-            
+        {            
             foreach (Tile tile in Tiles)
             {
                 tile.Draw(observer);
@@ -50,14 +44,18 @@ namespace NanoGames.Games.Cluster
 
         public bool Build()
         {
-            Vector centerpoint = CenterPoints[BuildIdxTiles];
-            buildOneTile(centerpoint);
-            BuildIdxTiles++;
-
-            if (BuildIdxTiles == CenterPoints.Count)
+            for (int idx = 0; idx < Constants.Planet.TilesNum; idx++)
             {
-                // all tiles of this planet have been build
-                return true;
+                Vector centerpoint = CenterPoints[BuildIdxTiles];
+
+                buildOneTile(centerpoint);
+                BuildIdxTiles++;
+
+                if (BuildIdxTiles == CenterPoints.Count)
+                {
+                    // all tiles of this planet have been build
+                    return true;
+                }
             }
 
             return false;

@@ -19,12 +19,15 @@ namespace NanoGames.Games.Cluster
 
             public const double DensityOfStars = 0.00005;
 
-            public const int NumberOfPlanets = 5;
-            public const double MaxR = 200;
-            public const double C = 0.6;
+            public const int NumberOfPlanets = 15;
+            public const double MaxR = 150;
+            public const double BaseRad = 18;
+            public const double C = 0.5;
             public const double MinD = 20;
             
             public const double SigmaY = SigmaX * SigmaRatio;
+
+            public const int BuildDuration = 60 * 3;
         }
 
         public static class LBeam
@@ -38,6 +41,7 @@ namespace NanoGames.Games.Cluster
         {
             public const double VoronoiDensity = 0.003;
             public const double epsilon = 0.001;
+            public const int TilesNum = 2;
         }
     }
 }

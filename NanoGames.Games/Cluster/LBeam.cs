@@ -48,7 +48,7 @@ namespace NanoGames.Games.Cluster
             foreach (ClusterPlayer player in world.Players)
             {
                 if ((player.Position - Position).LengthBBox < player.Size &&
-                    (player.Position - Position).Length < player.Size && false)
+                    (player.Position - Position).Length < player.Size)
                 {
                     world.Explosions.Add(new Explosion(Position, world.Random));
                     ReadyToDelete = true;
@@ -62,7 +62,7 @@ namespace NanoGames.Games.Cluster
         {
             double m = observer.Magnification;
             Vector obs = observer.Position;
-            Color c = Colors.Blue;
+            Color c = 1.5 * Math.Pow(m, 0.4) * Colors.Blue;
             IGraphics g = observer.Output.Graphics;
             
             Vector p1 = Position.Translated(-obs).Scaled(m).ToOrigin();

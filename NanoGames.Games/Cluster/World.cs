@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 
 namespace NanoGames.Games.Cluster
@@ -13,13 +14,14 @@ namespace NanoGames.Games.Cluster
         public List<Planet> Planets = new List<Planet> { };
         public List<LBeam> LBeams = new List<LBeam> { };
         public List<Explosion> Explosions = new List<Explosion> { };
+        public List<int> StartFrameBuild = new List<int> { };
         public IReadOnlyList<ClusterPlayer> Players;
 
         public double XMax;
         public double YMax;
         public Random Random;
         
-        public int BuildIdxPlanets;
+        public int NumberOfBuildPlanets;
 
 
         public World(IReadOnlyList<ClusterPlayer> players, Random random)
@@ -31,7 +33,7 @@ namespace NanoGames.Games.Cluster
             addStars();
             positionPlayers();
 
-            BuildIdxPlanets = 0;
+            NumberOfBuildPlanets = 0;
         }
         
 
@@ -156,14 +158,37 @@ namespace NanoGames.Games.Cluster
 
         public bool Build()
         {
-            Planet planet = Planets[BuildIdxPlanets];
+            int idx = 0;
+            foreach (Planet planet in Planets)
+            {
+                if (StartFrameBuild[idx] == 0)
+                {
+                    if (planet.Build())
+                    {
+                        StartFrameBuild[idx] = -1;
+                        NumberOfBuildPlanets++;
+                    }
+                }
+
+                else
+                {
+                    StartFrameBuild[idx]--;
+                }
+
+                idx++;
+            }
+
+
+            /*
+            // Planet planet = Planets[BuildIdxPlanets];
 
             if (planet.Build())
             {
-                BuildIdxPlanets++;
+                NumberOfBuildPlanets++;
             }
+            */
 
-            if (BuildIdxPlanets == Planets.Count)
+            if (NumberOfBuildPlanets == Planets.Count)
             {
                 // all planets have been build
                 return true;
@@ -192,7 +217,7 @@ namespace NanoGames.Games.Cluster
 
                     p = new Vector(Functions.NextDoubleNormal(Random, 0, Constants.World.SigmaX),
                         Functions.NextDoubleNormal(Random, 0, Constants.World.SigmaY));
-                    r = Constants.World.MaxR * Math.Pow(i, -Constants.World.C);
+                    r = Constants.World.MaxR * Math.Pow(i, -Constants.World.C) + Constants.World.BaseRad;
 
                     foreach (Planet planet in Planets)
                     {
@@ -218,6 +243,7 @@ namespace NanoGames.Games.Cluster
                 }
 
                 Planets.Add(new Planet(p, r, Random));
+                StartFrameBuild.Add((int)(Constants.World.BuildDuration * Random.NextDouble()));
 
                 xmax = Math.Max(xmax, Math.Abs(p.X) + r);
                 ymax = Math.Max(ymax, Math.Abs(p.Y) + r);
@@ -226,6 +252,9 @@ namespace NanoGames.Games.Cluster
             // update the size of world 
             XMax = 1.1 * xmax;
             YMax = 1.1 * ymax;
+            
+            // int min = StartFrameBuild.Min();
+            StartFrameBuild = StartFrameBuild.Select(idx => idx - StartFrameBuild.Min()).ToList();
         }
         
         private void addStars()
